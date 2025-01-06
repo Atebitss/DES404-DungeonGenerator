@@ -1,19 +1,26 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.HID;
 
 public class PlayerController : MonoBehaviour
 {
-    //~~~~~~player~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //~~~~~~misc~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     [SerializeField] private Rigidbody playerRigid;
     [SerializeField] private Camera playerCamera;
+    
+    private DbugDisplayController DDC;
+    public void SetDDC(DbugDisplayController DDC) { this.DDC = DDC; }
 
-    void FixedUpdate()
+    private void FixedUpdate()
     {
-        playerRigid.velocity = (movement * movementSpeed);
+        if (DDC != null) { DDC.playerPosition = playerRigid.position; }
+        UpdatePlayerMovement();
+        Debug.DrawRay(transform.position, new Vector3(transform.position.x * interactDistance, transform.position.y, transform.position.z), Color.red);
     }
-    //~~~~~player~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //~~~~~misc~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 
@@ -64,33 +71,39 @@ public class PlayerController : MonoBehaviour
 
     //~~~~~movement~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     private float movementSpeed = 5f;
-    private Vector3 movement;
+    private Vector3 velocity = Vector3.zero;
+    private Vector3 movement = Vector3.zero;
 
+    public void OnMove(InputAction.CallbackContext ctx)
+    {
+        Vector2 input = ctx.ReadValue<Vector2>();
+        movement = new Vector3(input.x, 0, input.y);
+    }
 
-    public void OnW(InputAction.CallbackContext ctx)
+    private void UpdatePlayerMovement()
     {
-        //W
-        Debug.Log("W");
-        if (ctx.performed){movement += new Vector3(0, 0, 1);}
-        if(ctx.canceled){movement += new Vector3(0, 0, -1);}
-    }
-    public void OnS(InputAction.CallbackContext ctx)
-    {
-        //S
-        if (ctx.performed){movement += new Vector3(0, 0, -1);}
-        if (ctx.canceled){movement += new Vector3(0, 0, 1);}
-    }
-    public void OnA(InputAction.CallbackContext ctx)
-    {
-        //A
-        if (ctx.performed){movement += new Vector3(-1, 0, 0);}
-        if (ctx.canceled){movement += new Vector3(1, 0, 0);}
-    }
-    public void OnD(InputAction.CallbackContext ctx)
-    {
-        //D
-        if (ctx.performed){movement += new Vector3(1, 0, 0);}
-        if (ctx.canceled){movement += new Vector3(-1, 0, 0);}
+        velocity = (movement * movementSpeed);
+        playerRigid.AddForce(velocity - playerRigid.velocity, ForceMode.VelocityChange);
+        if (DDC != null) { DDC.playerVelocity = velocity; }
     }
     //~~~~~movement~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+
+    //~~~~~interaction~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    [SerializeField] private LayerMask interactionMask;
+    private float interactDistance = 100f;
+
+    public void OnInteract(InputAction.CallbackContext ctx)
+    {
+        //E
+        Debug.Log("interact");
+        RaycastHit hit;
+        /*if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward), out hit, interactDistance, interactionMask))
+        { 
+            Debug.DrawRay(transform.position, hit.transform.position, Color.red);
+        }*/
+    }
+    //~~~~~interaction~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 }

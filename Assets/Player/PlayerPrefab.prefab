@@ -167,7 +167,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 7362370709811634931}
         m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
-        m_MethodName: OnW
+        m_MethodName: OnNorth
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -183,7 +183,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 7362370709811634931}
         m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
-        m_MethodName: OnS
+        m_MethodName: OnSouth
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -199,7 +199,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 7362370709811634931}
         m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
-        m_MethodName: OnA
+        m_MethodName: OnWest
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -215,7 +215,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 7362370709811634931}
         m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
-        m_MethodName: OnD
+        m_MethodName: OnEast
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -227,9 +227,41 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: cca3742c-21d2-4292-ad6f-3dc2007bfbea
     m_ActionName: Movement/East[/Keyboard/e]
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 7362370709811634931}
+        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
+        m_MethodName: OnInteract
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 0872d0a7-2a12-432f-86af-c73c1da8df29
+    m_ActionName: Normal/Interact[/Keyboard/e]
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 7362370709811634931}
+        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
+        m_MethodName: OnMove
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 5c7c0f15-ca34-4a1b-a2e2-72a936c2e0a6
+    m_ActionName: Normal/Move[/Keyboard/s,/Keyboard/w,/Keyboard/d,/Keyboard/a]
   m_NeverAutoSwitchControlSchemes: 1
   m_DefaultControlScheme: 
-  m_DefaultActionMap: Movement
+  m_DefaultActionMap: Normal
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
 --- !u!114 &7362370709811634931
@@ -246,6 +278,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerRigid: {fileID: 2105931423671842942}
   playerCamera: {fileID: 5022982567547155934}
+  CurrentHealthPoints: 10
+  MaxHealthPoints: 10
+  CurrentStaminaPoints: 10
+  MaxStaminaPoints: 10
+  CurrentMagicPoints: 10
+  MaxMagicPoints: 10
+  StrengthPoints: 1
+  DexterityPoints: 1
+  IntelligencePoints: 1
+  WisdomPoints: 1
+  interactionMask:
+    serializedVersion: 2
+    m_Bits: 8
 --- !u!1 &801474497619437302
 GameObject:
   m_ObjectHideFlags: 0
