@@ -1,9 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.HID;
+using UnityEngine.Windows;
 
 public class PlayerController : MonoBehaviour
 {
@@ -18,9 +20,10 @@ public class PlayerController : MonoBehaviour
     {
         if (DDC != null) { DDC.playerPosition = playerRigid.position; }
         UpdatePlayerMovement();
-        Debug.DrawRay(transform.position, new Vector3(transform.position.x * interactDistance, transform.position.y, transform.position.z), Color.red);
     }
     //~~~~~misc~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
 
 
 
@@ -69,10 +72,14 @@ public class PlayerController : MonoBehaviour
 
 
 
+
+
     //~~~~~movement~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    private float movementSpeed = 5f;
+    [SerializeField] private float movementSpeed = 5f;
+    private float lookSensitivity = 0.1f; //for some reason [SerializeField] sets sensitivity to 1 on start
     private Vector3 velocity = Vector3.zero;
     private Vector3 movement = Vector3.zero;
+    private float xRot = 0f;
 
     public void OnMove(InputAction.CallbackContext ctx)
     {
@@ -80,9 +87,30 @@ public class PlayerController : MonoBehaviour
         movement = new Vector3(input.x, 0, input.y);
     }
 
+    public void OnLook(InputAction.CallbackContext ctx)
+    {
+        //Debug.Log(ctx.ReadValue<Vector2>());
+        float lookX = ctx.ReadValue<Vector2>().x;
+        float lookY = ctx.ReadValue<Vector2>().y;
+
+        xRot -= (lookY * lookSensitivity);
+        //Debug.Log(xRot);
+        xRot = Mathf.Clamp(xRot, -90f, 90f);
+        playerCamera.transform.localRotation = Quaternion.Euler(xRot, 0f, 0f);
+
+        playerRigid.transform.Rotate(Vector3.up * (lookX * lookSensitivity));
+    }
+
+    public void OnJump(InputAction.CallbackContext ctx)
+    {
+        Debug.Log("jump");
+    }
+
+
+
     private void UpdatePlayerMovement()
     {
-        velocity = (movement * movementSpeed);
+        velocity = ((playerRigid.transform.right * movement.x) + (playerRigid.transform.forward * movement.z) * movementSpeed);
         playerRigid.AddForce(velocity - playerRigid.velocity, ForceMode.VelocityChange);
         if (DDC != null) { DDC.playerVelocity = velocity; }
     }
@@ -91,19 +119,36 @@ public class PlayerController : MonoBehaviour
 
 
 
+
     //~~~~~interaction~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     [SerializeField] private LayerMask interactionMask;
-    private float interactDistance = 100f;
+    private float interactDistance = 10f, interactCooldown = .5f;
+    private bool interacting = false;
 
     public void OnInteract(InputAction.CallbackContext ctx)
     {
         //E
-        Debug.Log("interact");
-        RaycastHit hit;
-        /*if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward), out hit, interactDistance, interactionMask))
-        { 
-            Debug.DrawRay(transform.position, hit.transform.position, Color.red);
-        }*/
+        if (!interacting)
+        {
+            Debug.Log("interact");
+
+            interacting = true;
+            RaycastHit hit;
+
+            Debug.DrawRay(transform.position, new Vector3(transform.position.x, transform.position.y, (transform.position.z + interactDistance)), Color.red, 100f);
+            if (Physics.Raycast(transform.position, new Vector3(transform.position.x, transform.position.y, (transform.position.z + interactDistance)), out hit, interactDistance, interactionMask))
+            {
+                Debug.Log("interact hit " + hit.collider.name);
+            }
+
+            StartCoroutine(ResetInteraction());
+        }
+    }
+    IEnumerator ResetInteraction()
+    {
+        yield return new WaitForSeconds(interactCooldown);
+        Debug.Log("interact reset");
+        interacting = false;
     }
     //~~~~~interaction~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 }
