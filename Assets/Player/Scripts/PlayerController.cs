@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -12,7 +13,8 @@ public class PlayerController : MonoBehaviour
     //~~~~~~misc~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     [SerializeField] private Rigidbody playerRigid;
     [SerializeField] private Camera playerCamera;
-    
+    [SerializeField] private TMP_Text interactionPromptText;
+
     private DbugDisplayController DDC;
     public void SetDDC(DbugDisplayController DDC) { this.DDC = DDC; }
 
@@ -20,6 +22,7 @@ public class PlayerController : MonoBehaviour
     {
         if (DDC != null) { DDC.playerPosition = playerRigid.position; }
         UpdatePlayerMovement();
+        UpdateInteractionPrompt();
     }
     //~~~~~misc~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -83,26 +86,28 @@ public class PlayerController : MonoBehaviour
 
     public void OnMove(InputAction.CallbackContext ctx)
     {
+        //W/A/S/D / Right Thumbstick
         Vector2 input = ctx.ReadValue<Vector2>();
         movement = new Vector3(input.x, 0, input.y);
     }
 
     public void OnLook(InputAction.CallbackContext ctx)
     {
+        //Mouse / Left Thumbstick
         //Debug.Log(ctx.ReadValue<Vector2>());
         float lookX = ctx.ReadValue<Vector2>().x;
         float lookY = ctx.ReadValue<Vector2>().y;
 
         xRot -= (lookY * lookSensitivity);
         //Debug.Log(xRot);
-        xRot = Mathf.Clamp(xRot, -90f, 90f);
+        xRot = Mathf.Clamp(xRot, -70f, 70f);
         playerCamera.transform.localRotation = Quaternion.Euler(xRot, 0f, 0f);
-
         playerRigid.transform.Rotate(Vector3.up * (lookX * lookSensitivity));
     }
 
     public void OnJump(InputAction.CallbackContext ctx)
     {
+        //Space / Button South
         Debug.Log("jump");
     }
 
@@ -110,7 +115,7 @@ public class PlayerController : MonoBehaviour
 
     private void UpdatePlayerMovement()
     {
-        velocity = ((playerRigid.transform.right * movement.x) + (playerRigid.transform.forward * movement.z) * movementSpeed);
+        velocity = (((playerRigid.transform.right * movement.x) * movementSpeed) + ((playerRigid.transform.forward * movement.z) * movementSpeed));
         playerRigid.AddForce(velocity - playerRigid.velocity, ForceMode.VelocityChange);
         if (DDC != null) { DDC.playerVelocity = velocity; }
     }
@@ -122,23 +127,30 @@ public class PlayerController : MonoBehaviour
 
     //~~~~~interaction~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     [SerializeField] private LayerMask interactionMask;
-    private float interactDistance = 10f, interactCooldown = .5f;
+    private float interactDistance = 2.5f, interactCooldown = .25f;
     private bool interacting = false;
 
     public void OnInteract(InputAction.CallbackContext ctx)
     {
-        //E
+        //E / Button West
         if (!interacting)
         {
-            Debug.Log("interact");
+            //Debug.Log("interact");
 
             interacting = true;
             RaycastHit hit;
 
-            Debug.DrawRay(transform.position, new Vector3(transform.position.x, transform.position.y, (transform.position.z + interactDistance)), Color.red, 100f);
-            if (Physics.Raycast(transform.position, new Vector3(transform.position.x, transform.position.y, (transform.position.z + interactDistance)), out hit, interactDistance, interactionMask))
+            if (Physics.Raycast(playerCamera.transform.position, (playerCamera.transform.forward * interactDistance), out hit, interactDistance, interactionMask))
             {
-                Debug.Log("interact hit " + hit.collider.name);
+                //Debug.Log("interact hit " + hit.collider.name);
+                //Debug.Log("tag " + hit.collider.tag);
+                switch (hit.collider.tag)
+                {
+                    case "Door":
+                        //Debug.Log("door, " + hit.collider.GetComponent<AbstractDoorScript>());
+                        hit.collider.GetComponent<AbstractDoorScript>().InteractWithDoor();
+                        break;
+                }
             }
 
             StartCoroutine(ResetInteraction());
@@ -147,8 +159,21 @@ public class PlayerController : MonoBehaviour
     IEnumerator ResetInteraction()
     {
         yield return new WaitForSeconds(interactCooldown);
-        Debug.Log("interact reset");
+        //Debug.Log("interact reset");
         interacting = false;
+    }
+
+
+
+    private void UpdateInteractionPrompt()
+    {
+        RaycastHit hit;
+        Debug.DrawRay(playerCamera.transform.position, (playerCamera.transform.forward * interactDistance), Color.red, 1f);
+        if (Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward, out hit, interactDistance, interactionMask))
+        {
+            interactionPromptText.text = "'E' to interact with " + hit.collider.tag;
+        }
+        else { interactionPromptText.text = ""; }
     }
     //~~~~~interaction~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 }

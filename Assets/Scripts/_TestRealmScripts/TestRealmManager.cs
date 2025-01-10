@@ -15,7 +15,7 @@ public class TestRealmManager : MonoBehaviour
 
     void Awake()
     {
-        DDC = GameObject.Find("DbugDisplayHUD").GetComponent<DbugDisplayController>();
+        if (GameObject.Find("DbugDisplayHUD")) { DDC = GameObject.Find("DbugDisplayHUD").GetComponent<DbugDisplayController>(); }
         if (!devMode) { DDC.SwitchVisible(); }
 
         player = Instantiate(playerPrefab, new Vector3(0, 0, 0), Quaternion.identity);
@@ -23,5 +23,8 @@ public class TestRealmManager : MonoBehaviour
         PC = player.GetComponent<PlayerController>();
 
         if (devMode) { PC.SetDDC(DDC); }
+
+
+        Instantiate(doorPrefab, new Vector3(0, 0, 5), Quaternion.identity);
     }
 }

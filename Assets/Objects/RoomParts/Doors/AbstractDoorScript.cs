@@ -32,6 +32,7 @@ public abstract class AbstractDoorScript : MonoBehaviour
     //~~~~~state~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     [SerializeField] private bool isOpen = false;
     [SerializeField] private bool isLocked = false;
+    [SerializeField] private Animator a;
 
     public void LockDoor() { isLocked = true; UpdateDoorMaterial(); }
     public void UnlockDoor() { isLocked = false; UpdateDoorMaterial(); }
@@ -61,18 +62,40 @@ public abstract class AbstractDoorScript : MonoBehaviour
         else if (!isLocked && isOpen)
         {
             //closing door
-            transform.Rotate(0, 90, 0);
-            //play(doorClosingSound)
-            UpdateDoorMaterial();
+            a.SetBool("closing", true); //run close animation
+            isOpen = false; //update state
+            //play(doorClosingSound) //play closing audio
+            UpdateDoorMaterial(); //update visual
+            ResetDoorStates(); //reset animation state
         }
         else if (!isLocked && !isOpen)
         {
             //opening door
-            transform.Rotate(0, 90, 0);
+            a.SetBool("opening", true);
+            isOpen = true;
             //play(doorClosingSound)
             UpdateDoorMaterial();
+            ResetDoorStates();
         }
 
+    }
+    private void ResetDoorStates()
+    {
+        AnimationClip[] clips = a.runtimeAnimatorController.animationClips;
+        string clipName = "";
+        float clipLength = 0f;
+
+        if (!isOpen) { clipName = "Door90AnticlockClose"; }
+        else if (isOpen) { clipName = "Door90AnticlockOpen"; }
+
+        foreach (AnimationClip clip in clips) { if (clip.name == clipName) { clipLength = clip.length; } }
+
+        Invoke("ResetAnimationBooleans", clipLength);
+    }
+    private void ResetAnimationBooleans()
+    {
+        a.SetBool("closing", false);
+        a.SetBool("opening", false);
     }
     //~~~~~state~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
