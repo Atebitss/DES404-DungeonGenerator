@@ -11,12 +11,12 @@ public class DungeonGeneration : MonoBehaviour
     private PathGeneration PG;
 
     //generation data
-    private Vector2 mapBoundsMax, mapBoundsMin;
+    private Vector2 mapBoundsMax, mapBoundsMin; //dungeon area literal positions
     private int treasureRoomsMax, treasureRoomsMin;
     private int specialRoomsMax, specialRoomsMin;
 
     //map creation
-    private int boundsX, boundsZ; //map generation
+    private int boundsX, boundsZ; //max dungeon area
     private int totalSpace, numOfRooms, posNumOfRooms, curRoomsSpawned = 0, scale = 2; //room generation
     private int largeRoomNum, mediumRoomNum, smallRoomNum; //number of room sizes
 
@@ -27,23 +27,27 @@ public class DungeonGeneration : MonoBehaviour
     private int bossRoomID, entryRoomID; //important room ids
     private int[] treasureRoomIDs, specialRoomIDs; //unique room ids
     private int numOfTreasureRooms, numOfSpecialRooms; //number of unique rooms
-    Vector2 boundsCenter, bossRoomCenter, entryRoomCenter;
-    Vector2[] roomCenters, treasureRoomCenters, specialRoomCenters;
-    private Vector2[] roomPositions; //bottom left corners of rooms
+    Vector2 boundsCenter, bossRoomCenter, entryRoomCenter; //unique centers
+    Vector2[] roomCenters, treasureRoomCenters, specialRoomCenters; //common centers
+    private Vector2[] roomPositions; //bottom left corners of rooms literal positions
 
     //room info
     [Header("Room Objects")]
-    [SerializeField] private GameObject basicRoom, dbugTile;
-    private GameObject[] roomObjects;
-    private int[] roomPosX, roomPosZ, roomBoundsX, roomBoundsZ;
-    private string[] roomStates, roomScales;
+    [SerializeField] private GameObject basicRoom, dbugTile; //prefabs
+    private GameObject[] roomObjects; //spawned objects
+    private int[] roomPosX, roomPosZ, roomBoundsX, roomBoundsZ; //room tile positions & bounds
+    private string[] roomStates, roomScales; //types & sizes of rooms
 
     //dungeon types
-    private string dungeonType;
+    private string dungeonType; //form the dungeon will take
     private Dictionary<string, Dictionary<int, List<int>>> dungeonTypes = new Dictionary<string, Dictionary<int, List<int>>>();
+    //dictionary containing;
+    //               dungeon form string, a second dictionary containing;
+    //                                                            room scale & a list containing;
+    //                                                                                    valid room IDs
 
     //general room types
-    private Dictionary<string, int> largeRoomTypes = new Dictionary<string, int>();
+    private Dictionary<string, int> largeRoomTypes = new Dictionary<string, int>(); //dictionary containing room name & location focus
     private Dictionary<string, int> mediumRoomTypes = new Dictionary<string, int>(); 
     private string[] smallRoomTypes = { "Crypts", "Shrine", "PortalNook", "Storage", "Lavatory", "Pantry", "GuardPost", "Cell", "Alcove", "TrapRoom", "SpiderDen", "RubbleRoom", "FungusNook", "IllusionRoom", "SecretRoom" };
     private Dictionary<string, List<int>> parentRoomTypes = new Dictionary<string, List<int>>();

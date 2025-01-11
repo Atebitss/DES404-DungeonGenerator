@@ -36,13 +36,13 @@ public class MapManager : MonoBehaviour
     private Renderer[,] gridDbugRenderer;
 
     //map creation
-    private int boundsX, boundsZ; //map generation
-    private int totalSpace; //room generation
+    private int boundsX, boundsZ; //map width & length
+    private int totalSpace; //map area
     public int GetTotalSpace() { return totalSpace; }
 
     //map grid
     private string[,] gridStates; //what fills the grid square, if anything
-    private Vector2[,] gridPositions; //literal position
+    private Vector2[,] gridPositions; //literal positions
 
 
 
@@ -79,6 +79,7 @@ public class MapManager : MonoBehaviour
     {
         Debug.Log("MM Awake");
 
+        //set up references
         DG = this.gameObject.GetComponent<DungeonGeneration>();
         PG = this.gameObject.GetComponent<PathGeneration>();
     }
@@ -87,6 +88,7 @@ public class MapManager : MonoBehaviour
     {
         Debug.Log("MM, Regenerating Dungeon");
 
+        //prime & begin generation
         ResetMap();
         BeginMapGeneration(); 
     }
@@ -98,12 +100,14 @@ public class MapManager : MonoBehaviour
         Debug.Log("New dungeon generation: " + genAttempts);
         genAttempts++;
 
+        //generate dungeon area & fill space
         DefineBounds();
         DefineGrid();
 
         //update camera position based on map size
         defaultCamera.transform.position = new Vector3((boundsX / 2), (((boundsX / 2) + (boundsZ / 2)) * 0.8f), (boundsZ / 2));
 
+        //begin dungeon generation within bounds
         if(genAttempts > 1) { DG.ResetDungeon(); }
         DG.BeginDungeonGeneration(treasureRoomsMax, treasureRoomsMin, specialRoomsMax, specialRoomsMin, boundsX, boundsZ, totalSpace, gridPositions);
     }
@@ -112,7 +116,7 @@ public class MapManager : MonoBehaviour
     {
         Debug.Log("MM, Defining Dungeon Bounds");
 
-        //define bounds
+        //define dungeon area
         boundsZ = Random.Range(mapBoundsMin, mapBoundsMax);   //z extent
         boundsX = (int)(boundsZ * 1.25f);   //x extent
         totalSpace = (boundsX * boundsZ); //interior mass
@@ -124,7 +128,7 @@ public class MapManager : MonoBehaviour
     {
         Debug.Log("MM, Defining Dungeon Grid");
 
-        //define grid & debug grid
+        //fill dungeon area with grid
         gridStates = new string[boundsX, boundsZ];      //states of grid positions
         gridPositions = new Vector2[boundsX, boundsZ];  //in world grid positions
         gridDbug = new GameObject[boundsX, boundsZ];    //game object array for debug grid
@@ -141,18 +145,18 @@ public class MapManager : MonoBehaviour
             {
                 //Debug.Log("x: " + xPos + ", z: " + zPos);
                 //Debug.Log("creating tile " + (pos + 1) + " at x:" + tileXOffset * xPos + ", z:" + tileZOffset * ZPos);
-                gridPositions[xPos, zPos] = new Vector2(((testTile.transform.localScale.x + 0.1f) * xPos), ((testTile.transform.localScale.z + 0.1f) * zPos));
-                gridStates[xPos, zPos] = "Empty";
+                gridPositions[xPos, zPos] = new Vector2(((testTile.transform.localScale.x + 0.1f) * xPos), ((testTile.transform.localScale.z + 0.1f) * zPos)); //spawn new grid tile
+                gridStates[xPos, zPos] = "Empty"; //update tile state
                 //Debug.Log("grid pos: " + gridPositions[xPos, zPos]);
 
                 //debug
-                gridDbug[xPos, zPos] = Instantiate(testTile, new Vector3(gridPositions[xPos, zPos].x, 0, gridPositions[xPos, zPos].y), Quaternion.identity);
+                gridDbug[xPos, zPos] = Instantiate(testTile, new Vector3(gridPositions[xPos, zPos].x, 0, gridPositions[xPos, zPos].y), Quaternion.identity); //spawn new debug grid tile
                 gridDbug[xPos, zPos].name = "DbugTile" + ConvertPosToPosID(new Vector2(xPos, zPos)); //name debug tiles with relevant position ID
-                gridDbug[xPos, zPos].transform.parent = dbugParent.transform;
-                gridDbugText[xPos, zPos] = gridDbug[xPos, zPos].transform.GetChild(0).GetChild(0).GetComponent<TMP_Text>();
+                gridDbug[xPos, zPos].transform.parent = dbugParent.transform; //add tile to parent
+                gridDbugText[xPos, zPos] = gridDbug[xPos, zPos].transform.GetChild(0).GetChild(0).GetComponent<TMP_Text>(); //set tile debug text
 
-                gridDbugRenderer[xPos, zPos] = gridDbug[xPos, zPos].GetComponent<Renderer>();
-                gridDbugRenderer[xPos, zPos].material = matDbugEmpty;
+                gridDbugRenderer[xPos, zPos] = gridDbug[xPos, zPos].GetComponent<Renderer>(); //set tile debug renderer
+                gridDbugRenderer[xPos, zPos].material = matDbugEmpty; //set tile debug material
             }
         }
     }
@@ -165,23 +169,23 @@ public class MapManager : MonoBehaviour
     }
 
 
-    public void UpdateDbugTileTextMoveCost(int posX, int posZ, float moveCost)
+    public void UpdateDbugTileTextMoveCost(int posX, int posZ, float moveCost) //update tile debug text with PathGeneration movement cost (for hallway pathfinding)
     {
         gridDbugText[posX, posZ].text = Regex.Replace(gridDbugText[posX, posZ].text, @"\d+$", moveCost.ToString());
     }
 
-    public void UpdateGridState(int posX, int posZ, string gridState)
+    public void UpdateGridState(int posX, int posZ, string gridState) //update tile state
     {
         gridStates[posX, posZ] = gridState;
     }
     public string GetGridState(int posX, int posZ) { /*Debug.Log(gridStates[posX, posZ]);*/ return gridStates[posX, posZ]; }
 
-    public void UpdateDbugTileTextGridState(int posX, int posZ, string gridState)
+    public void UpdateDbugTileTextGridState(int posX, int posZ, string gridState) //update tile debug text with tile state
     {
         gridDbugText[posX, posZ].text = gridState;
     }
 
-    public void UpdateDbugTileMat(int posX, int posZ, string matType)
+    public void UpdateDbugTileMat(int posX, int posZ, string matType) //update tile debug material
     {
         Material newMat = null;
 
@@ -208,7 +212,7 @@ public class MapManager : MonoBehaviour
     }
 
 
-    public void UpdateHUDDbugText(string newText)
+    public void UpdateHUDDbugText(string newText) //update dbug text with DungeonGeneration state updates
     {
         HUDDbugText.GetComponent<TMP_Text>().text = newText;
     }
