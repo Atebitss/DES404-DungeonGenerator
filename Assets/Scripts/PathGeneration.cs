@@ -114,14 +114,13 @@ public class PathGeneration : MonoBehaviour
                 //Debug.Log("checking neighbor position x:" + neighborPosX + ", y:" + neighborPosZ);
                 //Debug.Log("grid state:" + gridStates[neighborPosX, neighborPosZ]);
 
-                if (closedSet[neighborPosX, neighborPosZ]) { continue; } //if position closed, skip
                 if (neighborPosX < 0 || neighborPosX >= boundsX || neighborPosZ < 0 || neighborPosZ >= boundsZ) { continue; } //check if neighboring position is outside of area bounds
-
 
                 int moveCost = GetMoveCost(neighborPosX, neighborPosZ); //finds the appropriate moving cost for that position
                 //Debug.Log("move cost: " + moveCost);
                 if (moveCost == -1) { continue; } //if moving cost indicates a viable space
 
+                if (closedSet[neighborPosX, neighborPosZ]) { continue; } //if position closed, skip
 
                 MM.UpdateDbugTileTextMoveCost(neighborPosX, neighborPosZ, moveCost); //update checked tile debug text with new cost
 
