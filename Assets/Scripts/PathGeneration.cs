@@ -8,6 +8,10 @@ public class PathGeneration : MonoBehaviour
     private MapManager MM;
     private DungeonGeneration DG;
 
+    //debug info
+    [SerializeField] private bool dbugEnabled = false;
+    public bool isDbugEnabled() { return dbugEnabled; }
+
     //map creation
     private int boundsX, boundsZ; //map generation
     private Vector2 startPos, targetPos;
@@ -16,18 +20,18 @@ public class PathGeneration : MonoBehaviour
 
     private void Awake()
     {
-        Debug.Log("PG, Awake");
-
         //set up references
         MM = this.gameObject.GetComponent<MapManager>();
         DG = this.gameObject.GetComponent<DungeonGeneration>();
+
+        if (dbugEnabled) { MM.UpdateHUDDbugText("PG, Awake"); }
     }
 
 
 
     public void BeginPathGeneration(Vector2 startPos, Vector2 targetPos, int boundsX, int boundsZ)
     {
-        Debug.Log("PG, Begin Path Generation");
+        if (dbugEnabled) { MM.UpdateHUDDbugText("PG, Begin Path Generation"); }
 
         //update data
         this.boundsX = boundsX;
@@ -44,7 +48,7 @@ public class PathGeneration : MonoBehaviour
     private Vector2[] FindPath()
     {
         //find connections between rooms using A*
-        //Debug.Log("PG, Find Path");
+        if (dbugEnabled) { MM.UpdateHUDDbugText("PG, Find Path"); }
 
         int startPosX = (int)startPos.x; //beginning position
         int startPosZ = (int)startPos.y;
@@ -56,16 +60,12 @@ public class PathGeneration : MonoBehaviour
         Vector2[,] previousPos = new Vector2[boundsX, boundsZ]; //previous grid positions
         int[,] costToNext = new int[boundsX, boundsZ]; //cheapest cost to next position
         int[,] pathToEnd = new int[boundsX, boundsZ]; //cheapest cost path to end position
-        //Debug.Log("x:" + startPosX + ", z:" + startPosZ);
-        //Debug.Log("x:" + targetPosX + ", z:" + targetPosZ);
-        //Debug.Log(MM.GetGridState(startPosX, startPosZ));
 
         string startPosState = MM.GetGridState(startPosX, startPosZ); //beginning position state
         string targetPosState = MM.GetGridState(targetPosX, targetPosZ);
         int startRoomID = int.Parse(startPosState.Substring(4)); //starting room ID
         int targetRoomID = int.Parse(targetPosState.Substring(4)); //targetted room ID
-        //Debug.Log("startRoomID: " + startRoomID);
-        //Debug.Log("targetRoomID: " + targetRoomID);
+        if (dbugEnabled) { MM.UpdateHUDDbugText("startRoomID: " + startRoomID + " / targetRoomID: " + targetRoomID); }
 
 
         //initialise movement costs for all grid positions
@@ -77,6 +77,7 @@ public class PathGeneration : MonoBehaviour
                 pathToEnd[x, z] = int.MaxValue;
                 previousPos[x, z] = new Vector2(-1, -1);
             }
+
         }
 
         costToNext[startPosX, startPosZ] = 0; //set cost of current tile to 0
@@ -111,18 +112,21 @@ public class PathGeneration : MonoBehaviour
                 int neighborPosX = (int)neighborPos.x; //cast to int to avoid float issues
                 int neighborPosZ = (int)neighborPos.y;
 
-                //Debug.Log("checking neighbor position x:" + neighborPosX + ", y:" + neighborPosZ);
-                //Debug.Log("grid state:" + gridStates[neighborPosX, neighborPosZ]);
+                /*if (dbugEnabled)
+                {
+                    Debug.Log("checking neighbor position x:" + neighborPosX + ", y:" + neighborPosZ);
+                    Debug.Log("grid state:" + gridStates[neighborPosX, neighborPosZ]);
+                }*/
 
                 if (neighborPosX < 0 || neighborPosX >= boundsX || neighborPosZ < 0 || neighborPosZ >= boundsZ) { continue; } //check if neighboring position is outside of area bounds
 
                 int moveCost = GetMoveCost(neighborPosX, neighborPosZ); //finds the appropriate moving cost for that position
-                //Debug.Log("move cost: " + moveCost);
+                //if (dbugEnabled) { Debug.Log("move cost: " + moveCost);}
                 if (moveCost == -1) { continue; } //if moving cost indicates a viable space
 
                 if (closedSet[neighborPosX, neighborPosZ]) { continue; } //if position closed, skip
 
-                MM.UpdateDbugTileTextMoveCost(neighborPosX, neighborPosZ, moveCost); //update checked tile debug text with new cost
+                if (MM.isDbugEnabled()) { MM.UpdateDbugTileTextMoveCost(neighborPosX, neighborPosZ, moveCost); } //update checked tile debug text with new cost
 
 
                 int tempCostToNext = costToNext[curPosX, curPosZ] + moveCost; //cost of current position
@@ -135,7 +139,7 @@ public class PathGeneration : MonoBehaviour
                     pathToEnd[neighborPosX, neighborPosZ] = costToNext[neighborPosX, neighborPosZ] + Heuristic(neighborPos, targetPos);
 
                     //update open set with neighbor position
-                    if (!openSet[neighborPosX, neighborPosZ]) { /*Debug.Log("update open set with " + neighborPos);*/ openSet[neighborPosX, neighborPosZ] = true; }
+                    if (!openSet[neighborPosX, neighborPosZ]) { /*if (dbugEnabled) { MM.UpdateHUDDbugText("update open set with " + neighborPos); } */ openSet[neighborPosX, neighborPosZ] = true; }
                 }
             }
         }
@@ -143,7 +147,7 @@ public class PathGeneration : MonoBehaviour
 
     private Vector2 FindLowestCostPosition(bool[,] openSet, int[,] pathToEnd, Vector2 targetPos)
     {
-        //Debug.Log("PG, Find Lowest Cost Position");
+        //if (dbugEnabled) { MM.UpdateHUDDbugText("PG, Find Lowest Cost Position"); }
 
         //initialise lowest cost trackers
         Vector2 lowestCostPos = new Vector2(-1, -1); //set to -1 to be invalid until fixed
@@ -178,8 +182,8 @@ public class PathGeneration : MonoBehaviour
     private int GetMoveCost(int x, int z)
     {
         //find movement cost of requested position
-        //Debug.Log("PG, Get Move Cost");
-        //Debug.Log("grid state: " + MM.GetGridState(x, z));
+        //if (dbugEnabled) { MM.UpdateHUDDbugText("PG, Get Move Cost"); }
+        //if (dbugEnabled) { MM.UpdateHUDDbugText("grid state: " + MM.GetGridState(x, z)); }
 
         //return cost depending on position state
         switch (MM.GetGridState(x, z))
@@ -201,7 +205,7 @@ public class PathGeneration : MonoBehaviour
     private Vector2[] ConstructPath(Vector2[,] previousPos, Vector2 curPos)
     {
         //puts together an array of the path findings previous steps
-        //Debug.Log("PG, Construct Path");
+        if (dbugEnabled) { MM.UpdateHUDDbugText("PG, Construct Path"); }
 
         int pathLength = 0; //track number of tiles in path
         Vector2 tempPos = curPos; //used to track previous position as the path iterates
@@ -243,7 +247,7 @@ public class PathGeneration : MonoBehaviour
     private void GeneratePath(Vector2[] path)
     {
         //update map manager with new path
-        Debug.Log("PG, Generate Path");
+        if (dbugEnabled) { MM.UpdateHUDDbugText("PG, Generate Path between " + startPos + " & " + targetPos); }
 
         if (path == null) { return; } //if there's no path, skip
 
@@ -268,7 +272,7 @@ public class PathGeneration : MonoBehaviour
                     if (MM.GetGridState(x, z) == "Empty")
                     {
                         //set grid states and update material for hallways
-                        //Debug.Log("setting position x:" + x + ", y:" + z + " as hallway");
+                        //if (dbugEnabled) { MM.UpdateHUDDbugText("setting position x:" + x + ", y:" + z + " as hallway"); }
                         MM.UpdateDbugTileMat(x, z, "Hallway");
                         MM.UpdateDbugTileTextGridState(x, z, "Hallway");
                         MM.UpdateGridState(x, z, "Hallway"); //mark the grid position as a hallway
@@ -276,7 +280,7 @@ public class PathGeneration : MonoBehaviour
                     else if (MM.GetGridState(x, z) == "Wall")
                     {
                         //set grid states and update material for doorways
-                        //Debug.Log("setting position x:" + x + ", y:" + z + " as doorway");
+                        //if (dbugEnabled) { MM.UpdateHUDDbugText("setting position x:" + x + ", y:" + z + " as doorway"); }
                         MM.UpdateDbugTileMat(x, z, "Doorway");
                         MM.UpdateDbugTileTextGridState(x, z, "Doorway");
                         MM.UpdateGridState(x, z, "Doorway"); //mark the grid position as a doorway

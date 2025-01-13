@@ -45,10 +45,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d92b1edc4e856a341997c0478719fd8e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  dbugEnabled: 1
   baseDbugMat: {fileID: 2100000, guid: e8a11bef448ed1b4382b0b5eebb590ca, type: 2}
-  emptyDbugMat: {fileID: 2100000, guid: b935ea7b19223f444a7418c023851217, type: 2}
-  wallDbugMat: {fileID: 2100000, guid: 40ce6f7b8d8dcb645bd3b910de554598, type: 2}
-  wallCornerDbugMat: {fileID: 2100000, guid: f1c0b3bc4025c124ca60ac26dee72494, type: 2}
+  matDbugEmpty: {fileID: 2100000, guid: b935ea7b19223f444a7418c023851217, type: 2}
+  matDbugWall: {fileID: 2100000, guid: 40ce6f7b8d8dcb645bd3b910de554598, type: 2}
+  matDbugDoor: {fileID: 2100000, guid: 1e2c8f73981c08a43ab9d2b91837d8e3, type: 2}
   dbugMarker: {fileID: 6787671552346119472, guid: aa2f3d0dd74341a4db2fc987025a5892, type: 3}
   dbugText: {fileID: 8348211830089719479}
   testFloorTile: {fileID: 8997730621713062801, guid: 194148bec6d799e49a67d416d13f91fe, type: 3}
@@ -90,8 +91,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 5.5}
-  m_SizeDelta: {x: 1920, y: 1080}
+  m_AnchoredPosition: {x: 0, y: 1}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &9119318297755341683
 Canvas:
@@ -191,7 +192,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 200, y: 50}
+  m_SizeDelta: {x: 10, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &531869536229585275
 CanvasRenderer:

@@ -448,7 +448,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -622, y: 256}
+  m_AnchoredPosition: {x: -622, y: 325}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &965646943
@@ -725,6 +725,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5fc84d788842a714d91d94917e44a74e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  dbugEnabled: 1
 --- !u!114 &1945132724
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -743,6 +744,8 @@ MonoBehaviour:
   treasureRoomsMin: 3
   specialRoomsMax: 5
   specialRoomsMin: 3
+  dbugEnabled: 1
+  showDbugTiles: 0
   defaultCamera: {fileID: 963194227}
   baseDbugMat: {fileID: 2100000, guid: e8a11bef448ed1b4382b0b5eebb590ca, type: 2}
   matDbugEmpty: {fileID: 2100000, guid: b935ea7b19223f444a7418c023851217, type: 2}
@@ -768,6 +771,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4bdb70d58032f6548990ecc3fe0b286b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  dbugEnabled: 1
   basicRoom: {fileID: 4597496329373697504, guid: 8ab234d5dca0f924da914ca87cc9e3df, type: 3}
   dbugTile: {fileID: 6787671552346119472, guid: aa2f3d0dd74341a4db2fc987025a5892, type: 3}
 --- !u!1 &2000653574
@@ -872,8 +876,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -200, y: 325}
-  m_SizeDelta: {x: 1000, y: 100}
+  m_AnchoredPosition: {x: -200, y: 391}
+  m_SizeDelta: {x: 1000, y: 1}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2119093244
 MonoBehaviour:
