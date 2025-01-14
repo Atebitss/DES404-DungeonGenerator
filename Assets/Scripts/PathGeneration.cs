@@ -179,24 +179,55 @@ public class PathGeneration : MonoBehaviour
         return lowestCostPos; //return lowest cost position
     }
 
+    [SerializeField] private int wallCost = 50, wallCornerCost = 500, hallwayCost = 1, doorwayCost = 1, emptyCost = 15, roomCost = 1;
     private int GetMoveCost(int x, int z)
     {
         //find movement cost of requested position
         //if (dbugEnabled) { MM.UpdateHUDDbugText("PG, Get Move Cost"); }
         //if (dbugEnabled) { MM.UpdateHUDDbugText("grid state: " + MM.GetGridState(x, z)); }
+        int moveCost = -1;
 
         //return cost depending on position state
         switch (MM.GetGridState(x, z))
         {
-            case "Wall": return 50; //high cost, path will avoid this if possible
-            case "WallCorner": return 500; //absurd cost, path will avoid this at all costs
-            case "Hallway": return 1; //low cost, path will prioritise this
-            case "Doorway": return 1;
-            case "Empty": return 15; //moderate cost, path will use if needed
+            case "Wall": moveCost = wallCost; break; //high cost, path will avoid this if possible
+            case "WallCorner": moveCost = wallCornerCost; break; //absurd cost, path will avoid this at all costs
+            case "Hallway": moveCost = hallwayCost; break; //low cost, path will prioritise this
+            case "Doorway": moveCost = doorwayCost; break;
+            case "Empty": moveCost = emptyCost; break; //moderate cost, path will use if needed
             default:
-                if (MM.GetGridState(x, z).StartsWith("Room")) { return 5; } //low cost, allows path to traverse rooms easily
-                else { return -1; } //should never occur
+                if (MM.GetGridState(x, z).StartsWith("Room")) { moveCost = roomCost; break; } //low cost, allows path to traverse rooms easily
+                else { moveCost = -1; break; } //should never occur
         }
+
+        //check if current checked tile is adjacent to a corner to avoid strange hallways
+        if(IsAdjacentToWallCorner(x, z)) { moveCost = wallCornerCost; }
+
+        return moveCost;
+    }
+    private bool IsAdjacentToWallCorner(int x, int z)
+    {
+        //check 8 adjacent neighbour positions
+        for(int xOffset = -1; xOffset <= 1; xOffset++)
+        {
+            for (int zOffset = -1; zOffset <= 1; zOffset++)
+            {
+                if(xOffset == 0 && zOffset == 0) { continue; } //skip current tile
+
+                int neighbourX = (x + xOffset);
+                int neighbourZ = (z + zOffset);
+
+                //if neighbour is wihtin bounds
+                if (neighbourX >= 0 && neighbourX < boundsX && neighbourZ >= 0 && neighbourZ < boundsZ)
+                {
+                    //if neighbour is a wall corner, return true
+                    if(MM.GetGridState(neighbourX, neighbourZ) == "WallCorner") { return true; }
+                }
+            }
+        }
+
+        //if no wall corner adjacent, return false
+        return false;
     }
 
     //calculate the shortest distance between start position and target position

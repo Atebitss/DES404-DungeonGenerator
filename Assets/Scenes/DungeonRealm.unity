@@ -726,6 +726,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dbugEnabled: 1
+  wallCost: 50
+  wallCornerCost: 500
+  hallwayCost: 1
+  doorwayCost: 1
+  emptyCost: 15
+  roomCost: 1
 --- !u!114 &1945132724
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -745,7 +751,7 @@ MonoBehaviour:
   specialRoomsMax: 5
   specialRoomsMin: 3
   dbugEnabled: 1
-  showDbugTiles: 0
+  showDbugTiles: 1
   defaultCamera: {fileID: 963194227}
   baseDbugMat: {fileID: 2100000, guid: e8a11bef448ed1b4382b0b5eebb590ca, type: 2}
   matDbugEmpty: {fileID: 2100000, guid: b935ea7b19223f444a7418c023851217, type: 2}
