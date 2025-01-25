@@ -26,6 +26,7 @@ public class PlayerController : MonoBehaviour
         UpdatePlayerMovement();
         UpdatePlayerLooking();
         UpdateInteractionPrompt();
+        UpdatePlayerStates();
     }
     //~~~~~misc~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -221,6 +222,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private int MaxStaminaPoints = 10;
     [SerializeField] private int CurrentMagicPoints = 10, MaxMagicPoints = 10;
     [SerializeField] private int StrengthPoints = 1, DexterityPoints = 1, IntelligencePoints = 1, WisdomPoints = 1;
+    [SerializeField] private bool invisible = false;
+    [SerializeField] private float invisiblityTimer = 0f;
+    private float invisibilityStartTime = 0f;
 
     //health points
     public void AlterCurrentHealthPoints(int alter) { CurrentHealthPoints += alter; }
@@ -259,5 +263,20 @@ public class PlayerController : MonoBehaviour
     //wisdom
     public void AlterWisdomPoints(int alter) { WisdomPoints += alter; }
     public int GetWisdomPoints() { return WisdomPoints; }
+
+
+    //invincibility
+    public void MakePlayerInvincible(float iTime) { invisiblityTimer = iTime; }
+    public void UpdatePlayerStates()
+    {
+        if (invisiblityTimer > 0 && !invisible)
+        {
+            invisible = true; //set tracker true
+            invisibilityStartTime = Time.time; //track when invisibility started
+        }
+
+        if (invisiblityTimer > 0) { invisiblityTimer -= Time.deltaTime; } //count down timer
+        if (invisiblityTimer <= 0) { invisible = false; } //when timer runs out, set tracker false
+    }
     //~~~~~stats~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 }

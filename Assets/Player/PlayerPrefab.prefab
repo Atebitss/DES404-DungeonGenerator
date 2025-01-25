@@ -314,7 +314,7 @@ MonoBehaviour:
   movementSpeed: 2.5
   dodgeMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 64
   dodgeForce: 10
   dodgeDuration: 0.25
   dodgeDistance: 5
