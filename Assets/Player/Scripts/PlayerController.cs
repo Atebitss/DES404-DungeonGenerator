@@ -60,7 +60,7 @@ public class PlayerController : MonoBehaviour
     //looking
     [SerializeField] private float lookSensitivity = 2.5f; //players looking velocity
     private Quaternion targetCameraRot = Quaternion.identity; //used to lerp camera rotation
-    private float lookX, lookY;
+    private Vector2 lookment = Vector2.zero;
     private float xRot = 0f;
 
 
@@ -136,19 +136,18 @@ public class PlayerController : MonoBehaviour
     {
         //Mouse / Right Thumbstick
         //Debug.Log(ctx.ReadValue<Vector2>());
-        lookX = ctx.ReadValue<Vector2>().x;
-        lookY = ctx.ReadValue<Vector2>().y;
+        lookment = ctx.ReadValue<Vector2>();
     }
     private void UpdatePlayerLooking()
     {
-        xRot -= (lookY * lookSensitivity);
+        xRot -= (lookment.y * lookSensitivity);
         //Debug.Log(xRot);
         xRot = Mathf.Clamp(xRot, -70f, 70f);
 
         targetCameraRot = Quaternion.Euler(xRot, 0f, 0f);
         playerCamera.transform.localRotation = Quaternion.Lerp(playerCamera.transform.localRotation, targetCameraRot, (Time.deltaTime / 0.1f));
 
-        targetPlayerRot *= Quaternion.Euler(0f, (lookX * lookSensitivity), 0f);
+        targetPlayerRot *= Quaternion.Euler(0f, (lookment.x * lookSensitivity), 0f);
         playerRigid.transform.rotation = Quaternion.Lerp(playerRigid.transform.localRotation, targetPlayerRot, (Time.deltaTime / 0.1f));
     }
     //~~~~~movement~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
