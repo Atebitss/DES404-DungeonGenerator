@@ -199,8 +199,8 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 7362370709811634931}
         m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
-        m_MethodName: OnLook
-        m_Mode: 0
+        m_MethodName: 
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -212,9 +212,85 @@ MonoBehaviour:
     m_ActionId: f1dfe8c6-313c-47bc-8b9a-4c339f93a751
     m_ActionName: Normal/Look[/Mouse/delta]
   - m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 7362370709811634931}
+        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
+        m_MethodName: OnJump
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_ActionId: 368e1f21-b5a5-4c04-84e3-b321a10cab9c
     m_ActionName: Normal/Jump[/Keyboard/space,/XInputControllerWindows/buttonSouth]
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 7362370709811634931}
+        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
+        m_MethodName: OnLook
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: a001ebf4-a6d1-4a17-9d32-2350c9865ad6
+    m_ActionName: Normal/LookController[/XInputControllerWindows/rightStick]
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 7362370709811634931}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 1e7e23c4-c264-4c42-b38d-8c4c04959852
+    m_ActionName: Normal/LightAttack[/Mouse/leftButton,/XInputControllerWindows/buttonWest]
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 7362370709811634931}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: b4baacc4-509b-496b-9632-59b017739922
+    m_ActionName: Normal/HeavyAttack[/Mouse/leftButton,/XInputControllerWindows/buttonWest]
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 7362370709811634931}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 789f902e-8518-4493-a697-876b5a9c154f
+    m_ActionName: Normal/Dodge[/Keyboard/space,/XInputControllerWindows/buttonSouth]
   m_NeverAutoSwitchControlSchemes: 1
   m_DefaultControlScheme: 
   m_DefaultActionMap: Normal
@@ -234,7 +310,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerRigid: {fileID: 2105931423671842942}
   playerCamera: {fileID: 5022982567547155934}
-  interactionBox: {fileID: 0}
   interactionPromptText: {fileID: 408251515721017303}
   CurrentHealthPoints: 10
   MaxHealthPoints: 10
@@ -246,7 +321,8 @@ MonoBehaviour:
   DexterityPoints: 1
   IntelligencePoints: 1
   WisdomPoints: 1
-  movementSpeed: 5
+  movementSpeed: 2.5
+  lookSensitivity: 2.5
   interactionMask:
     serializedVersion: 2
     m_Bits: 8

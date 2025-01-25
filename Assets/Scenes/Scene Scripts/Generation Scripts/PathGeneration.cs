@@ -5,7 +5,7 @@ using UnityEngine;
 public class PathGeneration : MonoBehaviour
 {
     //relevant scripts
-    private MapManager MM;
+    private MapGeneration MG;
     private DungeonGeneration DG;
 
     //debug info
@@ -21,17 +21,17 @@ public class PathGeneration : MonoBehaviour
     private void Awake()
     {
         //set up references
-        MM = this.gameObject.GetComponent<MapManager>();
+        MG = this.gameObject.GetComponent<MapGeneration>();
         DG = this.gameObject.GetComponent<DungeonGeneration>();
 
-        if (dbugEnabled) { MM.UpdateHUDDbugText("PG, Awake"); }
+        if (dbugEnabled) { MG.UpdateHUDDbugText("PG, Awake"); }
     }
 
 
 
     public void BeginPathGeneration(Vector2 startPos, Vector2 targetPos, int boundsX, int boundsZ)
     {
-        if (dbugEnabled) { MM.UpdateHUDDbugText("PG, Begin Path Generation"); }
+        if (dbugEnabled) { MG.UpdateHUDDbugText("PG, Begin Path Generation"); }
 
         //update data
         this.boundsX = boundsX;
@@ -48,7 +48,7 @@ public class PathGeneration : MonoBehaviour
     private Vector2[] FindPath()
     {
         //find connections between rooms using A*
-        if (dbugEnabled) { MM.UpdateHUDDbugText("PG, Find Path"); }
+        if (dbugEnabled) { MG.UpdateHUDDbugText("PG, Find Path"); }
 
         int startPosX = (int)startPos.x; //beginning position
         int startPosZ = (int)startPos.y;
@@ -61,11 +61,11 @@ public class PathGeneration : MonoBehaviour
         int[,] costToNext = new int[boundsX, boundsZ]; //cheapest cost to next position
         int[,] pathToEnd = new int[boundsX, boundsZ]; //cheapest cost path to end position
 
-        string startPosState = MM.GetGridState(startPosX, startPosZ); //beginning position state
-        string targetPosState = MM.GetGridState(targetPosX, targetPosZ);
+        string startPosState = MG.GetGridState(startPosX, startPosZ); //beginning position state
+        string targetPosState = MG.GetGridState(targetPosX, targetPosZ);
         int startRoomID = int.Parse(startPosState.Substring(4)); //starting room ID
         int targetRoomID = int.Parse(targetPosState.Substring(4)); //targetted room ID
-        if (dbugEnabled) { MM.UpdateHUDDbugText("startRoomID: " + startRoomID + " / targetRoomID: " + targetRoomID); }
+        if (dbugEnabled) { MG.UpdateHUDDbugText("startRoomID: " + startRoomID + " / targetRoomID: " + targetRoomID); }
 
 
         //initialise movement costs for all grid positions
@@ -126,7 +126,7 @@ public class PathGeneration : MonoBehaviour
 
                 if (closedSet[neighborPosX, neighborPosZ]) { continue; } //if position closed, skip
 
-                if (MM.isDbugEnabled()) { MM.UpdateDbugTileTextMoveCost(neighborPosX, neighborPosZ, moveCost); } //update checked tile debug text with new cost
+                if (MG.isDbugEnabled()) { MG.UpdateDbugTileTextMoveCost(neighborPosX, neighborPosZ, moveCost); } //update checked tile debug text with new cost
 
 
                 int tempCostToNext = costToNext[curPosX, curPosZ] + moveCost; //cost of current position
@@ -139,7 +139,7 @@ public class PathGeneration : MonoBehaviour
                     pathToEnd[neighborPosX, neighborPosZ] = costToNext[neighborPosX, neighborPosZ] + Heuristic(neighborPos, targetPos);
 
                     //update open set with neighbor position
-                    if (!openSet[neighborPosX, neighborPosZ]) { /*if (dbugEnabled) { MM.UpdateHUDDbugText("update open set with " + neighborPos); } */ openSet[neighborPosX, neighborPosZ] = true; }
+                    if (!openSet[neighborPosX, neighborPosZ]) { /*if (dbugEnabled) { MG.UpdateHUDDbugText("update open set with " + neighborPos); } */ openSet[neighborPosX, neighborPosZ] = true; }
                 }
             }
         }
@@ -147,7 +147,7 @@ public class PathGeneration : MonoBehaviour
 
     private Vector2 FindLowestCostPosition(bool[,] openSet, int[,] pathToEnd, Vector2 targetPos)
     {
-        //if (dbugEnabled) { MM.UpdateHUDDbugText("PG, Find Lowest Cost Position"); }
+        //if (dbugEnabled) { MG.UpdateHUDDbugText("PG, Find Lowest Cost Position"); }
 
         //initialise lowest cost trackers
         Vector2 lowestCostPos = new Vector2(-1, -1); //set to -1 to be invalid until fixed
@@ -183,12 +183,12 @@ public class PathGeneration : MonoBehaviour
     private int GetMoveCost(int x, int z)
     {
         //find movement cost of requested position
-        //if (dbugEnabled) { MM.UpdateHUDDbugText("PG, Get Move Cost"); }
-        //if (dbugEnabled) { MM.UpdateHUDDbugText("grid state: " + MM.GetGridState(x, z)); }
+        //if (dbugEnabled) { MG.UpdateHUDDbugText("PG, Get Move Cost"); }
+        //if (dbugEnabled) { MG.UpdateHUDDbugText("grid state: " + MG.GetGridState(x, z)); }
         int moveCost = -1;
 
         //return cost depending on position state
-        switch (MM.GetGridState(x, z))
+        switch (MG.GetGridState(x, z))
         {
             case "Wall": moveCost = wallCost; break; //high cost, path will avoid this if possible
             case "WallCorner": moveCost = wallCornerCost; break; //absurd cost, path will avoid this at all costs
@@ -196,7 +196,7 @@ public class PathGeneration : MonoBehaviour
             case "Doorway": moveCost = doorwayCost; break;
             case "Empty": moveCost = emptyCost; break; //moderate cost, path will use if needed
             default:
-                if (MM.GetGridState(x, z).StartsWith("Room")) { moveCost = roomCost; break; } //low cost, allows path to traverse rooms easily
+                if (MG.GetGridState(x, z).StartsWith("Room")) { moveCost = roomCost; break; } //low cost, allows path to traverse rooms easily
                 else { moveCost = -1; break; } //should never occur
         }
 
@@ -221,7 +221,7 @@ public class PathGeneration : MonoBehaviour
                 if (neighbourX >= 0 && neighbourX < boundsX && neighbourZ >= 0 && neighbourZ < boundsZ)
                 {
                     //if neighbour is a wall corner, return true
-                    if(MM.GetGridState(neighbourX, neighbourZ) == "WallCorner") { return true; }
+                    if(MG.GetGridState(neighbourX, neighbourZ) == "WallCorner") { return true; }
                 }
             }
         }
@@ -236,7 +236,7 @@ public class PathGeneration : MonoBehaviour
     private Vector2[] ConstructPath(Vector2[,] previousPos, Vector2 curPos)
     {
         //puts together an array of the path findings previous steps
-        if (dbugEnabled) { MM.UpdateHUDDbugText("PG, Construct Path"); }
+        if (dbugEnabled) { MG.UpdateHUDDbugText("PG, Construct Path"); }
 
         int pathLength = 0; //track number of tiles in path
         Vector2 tempPos = curPos; //used to track previous position as the path iterates
@@ -278,7 +278,7 @@ public class PathGeneration : MonoBehaviour
     private void GeneratePath(Vector2[] path)
     {
         //update map manager with new path
-        if (dbugEnabled) { MM.UpdateHUDDbugText("PG, Generate Path between " + startPos + " & " + targetPos); }
+        if (dbugEnabled) { MG.UpdateHUDDbugText("PG, Generate Path between " + startPos + " & " + targetPos); }
 
         if (path == null) { return; } //if there's no path, skip
 
@@ -300,21 +300,21 @@ public class PathGeneration : MonoBehaviour
             {
                 for (int z = Mathf.Min(startZ, endZ); z <= Mathf.Max(startZ, endZ); z++)
                 {
-                    if (MM.GetGridState(x, z) == "Empty")
+                    if (MG.GetGridState(x, z) == "Empty")
                     {
                         //set grid states and update material for hallways
-                        //if (dbugEnabled) { MM.UpdateHUDDbugText("setting position x:" + x + ", y:" + z + " as hallway"); }
-                        MM.UpdateDbugTileMat(x, z, "Hallway");
-                        MM.UpdateDbugTileTextGridState(x, z, "Hallway");
-                        MM.UpdateGridState(x, z, "Hallway"); //mark the grid position as a hallway
+                        //if (dbugEnabled) { MG.UpdateHUDDbugText("setting position x:" + x + ", y:" + z + " as hallway"); }
+                        MG.UpdateDbugTileMat(x, z, "Hallway");
+                        MG.UpdateDbugTileTextGridState(x, z, "Hallway");
+                        MG.UpdateGridState(x, z, "Hallway"); //mark the grid position as a hallway
                     }
-                    else if (MM.GetGridState(x, z) == "Wall")
+                    else if (MG.GetGridState(x, z) == "Wall")
                     {
                         //set grid states and update material for doorways
-                        //if (dbugEnabled) { MM.UpdateHUDDbugText("setting position x:" + x + ", y:" + z + " as doorway"); }
-                        MM.UpdateDbugTileMat(x, z, "Doorway");
-                        MM.UpdateDbugTileTextGridState(x, z, "Doorway");
-                        MM.UpdateGridState(x, z, "Doorway"); //mark the grid position as a doorway
+                        //if (dbugEnabled) { MG.UpdateHUDDbugText("setting position x:" + x + ", y:" + z + " as doorway"); }
+                        MG.UpdateDbugTileMat(x, z, "Doorway");
+                        MG.UpdateDbugTileTextGridState(x, z, "Doorway");
+                        MG.UpdateGridState(x, z, "Doorway"); //mark the grid position as a doorway
                     }
                 }
             }

@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using UnityEngine;
 using TMPro;
 
-public class MapManager : MonoBehaviour
+public class MapGeneration : MonoBehaviour
 {
     //relevant scripts
     private DungeonGeneration DG;
@@ -53,7 +53,7 @@ public class MapManager : MonoBehaviour
 
     private void ResetMap()
     {
-        Debug.Log("MM, Reset Map");
+        Debug.Log("MG, Reset Map");
 
         if (dbugEnabled && showDbugTiles)
         {
@@ -85,7 +85,7 @@ public class MapManager : MonoBehaviour
 
     private void Awake() 
     {
-        Debug.Log("MM Awake");
+        Debug.Log("MG Awake");
 
         //set up references
         DG = this.gameObject.GetComponent<DungeonGeneration>();
@@ -94,7 +94,7 @@ public class MapManager : MonoBehaviour
     
     public void RegenerateDungeon()
     {
-        Debug.Log("MM, Regenerating Dungeon");
+        Debug.Log("MG, Regenerating Dungeon");
 
         //prime & begin generation
         ResetMap();
@@ -103,7 +103,7 @@ public class MapManager : MonoBehaviour
 
     private void BeginMapGeneration()
     {
-        Debug.Log("MM, Beginning Map Generation");
+        Debug.Log("MG, Beginning Map Generation");
 
         Debug.Log("New dungeon generation: " + genAttempts);
         genAttempts++;
@@ -122,7 +122,7 @@ public class MapManager : MonoBehaviour
 
     private void DefineBounds()
     {
-        Debug.Log("MM, Defining Dungeon Bounds");
+        Debug.Log("MG, Defining Dungeon Bounds");
 
         //define dungeon area
         boundsZ = Random.Range(mapBoundsMin, mapBoundsMax);   //z extent
@@ -134,7 +134,7 @@ public class MapManager : MonoBehaviour
 
     private void DefineGrid()
     {
-        Debug.Log("MM, Defining Dungeon Grid");
+        Debug.Log("MG, Defining Dungeon Grid");
 
         //fill dungeon area with grid
         gridStates = new string[boundsX, boundsZ];      //states of grid positions

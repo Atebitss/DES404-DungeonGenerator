@@ -22,6 +22,7 @@ public class PlayerController : MonoBehaviour
     {
         if (DDC != null) { DDC.playerPosition = playerRigid.position; }
         UpdatePlayerMovement();
+        UpdatePlayerLooking();
         UpdateInteractionPrompt();
     }
     //~~~~~misc~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -31,7 +32,9 @@ public class PlayerController : MonoBehaviour
 
 
     //~~~~~stats~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    [SerializeField] private int CurrentHealthPoints = 10, MaxHealthPoints = 10, CurrentStaminaPoints = 10, MaxStaminaPoints = 10, CurrentMagicPoints = 10, MaxMagicPoints = 10;
+    [SerializeField] private int CurrentHealthPoints = 10, MaxHealthPoints = 10;
+    [SerializeField] private int CurrentStaminaPoints = 10, MaxStaminaPoints = 10;
+    [SerializeField] private int CurrentMagicPoints = 10, MaxMagicPoints = 10;
     [SerializeField] private int StrengthPoints = 1, DexterityPoints = 1, IntelligencePoints = 1, WisdomPoints = 1;
 
         //health points
@@ -78,46 +81,51 @@ public class PlayerController : MonoBehaviour
 
 
     //~~~~~movement~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    [SerializeField] private float movementSpeed = 5f;
-    private float lookSensitivity = 0.1f; //for some reason [SerializeField] sets sensitivity to 1 on start
+    [SerializeField] private float movementSpeed = 2.5f;
+    [SerializeField] private float lookSensitivity = 2.5f;
     private Vector3 velocity = Vector3.zero;
     private Vector3 movement = Vector3.zero;
+    private Quaternion targetCameraRot = Quaternion.identity, targetPlayerRot = Quaternion.identity;
+    private float lookX, lookY;
     private float xRot = 0f;
 
     public void OnMove(InputAction.CallbackContext ctx)
     {
-        //W/A/S/D / Right Thumbstick
+        //W/A/S/D / Left Thumbstick
         Vector2 input = ctx.ReadValue<Vector2>();
         movement = new Vector3(input.x, 0, input.y);
+    }
+    private void UpdatePlayerMovement()
+    {
+        velocity = (((playerRigid.transform.right * movement.x) * movementSpeed) + ((playerRigid.transform.forward * movement.z) * movementSpeed));
+        playerRigid.AddForce(velocity - playerRigid.velocity, ForceMode.VelocityChange);
+        if (DDC != null) { DDC.playerVelocity = velocity; }
     }
 
     public void OnLook(InputAction.CallbackContext ctx)
     {
-        //Mouse / Left Thumbstick
+        //Mouse / Right Thumbstick
         //Debug.Log(ctx.ReadValue<Vector2>());
-        float lookX = ctx.ReadValue<Vector2>().x;
-        float lookY = ctx.ReadValue<Vector2>().y;
-
+        lookX = ctx.ReadValue<Vector2>().x;
+        lookY = ctx.ReadValue<Vector2>().y;
+    }
+    private void UpdatePlayerLooking()
+    {
         xRot -= (lookY * lookSensitivity);
         //Debug.Log(xRot);
         xRot = Mathf.Clamp(xRot, -70f, 70f);
-        playerCamera.transform.localRotation = Quaternion.Euler(xRot, 0f, 0f);
-        playerRigid.transform.Rotate(Vector3.up * (lookX * lookSensitivity));
+
+        targetCameraRot = Quaternion.Euler(xRot, 0f, 0f);
+        playerCamera.transform.localRotation = Quaternion.Lerp(playerCamera.transform.localRotation, targetCameraRot, (Time.deltaTime / 0f));
+
+        targetPlayerRot *= Quaternion.Euler(0f, (lookX * lookSensitivity), 0f);
+        playerRigid.transform.rotation = Quaternion.Lerp(playerRigid.transform.localRotation, targetPlayerRot, (Time.deltaTime / 0f));
     }
 
     public void OnJump(InputAction.CallbackContext ctx)
     {
         //Space / Button South
         Debug.Log("jump");
-    }
-
-
-
-    private void UpdatePlayerMovement()
-    {
-        velocity = (((playerRigid.transform.right * movement.x) * movementSpeed) + ((playerRigid.transform.forward * movement.z) * movementSpeed));
-        playerRigid.AddForce(velocity - playerRigid.velocity, ForceMode.VelocityChange);
-        if (DDC != null) { DDC.playerVelocity = velocity; }
     }
     //~~~~~movement~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

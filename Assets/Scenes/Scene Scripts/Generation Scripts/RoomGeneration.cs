@@ -15,7 +15,7 @@ public class RoomGeneration : MonoBehaviour
 
 
     //relevant scripts
-    private MapManager MM;
+    private MapGeneration MG;
 
 
     //Generation Info
@@ -65,7 +65,7 @@ public class RoomGeneration : MonoBehaviour
         this.roomType = roomType;
         this.literalPosition = literalPosition;
 
-        MM = GameObject.Find("SceneManager").gameObject.GetComponent<MapManager>();
+        MG = GameObject.Find("SceneManager").gameObject.GetComponent<MapGeneration>();
 
         Begin();
     }
@@ -119,7 +119,7 @@ public class RoomGeneration : MonoBehaviour
             {
                 //Debug.Log("creating tile " + (pos + 1) + " at x:" + tileXOffset * xPos + ", z:" + tileZOffset * ZPos);
                 roomGridPositions[pos] = new Vector3(((tileXOffset * xPos) + this.transform.position.x), 0, ((tileZOffset * zPos) + this.transform.position.z));
-                roomGridStates[pos] = MM.GetGridState((roomPosX + xPos), (roomPosZ + zPos));
+                roomGridStates[pos] = MG.GetGridState((roomPosX + xPos), (roomPosZ + zPos));
 
                 if (dbugEnabled)
                 { 
@@ -208,7 +208,7 @@ public class RoomGeneration : MonoBehaviour
         Vector3 tempPos = new Vector3((roomBoundsX / 2), 0, (roomBoundsZ / 2));
         dbugText.transform.position = dbugText.transform.position + tempPos;
         TMP_Text curText = dbugText.GetComponent<TMP_Text>();
-        //float space = MM.GetTotalSpace();
+        //float space = MG.GetTotalSpace();
         //curText.fontSize = curText.fontSize + (space / 100000);
         curText.text = "ID: " + roomID + "\nsize: " + roomSize + "\ntype: " + roomType + "\nx: " + roomBoundsX + ", z: " + roomBoundsZ;
     }
