@@ -4,23 +4,24 @@ using UnityEngine;
 
 public class EnemyController : AbstractEnemy
 {
-    void Awake()
+    void Start()
     {
         //Debug.Log("Moving Target awake");
 
         //set stats
-        health = 10;
+        health = 1;
         damage = 1;
         speed = 5;
 
         enemyRenderer = this.gameObject.GetComponent<Renderer>();
         baseMaterial = enemyRenderer.material;
 
+        SM = GameObject.FindWithTag("SceneManager").GetComponent<AbstractSceneManager>();
         PC = SM.GetPlayerController();
 
         //aim towards player
-        Transform playerPos = PC.gameObject.transform;
-        transform.LookAt(playerPos);
+        //Transform playerPos = PC.gameObject.transform;
+        //transform.LookAt(playerPos);
     }
     private void OnTriggerEnter(Collider col)
     {
@@ -40,7 +41,7 @@ public class EnemyController : AbstractEnemy
         if (col.gameObject.tag == "Player")
         {
             PC.AlterCurrentHealthPoints(-damage);
-            Destroy(this.gameObject);
+            //Destroy(this.gameObject);
         }
     }
 
@@ -92,6 +93,7 @@ public class EnemyController : AbstractEnemy
 
     void OnDestroy()
     {
+        PC.RemoveEnemyFromArrays(this.gameObject);
     }
 
 

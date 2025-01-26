@@ -84,7 +84,7 @@ public class PlayerController : MonoBehaviour
     //looking
     [SerializeField] private float lookSensitivity = 2.5f; //players looking velocity
     private Quaternion targetCameraRot = Quaternion.identity; //used to lerp camera rotation
-    private Vector2 lookment = Vector2.zero;
+    private Vector2 lookment = Vector2.zero; //like movement but for looking
     private float xRot = 0f;
 
 
@@ -94,6 +94,7 @@ public class PlayerController : MonoBehaviour
         Vector2 input = ctx.ReadValue<Vector2>(); //get input from input system
         movement = new Vector3(input.x, 0, input.y); //translate input to impact
     }
+    
     public void OnJump(InputAction.CallbackContext ctx)
     {
         //Space / Button South
@@ -104,6 +105,7 @@ public class PlayerController : MonoBehaviour
 
         }
     }
+   
     public void OnDodge(InputAction.CallbackContext ctx)
     {
         //(Space / Button South) + (WASD/ Left Thumbstick)
@@ -130,6 +132,7 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
+    
     private void UpdatePlayerMovement()
     {
         if (!dodging) //if player is moving as normal
@@ -165,17 +168,59 @@ public class PlayerController : MonoBehaviour
     }
     private void UpdatePlayerLooking()
     {
-        xRot -= (lookment.y * lookSensitivity);
-        //Debug.Log(xRot);
-        xRot = Mathf.Clamp(xRot, -70f, 70f);
+        xRot -= (lookment.y * lookSensitivity); //increase rotation by sensitivity
+        xRot = Mathf.Clamp(xRot, -70f, 70f); //lock rotation between 70 up & down
 
-        targetCameraRot = Quaternion.Euler(xRot, 0f, 0f);
+        targetCameraRot = Quaternion.Euler(xRot, 0f, 0f); //new camera rotation
         playerCamera.transform.localRotation = Quaternion.Lerp(playerCamera.transform.localRotation, targetCameraRot, (Time.deltaTime / 0.1f));
 
-        targetPlayerRot *= Quaternion.Euler(0f, (lookment.x * lookSensitivity), 0f);
+
+        lightAttackCollider.transform.position = (playerCamera.transform.position + playerCamera.transform.forward); //new attack collider position to infront of camera
+        lightAttackCollider.transform.localRotation = Quaternion.Lerp(playerCamera.transform.localRotation, targetCameraRot, (Time.deltaTime / 0.1f));
+
+        heavyAttackCollider.transform.position = (playerCamera.transform.position + playerCamera.transform.forward); //new attack collider position to infront of camera
+        heavyAttackCollider.transform.localRotation = Quaternion.Lerp(playerCamera.transform.localRotation, targetCameraRot, (Time.deltaTime / 0.1f));
+
+
+        targetPlayerRot *= Quaternion.Euler(0f, (lookment.x * lookSensitivity), 0f); //new player turn rotation
         playerRigid.transform.rotation = Quaternion.Lerp(playerRigid.transform.localRotation, targetPlayerRot, (Time.deltaTime / 0.1f));
     }
     //~~~~~movement~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+
+
+    //~~~~~attacking~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    [Header("-Attacking")]
+    [SerializeField] private GameObject lightAttackCollider;
+    [SerializeField] private PlayerLightAttackColliderManager PLACM;
+    [SerializeField] private GameObject heavyAttackCollider;
+    [SerializeField] private PlayerHeavyAttackColliderManager PHACM;
+    [SerializeField] private int attackDamage = 5;
+    [SerializeField] private float attackSpeed = 1f;
+    private float attackCooldown = 0.5f;
+
+    public void OnLightAttack(InputAction.CallbackContext ctx)
+    {
+        if (ctx.performed)
+        {
+            Debug.Log("light attack");
+            GameObject[] hitEnemies = PLACM.GetAttackColliderObjects(); //reference each enemy found in the collider
+            for (int i = 0; i < hitEnemies.Length; i++) { hitEnemies[i].GetComponent<AbstractEnemy>().AlterHealth(-attackDamage); } //deal damage to each enemy
+        }
+    }
+    public void OnHeavyAttack(InputAction.CallbackContext ctx)
+    {
+        if (ctx.performed)
+        {
+            Debug.Log("heavy attack");
+            GameObject[] hitEnemies = PHACM.GetAttackColliderObjects(); //reference each enemy found in the collider
+            for (int i = 0; i < hitEnemies.Length; i++) { hitEnemies[i].GetComponent<AbstractEnemy>().AlterHealth(-attackDamage); } //deal damage to each enemy
+        }
+    }
+    public void RemoveEnemyFromArrays(GameObject obj) { PLACM.RemoveObjectFromArray(obj); PHACM.RemoveObjectFromArray(obj); }
+    //~~~~~attacking~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 
@@ -189,8 +234,8 @@ public class PlayerController : MonoBehaviour
 
     public void OnInteract(InputAction.CallbackContext ctx)
     {
-        //E / Button West
-        if (!interacting)
+        //E / Right Bumper
+        if (ctx.performed && !interacting)
         {
             //Debug.Log("interact");
 
@@ -220,15 +265,13 @@ public class PlayerController : MonoBehaviour
         interacting = false;
     }
 
-
-
     private void UpdateInteractionPrompt()
     {
         RaycastHit hit;
         Debug.DrawRay(playerCamera.transform.position, (playerCamera.transform.forward * interactDistance), Color.red, 1f);
         if (Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward, out hit, interactDistance, interactionMask))
         {
-            interactionPromptText.text = "'E' to interact with " + hit.collider.tag;
+            interactionPromptText.text = "'RB' to interact with " + hit.collider.tag;
         }
         else { interactionPromptText.text = ""; }
     }
