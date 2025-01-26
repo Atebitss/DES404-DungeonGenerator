@@ -13,8 +13,8 @@ TagManager:
   - InteractableObject
   - Water
   - UI
+  - Player
   - Enemy
-  - 
   - 
   - 
   - 

@@ -15,9 +15,9 @@ GameObject:
   - component: {fileID: 2105931423671842942}
   - component: {fileID: 1407151501325918776}
   - component: {fileID: 7362370709811634931}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: PlayerCharacter
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -334,6 +334,8 @@ MonoBehaviour:
   DexterityPoints: 1
   IntelligencePoints: 1
   WisdomPoints: 1
+  invincible: 0
+  invincibilityTimer: 0
 --- !u!1 &801474497619437302
 GameObject:
   m_ObjectHideFlags: 0
@@ -435,9 +437,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2934956139314843675}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: PlayerPrefab
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

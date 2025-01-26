@@ -731,7 +731,7 @@ GameObject:
   - component: {fileID: 903398112}
   - component: {fileID: 903398111}
   - component: {fileID: 903398110}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: EnemyCharacter
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1216,9 +1216,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1820106944}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: BasicEnemyPrefab
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

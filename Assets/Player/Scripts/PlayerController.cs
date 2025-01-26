@@ -19,6 +19,28 @@ public class PlayerController : MonoBehaviour
     private DbugDisplayController DDC; //debug display
     public void SetDDC(DbugDisplayController DDC) { this.DDC = DDC; }
 
+    private void Awake()
+    {
+        //dodge layer mask to layer IDs
+        int layerCount = 0;
+        int[] tempDodgeLayerIDs = new int[32];
+
+        for (int i = 0; i < 32; i++)
+        {
+            if((dodgeMask.value & (1 << i)) != 0)
+            {
+                tempDodgeLayerIDs[layerCount] = (i + 1);
+                layerCount++;
+            }
+        }
+
+        dodgeLayerIDs = new int[layerCount];
+        for (int i = 0; i < layerCount; i++)
+        {
+            dodgeLayerIDs[i] = tempDodgeLayerIDs[i];
+        }
+    }
+
     private void FixedUpdate()
     {
         if (DDC != null) { DDC.playerPosition = playerRigid.position; } //update debug display
@@ -44,6 +66,7 @@ public class PlayerController : MonoBehaviour
 
     //dodging
     [SerializeField] private LayerMask dodgeMask; //enemy layer
+    private int[] dodgeLayerIDs = new int[0];
     [SerializeField] private float dodgeForce = 10f; //--------|
     [SerializeField] private float dodgeDuration = 0.25f; //---|- each used to calc dodge
     [SerializeField] private float dodgeDistance = 5f; //------|
@@ -91,7 +114,8 @@ public class PlayerController : MonoBehaviour
             dodgeStartTime = Time.time; //remember time when dodge started
             dodgeCD = dodgeCDMax; //set cooldown timer
             dodging = true; //set tracker to true
-            Physics.IgnoreLayerCollision(gameObject.layer, dodgeMask, true); //allow dodging through enemies
+            for (int i = 0; i < dodgeLayerIDs.Length; i++) { Physics.IgnoreLayerCollision(gameObject.layer, dodgeLayerIDs[i], true); } //allow dodging through enemies
+            MakePlayerInvincible(dodgeDuration);
 
             if (movement.x != 0 && movement.z != 0) //if the player is moving horizontally
             {
@@ -121,7 +145,7 @@ public class PlayerController : MonoBehaviour
             if ((Time.time - dodgeStartTime) >= dodgeDuration) //if the player has been dodging for 1 second
             {
                 playerRigid.velocity = Vector3.zero; //reset velocity
-                Physics.IgnoreLayerCollision(gameObject.layer, dodgeMask, false); //disallow dodging through enemies
+                for (int i = 0; i < dodgeLayerIDs.Length; i++) { Physics.IgnoreLayerCollision(gameObject.layer, dodgeLayerIDs[i], false); } //allow dodging through enemies
                 dodging = false; //set tracker to false
             }
         }
@@ -220,11 +244,12 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private int MaxHealthPoints = 10;
     [SerializeField] private int CurrentStaminaPoints = 10;
     [SerializeField] private int MaxStaminaPoints = 10;
-    [SerializeField] private int CurrentMagicPoints = 10, MaxMagicPoints = 10;
+    [SerializeField] private int CurrentMagicPoints = 10;
+    [SerializeField] private int MaxMagicPoints = 10;
     [SerializeField] private int StrengthPoints = 1, DexterityPoints = 1, IntelligencePoints = 1, WisdomPoints = 1;
-    [SerializeField] private bool invisible = false;
-    [SerializeField] private float invisiblityTimer = 0f;
-    private float invisibilityStartTime = 0f;
+    [SerializeField] private bool invincible = false;
+    [SerializeField] private float invincibilityTimer = 0f;
+    private float invincibilityStartTime = 0f;
 
     //health points
     public void AlterCurrentHealthPoints(int alter) { CurrentHealthPoints += alter; }
@@ -266,17 +291,17 @@ public class PlayerController : MonoBehaviour
 
 
     //invincibility
-    public void MakePlayerInvincible(float iTime) { invisiblityTimer = iTime; }
+    public void MakePlayerInvincible(float iTime) { invincibilityTimer = iTime; }
     public void UpdatePlayerStates()
     {
-        if (invisiblityTimer > 0 && !invisible)
+        if (invincibilityTimer > 0 && !invincible)
         {
-            invisible = true; //set tracker true
-            invisibilityStartTime = Time.time; //track when invisibility started
+            invincible = true; //set tracker true
+            invincibilityStartTime = Time.time; //track when invisibility started
         }
 
-        if (invisiblityTimer > 0) { invisiblityTimer -= Time.deltaTime; } //count down timer
-        if (invisiblityTimer <= 0) { invisible = false; } //when timer runs out, set tracker false
+        if (invincibilityTimer > 0) { invincibilityTimer -= Time.deltaTime; } //count down timer
+        if (invincibilityTimer <= 0) { invincible = false; } //when timer runs out, set tracker false
     }
     //~~~~~stats~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 }
