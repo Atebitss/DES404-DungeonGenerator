@@ -203,24 +203,26 @@ public class PlayerController : MonoBehaviour
 
     //~~~~~attacking~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     [Header("-Attacking")]
-    private bool attacking = false;
-    private int lightAttackComboCounter = 1;
-    private float lightAttackComboTimer = 0f, lightAttackComboTimerMax = 1f, lightAttackComboTimerStart = 0f;
-    private Quaternion lightAttackComboRotation = new Quaternion(0, 0, -30, 0);
-    [SerializeField] private GameObject lightAttackCollider;
-    [SerializeField] private PlayerLightAttackColliderManager PLACM;
-    [SerializeField] private GameObject heavyAttackCollider;
-    [SerializeField] private PlayerHeavyAttackColliderManager PHACM;
-    [SerializeField] private int attackDamage = 5;
-    [SerializeField] private float attackSpeed = 1f;
-    private float attackCooldownTimer = 0f, attackCooldownMax = 0.5f, attackCooldownStart = 0f;
-    private int attackComboDamage = 0;
+    private bool attacking = false; //tracker false to allow for first attack
+    private int lightAttackComboCounter = 1; //combo tracker set to one to skip first rotation
+    private float lightAttackComboTimer = 0f, lightAttackComboTimerMax = 1f, lightAttackComboTimerStart = 0f; //used to reset combo timer
+    private Quaternion lightAttackComboRotation = new Quaternion(0, 0, -30, 0); //first rotation
+    [SerializeField] private GameObject lightAttackCollider; //light collider
+    [SerializeField] private PlayerLightAttackColliderManager PLACM; //light collider script
+    [SerializeField] private GameObject heavyAttackCollider; //heavy collider
+    [SerializeField] private PlayerHeavyAttackColliderManager PHACM; //heavy collider script
+    [SerializeField] private int attackDamage = 5; //dafault damage
+    [SerializeField] private float attackSpeed = 1f; //default speed
+    private bool comboing = false;
+    private float attackCooldownTimer = 0f, attackCooldownMax = 0.5f, attackCooldownStart = 0f; //used to reset attack timer
+    private int attackComboDamage = 0; //additional damage
 
     public void OnLightAttack(InputAction.CallbackContext ctx)
     {
         if (ctx.performed && attackCooldownTimer <= 0)
         {
             Debug.Log("light attack");
+            Debug.Log("combo: " + lightAttackComboCounter);
             if (lightAttackComboCounter == 0) { attackComboDamage = 0; } //reset any temp combo damage
 
             //track light attack
@@ -391,6 +393,17 @@ public class PlayerController : MonoBehaviour
 
         if (attackCooldownTimer > 0) { attackCooldownTimer -= Time.deltaTime; } //count down timer
         if (attackCooldownTimer <= 0) { attacking = false; } //when timer runs out, set tracker false
+
+
+
+        if (lightAttackComboTimer > 0 && !comboing) { comboing = true; }
+        if (lightAttackComboTimer > 0) { lightAttackComboTimer -= Time.deltaTime; } //count down timer
+        if (lightAttackComboTimer <= 0 && comboing)  //when timer runs out
+        {
+            lightAttackComboCounter = 1; //set tracker to start
+            lightAttackComboRotation = new Quaternion(0, 0, -30, 0); //reset rotation
+            comboing = false; //set tracker false
+        }
     }
     //~~~~~stats~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 }
