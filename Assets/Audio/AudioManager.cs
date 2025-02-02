@@ -44,7 +44,7 @@ public class AudioManager : MonoBehaviour
             return;
         }
 
-        //if (PlayerData.GetDevMode()) { Debug.Log("playing AudioSound: " + name); }
+        Debug.Log("playing AudioSound: " + name);
 
         s.SetSoundPlaying(true);
         s.source.Play();
@@ -77,7 +77,7 @@ public class AudioManager : MonoBehaviour
             return;
         }
 
-        //if (PlayerData.GetDevMode()) { Debug.Log("playing AudioSound once: " + name); }
+        Debug.Log("playing AudioSound once: " + name);
 
         if (!s.source.isPlaying) s.source.Play();
     }
@@ -94,7 +94,7 @@ public class AudioManager : MonoBehaviour
             return;
         }
 
-        //if (PlayerData.GetDevMode()) { Debug.Log("playing AudioSound one shot: " + name); }
+        Debug.Log("playing AudioSound one shot: " + name);
 
         s.source.PlayOneShot(s.GetSoundClip());
     }
@@ -111,7 +111,7 @@ public class AudioManager : MonoBehaviour
 
         if (s.IsSoundPlaying())
         {
-            //if (PlayerData.GetDevMode()) { Debug.Log("stopping AudioSound: " + AudioSound); }
+            Debug.Log("stopping AudioSound: " + AudioSound);
 
             s.SetSoundPlaying(false);
             s.source.Stop();

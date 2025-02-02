@@ -127,7 +127,7 @@ public class PlayerController : MonoBehaviour
             for (int i = 0; i < dodgeLayerIDs.Length; i++) { Physics.IgnoreLayerCollision(gameObject.layer, dodgeLayerIDs[i], true); } //allow dodging through enemies
             MakePlayerInvincible(dodgeDuration);
 
-            AM.Play("Player_Dodge" + Random.Range(1, 3));
+            AM.Play("Player_Dodge" + Random.Range(1, 4));
 
             if (movement.x != 0 && movement.z != 0) //if the player is moving horizontally
             {
