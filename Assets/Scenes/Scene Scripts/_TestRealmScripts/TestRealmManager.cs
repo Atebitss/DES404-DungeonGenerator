@@ -5,6 +5,7 @@ using UnityEngine;
 public class TestRealmManager : AbstractSceneManager
 {
     [SerializeField] private bool devMode = false;
+    [SerializeField] private GameObject amPrefab;
     [SerializeField] private GameObject playerPrefab;
     [SerializeField] private GameObject doorPrefab;
 
@@ -16,6 +17,8 @@ public class TestRealmManager : AbstractSceneManager
     {
         if (GameObject.Find("DbugDisplayHUD")) { DDC = GameObject.Find("DbugDisplayHUD").GetComponent<DbugDisplayController>(); }
         if (!devMode) { DDC.SwitchVisible(); }
+
+        AM = Instantiate(amPrefab, new Vector3(0, 0, 0), Quaternion.identity).GetComponent<AudioManager>();
 
         player = Instantiate(playerPrefab, new Vector3(0, 0, 0), Quaternion.identity);
         player = player.transform.GetChild(0).gameObject;

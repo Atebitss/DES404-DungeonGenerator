@@ -1,0 +1,124 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &4065216700189244488
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6246798576525030690}
+  - component: {fileID: 3881629974155090602}
+  m_Layer: 0
+  m_Name: AudioManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6246798576525030690
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4065216700189244488}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3881629974155090602
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4065216700189244488}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5d7a8e2893ede14b96809de1bed95e3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  AudioSounds:
+  - source: {fileID: 0}
+    name: Sword_SwingCleave
+    clip: {fileID: 8300000, guid: 1e6843076a5c1494288a902cdd44ecf8, type: 3}
+    volume: 0.25
+    pitch: 1
+    loop: 0
+    play: 0
+  - source: {fileID: 0}
+    name: Sword_Hit1
+    clip: {fileID: 8300000, guid: 33a702494fdff0444a29523f7b2ebade, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 0
+    play: 0
+  - source: {fileID: 0}
+    name: Sword_Hit2
+    clip: {fileID: 8300000, guid: f8b5aa201d65cff4b91f550edf4ce402, type: 3}
+    volume: 5
+    pitch: 1
+    loop: 0
+    play: 0
+  - source: {fileID: 0}
+    name: Sword_Hit3
+    clip: {fileID: 8300000, guid: 4bdf2f4a42e8aaa47aa7d45f9c4f1938, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 0
+    play: 0
+  - source: {fileID: 0}
+    name: Sword_SwingFinal
+    clip: {fileID: 8300000, guid: c0460149eb0fe5c449984c8fb478e441, type: 3}
+    volume: 0.5
+    pitch: 0.75
+    loop: 0
+    play: 0
+  - source: {fileID: 0}
+    name: Sword_Swing1
+    clip: {fileID: 8300000, guid: 9291cc5d1497ea04a94cf1ec7e3997a9, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 0
+    play: 0
+  - source: {fileID: 0}
+    name: Sword_Swing2
+    clip: {fileID: 8300000, guid: 8fe759b5705c9f44583297cb00dd8fb9, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 0
+    play: 0
+  - source: {fileID: 0}
+    name: 
+    clip: {fileID: 0}
+    volume: 1
+    pitch: 1
+    loop: 0
+    play: 0
+  - source: {fileID: 0}
+    name: Player_Dodge1
+    clip: {fileID: 8300000, guid: 0997e6a555b8bdf4bbbca31e90884f7e, type: 3}
+    volume: 2
+    pitch: 1
+    loop: 0
+    play: 0
+  - source: {fileID: 0}
+    name: Player_Dodge2
+    clip: {fileID: 8300000, guid: 4a05f43efd8da744f89b7281a355eecc, type: 3}
+    volume: 2
+    pitch: 1
+    loop: 0
+    play: 0
+  - source: {fileID: 0}
+    name: Player_Dodge3
+    clip: {fileID: 8300000, guid: ee6766a428d022e44918627994d4256e, type: 3}
+    volume: 2
+    pitch: 1
+    loop: 0
+    play: 0

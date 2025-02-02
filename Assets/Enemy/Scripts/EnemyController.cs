@@ -17,6 +17,7 @@ public class EnemyController : AbstractEnemy
         baseMaterial = enemyRenderer.material;
 
         SM = GameObject.FindWithTag("SceneManager").GetComponent<AbstractSceneManager>();
+        AM = SM.GetAudioManager();
         PC = SM.GetPlayerController();
 
         //aim towards player

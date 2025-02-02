@@ -276,6 +276,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SM: {fileID: 0}
+  AM: {fileID: 0}
   PC: {fileID: 0}
   health: 0
   damage: 0
@@ -415,8 +416,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2140f40bfe1ca442b4de2afdafb43d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  AM: {fileID: 0}
   PC: {fileID: 0}
   devMode: 1
+  amPrefab: {fileID: 4065216700189244488, guid: 924cc0721c1d6e841a3aff4bc23543af, type: 3}
   playerPrefab: {fileID: 2783768033875945984, guid: 07888939a1f59d349b73cd0353289295, type: 3}
   doorPrefab: {fileID: 7151845054247194810, guid: ec6fe55e299e1054496342b441da8b59, type: 3}
 --- !u!4 &357799855
@@ -576,6 +579,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SM: {fileID: 0}
+  AM: {fileID: 0}
   PC: {fileID: 0}
   health: 0
   damage: 0
@@ -807,6 +811,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SM: {fileID: 0}
+  AM: {fileID: 0}
   PC: {fileID: 0}
   health: 0
   damage: 0
@@ -1067,6 +1072,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SM: {fileID: 0}
+  AM: {fileID: 0}
   PC: {fileID: 0}
   health: 0
   damage: 0
@@ -1374,6 +1380,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SM: {fileID: 0}
+  AM: {fileID: 0}
   PC: {fileID: 0}
   health: 0
   damage: 0

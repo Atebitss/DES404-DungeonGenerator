@@ -4,6 +4,7 @@ public abstract class AbstractEnemy : MonoBehaviour
 {
     //scripts
     public AbstractSceneManager SM;
+    public AudioManager AM;
     public PlayerController PC;
     
     //health

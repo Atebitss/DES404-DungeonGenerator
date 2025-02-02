@@ -16,6 +16,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Camera playerCamera; //player camera used for looking and object interactions
     [SerializeField] private TMP_Text interactionPromptText; //object interaction display
 
+    private AbstractSceneManager SM;
+    private AudioManager AM;
+
     private DbugDisplayController DDC; //debug display
     public void SetDDC(DbugDisplayController DDC) { this.DDC = DDC; }
 
@@ -39,6 +42,11 @@ public class PlayerController : MonoBehaviour
         {
             dodgeLayerIDs[i] = tempDodgeLayerIDs[i];
         }
+    }
+    private void Start()
+    {
+        SM = GameObject.FindWithTag("SceneManager").GetComponent<AbstractSceneManager>();
+        AM = SM.GetAudioManager();
     }
 
     private void FixedUpdate()
@@ -119,6 +127,8 @@ public class PlayerController : MonoBehaviour
             for (int i = 0; i < dodgeLayerIDs.Length; i++) { Physics.IgnoreLayerCollision(gameObject.layer, dodgeLayerIDs[i], true); } //allow dodging through enemies
             MakePlayerInvincible(dodgeDuration);
 
+            AM.Play("Player_Dodge" + Random.Range(1, 3));
+
             if (movement.x != 0 && movement.z != 0) //if the player is moving horizontally
             {
                 //calc velocity in direction moving
@@ -175,10 +185,10 @@ public class PlayerController : MonoBehaviour
         playerCamera.transform.localRotation = Quaternion.Lerp(playerCamera.transform.localRotation, targetCameraRot, (Time.deltaTime / 0.1f));
 
 
-        lightAttackCollider.transform.position = (playerCamera.transform.position + playerCamera.transform.forward); //new attack collider position to infront of camera
-        lightAttackCollider.transform.localRotation = Quaternion.Lerp(playerCamera.transform.localRotation, targetCameraRot, (Time.deltaTime / 0.1f));
+        lightAttackCollider.transform.position = (playerCamera.transform.position + (playerCamera.transform.forward * 1.25f)); //new attack collider position to infront of camera
+        lightAttackCollider.transform.localRotation = Quaternion.Lerp(playerCamera.transform.localRotation, (targetCameraRot * lightAttackComboRotation), (Time.deltaTime / 0.1f));
 
-        heavyAttackCollider.transform.position = (playerCamera.transform.position + playerCamera.transform.forward); //new attack collider position to infront of camera
+        heavyAttackCollider.transform.position = (playerCamera.transform.position + (playerCamera.transform.forward * 1.25f)); //new attack collider position to infront of camera
         heavyAttackCollider.transform.localRotation = Quaternion.Lerp(playerCamera.transform.localRotation, targetCameraRot, (Time.deltaTime / 0.1f));
 
 
@@ -193,21 +203,45 @@ public class PlayerController : MonoBehaviour
 
     //~~~~~attacking~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     [Header("-Attacking")]
+    private bool attacking = false;
+    private int lightAttackComboCounter = 1;
+    private float lightAttackComboTimer = 0f, lightAttackComboTimerMax = 1f, lightAttackComboTimerStart = 0f;
+    private Quaternion lightAttackComboRotation = new Quaternion(0, 0, -30, 0);
     [SerializeField] private GameObject lightAttackCollider;
     [SerializeField] private PlayerLightAttackColliderManager PLACM;
     [SerializeField] private GameObject heavyAttackCollider;
     [SerializeField] private PlayerHeavyAttackColliderManager PHACM;
     [SerializeField] private int attackDamage = 5;
     [SerializeField] private float attackSpeed = 1f;
-    private float attackCooldown = 0.5f;
+    private float attackCooldownTimer = 0f, attackCooldownMax = 0.5f, attackCooldownStart = 0f;
+    private int attackComboDamage = 0;
 
     public void OnLightAttack(InputAction.CallbackContext ctx)
     {
-        if (ctx.performed)
+        if (ctx.performed && attackCooldownTimer <= 0)
         {
             Debug.Log("light attack");
+            if (lightAttackComboCounter == 0) { attackComboDamage = 0; } //reset any temp combo damage
+
+            //track light attack
+            lightAttackComboTimerStart = Time.time; //track when last combo hit started
+            attackCooldownTimer = attackCooldownMax;
+            lightAttackComboTimer = lightAttackComboTimerMax;
+
             GameObject[] hitEnemies = PLACM.GetAttackColliderObjects(); //reference each enemy found in the collider
-            for (int i = 0; i < hitEnemies.Length; i++) { hitEnemies[i].GetComponent<AbstractEnemy>().AlterHealth(-attackDamage); } //deal damage to each enemy
+            for (int i = 0; i < hitEnemies.Length; i++) { hitEnemies[i].GetComponent<AbstractEnemy>().AlterHealth(-(attackDamage + attackComboDamage)); AM.Play("Sword_Hit" + Random.Range(1, 3)); } //deal damage to each enemy
+
+            if (lightAttackComboCounter == 1) { lightAttackComboRotation = new Quaternion(0, 0, 30, 0); AM.Play("Sword_Swing1"); } //turn attack collider to 30*
+            else if (lightAttackComboCounter == 2) { lightAttackComboRotation = new Quaternion(0, 0, 0, 0); AM.Play("Sword_Swing2"); } //turn attack collider to -30*
+            else if (lightAttackComboCounter == 3) //turn attack collider to 0* & reset
+            {
+                lightAttackComboRotation = new Quaternion(0, 0, -30, 0);
+                AM.Play("Sword_SwingFinal");
+                attackComboDamage = attackDamage * 2; //double damage added on to regular damage
+                lightAttackComboCounter = 0;  //reset counter
+            }
+
+            lightAttackComboCounter++;
         }
     }
     public void OnHeavyAttack(InputAction.CallbackContext ctx)
@@ -215,8 +249,9 @@ public class PlayerController : MonoBehaviour
         if (ctx.performed)
         {
             Debug.Log("heavy attack");
+            AM.Play("Sword_SwingCleave");
             GameObject[] hitEnemies = PHACM.GetAttackColliderObjects(); //reference each enemy found in the collider
-            for (int i = 0; i < hitEnemies.Length; i++) { hitEnemies[i].GetComponent<AbstractEnemy>().AlterHealth(-attackDamage); } //deal damage to each enemy
+            for (int i = 0; i < hitEnemies.Length; i++) { hitEnemies[i].GetComponent<AbstractEnemy>().AlterHealth(-attackDamage); AM.Play("Sword_Hit" + Random.Range(1, 3)); } //deal damage to each enemy
         }
     }
     public void RemoveEnemyFromArrays(GameObject obj) { PLACM.RemoveObjectFromArray(obj); PHACM.RemoveObjectFromArray(obj); }
@@ -345,6 +380,17 @@ public class PlayerController : MonoBehaviour
 
         if (invincibilityTimer > 0) { invincibilityTimer -= Time.deltaTime; } //count down timer
         if (invincibilityTimer <= 0) { invincible = false; } //when timer runs out, set tracker false
+
+
+
+        if (attackCooldownTimer > 0 && !attacking)
+        {
+            attacking = true; //set tracker
+            attackCooldownStart = Time.time; //track when attack started
+        }
+
+        if (attackCooldownTimer > 0) { attackCooldownTimer -= Time.deltaTime; } //count down timer
+        if (attackCooldownTimer <= 0) { attacking = false; } //when timer runs out, set tracker false
     }
     //~~~~~stats~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 }
