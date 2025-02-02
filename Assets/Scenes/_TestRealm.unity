@@ -955,8 +955,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 50
-  m_fontSizeBase: 50
+  m_fontSize: 25
+  m_fontSizeBase: 25
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -1682,8 +1682,36 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   DbugText: {fileID: 701842002}
+  playerJumping: 0
+  playerGrounded: 0
   playerPosition: {x: 0, y: 0, z: 0}
   playerVelocity: {x: 0, y: 0, z: 0}
+  playerMovement: {x: 0, y: 0, z: 0}
+  playerHealthCurrent: 0
+  playerHealthMax: 0
+  playerHealthPerSecond: 0
+  playerStaminaCurrent: 0
+  playerStaminaMax: 0
+  playerStaminaPerSecond: 0
+  playerMagicCurrent: 0
+  playerMagicMax: 0
+  playerMagicPerSecond: 0
+  playerAttackDamage: 0
+  playerAttackSpeed: 0
+  playerDodging: 0
+  playerDodgeCooldownTimer: 0
+  playerDodgeStartTime: 0
+  playerDodgeVelocity: {x: 0, y: 0, z: 0}
+  playerAttacking: 0
+  playerAttackCooldownTimer: 0
+  playerAttackStartTime: 0
+  playerComboing: 0
+  lightAttackComboCounter: 0
+  playerLightAttackComboTimer: 0
+  playerLightAttackComboStartTime: 0
+  playerInvincible: 0
+  playerInvincibilityTimer: 0
+  playerInvincibilityStartTime: 0
 --- !u!114 &1591639235
 MonoBehaviour:
   m_ObjectHideFlags: 0

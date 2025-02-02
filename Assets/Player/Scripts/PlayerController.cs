@@ -22,6 +22,8 @@ public class PlayerController : MonoBehaviour
     private DbugDisplayController DDC; //debug display
     public void SetDDC(DbugDisplayController DDC) { this.DDC = DDC; }
 
+    [SerializeField] private Animator a;
+
     private void Awake()
     {
         //dodge layer mask to layer IDs
@@ -51,7 +53,50 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (DDC != null) { DDC.playerPosition = playerRigid.position; } //update debug display
+        if (DDC != null) //update debug display 
+        {
+            //world space
+            DDC.playerJumping = jumping;
+            DDC.playerGrounded = grounded;
+            DDC.playerPosition = playerRigid.position;
+            DDC.playerVelocity = playerVelocity;
+            DDC.playerMovement = movement;
+
+            //stats
+            DDC.playerHealthCurrent = healthPointsCurrent;
+            DDC.playerHealthMax = healthPointsMax;
+            DDC.playerHealthPerSecond = 0f;
+            DDC.playerStaminaCurrent = staminaPointsCurrent;
+            DDC.playerStaminaMax = staminaPointsMax;
+            DDC.playerStaminaPerSecond = 0f;
+            DDC.playerMagicCurrent = magicPointsCurrent;
+            DDC.playerMagicMax = magicPointsMax;
+            DDC.playerMagicPerSecond = 0f;
+            DDC.playerAttackDamage = attackDamage;
+            DDC.playerAttackSpeed = attackSpeed;
+
+            //dodge
+            DDC.playerDodging = dodging;
+            DDC.playerDodgeCooldownTimer = dodgeCooldownTimer;
+            DDC.playerDodgeStartTime = dodgeStartTime;
+            DDC.playerDodgeVelocity = dodgeVelocity;
+
+            //attack
+            DDC.playerAttacking = attacking;
+            DDC.playerAttackCooldownTimer = attackCooldownTimer;
+            DDC.playerAttackStartTime = attackStartTime;
+
+            //attack combo
+            DDC.playerComboing = comboing;
+            DDC.lightAttackComboCounter = lightAttackComboCounter;
+            DDC.playerLightAttackComboTimer = lightAttackComboTimer;
+            DDC.playerLightAttackComboStartTime = lightAttackComboStartTime;
+
+            //invincibility
+            DDC.playerInvincible = invincible;
+            DDC.playerInvincibilityTimer = invincibilityTimer;
+            DDC.playerInvincibilityStartTime = invincibilityStartTime;
+        }
 
         UpdatePlayerMovement();
         UpdatePlayerLooking();
@@ -80,9 +125,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float dodgeDistance = 5f; //------|
     private Vector3 dodgeVelocity = Vector3.zero; //used to calc directional velocity
     private bool dodging = false; //tracker
-    private float dodgeCD = 0f; //current dodge cooldown time
-    [SerializeField] private float dodgeCDMax = 0.5f; //time between dodges
+    private float dodgeCooldownTimer = 0f; //current dodge cooldown time
     private float dodgeStartTime = 0f; //track real time dodge began
+    [SerializeField] private float dodgeCDMax = 0.5f; //time between dodges
 
     //jumping
     [SerializeField] private float jumpForce = 10f;
@@ -117,12 +162,12 @@ public class PlayerController : MonoBehaviour
     public void OnDodge(InputAction.CallbackContext ctx)
     {
         //(Space / Button South) + (WASD/ Left Thumbstick)
-        if (ctx.performed && dodgeCD <= 0 && !dodging) //if dodge cooldown is not active and the player is not currently dodging
+        if (ctx.performed && dodgeCooldownTimer <= 0 && !dodging) //if dodge cooldown is not active and the player is not currently dodging
         {
             Debug.Log("dodge");
 
             dodgeStartTime = Time.time; //remember time when dodge started
-            dodgeCD = dodgeCDMax; //set cooldown timer
+            dodgeCooldownTimer = dodgeCDMax; //set cooldown timer
             dodging = true; //set tracker to true
             for (int i = 0; i < dodgeLayerIDs.Length; i++) { Physics.IgnoreLayerCollision(gameObject.layer, dodgeLayerIDs[i], true); } //allow dodging through enemies
             MakePlayerInvincible(dodgeDuration);
@@ -163,10 +208,7 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        if (dodgeCD > 0) { dodgeCD -= Time.deltaTime; } //count down cooldown 
-
-
-        if (DDC != null) { DDC.playerVelocity = playerVelocity; }
+        if (dodgeCooldownTimer > 0) { dodgeCooldownTimer -= Time.deltaTime; } //count down cooldown
     }
 
 
@@ -204,9 +246,14 @@ public class PlayerController : MonoBehaviour
     //~~~~~attacking~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     [Header("-Attacking")]
     private bool attacking = false; //tracker false to allow for first attack
-    private int lightAttackComboCounter = 1; //combo tracker set to one to skip first rotation
-    private float lightAttackComboTimer = 0f, lightAttackComboTimerMax = 1f, lightAttackComboTimerStart = 0f; //used to reset combo timer
-    private Quaternion lightAttackComboRotation = new Quaternion(0, 0, -30, 0); //first rotation
+    private float attackCooldownTimer = 0f, attackStartTime = 0f; //used to reset attack timer
+    [SerializeField] private float attackCooldownMax = 0.5f;
+    private int attackComboDamage = 0; //additional damage
+    private int lightAttackComboCounter = 0; //combo tracker set to one to skip first rotation
+    private float lightAttackComboTimer = 0f, lightAttackComboStartTime = 0f; //used to reset combo timer
+    [SerializeField] private float lightAttackComboTimerMax = 1f;
+    private Quaternion lightAttackComboRotation = new Quaternion(0, 0, 30, 0); //first rotation
+    [SerializeField] private GameObject weaponAttackCollider;
     [SerializeField] private GameObject lightAttackCollider; //light collider
     [SerializeField] private PlayerLightAttackColliderManager PLACM; //light collider script
     [SerializeField] private GameObject heavyAttackCollider; //heavy collider
@@ -214,8 +261,6 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private int attackDamage = 5; //dafault damage
     [SerializeField] private float attackSpeed = 1f; //default speed
     private bool comboing = false;
-    private float attackCooldownTimer = 0f, attackCooldownMax = 0.5f, attackCooldownStart = 0f; //used to reset attack timer
-    private int attackComboDamage = 0; //additional damage
 
     public void OnLightAttack(InputAction.CallbackContext ctx)
     {
@@ -223,27 +268,34 @@ public class PlayerController : MonoBehaviour
         {
             Debug.Log("light attack");
             Debug.Log("combo: " + lightAttackComboCounter);
-            if (lightAttackComboCounter == 0) { attackComboDamage = 0; } //reset any temp combo damage
+            if (lightAttackComboCounter == 0) 
+            {
+                attackComboDamage = 0; //reset any temp combo damage
+            }
 
             //track light attack
-            lightAttackComboTimerStart = Time.time; //track when last combo hit started
+            lightAttackComboStartTime = Time.time; //track when last combo hit started
             attackCooldownTimer = attackCooldownMax;
             lightAttackComboTimer = lightAttackComboTimerMax;
+            if (lightAttackComboCounter == 0) { lightAttackComboRotation = new Quaternion(0, 0, 30, 0); AM.Play("Sword_Swing1"); } //turn attack collider to 30*
+            else if (lightAttackComboCounter == 1) { lightAttackComboRotation = new Quaternion(0, 0, -30, 0); AM.Play("Sword_Swing2"); } //turn attack collider to -30*
+            else if (lightAttackComboCounter == 2) //turn attack collider to 0* & reset
+            {
+                lightAttackComboRotation = new Quaternion(0, 0, 0, 0);
+                a.SetInteger("lightSwingCombo", lightAttackComboCounter);
+                AM.Play("Sword_SwingFinal");
+                attackComboDamage = attackDamage * 2; //double damage added on to regular damage
+            }
 
             GameObject[] hitEnemies = PLACM.GetAttackColliderObjects(); //reference each enemy found in the collider
             for (int i = 0; i < hitEnemies.Length; i++) { hitEnemies[i].GetComponent<AbstractEnemy>().AlterHealth(-(attackDamage + attackComboDamage)); AM.Play("Sword_Hit" + Random.Range(1, 3)); } //deal damage to each enemy
 
-            if (lightAttackComboCounter == 1) { lightAttackComboRotation = new Quaternion(0, 0, 30, 0); AM.Play("Sword_Swing1"); } //turn attack collider to 30*
-            else if (lightAttackComboCounter == 2) { lightAttackComboRotation = new Quaternion(0, 0, 0, 0); AM.Play("Sword_Swing2"); } //turn attack collider to -30*
-            else if (lightAttackComboCounter == 3) //turn attack collider to 0* & reset
-            {
-                lightAttackComboRotation = new Quaternion(0, 0, -30, 0);
-                AM.Play("Sword_SwingFinal");
-                attackComboDamage = attackDamage * 2; //double damage added on to regular damage
-                lightAttackComboCounter = 0;  //reset counter
-            }
-
             lightAttackComboCounter++;
+
+            //update sword swing animation
+            a.SetInteger("lightSwingCombo", lightAttackComboCounter);
+
+            if (lightAttackComboCounter == 3) { lightAttackComboCounter = 0; } //reset counter
         }
     }
     public void OnHeavyAttack(InputAction.CallbackContext ctx)
@@ -320,37 +372,37 @@ public class PlayerController : MonoBehaviour
 
     //~~~~~stats~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     [Header("-Stat")]
-    [SerializeField] private int CurrentHealthPoints = 10;
-    [SerializeField] private int MaxHealthPoints = 10;
-    [SerializeField] private int CurrentStaminaPoints = 10;
-    [SerializeField] private int MaxStaminaPoints = 10;
-    [SerializeField] private int CurrentMagicPoints = 10;
-    [SerializeField] private int MaxMagicPoints = 10;
+    [SerializeField] private int healthPointsCurrent = 10;
+    [SerializeField] private int healthPointsMax = 10;
+    [SerializeField] private int staminaPointsCurrent = 10;
+    [SerializeField] private int staminaPointsMax = 10;
+    [SerializeField] private int magicPointsCurrent = 10;
+    [SerializeField] private int magicPointsMax = 10;
     [SerializeField] private int StrengthPoints = 1, DexterityPoints = 1, IntelligencePoints = 1, WisdomPoints = 1;
     [SerializeField] private bool invincible = false;
     [SerializeField] private float invincibilityTimer = 0f;
     private float invincibilityStartTime = 0f;
 
     //health points
-    public void AlterCurrentHealthPoints(int alter) { CurrentHealthPoints += alter; }
-    public int GetCurrentHealthPoints() { return CurrentHealthPoints; }
+    public void AlterCurrentHealthPoints(int alter) { healthPointsCurrent += alter; }
+    public int GetCurrentHealthPoints() { return healthPointsCurrent; }
 
-    public void AlterMaxHealthPoints(int alter) { MaxHealthPoints += alter; }
-    public int GetMaxHealthPoints() { return MaxHealthPoints; }
+    public void AlterMaxHealthPoints(int alter) { healthPointsMax += alter; }
+    public int GetMaxHealthPoints() { return healthPointsMax; }
 
     //stamina points
-    public void AlterCurrentStaminaPoints(int alter) { CurrentStaminaPoints += alter; }
-    public int GetCurrentStaminaPoints() { return CurrentStaminaPoints; }
+    public void AlterCurrentStaminaPoints(int alter) { staminaPointsCurrent += alter; }
+    public int GetCurrentStaminaPoints() { return staminaPointsCurrent; }
 
-    public void AlterMaxStaminaPoints(int alter) { MaxStaminaPoints += alter; }
-    public int GetMaxStaminaPoints() { return MaxStaminaPoints; }
+    public void AlterMaxStaminaPoints(int alter) { staminaPointsMax += alter; }
+    public int GetMaxStaminaPoints() { return staminaPointsMax; }
 
     //magic points
-    public void AlterCurrentMagicPoints(int alter) { CurrentMagicPoints += alter; }
-    public int GetCurrentMagicPoints() { return CurrentMagicPoints; }
+    public void AlterCurrentMagicPoints(int alter) { magicPointsCurrent += alter; }
+    public int GetCurrentMagicPoints() { return magicPointsCurrent; }
 
-    public void AlterMaxMagicPoints(int alter) { MaxMagicPoints += alter; }
-    public int GetMaxMagicPoints() { return MaxMagicPoints; }
+    public void AlterMaxMagicPoints(int alter) { magicPointsMax += alter; }
+    public int GetMaxMagicPoints() { return magicPointsMax; }
 
     //other stats
     //stength
@@ -381,18 +433,18 @@ public class PlayerController : MonoBehaviour
         }
 
         if (invincibilityTimer > 0) { invincibilityTimer -= Time.deltaTime; } //count down timer
-        if (invincibilityTimer <= 0) { invincible = false; } //when timer runs out, set tracker false
+        if (invincibilityTimer <= 0) { invincibilityTimer = 0; invincibilityStartTime = 0; invincible = false; } //when timer runs out, set tracker false
 
 
 
         if (attackCooldownTimer > 0 && !attacking)
         {
             attacking = true; //set tracker
-            attackCooldownStart = Time.time; //track when attack started
+            attackStartTime = Time.time; //track when attack started
         }
 
         if (attackCooldownTimer > 0) { attackCooldownTimer -= Time.deltaTime; } //count down timer
-        if (attackCooldownTimer <= 0) { attacking = false; } //when timer runs out, set tracker false
+        if (attackCooldownTimer <= 0) { attackCooldownTimer = 0; attackStartTime = 0;  attacking = false; } //when timer runs out, set tracker false
 
 
 
@@ -400,9 +452,11 @@ public class PlayerController : MonoBehaviour
         if (lightAttackComboTimer > 0) { lightAttackComboTimer -= Time.deltaTime; } //count down timer
         if (lightAttackComboTimer <= 0 && comboing)  //when timer runs out
         {
-            lightAttackComboCounter = 1; //set tracker to start
-            lightAttackComboRotation = new Quaternion(0, 0, -30, 0); //reset rotation
+            lightAttackComboTimer = 0;
+            lightAttackComboCounter = 0; //set tracker to start
+            lightAttackComboRotation = new Quaternion(0, 0, 30, 0); //reset rotation
             comboing = false; //set tracker false
+            a.SetInteger("lightSwingCombo", lightAttackComboCounter);
         }
     }
     //~~~~~stats~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
