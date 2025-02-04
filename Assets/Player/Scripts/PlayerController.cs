@@ -49,59 +49,74 @@ public class PlayerController : MonoBehaviour
     {
         SM = GameObject.FindWithTag("SceneManager").GetComponent<AbstractSceneManager>();
         AM = SM.GetAudioManager();
+
+        PWCM.SetPlayerDamage(attackDamage);
+        PWCM.SetAM(AM);
     }
+
 
     private void FixedUpdate()
     {
-        if (DDC != null) //update debug display 
-        {
-            //world space
-            DDC.playerJumping = jumping;
-            DDC.playerGrounded = grounded;
-            DDC.playerPosition = playerRigid.position;
-            DDC.playerVelocity = playerVelocity;
-            DDC.playerMovement = movement;
-
-            //stats
-            DDC.playerHealthCurrent = healthPointsCurrent;
-            DDC.playerHealthMax = healthPointsMax;
-            DDC.playerHealthPerSecond = 0f;
-            DDC.playerStaminaCurrent = staminaPointsCurrent;
-            DDC.playerStaminaMax = staminaPointsMax;
-            DDC.playerStaminaPerSecond = 0f;
-            DDC.playerMagicCurrent = magicPointsCurrent;
-            DDC.playerMagicMax = magicPointsMax;
-            DDC.playerMagicPerSecond = 0f;
-            DDC.playerAttackDamage = attackDamage;
-            DDC.playerAttackSpeed = attackSpeed;
-
-            //dodge
-            DDC.playerDodging = dodging;
-            DDC.playerDodgeCooldownTimer = dodgeCooldownTimer;
-            DDC.playerDodgeStartTime = dodgeStartTime;
-            DDC.playerDodgeVelocity = dodgeVelocity;
-
-            //attack
-            DDC.playerAttacking = attacking;
-            DDC.playerAttackCooldownTimer = attackCooldownTimer;
-            DDC.playerAttackStartTime = attackStartTime;
-
-            //attack combo
-            DDC.playerComboing = comboing;
-            DDC.lightAttackComboCounter = lightAttackComboCounter;
-            DDC.playerLightAttackComboTimer = lightAttackComboTimer;
-            DDC.playerLightAttackComboStartTime = lightAttackComboStartTime;
-
-            //invincibility
-            DDC.playerInvincible = invincible;
-            DDC.playerInvincibilityTimer = invincibilityTimer;
-            DDC.playerInvincibilityStartTime = invincibilityStartTime;
-        }
-
+        if (DDC != null) { UpdateDDC(); }
         UpdatePlayerMovement();
         UpdatePlayerLooking();
         UpdateInteractionPrompt();
         UpdatePlayerStates();
+    }
+
+
+    private void UpdateDDC()
+    {
+        //world space
+        DDC.playerJumping = jumping;
+        DDC.playerGrounded = grounded;
+        DDC.playerPosition = playerRigid.position;
+        DDC.playerVelocity = playerVelocity;
+        DDC.playerMovement = movement;
+
+        //stats
+        DDC.playerHealthCurrent = healthPointsCurrent;
+        DDC.playerHealthMax = healthPointsMax;
+        DDC.playerHealthPerSecond = 0f;
+        DDC.playerStaminaCurrent = staminaPointsCurrent;
+        DDC.playerStaminaMax = staminaPointsMax;
+        DDC.playerStaminaPerSecond = 0f;
+        DDC.playerMagicCurrent = magicPointsCurrent;
+        DDC.playerMagicMax = magicPointsMax;
+        DDC.playerMagicPerSecond = 0f;
+        DDC.playerAttackDamage = attackDamage;
+        DDC.playerAttackSpeed = attackSpeed;
+
+        //dodge
+        DDC.playerDodging = dodging;
+        DDC.playerDodgeCooldownTimer = dodgeCooldownTimer;
+        DDC.playerDodgeStartTime = dodgeStartTime;
+        DDC.playerDodgeVelocity = dodgeVelocity;
+
+        //attack
+        DDC.playerAttacking = attacking;
+        DDC.playerAttackCooldownTimer = attackCooldownTimer;
+        DDC.playerAttackStartTime = attackStartTime;
+
+        //attack combo
+        DDC.playerComboing = comboing;
+        DDC.lightAttackComboCounter = lightAttackComboCounter;
+        DDC.playerLightAttackComboTimer = lightAttackComboTimer;
+        DDC.playerLightAttackComboStartTime = lightAttackComboStartTime;
+
+        //invincibility
+        DDC.playerInvincible = invincible;
+        DDC.playerInvincibilityTimer = invincibilityTimer;
+        DDC.playerInvincibilityStartTime = invincibilityStartTime;
+    }
+
+
+
+    private float GetCurAnimLength()
+    {
+        //find legnth of current animation
+        foreach (AnimationClip clip in a.runtimeAnimatorController.animationClips) { if (a.GetCurrentAnimatorStateInfo(0).IsName(clip.name)) { return clip.length; } }
+        return -1;
     }
     //~~~~~misc~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -227,11 +242,12 @@ public class PlayerController : MonoBehaviour
         playerCamera.transform.localRotation = Quaternion.Lerp(playerCamera.transform.localRotation, targetCameraRot, (Time.deltaTime / 0.1f));
 
 
-        lightAttackCollider.transform.position = (playerCamera.transform.position + (playerCamera.transform.forward * 1.25f)); //new attack collider position to infront of camera
-        lightAttackCollider.transform.localRotation = Quaternion.Lerp(playerCamera.transform.localRotation, (targetCameraRot * lightAttackComboRotation), (Time.deltaTime / 0.1f));
-
-        heavyAttackCollider.transform.position = (playerCamera.transform.position + (playerCamera.transform.forward * 1.25f)); //new attack collider position to infront of camera
-        heavyAttackCollider.transform.localRotation = Quaternion.Lerp(playerCamera.transform.localRotation, targetCameraRot, (Time.deltaTime / 0.1f));
+        if (!attacking)
+        {
+            Vector3 weaponOffset = (playerCamera.transform.right * 0.25f) + (playerCamera.transform.up * -0.5f) + (playerCamera.transform.forward * -0.5f);
+            weaponParent.transform.position = ((playerRigid.transform.position + weaponOffset) + playerCamera.transform.forward);
+            weaponParent.transform.rotation = playerCamera.transform.rotation;
+        }
 
 
         targetPlayerRot *= Quaternion.Euler(0f, (lookment.x * lookSensitivity), 0f); //new player turn rotation
@@ -252,63 +268,74 @@ public class PlayerController : MonoBehaviour
     private int lightAttackComboCounter = 0; //combo tracker set to one to skip first rotation
     private float lightAttackComboTimer = 0f, lightAttackComboStartTime = 0f; //used to reset combo timer
     [SerializeField] private float lightAttackComboTimerMax = 1f;
-    private Quaternion lightAttackComboRotation = new Quaternion(0, 0, 30, 0); //first rotation
-    [SerializeField] private GameObject weaponAttackCollider;
-    [SerializeField] private GameObject lightAttackCollider; //light collider
-    [SerializeField] private PlayerLightAttackColliderManager PLACM; //light collider script
-    [SerializeField] private GameObject heavyAttackCollider; //heavy collider
-    [SerializeField] private PlayerHeavyAttackColliderManager PHACM; //heavy collider script
+    [SerializeField] private GameObject weaponParent; //weapon parent
+    [SerializeField] private GameObject weaponAttackCollider; //weapon collider
+    [SerializeField] private PlayerWeaponColliderManager PWCM; //weapon collider script
     [SerializeField] private int attackDamage = 5; //dafault damage
     [SerializeField] private float attackSpeed = 1f; //default speed
     private bool comboing = false;
 
     public void OnLightAttack(InputAction.CallbackContext ctx)
     {
-        if (ctx.performed && attackCooldownTimer <= 0)
+        if (ctx.performed && attackCooldownTimer <= 0 && !attacking)
         {
-            Debug.Log("light attack");
-            Debug.Log("combo: " + lightAttackComboCounter);
+            //Debug.Log("light attack");
+            //Debug.Log("combo: " + lightAttackComboCounter);
+            
             if (lightAttackComboCounter == 0) 
             {
                 attackComboDamage = 0; //reset any temp combo damage
             }
 
+
             //track light attack
-            lightAttackComboStartTime = Time.time; //track when last combo hit started
             attackCooldownTimer = attackCooldownMax;
             lightAttackComboTimer = lightAttackComboTimerMax;
-            if (lightAttackComboCounter == 0) { lightAttackComboRotation = new Quaternion(0, 0, 30, 0); AM.Play("Sword_Swing1"); } //turn attack collider to 30*
-            else if (lightAttackComboCounter == 1) { lightAttackComboRotation = new Quaternion(0, 0, -30, 0); AM.Play("Sword_Swing2"); } //turn attack collider to -30*
-            else if (lightAttackComboCounter == 2) //turn attack collider to 0* & reset
+            lightAttackComboStartTime = Time.time; //track when last combo hit started
+
+
+            //switch depending on combo
+            if (lightAttackComboCounter == 0) { AM.Play("Sword_Swing1"); }
+            else if (lightAttackComboCounter == 1) { AM.Play("Sword_Swing2"); }
+            else if (lightAttackComboCounter == 2)
             {
-                lightAttackComboRotation = new Quaternion(0, 0, 0, 0);
-                a.SetInteger("lightSwingCombo", lightAttackComboCounter);
                 AM.Play("Sword_SwingFinal");
                 attackComboDamage = attackDamage * 2; //double damage added on to regular damage
             }
 
-            GameObject[] hitEnemies = PLACM.GetAttackColliderObjects(); //reference each enemy found in the collider
-            for (int i = 0; i < hitEnemies.Length; i++) { hitEnemies[i].GetComponent<AbstractEnemy>().AlterHealth(-(attackDamage + attackComboDamage)); AM.Play("Sword_Hit" + Random.Range(1, 3)); } //deal damage to each enemy
-
-            lightAttackComboCounter++;
+            lightAttackComboCounter++; //increase combo
 
             //update sword swing animation
             a.SetInteger("lightSwingCombo", lightAttackComboCounter);
+            PWCM.EnableAttackCheck(GetCurAnimLength());
 
             if (lightAttackComboCounter == 3) { lightAttackComboCounter = 0; } //reset counter
         }
     }
     public void OnHeavyAttack(InputAction.CallbackContext ctx)
     {
-        if (ctx.performed)
+        if (ctx.performed && attackCooldownTimer <= 0 && !attacking)
         {
             Debug.Log("heavy attack");
+
+            attackCooldownTimer = attackCooldownMax;
+
+            if (lightAttackComboCounter != 0)  //reset light attack
+            {
+                lightAttackComboCounter = 0;
+                lightAttackComboTimer = 0;
+                a.SetInteger("lightSwingCombo", lightAttackComboCounter);
+            }
+
             AM.Play("Sword_SwingCleave");
-            GameObject[] hitEnemies = PHACM.GetAttackColliderObjects(); //reference each enemy found in the collider
-            for (int i = 0; i < hitEnemies.Length; i++) { hitEnemies[i].GetComponent<AbstractEnemy>().AlterHealth(-attackDamage); AM.Play("Sword_Hit" + Random.Range(1, 3)); } //deal damage to each enemy
+
+            a.SetBool("attackingHeavy", true);
+            PWCM.EnableAttackCheck(GetCurAnimLength());
+
+            Invoke("ResetHeavyAttackAnimBool", GetCurAnimLength());
         }
     }
-    public void RemoveEnemyFromArrays(GameObject obj) { PLACM.RemoveObjectFromArray(obj); PHACM.RemoveObjectFromArray(obj); }
+    private void ResetHeavyAttackAnimBool() { a.SetBool("attackingHeavy", false); }
     //~~~~~attacking~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
@@ -444,7 +471,12 @@ public class PlayerController : MonoBehaviour
         }
 
         if (attackCooldownTimer > 0) { attackCooldownTimer -= Time.deltaTime; } //count down timer
-        if (attackCooldownTimer <= 0) { attackCooldownTimer = 0; attackStartTime = 0;  attacking = false; } //when timer runs out, set tracker false
+        if (attackCooldownTimer <= 0) //when timer runs out, set tracker false
+        {
+            attackCooldownTimer = 0;
+            attackStartTime = 0;  
+            attacking = false; 
+        }
 
 
 
@@ -454,7 +486,6 @@ public class PlayerController : MonoBehaviour
         {
             lightAttackComboTimer = 0;
             lightAttackComboCounter = 0; //set tracker to start
-            lightAttackComboRotation = new Quaternion(0, 0, 30, 0); //reset rotation
             comboing = false; //set tracker false
             a.SetInteger("lightSwingCombo", lightAttackComboCounter);
         }

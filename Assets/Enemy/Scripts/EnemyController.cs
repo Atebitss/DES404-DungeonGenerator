@@ -92,10 +92,10 @@ public class EnemyController : AbstractEnemy
         };
     }
 
-    void OnDestroy()
+    /*void OnDestroy()
     {
         PC.RemoveEnemyFromArrays(this.gameObject);
-    }
+    }*/
 
 
 
