@@ -28,13 +28,13 @@ public class TestRealmManager : AbstractSceneManager
         if (devMode) { PC.SetDDC(DDC); }
 
 
-        Instantiate(doorPrefab, new Vector3(0, 0, -2.5f), Quaternion.identity);
+        Instantiate(enemyPrefab, new Vector3(0, 0, 5f), Quaternion.identity);
 
 
-        int maxEnemies = Random.Range(10, 10);
+        /*int maxEnemies = Random.Range(10, 10);
         for (int i = 0; i < maxEnemies; i++)
         {
             Instantiate(enemyPrefab, new Vector3(Random.Range(-10, 10), 1, Random.Range(-25, -5)), Quaternion.identity);
-        }
+        }*/
     }
 }

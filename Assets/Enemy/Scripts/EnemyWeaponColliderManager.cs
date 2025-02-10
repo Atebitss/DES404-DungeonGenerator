@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerWeaponColliderManager : MonoBehaviour
+public class EnemyWeaponColliderManager : MonoBehaviour
 {
     private bool attacking = false;
     private int attackDamage = 1;
@@ -16,13 +16,13 @@ public class PlayerWeaponColliderManager : MonoBehaviour
 
     public void EnableAttackCheck(float attackAnimDur)
     {
-        Debug.Log("attack enabled");
+        Debug.Log("attack enabled on " + this.gameObject.name);
         attacking = true;
         Invoke("DisableAttackCheck", attackAnimDur);
     }
     private void DisableAttackCheck()
     {
-        Debug.Log("attack disabled");
+        Debug.Log("attack disabled on " + this.gameObject.name);
         attacking = false;
     }
 
@@ -30,9 +30,9 @@ public class PlayerWeaponColliderManager : MonoBehaviour
     private void OnTriggerEnter(Collider col)
     {
         Debug.Log(col.gameObject.name);
-        if (attacking && col.gameObject.tag == "Enemy")
+        if (attacking && col.gameObject.tag == "Player")
         {
-            Debug.Log("enemy found");
+            Debug.Log("player found");
             col.gameObject.GetComponent<AbstractEnemy>().AlterHealth(-attackDamage);
             AM.Play("Sword_Hit" + Random.Range(1, 3));
         }

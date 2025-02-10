@@ -15,6 +15,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Rigidbody playerRigid; //player rigidbody used for physics interactions
     [SerializeField] private Camera playerCamera; //player camera used for looking and object interactions
     [SerializeField] private TMP_Text interactionPromptText; //object interaction display
+    [SerializeField] private Animator a; //player animator used for running animations
 
     private AbstractSceneManager SM;
     private AudioManager AM;
@@ -22,7 +23,6 @@ public class PlayerController : MonoBehaviour
     private DbugDisplayController DDC; //debug display
     public void SetDDC(DbugDisplayController DDC) { this.DDC = DDC; }
 
-    [SerializeField] private Animator a;
 
     private void Awake()
     {
@@ -50,7 +50,7 @@ public class PlayerController : MonoBehaviour
         SM = GameObject.FindWithTag("SceneManager").GetComponent<AbstractSceneManager>();
         AM = SM.GetAudioManager();
 
-        PWCM.SetPlayerDamage(attackDamage);
+        PWCM.SetWeaponDamage(attackDamage);
         PWCM.SetAM(AM);
     }
 
