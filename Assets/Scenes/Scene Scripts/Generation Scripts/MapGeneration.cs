@@ -1,4 +1,4 @@
-using System.Collections;
+ using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using UnityEngine.UI;
@@ -26,6 +26,10 @@ public class MapGeneration : MonoBehaviour
     [SerializeField] private bool dbugEnabled = false;
     [SerializeField] private bool showDbugTiles = false;
     public bool isDbugEnabled() { return dbugEnabled; }
+
+    [SerializeField] private bool visualDemo = false;
+    public bool isVisualEnabled() { return visualDemo; }
+
 
     [Header("Debug Materials")]
     [SerializeField] private Camera defaultCamera;

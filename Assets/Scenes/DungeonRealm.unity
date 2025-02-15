@@ -353,7 +353,7 @@ Camera:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
   m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
@@ -688,6 +688,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1945132722}
+  - component: {fileID: 1945132726}
   - component: {fileID: 1945132724}
   - component: {fileID: 1945132725}
   - component: {fileID: 1945132723}
@@ -752,6 +753,7 @@ MonoBehaviour:
   specialRoomsMin: 3
   dbugEnabled: 1
   showDbugTiles: 1
+  visualDemo: 1
   defaultCamera: {fileID: 963194227}
   baseDbugMat: {fileID: 2100000, guid: e8a11bef448ed1b4382b0b5eebb590ca, type: 2}
   matDbugEmpty: {fileID: 2100000, guid: b935ea7b19223f444a7418c023851217, type: 2}
@@ -781,6 +783,25 @@ MonoBehaviour:
   dbugEnabled: 1
   basicRoom: {fileID: 4597496329373697504, guid: 8ab234d5dca0f924da914ca87cc9e3df, type: 3}
   dbugTile: {fileID: 6787671552346119472, guid: aa2f3d0dd74341a4db2fc987025a5892, type: 3}
+--- !u!114 &1945132726
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1945132720}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4e4367cd3edc664f83e443b40584045, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  AM: {fileID: 0}
+  PC: {fileID: 0}
+  devMode: 0
+  amPrefab: {fileID: 4065216700189244488, guid: 924cc0721c1d6e841a3aff4bc23543af, type: 3}
+  playerPrefab: {fileID: 2783768033875945984, guid: 07888939a1f59d349b73cd0353289295, type: 3}
+  enemyPrefab: {fileID: 3375864117963020452, guid: 46bfd7227e5fe13448287a98bbe35f7b, type: 3}
+  doorPrefab: {fileID: 7151845054247194810, guid: ec6fe55e299e1054496342b441da8b59, type: 3}
 --- !u!1 &2000653574
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PathGeneration : MonoBehaviour
@@ -29,7 +30,7 @@ public class PathGeneration : MonoBehaviour
 
 
 
-    public void BeginPathGeneration(Vector2 startPos, Vector2 targetPos, int boundsX, int boundsZ)
+    public IEnumerator BeginPathGeneration(Vector2 startPos, Vector2 targetPos, int boundsX, int boundsZ)
     {
         if (dbugEnabled) { MG.UpdateHUDDbugText("PG, Begin Path Generation"); }
 
@@ -41,7 +42,7 @@ public class PathGeneration : MonoBehaviour
         this.targetPos = targetPos;
 
         //begin path generation
-        GeneratePath(FindPath());
+        yield return StartCoroutine(GeneratePath(FindPath()));
     }
 
 
@@ -275,12 +276,12 @@ public class PathGeneration : MonoBehaviour
         return path;
     }
 
-    private void GeneratePath(Vector2[] path)
+    private IEnumerator GeneratePath(Vector2[] path)
     {
         //update map manager with new path
         if (dbugEnabled) { MG.UpdateHUDDbugText("PG, Generate Path between " + startPos + " & " + targetPos); }
 
-        if (path == null) { return; } //if there's no path, skip
+        if (MG.isVisualEnabled() && path == null) { yield return null; } //if there's no path, skip
 
         Vector2 hallwayStart = path[0]; //set start position
         Vector2 hallwayEnd = path[path.Length - 1]; //set end position
@@ -318,6 +319,9 @@ public class PathGeneration : MonoBehaviour
                     }
                 }
             }
+
+            if (MG.isVisualEnabled()) { yield return new WaitForSeconds(.01f); }
+            else { yield return null; }
         }
     }
 }
