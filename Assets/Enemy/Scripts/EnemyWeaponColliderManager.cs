@@ -6,7 +6,6 @@ public class EnemyWeaponColliderManager : MonoBehaviour
 {
     private bool attacking = false;
     private int attackDamage = 1;
-    private GameObject[] colObjs = new GameObject[0];
     private AudioManager AM;
 
 
@@ -16,24 +15,24 @@ public class EnemyWeaponColliderManager : MonoBehaviour
 
     public void EnableAttackCheck(float attackAnimDur)
     {
-        Debug.Log("attack enabled on " + this.gameObject.name);
+        //Debug.Log("attack enabled on " + this.gameObject.name);
         attacking = true;
         Invoke("DisableAttackCheck", attackAnimDur);
     }
     private void DisableAttackCheck()
     {
-        Debug.Log("attack disabled on " + this.gameObject.name);
+        //Debug.Log("attack disabled on " + this.gameObject.name);
         attacking = false;
     }
 
 
     private void OnTriggerEnter(Collider col)
     {
-        Debug.Log(col.gameObject.name);
+        //Debug.Log(col.gameObject.name);
         if (attacking && col.gameObject.tag == "Player")
         {
-            Debug.Log("player found");
-            col.gameObject.GetComponent<AbstractEnemy>().AlterHealth(-attackDamage);
+            //Debug.Log("player found");
+            col.gameObject.GetComponent<PlayerController>().AlterCurrentHealthPoints(-attackDamage);
             AM.Play("Sword_Hit" + Random.Range(1, 3));
         }
     }

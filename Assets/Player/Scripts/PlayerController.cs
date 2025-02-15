@@ -26,24 +26,7 @@ public class PlayerController : MonoBehaviour
 
     private void Awake()
     {
-        //dodge layer mask to layer IDs
-        int layerCount = 0;
-        int[] tempDodgeLayerIDs = new int[32];
-
-        for (int i = 0; i < 32; i++)
-        {
-            if((dodgeMask.value & (1 << i)) != 0)
-            {
-                tempDodgeLayerIDs[layerCount] = (i + 1);
-                layerCount++;
-            }
-        }
-
-        dodgeLayerIDs = new int[layerCount];
-        for (int i = 0; i < layerCount; i++)
-        {
-            dodgeLayerIDs[i] = tempDodgeLayerIDs[i];
-        }
+        dodgeLayer = (int)Mathf.Log(dodgeMask.value, 2);
     }
     private void Start()
     {
@@ -134,7 +117,7 @@ public class PlayerController : MonoBehaviour
 
     //dodging
     [SerializeField] private LayerMask dodgeMask; //enemy layer
-    private int[] dodgeLayerIDs = new int[0];
+    private int dodgeLayer = -1;
     [SerializeField] private float dodgeForce = 10f; //--------|
     [SerializeField] private float dodgeDuration = 0.25f; //---|- each used to calc dodge
     [SerializeField] private float dodgeDistance = 5f; //------|
@@ -180,26 +163,33 @@ public class PlayerController : MonoBehaviour
         if (ctx.performed && dodgeCooldownTimer <= 0 && !dodging) //if dodge cooldown is not active and the player is not currently dodging
         {
             Debug.Log("dodge");
+            StartCoroutine(Dodge());
+        }
+    }
+    public IEnumerator Dodge()
+    {
+        gameObject.layer = 8;
+        yield return new WaitForFixedUpdate(); // Wait until the next physics frame
 
-            dodgeStartTime = Time.time; //remember time when dodge started
-            dodgeCooldownTimer = dodgeCDMax; //set cooldown timer
-            dodging = true; //set tracker to true
-            for (int i = 0; i < dodgeLayerIDs.Length; i++) { Physics.IgnoreLayerCollision(gameObject.layer, dodgeLayerIDs[i], true); } //allow dodging through enemies
-            MakePlayerInvincible(dodgeDuration);
+        dodgeStartTime = Time.time; //remember time when dodge started
+        dodgeCooldownTimer = dodgeCDMax; //set cooldown timer
+        dodging = true; //set tracker to true
+        Debug.Log("Dodge start");
 
-            AM.Play("Player_Dodge" + Random.Range(1, 4));
+        MakePlayerInvincible(dodgeDuration);
 
-            if (movement.x != 0 && movement.z != 0) //if the player is moving horizontally
-            {
-                //calc velocity in direction moving
-                dodgeVelocity = ((playerRigid.transform.TransformDirection(movement.normalized) * dodgeForce).normalized * (dodgeDistance / dodgeDuration));
+        AM.Play("Player_Dodge" + Random.Range(1, 4));
 
-            }
-            else //if player is not moving horizontally
-            {
-                //calc velocity in direction faced
-                dodgeVelocity = ((playerRigid.transform.forward * dodgeForce).normalized * (dodgeDistance / dodgeDuration));
-            }
+        if (movement.x != 0 && movement.z != 0) //if the player is moving horizontally
+        {
+            //calc velocity in direction moving
+            dodgeVelocity = ((playerRigid.transform.TransformDirection(movement.normalized) * dodgeForce).normalized * (dodgeDistance / dodgeDuration));
+
+        }
+        else //if player is not moving horizontally
+        {
+            //calc velocity in direction faced
+            dodgeVelocity = ((playerRigid.transform.forward * dodgeForce).normalized * (dodgeDistance / dodgeDuration));
         }
     }
     
@@ -213,12 +203,14 @@ public class PlayerController : MonoBehaviour
         }
         else if (dodging) //if player is dodging
         {
-            playerRigid.velocity = dodgeVelocity; //set immediate velocity to calced velocity
+            playerRigid.AddForce(dodgeVelocity - playerRigid.velocity, ForceMode.VelocityChange); //set immediate velocity to calced velocity
 
             if ((Time.time - dodgeStartTime) >= dodgeDuration) //if the player has been dodging for 1 second
             {
                 playerRigid.velocity = Vector3.zero; //reset velocity
-                for (int i = 0; i < dodgeLayerIDs.Length; i++) { Physics.IgnoreLayerCollision(gameObject.layer, dodgeLayerIDs[i], false); } //allow dodging through enemies
+                //for (int i = 0; i < dodgeLayerIDs.Length; i++) { Physics.IgnoreLayerCollision(gameObject.layer, dodgeLayerIDs[i], false); } //allow dodging through enemies
+                Debug.Log("Dodge end");
+                gameObject.layer = 6;
                 dodging = false; //set tracker to false
             }
         }
@@ -263,7 +255,7 @@ public class PlayerController : MonoBehaviour
     [Header("-Attacking")]
     private bool attacking = false; //tracker false to allow for first attack
     private float attackCooldownTimer = 0f, attackStartTime = 0f; //used to reset attack timer
-    [SerializeField] private float attackCooldownMax = 0.5f;
+    [SerializeField] private float attackCooldownMax = 1f;
     private int attackComboDamage = 0; //additional damage
     private int lightAttackComboCounter = 0; //combo tracker set to one to skip first rotation
     private float lightAttackComboTimer = 0f, lightAttackComboStartTime = 0f; //used to reset combo timer
@@ -307,7 +299,7 @@ public class PlayerController : MonoBehaviour
 
             //update sword swing animation
             a.SetInteger("lightSwingCombo", lightAttackComboCounter);
-            PWCM.EnableAttackCheck(GetCurAnimLength());
+            PWCM.EnableAttackCheck((GetCurAnimLength() * 2));
 
             if (lightAttackComboCounter == 3) { lightAttackComboCounter = 0; } //reset counter
         }
@@ -330,9 +322,9 @@ public class PlayerController : MonoBehaviour
             AM.Play("Sword_SwingCleave");
 
             a.SetBool("attackingHeavy", true);
-            PWCM.EnableAttackCheck(GetCurAnimLength());
+            PWCM.EnableAttackCheck((GetCurAnimLength() * 2));
 
-            Invoke("ResetHeavyAttackAnimBool", GetCurAnimLength());
+            Invoke("ResetHeavyAttackAnimBool", (GetCurAnimLength() * 2));
         }
     }
     private void ResetHeavyAttackAnimBool() { a.SetBool("attackingHeavy", false); }
@@ -406,13 +398,15 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private int magicPointsCurrent = 10;
     [SerializeField] private int magicPointsMax = 10;
     [SerializeField] private int StrengthPoints = 1, DexterityPoints = 1, IntelligencePoints = 1, WisdomPoints = 1;
-    [SerializeField] private bool invincible = false;
+    [SerializeField] private bool invincible = false, permaInvincible = false;
     [SerializeField] private float invincibilityTimer = 0f;
     private float invincibilityStartTime = 0f;
 
     //health points
-    public void AlterCurrentHealthPoints(int alter) { healthPointsCurrent += alter; }
+    public void SetCurrentHealthPoints(int newHealth) { if (!invincible) { healthPointsCurrent = newHealth; HealthCheck(); } }
+    public void AlterCurrentHealthPoints(int alter) { if(!invincible) { healthPointsCurrent += alter; HealthCheck(); } }
     public int GetCurrentHealthPoints() { return healthPointsCurrent; }
+    private void HealthCheck() { if (healthPointsCurrent <= 0) { Destroy(this.gameObject); } }
 
     public void AlterMaxHealthPoints(int alter) { healthPointsMax += alter; }
     public int GetMaxHealthPoints() { return healthPointsMax; }
@@ -458,9 +452,10 @@ public class PlayerController : MonoBehaviour
             invincible = true; //set tracker true
             invincibilityStartTime = Time.time; //track when invisibility started
         }
+        else if (permaInvincible && !invincible) { invincible = true; } 
 
         if (invincibilityTimer > 0) { invincibilityTimer -= Time.deltaTime; } //count down timer
-        if (invincibilityTimer <= 0) { invincibilityTimer = 0; invincibilityStartTime = 0; invincible = false; } //when timer runs out, set tracker false
+        if (invincibilityTimer <= 0 && !permaInvincible) { invincibilityTimer = 0; invincibilityStartTime = 0; invincible = false; } //when timer runs out, set tracker false
 
 
 

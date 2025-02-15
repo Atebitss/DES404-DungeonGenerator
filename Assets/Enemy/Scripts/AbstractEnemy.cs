@@ -11,6 +11,7 @@ public abstract class AbstractEnemy : MonoBehaviour
      */
     //~~~~~misc~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     [Header("-Misc")]
+    [SerializeField] private bool isActive = true;
     [SerializeField] private Rigidbody enemyRigid; //enemy rigidbody used for physics interactions
     [SerializeField] private Animator a; //player animator used for running animations
 
@@ -30,11 +31,18 @@ public abstract class AbstractEnemy : MonoBehaviour
 
 
     //~~~~~state updates~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    private void Start()
+    {
+    }
     private void FixedUpdate()
     {
         UpdateEnemyStates();
-        UpdateEnemyLooking();
-        UpdateEnemyMovement();
+
+        if (isActive)
+        {
+            UpdateEnemyLooking();
+            UpdateEnemyMovement();
+        }
     }
     public void UpdateEnemyStates()
     {
@@ -71,14 +79,22 @@ public abstract class AbstractEnemy : MonoBehaviour
 
     //~~~~~attacking~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     [Header("-Attacking")]
+    //attack
     [HideInInspector] public bool attacking = false; //tracker false to allow for first attack
     public float attackCooldownTimer = 0f, attackStartTime = 0f; //used to reset attack timer
-    [SerializeField] public float attackCooldownMax = 2f;
-    [SerializeField] private GameObject weaponParent; //weapon parent
-    [SerializeField] private GameObject weaponAttackCollider; //weapon collider
-    [SerializeField] private EnemyWeaponColliderManager EWCM; //weapon collider script
+    [SerializeField] public float attackCooldownMax = 5f;
     [SerializeField] public int attackDamage = 5; //dafault damage
     [SerializeField] public float attackSpeed = 1f; //default speed
+    [SerializeField] public float attackDistance = 1.5f; //default attack distance
+
+    //weapon
+    [SerializeField] private GameObject weaponParent; //weapon parent
+    [SerializeField] private GameObject weaponAttackCollider; //weapon collider
+    [SerializeField] public EnemyWeaponColliderManager EWCM; //weapon collider script
+
+    //detection
+    private bool playerDetected = false;
+    [SerializeField] private EnemyPlayerCollider EPC;
 
     private void Attack()
     {
@@ -91,10 +107,10 @@ public abstract class AbstractEnemy : MonoBehaviour
             AM.Play("Sword_Swing1");
 
             a.SetBool("attacking", true);
-            Debug.Log(GetCurAnimLength());
-            EWCM.EnableAttackCheck(GetCurAnimLength());
+            //Debug.Log(GetCurAnimLength());
+            EWCM.EnableAttackCheck((GetCurAnimLength() * 2));
 
-            Invoke("ResetAttackAnimBool", GetCurAnimLength());
+            Invoke("ResetAttackAnimBool", (GetCurAnimLength() * 2));
         }
     }
     private void ResetAttackAnimBool() { a.SetBool("attacking", false); }
@@ -118,9 +134,45 @@ public abstract class AbstractEnemy : MonoBehaviour
 
     private void UpdateEnemyMovement()
     {
-        //if enemy is moving as normal
-        //add velocity force in forward direction
-        enemyRigid.velocity = new Vector3((enemyRigid.transform.forward.x * movementSpeed), enemyRigid.velocity.y, (enemyRigid.transform.forward.z * movementSpeed));
+        //check if player is within close range
+        if(EPC.IsPlayerDetected())
+        {
+            //if the player is found
+            //stop movement and update tracker
+            if(!playerDetected) { playerDetected = true; }
+
+            //begin attack movement
+            if (!attacking) //if not attacking
+            {
+                //calc distance between enemy and player
+                float distToPlayer = Vector3.Distance(transform.position, PC.transform.position);
+                //Debug.Log(attackDistance + " / " + distToPlayer);
+
+                //if distance greater than melee distance, move into melee range
+                if (distToPlayer > attackDistance) 
+                {
+                    enemyRigid.velocity = new Vector3((enemyRigid.transform.forward.x * (movementSpeed * 2)), enemyRigid.velocity.y, (enemyRigid.transform.forward.z * (movementSpeed * 2)));
+                }
+                else 
+                {
+                    enemyRigid.velocity = Vector3.zero;
+                    Attack();
+                    Invoke("Retreat", 2f);
+                }
+            }
+        }
+        else
+        {
+            //if enemy is moving as normal
+            //update tracker
+            if (playerDetected) { playerDetected = false; }
+            //add velocity force in forward direction
+            enemyRigid.velocity = new Vector3((enemyRigid.transform.forward.x * movementSpeed), enemyRigid.velocity.y, (enemyRigid.transform.forward.z * movementSpeed));
+        }
+    }
+    private void Retreat()
+    {
+        enemyRigid.velocity = new Vector3((-enemyRigid.transform.forward.x * (movementSpeed * 5)), enemyRigid.velocity.y, (-enemyRigid.transform.forward.z * (movementSpeed * 5)));
     }
 
     private void UpdateEnemyLooking()
@@ -133,7 +185,8 @@ public abstract class AbstractEnemy : MonoBehaviour
         }
 
 
-        targetEnemyRot = Quaternion.LookRotation(PC.transform.position - enemyRigid.position);
+        Vector3 playerLookPosition = new Vector3(PC.transform.position.x, (PC.transform.position.y - 0.5f), PC.transform.position.z);
+        targetEnemyRot = Quaternion.LookRotation(playerLookPosition - enemyRigid.position);
         enemyRigid.transform.rotation = Quaternion.Lerp(enemyRigid.transform.rotation, targetEnemyRot, Time.deltaTime * lookSensitivity);
     }
     //~~~~~movement~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

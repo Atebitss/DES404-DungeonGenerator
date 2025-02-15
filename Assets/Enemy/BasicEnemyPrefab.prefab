@@ -1,5 +1,71 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &543986797196486423
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6115117420659367760}
+  - component: {fileID: 4613551058788062843}
+  - component: {fileID: 6252279524944078916}
+  m_Layer: 7
+  m_Name: PlayerDetectionCollider
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6115117420659367760
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 543986797196486423}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1017267259805658404}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!135 &4613551058788062843
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 543986797196486423}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 1
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 2.5
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &6252279524944078916
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 543986797196486423}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 38c34267e8af3714e86cb8950857170d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1701483941685567264
 GameObject:
   m_ObjectHideFlags: 0
@@ -100,8 +166,8 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 1
   m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 5, y: 1.5, z: 5}
@@ -153,6 +219,7 @@ Transform:
   m_Children:
   - {fileID: 3987276604464211926}
   - {fileID: 7544219055295210380}
+  - {fileID: 6115117420659367760}
   m_Father: {fileID: 2262343023242419389}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &5613823005629515241
@@ -202,7 +269,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 116
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
 --- !u!114 &8922853273334535014
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -215,21 +282,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4fecebaf4c8a5414792c6396cf3b4148, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isActive: 1
   enemyRigid: {fileID: 5759717008156093597}
   a: {fileID: 1935557783522769971}
   SM: {fileID: 0}
   AM: {fileID: 0}
   PC: {fileID: 0}
-  health: 1
+  health: 0
   attacking: 0
   attackCooldownTimer: 0
   attackStartTime: 0
-  attackCooldownMax: 2
+  attackCooldownMax: 5
+  attackDamage: 5
+  attackSpeed: 1
+  attackDistance: 1.5
   weaponParent: {fileID: 7034578543878992195}
   weaponAttackCollider: {fileID: 1701483941685567264}
   EWCM: {fileID: 6178674796021915901}
-  attackDamage: 5
-  attackSpeed: 1
+  EPC: {fileID: 6252279524944078916}
   movementSpeed: 2.5
   lookSensitivity: 2.5
 --- !u!82 &5414379114799386796
@@ -373,7 +443,7 @@ GameObject:
   - component: {fileID: 3869931894462583156}
   m_Layer: 7
   m_Name: EnemyRenderer
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

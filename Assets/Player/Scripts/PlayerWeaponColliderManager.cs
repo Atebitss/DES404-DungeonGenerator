@@ -16,20 +16,20 @@ public class PlayerWeaponColliderManager : MonoBehaviour
 
     public void EnableAttackCheck(float attackAnimDur)
     {
-        Debug.Log("attack enabled");
+        //Debug.Log("attack enabled");
         attacking = true;
         Invoke("DisableAttackCheck", attackAnimDur);
     }
     private void DisableAttackCheck()
     {
-        Debug.Log("attack disabled");
+        //Debug.Log("attack disabled");
         attacking = false;
     }
 
 
     private void OnTriggerEnter(Collider col)
     {
-        Debug.Log(col.gameObject.name);
+        //Debug.Log(col.gameObject.name);
         if (attacking && col.gameObject.tag == "Enemy")
         {
             Debug.Log("enemy found");

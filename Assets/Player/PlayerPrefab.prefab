@@ -139,7 +139,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 116
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
 --- !u!114 &1407151501325918776
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -317,14 +317,14 @@ MonoBehaviour:
   movementSpeed: 2.5
   dodgeMask:
     serializedVersion: 2
-    m_Bits: 64
-  dodgeForce: 10
+    m_Bits: 128
+  dodgeForce: 50
   dodgeDuration: 0.25
   dodgeDistance: 5
   dodgeCDMax: 0.5
   jumpForce: 10
   lookSensitivity: 2.5
-  attackCooldownMax: 0.5
+  attackCooldownMax: 1
   lightAttackComboTimerMax: 1
   weaponParent: {fileID: 4954393113427719825}
   weaponAttackCollider: {fileID: 8225045803689722017}
@@ -345,6 +345,7 @@ MonoBehaviour:
   IntelligencePoints: 1
   WisdomPoints: 1
   invincible: 0
+  permaInvincible: 1
   invincibilityTimer: 0
 --- !u!82 &631621802871244450
 AudioSource:
@@ -453,7 +454,7 @@ GameObject:
   - component: {fileID: 4760816060601231220}
   - component: {fileID: 5022982567547155934}
   - component: {fileID: 1115242724380623365}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: PlayerCamera
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -768,7 +769,7 @@ GameObject:
   - component: {fileID: 3695976310893028198}
   - component: {fileID: 2433320279493083248}
   - component: {fileID: 408251515721017303}
-  m_Layer: 5
+  m_Layer: 6
   m_Name: InteractionPrompt
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -903,7 +904,7 @@ GameObject:
   - component: {fileID: 7176919094591941176}
   - component: {fileID: 4274115588673511934}
   - component: {fileID: 2351247655044640334}
-  m_Layer: 5
+  m_Layer: 6
   m_Name: PlayerHUD
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1005,7 +1006,7 @@ GameObject:
   - component: {fileID: 220255132329050269}
   - component: {fileID: 476481944717201029}
   - component: {fileID: 1711117160582974335}
-  m_Layer: 5
+  m_Layer: 6
   m_Name: Crosshair
   m_TagString: Untagged
   m_Icon: {fileID: 0}
