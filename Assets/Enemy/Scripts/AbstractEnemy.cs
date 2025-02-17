@@ -1,6 +1,5 @@
 using UnityEngine;
 using System.Collections.Generic;
-using Unity.Android.Gradle;
 public abstract class AbstractEnemy : MonoBehaviour
 {
     /*
