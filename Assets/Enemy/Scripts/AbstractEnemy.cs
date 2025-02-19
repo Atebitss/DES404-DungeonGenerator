@@ -92,8 +92,9 @@ public abstract class AbstractEnemy : MonoBehaviour
     [SerializeField] public EnemyWeaponColliderManager EWCM; //weapon collider script
 
     //detection
-    private bool playerDetected = false;
-    [SerializeField] private EnemyPlayerCollider EPC;
+    private bool playerNear = false;
+    [SerializeField] private EnemyDetectionColliderNear EDCNear;
+    [SerializeField] private EnemyDetectionColliderFar EDCFar;
 
     private void Attack()
     {
@@ -124,21 +125,35 @@ public abstract class AbstractEnemy : MonoBehaviour
     //moving
     [SerializeField] private float movementSpeed = 2.5f; //players movement velocity
     public void SetMovementSpeed(int newSpeed) { movementSpeed = newSpeed; }
-    private Quaternion targetEnemyRot = Quaternion.identity; //used to lerp enemy rotation
     private Vector3 movement = Vector3.zero; //enemy movement directions
     private Vector3 enemyVelocity = Vector3.zero; //used to calc movement
 
+    //boid movement
+    [SerializeField] private float seperationDistance = 2.5f; //seperation distance
+    public void SetSeperationDistance(int newDistance) { seperationDistance = newDistance; }
+    [SerializeField] private float seperationWeight = 2.5f; //seperation weight
+    public void SetSeperationWeight(int newWeight) { seperationWeight = newWeight; }
+
+    //retreating
+    [SerializeField] private float retreatSpeed = 5f; //retreat speed
+    public void SetRetreatSpeed(int newSpeed) { retreatSpeed = newSpeed; }
+    [SerializeField] private float retreatTime = 2f; //retreat time
+    public void SetRetreatTime(int newTime) { retreatTime = newTime; }
+
     //looking
     [SerializeField] private float lookSensitivity = 2.5f; //enemy looking velocity
+    public void SetLookSensitivity(int newSensitivity) { lookSensitivity = newSensitivity; }
+    private Quaternion targetEnemyRot = Quaternion.identity; //used to lerp enemy rotation
+
 
     private void UpdateEnemyMovement()
     {
         //check if player is within close range
-        if(EPC.IsPlayerDetected())
+        if(EDCNear.IsPlayerNear())
         {
-            //if the player is found
+            //if the player is near the enemy
             //stop movement and update tracker
-            if(!playerDetected) { playerDetected = true; }
+            if(!playerNear) { playerNear = true; }
 
             //begin attack movement
             if (!attacking) //if not attacking
@@ -150,13 +165,17 @@ public abstract class AbstractEnemy : MonoBehaviour
                 //if distance greater than melee distance, move into melee range
                 if (distToPlayer > attackDistance) 
                 {
-                    enemyRigid.velocity = new Vector3((enemyRigid.transform.forward.x * (movementSpeed * 2)), enemyRigid.velocity.y, (enemyRigid.transform.forward.z * (movementSpeed * 2)));
+                    Vector3 directionToPlayer = (PC.transform.position - transform.position).normalized;
+                    Vector3 seperationForce = CalculateSeperationForce();
+                    Vector3 newMovement = (directionToPlayer + seperationForce).normalized * movementSpeed;
+
+                    enemyRigid.velocity = new Vector3(newMovement.x, enemyRigid.velocity.y, newMovement.z);
                 }
                 else 
                 {
                     enemyRigid.velocity = Vector3.zero;
                     Attack();
-                    Invoke("Retreat", 2f);
+                    Invoke("Retreat", retreatTime);
                 }
             }
         }
@@ -164,14 +183,52 @@ public abstract class AbstractEnemy : MonoBehaviour
         {
             //if enemy is moving as normal
             //update tracker
-            if (playerDetected) { playerDetected = false; }
+            if (playerNear) { playerNear = false; }
+
             //add velocity force in forward direction
-            enemyRigid.velocity = new Vector3((enemyRigid.transform.forward.x * movementSpeed), enemyRigid.velocity.y, (enemyRigid.transform.forward.z * movementSpeed));
+            Vector3 seperationForce = CalculateSeperationForce();
+            Vector3 newMovement = (transform.forward + seperationForce).normalized * movementSpeed;
+
+            enemyRigid.velocity = new Vector3(newMovement.x, enemyRigid.velocity.y, newMovement.z);
         }
     }
+    private Vector3 CalculateSeperationForce()
+    {
+        GameObject[] enemiesNear = EDCNear.GetEnemiesNear();
+        Vector3 seperationForce = Vector3.zero;
+        int enemyCount = 0;
+
+        foreach (GameObject enemy in enemiesNear)
+        {
+            if (enemy != null && enemy != this.gameObject)
+            {
+                //calc distance between current enemy and other enemy
+                float distanceToEnemy = Vector3.Distance(transform.position, enemy.transform.position);
+                if (distanceToEnemy < seperationDistance) //if enemy is within seperation distance
+                {
+                    //calc direction to enemy, informs the force direction
+                    Vector3 directionToEnemy = (transform.position - enemy.transform.position).normalized;
+
+                    //add force direction to seperation force
+                    seperationForce += directionToEnemy / (distanceToEnemy * seperationWeight);
+
+                    //increase enemy count
+                    enemyCount++;
+                }
+            }
+        }
+
+
+        //if there are enemies near, normalize the seperation force
+        if (enemyCount > 0) { seperationForce /= enemyCount; }
+
+        return seperationForce;
+    }
+    
+    
     private void Retreat()
     {
-        enemyRigid.velocity = new Vector3((-enemyRigid.transform.forward.x * (movementSpeed * 5)), enemyRigid.velocity.y, (-enemyRigid.transform.forward.z * (movementSpeed * 5)));
+        enemyRigid.velocity = new Vector3((-enemyRigid.transform.forward.x * retreatSpeed), enemyRigid.velocity.y, (-enemyRigid.transform.forward.z * retreatSpeed));
     }
 
     private void UpdateEnemyLooking()
