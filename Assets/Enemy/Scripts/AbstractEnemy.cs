@@ -171,9 +171,11 @@ public abstract class AbstractEnemy : MonoBehaviour
 
                     enemyRigid.velocity = new Vector3(newMovement.x, enemyRigid.velocity.y, newMovement.z);
                 }
-                else 
+                else if(distToPlayer <= attackDistance)
                 {
-                    enemyRigid.velocity = Vector3.zero;
+                    Vector3 seperationForce = CalculateSeperationForce();
+                    Vector3 newMovement = new Vector3((seperationForce.x * movementSpeed), enemyRigid.velocity.y, (seperationForce.z * movementSpeed));
+                    enemyRigid.velocity = newMovement;
                     Attack();
                     Invoke("Retreat", retreatTime);
                 }
