@@ -7,7 +7,7 @@ using static UnityEditor.PlayerSettings;
 
 public class RoomGeneration : MonoBehaviour
 {
-    //Debug
+    //debug
     [SerializeField] private bool dbugEnabled = false;
     [SerializeField] private Material baseDbugMat, matDbugEmpty, matDbugWall, matDbugDoor;
     [SerializeField] private GameObject dbugMarker, dbugText;
@@ -15,32 +15,41 @@ public class RoomGeneration : MonoBehaviour
 
 
     //relevant scripts
+    private AbstractSceneManager ASM;
     private MapGeneration MG;
 
 
-    //Generation Info
+    //generation info
+    [SerializeField] private Collider roomCollider;
     private int roomID = -1, roomPosX = -1, roomPosZ = -1, roomBoundsX = -1, roomBoundsZ = -1; //room size
     private string roomSize = "", roomType = "";
     private Vector3[] roomGridPositions;
-    private Vector3 literalPosition;
+    private Vector3 literalPosition, roomCenter;
     private string[] roomGridStates; //current 'state' of grid position (state ie. Wall, Doorway, Corner, Table, Chair)
 
 
-    //Floor Info
+    //room info
+    private bool entered = false;
+
     [SerializeField] private GameObject testFloorTile;
     private GameObject floorObject;
     private float tileXOffset, tileZOffset;
 
-
-    //Door Info
     private Vector2[] doorPositions;
+    private GameObject[] doorObjects = new GameObject[4];
 
-
-    //Wall Info
     [SerializeField] private GameObject testWallSection, testDoorwaySection;
-    private GameObject[] wallObjects = new GameObject[4], doorObjects = new GameObject[4]; //0 - bottom, 1 - top, 2 - left, 3 - right
+    private GameObject[] wallObjects = new GameObject[4]; //0 - bottom, 1 - top, 2 - left, 3 - right
     private bool[] wallHasDoorway = new bool[4]; //0 - bottom, 1 - top, 2 - left, 3 - right
     private float sectionXOffset, sectionZOffset;
+
+
+    //enemy info
+    private int enemyCount = 0;
+    public int GetEnemyCount() { return enemyCount; }
+    private int enemyMin = 0, enemyMax = 4;
+    public void SetEnemyMin(int min) { enemyMin = min; }
+    public void SetEnemyMax(int max) { enemyMax = max; }
 
 
 
@@ -56,6 +65,8 @@ public class RoomGeneration : MonoBehaviour
     }*/
     public void Wake(int roomID, int roomPosX, int roomPosZ, int roomBoundsX, int roomBoundsZ, string roomSize, string roomType, Vector3 literalPosition)
     {
+        if (dbugEnabled) { Debug.Log("ID: " + roomID + "   size: " + roomSize + "   type: " + roomType + "   x: " + roomBoundsX + ", z: " + roomBoundsZ); }
+
         this.roomID = roomID;
         this.roomPosX = roomPosX;
         this.roomPosZ = roomPosZ;
@@ -65,13 +76,21 @@ public class RoomGeneration : MonoBehaviour
         this.roomType = roomType;
         this.literalPosition = literalPosition;
 
+        ASM = GameObject.Find("SceneManager").gameObject.GetComponent<AbstractSceneManager>();
         MG = GameObject.Find("SceneManager").gameObject.GetComponent<MapGeneration>();
 
-        Begin();
-    }
-    private void Begin()
-    {
-        if (dbugEnabled) { Debug.Log("ID: " + roomID + "   size: " + roomSize + "   type: " + roomType + "   x: " + roomBoundsX + ", z: " + roomBoundsZ); }
+        roomCenter = new Vector3(roomPosX + (roomBoundsX / 2f), 0, roomPosZ + (roomBoundsZ / 2f));
+        //https://stackoverflow.com/questions/2304052/check-if-a-number-has-a-decimal-place-is-a-whole-number
+        //using modulo (%) 1 checks if there is a decimal component
+        //if so, add 0.1f to the center to offset the collider
+        if((roomBoundsX / 2f) % 1 != 0){roomCenter.x -= 0.5f;}
+        if((roomBoundsZ / 2f) % 1 != 0){roomCenter.z -= 0.5f;}
+
+        roomCollider.transform.localPosition = roomCenter;
+        roomCollider.transform.localScale = new Vector3(roomBoundsX, 0.5f, roomBoundsZ);
+
+        if(MG.isDbugEnabled()){dbugText.SetActive(true);}
+        else{dbugText.SetActive(false);}
 
         //set grid positions size to (x*z)
         roomGridPositions = new Vector3[(roomBoundsX * roomBoundsZ)];
@@ -92,6 +111,38 @@ public class RoomGeneration : MonoBehaviour
         }
         GenerateDoorways();
         //GenerateWalls();
+    }
+    
+
+
+    private void OnCollisionEnter(Collision col)
+    {
+        if(col.gameObject.tag == "Player" && !entered)
+        {
+            //lock doors and start combat
+            entered = true;
+
+            //lock doors
+            for(int i = 0; i < doorObjects.Length; i++)
+            {
+                AbstractDoorScript curDoorScript = doorObjects[i].GetComponent<AbstractDoorScript>();
+                curDoorScript.LockDoor();
+                //run animation
+            }
+
+            //start combat
+            enemyCount = Random.Range(enemyMin, enemyMax);
+            Vector3 playerPos = ASM.GetPlayerPosition();
+            Vector3[] enemyPositions = new Vector3[enemyCount];
+            for(int i = 0; i < enemyCount; i++)
+            {
+                //find random position within room
+                //check radius around player, if enemy is out with radius
+                //check radius around position for walls, if no walls
+                //check radius around position for other enemies, if no enemies
+                //spawn enemy
+            }
+        }
     }
 
 
@@ -118,7 +169,7 @@ public class RoomGeneration : MonoBehaviour
             for (int xPos = 0; xPos < roomBoundsX; xPos++)
             {
                 //Debug.Log("creating tile " + (pos + 1) + " at x:" + tileXOffset * xPos + ", z:" + tileZOffset * ZPos);
-                roomGridPositions[pos] = new Vector3(((tileXOffset * xPos) + this.transform.position.x), 0, ((tileZOffset * zPos) + this.transform.position.z));
+                roomGridPositions[pos] = new Vector3(literalPosition.x + (tileXOffset * xPos), 0, literalPosition.z + (tileZOffset * zPos));
                 roomGridStates[pos] = MG.GetGridState((roomPosX + xPos), (roomPosZ + zPos));
 
                 if (dbugEnabled)

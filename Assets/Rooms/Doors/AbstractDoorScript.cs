@@ -34,8 +34,8 @@ public abstract class AbstractDoorScript : MonoBehaviour
     [SerializeField] private bool isLocked = false;
     [SerializeField] private Animator a;
 
-    public void LockDoor() { isLocked = true; UpdateDoorMaterial(); }
-    public void UnlockDoor() { isLocked = false; UpdateDoorMaterial(); }
+    public void LockDoor() { isLocked = true; UpdateDoorMaterial(); /*run animation*/ }
+    public void UnlockDoor() { isLocked = false; UpdateDoorMaterial(); /*run animation*/ }
     public bool IsLocked() { return isLocked; }
 
 
