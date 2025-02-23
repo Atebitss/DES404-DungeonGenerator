@@ -745,15 +745,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d7e51d4e4c60a8469e73ca687febaff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mapBoundsMax: 150
+  mapBoundsMax: 50
   mapBoundsMin: 50
-  treasureRoomsMax: 5
+  treasureRoomsMax: 3
   treasureRoomsMin: 3
-  specialRoomsMax: 5
+  specialRoomsMax: 3
   specialRoomsMin: 3
   dbugEnabled: 1
   showDbugTiles: 1
-  visualDemo: 1
+  visualDemo: 0
   defaultCamera: {fileID: 963194227}
   baseDbugMat: {fileID: 2100000, guid: e8a11bef448ed1b4382b0b5eebb590ca, type: 2}
   matDbugEmpty: {fileID: 2100000, guid: b935ea7b19223f444a7418c023851217, type: 2}

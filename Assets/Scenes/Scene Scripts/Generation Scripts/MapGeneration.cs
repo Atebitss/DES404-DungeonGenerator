@@ -14,12 +14,12 @@ public class MapGeneration : MonoBehaviour
     //map generation data
     [Header("Generation Data")]
     private int genAttempts = 0;
-    [SerializeField] [Range(100, 150)] private int mapBoundsMax = 100;
-    [SerializeField] [Range(50, 100)] private int mapBoundsMin = 100;
-    [SerializeField] [Range(3, 5)] private int treasureRoomsMax = 3;
-    [SerializeField] [Range(1, 3)] private int treasureRoomsMin = 3;
-    [SerializeField] [Range(3, 5)] private int specialRoomsMax = 3;
-    [SerializeField] [Range(1, 3)] private int specialRoomsMin = 3;
+    [SerializeField] [Range(10, 250)] private int mapBoundsMax = 50;
+    [SerializeField] [Range(10, 250)] private int mapBoundsMin = 50;
+    [SerializeField] [Range(0, 5)] private int treasureRoomsMax = 3;
+    [SerializeField] [Range(0, 5)] private int treasureRoomsMin = 3;
+    [SerializeField] [Range(0, 5)] private int specialRoomsMax = 3;
+    [SerializeField] [Range(0, 5)] private int specialRoomsMin = 3;
 
     //debug info
     [Header("Debug Settings")]

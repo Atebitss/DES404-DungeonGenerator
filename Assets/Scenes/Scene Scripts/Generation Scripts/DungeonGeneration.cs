@@ -1113,10 +1113,12 @@ public class DungeonGeneration : MonoBehaviour
     private void FindTreasureRooms()
     {
         //find small rooms furthest from Boss & Entry & other Treasure Rooms
-        if (dbugEnabled) { MG.UpdateHUDDbugText("DG, Finding Treasure Rooms"); }
+        /*if (dbugEnabled) { MG.UpdateHUDDbugText("DG, Finding Treasure Rooms"); }
+        if (dbugEnabled) { Debug.Log("DG, Finding Treasure Rooms"); }*/
 
         entryRoomCenter = roomCenters[entryRoomID];
         float distFromEntryAndBoss = 0;
+        int numOfTreasureRoomsFound = 0;
         numOfTreasureRooms = Random.Range(treasureRoomsMin, treasureRoomsMax);
         treasureRoomIDs = new int[numOfTreasureRooms];
         treasureRoomCenters = new Vector2[numOfTreasureRooms];
@@ -1132,10 +1134,10 @@ public class DungeonGeneration : MonoBehaviour
                 Vector2 roomCenter = roomCenters[roomID];
                 float distRoomToBoss = Vector2.Distance(bossRoomCenter, roomCenter); //distance from current room to boss room
                 //Debug.Log(distRoomToBoss);
-                if (distRoomToBoss < 25) { continue; } //if current room close to boss room, skip
+                if (distRoomToBoss < ((boundsX*boundsZ) / 200)) { continue; } //if current room close to boss room (within 5% of dungeon bounds), skip
                 float distRoomToEntry = Vector2.Distance(entryRoomCenter, roomCenter); //distance from current room to entry room
                 //Debug.Log(distRoomToEntry);
-                if (distRoomToEntry < 25) { continue; } //if current room close to entry room, skip
+                if (distRoomToEntry < ((boundsX*boundsZ) / 200)) { continue; } //if current room close to entry room (within 5% of dungeon bounds), skip
                 float distFromRoomToEntryAndBoss = (distRoomToBoss + distRoomToEntry); //combine distances
 
                 for (int i = 0; i < treasureRoomIDs.Length; i++) //for each treasure room
@@ -1146,7 +1148,7 @@ public class DungeonGeneration : MonoBehaviour
                         //Debug.Log(treasureRoomIDs[i]);
                         float distRoomToTreasaure = Vector2.Distance(treasureRoomCenters[i], roomCenter); //distance from current room to current treasure room
                         //Debug.Log(distRoomToTreasaure);
-                        if (distRoomToTreasaure < 25) { continue; } //if current room close to current treasure room, skip
+                        if (distRoomToTreasaure < ((boundsX*boundsZ) / 200)) { continue; } //if current room close to current treasure room (within 5% of dungeon bounds), skip
                         distFromRoomToEntryAndBoss += distRoomToTreasaure; //otherwise, add distance to combination
                     }
                 }
@@ -1159,13 +1161,15 @@ public class DungeonGeneration : MonoBehaviour
                     //update trackers & add found room to treasure room array
                     distFromEntryAndBoss = distFromRoomToEntryAndBoss;
                     treasureRoomIDs[tR] = roomID;
-                    if (dbugEnabled) { MG.UpdateHUDDbugText("new treasure room id: " + treasureRoomIDs[tR]); }
+                    /*if (dbugEnabled) { MG.UpdateHUDDbugText("new treasure room id: " + treasureRoomIDs[tR]); }
+                    if (dbugEnabled) { Debug.Log("new treasure room id: " + treasureRoomIDs[tR]); }*/
                 }
             }
 
             if (treasureRoomIDs[tR] != -1) //if treasure room found
             {
-                if (dbugEnabled) { MG.UpdateHUDDbugText("treasure room id: " + treasureRoomIDs[tR]); }
+                /*if (dbugEnabled) { MG.UpdateHUDDbugText("treasure room id: " + treasureRoomIDs[tR]); }
+                if (dbugEnabled) { Debug.Log("treasure room id: " + treasureRoomIDs[tR]); }*/
 
                 //update room state tracker
                 roomStates[treasureRoomIDs[tR]] = "Treasure"; 
@@ -1192,8 +1196,16 @@ public class DungeonGeneration : MonoBehaviour
                     }
                 }
 
+                numOfTreasureRoomsFound++;
                 distFromEntryAndBoss = 0;
             }
+            /*else 
+            {
+                if (dbugEnabled) { MG.UpdateHUDDbugText("No treasure room found"); }
+                if (dbugEnabled) { Debug.Log("No treasure room found"); }
+            }*/
+
+            if(numOfTreasureRoomsFound == numOfTreasureRooms) { break; }
         }
     }
 
@@ -1203,6 +1215,7 @@ public class DungeonGeneration : MonoBehaviour
         if (dbugEnabled) { MG.UpdateHUDDbugText("DG, Finding Special Rooms"); }
 
         float distFromEntryAndBoss = 0;
+        int numOfSpecialRoomsFound = 0;
         numOfSpecialRooms = Random.Range(specialRoomsMin, specialRoomsMax);
         specialRoomIDs = new int[numOfSpecialRooms];
         specialRoomCenters = new Vector2[numOfSpecialRooms];
@@ -1210,18 +1223,18 @@ public class DungeonGeneration : MonoBehaviour
 
         for (int sR = 0; sR < numOfSpecialRooms; sR++) //for each special room, find a room
         {
-            //Debug.Log(sR + "/" + numOfSpecialRooms);
+            if (dbugEnabled) { Debug.Log(sR + "/" + numOfSpecialRooms); }
 
             for (int roomID = largeRoomNum; roomID < (largeRoomNum + mediumRoomNum + smallRoomNum); roomID++) //for each medium and small room
             {
                 //find room center and distance from entry and boss room center
                 Vector2 roomCenter = roomCenters[roomID];
                 float distRoomToBoss = Vector2.Distance(bossRoomCenter, roomCenter); //distance from current room to boss room
-                //Debug.Log(distRoomToBoss);
-                if (distRoomToBoss < 25) { continue; } //if current room close to boss room, skip
+                Debug.Log(roomID + " to boss: " + distRoomToBoss + "/ " + ((boundsX*boundsZ) / 200));
+                if (distRoomToBoss < ((boundsX*boundsZ) / 200)) { continue; } //if current room close to boss room (within 5% of dungeon bounds), skip
                 float distRoomToEntry = Vector2.Distance(entryRoomCenter, roomCenter); //distance from current room to entry room
-                //Debug.Log(distRoomToEntry);
-                if (distRoomToEntry < 25) { continue; } //if current room close to entry room, skip
+                Debug.Log(roomID + " to entry: " + distRoomToEntry + "/ " + ((boundsX*boundsZ) / 200));
+                if (distRoomToEntry < ((boundsX*boundsZ) / 200)) { continue; } //if current room close to entry room (within 5% of dungeon bounds), skip
                 float distFromRoomToEntryAndBoss = (distRoomToBoss + distRoomToEntry); //combine distances
 
                 for (int i = 0; i < treasureRoomIDs.Length; i++) //for each treasure room
@@ -1231,8 +1244,8 @@ public class DungeonGeneration : MonoBehaviour
                     {
                         //Debug.Log(treasureRoomIDs[i]);
                         float distRoomToTreasure = Vector2.Distance(treasureRoomCenters[i], roomCenter); //distance from current room to current treasure room
-                        //Debug.Log(distRoomToTreasure);
-                        if (distRoomToTreasure < 25) { continue; } //if current room close to current treasure room, skip
+                        Debug.Log(roomID + ": " + distRoomToTreasure + "/ " + ((boundsX*boundsZ) / 200));
+                        if (distRoomToTreasure < ((boundsX*boundsZ) / 200)) { continue; } //if current room close to current treasure room (within 5% of dungeon bounds), skip
                         distFromRoomToEntryAndBoss += distRoomToTreasure; //otherwise, add distance to combination
                     }
                 }
@@ -1244,17 +1257,17 @@ public class DungeonGeneration : MonoBehaviour
                     {
                         //Debug.Log(specialRoomIDs[i]);
                         float distRoomToSpecial = Vector2.Distance(specialRoomCenters[i], roomCenter); //distance from current room to current special room
-                        //Debug.Log(distRoomToSpecial);
-                        if (distRoomToSpecial < 25) { continue; } //if current room close to current special room, skip
+                        Debug.Log(roomID + " to special " + i + ": " + distRoomToSpecial + "/ " + ((boundsX*boundsZ) / 200));
+                        if (distRoomToSpecial < ((boundsX*boundsZ) / 200)) { continue; } //if current room close to current special room (within 5% of dungeon bounds), skip
                         distFromRoomToEntryAndBoss += distRoomToSpecial; //otherwise, add distance to combination
                     }
                 }
                 //if (dbugEnabled) { MG.UpdateHUDDbugText("roomID: " + roomID + " - " + roomCenter + ", " + distFromRoomToEntryAndBoss); }
 
                 //if room further than last nearest & room is empty
+                Debug.Log(distFromRoomToEntryAndBoss + " > " + distFromEntryAndBoss);
                 if (distFromRoomToEntryAndBoss > distFromEntryAndBoss && roomStates[roomID] == "Empty")
                 {
-                    //Debug.Log(distFromRoomToEntryAndBoss + " > " + distFromEntryAndBoss);
                     //update trackers and add room id to special array
                     distFromEntryAndBoss = distFromRoomToEntryAndBoss;
                     specialRoomIDs[sR] = roomID;
@@ -1265,6 +1278,7 @@ public class DungeonGeneration : MonoBehaviour
             if (specialRoomIDs[sR] != -1) //if special room found
             {
                 if (dbugEnabled) { MG.UpdateHUDDbugText("special room id: " + specialRoomIDs[sR]); }
+                if (dbugEnabled) { Debug.Log("special room id: " + specialRoomIDs[sR]); }
 
                 //update room state tracker
                 roomStates[specialRoomIDs[sR]] = "Special";
@@ -1291,8 +1305,17 @@ public class DungeonGeneration : MonoBehaviour
                     }
                 }
 
+                numOfSpecialRoomsFound++;
                 distFromEntryAndBoss = 0;
             }
+            else 
+            {
+                if (dbugEnabled) { MG.UpdateHUDDbugText("No special room found"); }
+                if (dbugEnabled) { Debug.Log("No special room found"); }
+            }
+
+            Debug.Log(numOfSpecialRoomsFound + "/" + numOfSpecialRooms);
+            if(numOfSpecialRoomsFound == numOfSpecialRooms) { break; }
         }
     }
 
@@ -1334,7 +1357,7 @@ public class DungeonGeneration : MonoBehaviour
 
                     for (int roomID = 0; roomID < largeRoomNum; roomID++)
                     {
-                        Debug.Log(roomID + "/" + usedTypeLargeIDs.Length);
+                        //Debug.Log(roomID + "/" + usedTypeLargeIDs.Length);
                         bool valid = false;
                         int inc = 0;
                         int[] curValidRoomIDs = FindThresholdRooms(scale, roomID); //find valid room types
