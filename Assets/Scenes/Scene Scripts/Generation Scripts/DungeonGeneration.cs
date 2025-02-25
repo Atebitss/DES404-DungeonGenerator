@@ -9,9 +9,9 @@ public class DungeonGeneration : MonoBehaviour
     //relevant scripts
     private MapGeneration MG;
     private PathGeneration PG;
+    private AbstractSceneManager ASM;
 
     //player
-    [SerializeField] private GameObject playerPrefab;
     private GameObject currentPlayer;
 
     //debug info
@@ -75,6 +75,7 @@ public class DungeonGeneration : MonoBehaviour
     {
         MG = this.gameObject.GetComponent<MapGeneration>();
         PG = this.gameObject.GetComponent<PathGeneration>();
+        ASM = this.gameObject.GetComponent<AbstractSceneManager>();
 
         if (dbugEnabled) { MG.UpdateHUDDbugText("DG, Awake"); }
 
@@ -516,6 +517,11 @@ public class DungeonGeneration : MonoBehaviour
 
                     //if moveX and moveY are both 0, room center is aligned with map center
                     if (moveX == 0 && moveY == 0) { break; }
+
+                    //check if the new position is within the map bounds
+                    int newPosX = roomPosX[curRoomsSpawned] + moveX;
+                    int newPosZ = roomPosZ[curRoomsSpawned] + moveY;
+                    if (newPosX < 0 || newPosX > boundsX || newPosZ < 0 || newPosZ > boundsZ) { break; }
 
                     //move room by one step
                     roomPosX[curRoomsSpawned] += moveX;
@@ -1947,5 +1953,8 @@ public class DungeonGeneration : MonoBehaviour
             roomObjects[roomID].GetComponent<RoomGeneration>().Wake(roomID, roomPosX[roomID], roomPosZ[roomID], roomBoundsX[roomID], roomBoundsZ[roomID], roomScales[roomID], roomStates[roomID], instantiatePos); //wake room script
             if (MG.isVisualEnabled()) { yield return new WaitForSeconds(.1f); }
         }
+
+        ASM.SpawnPlayer(new Vector3(entryRoomCenter.x, 0.1f, entryRoomCenter.y));
+        currentPlayer = ASM.GetPlayerObject();
     }
 }

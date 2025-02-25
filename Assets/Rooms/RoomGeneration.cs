@@ -70,13 +70,14 @@ public class RoomGeneration : MonoBehaviour
         ASM = GameObject.Find("SceneManager").gameObject.GetComponent<AbstractSceneManager>();
         MG = GameObject.Find("SceneManager").gameObject.GetComponent<MapGeneration>();
 
-        roomCenter = new Vector3(roomPosX + (roomBoundsX / 2f), 0, roomPosZ + (roomBoundsZ / 2f));
-        //https://stackoverflow.com/questions/2304052/check-if-a-number-has-a-decimal-place-is-a-whole-number
-        //using modulo (%) 1 checks if there is a decimal component
-        //if so, add half a tile to the center to offset the collider
-        if((roomBoundsX / 2f) % 1 != 0){roomCenter.x -= (tileXOffset / 2f);}
-        if((roomBoundsZ / 2f) % 1 != 0){roomCenter.z -= (tileZOffset / 2f);}
+        //set tile x & z offsets
+        tileXOffset = dbugFloorTile.transform.localScale.x;
+        tileZOffset = dbugFloorTile.transform.localScale.z;
 
+        //set room center
+        roomCenter = new Vector3(((roomBoundsX / 2f) - (tileXOffset / 2f)), 0, ((roomBoundsZ / 2f) - (tileZOffset / 2f)));
+
+        //move and scale room collider
         roomCollider.transform.localPosition = roomCenter;
         roomCollider.transform.localScale = new Vector3(roomBoundsX, 0.5f, roomBoundsZ);
 
@@ -86,10 +87,6 @@ public class RoomGeneration : MonoBehaviour
 
         //set grid positions size to (x*z)
         roomGridPositions = new Vector3[(roomBoundsX * roomBoundsZ)];
-
-        //set tile x & z offsets
-        tileXOffset = dbugFloorTile.transform.localScale.x;
-        tileZOffset = dbugFloorTile.transform.localScale.z;
 
         //set first position to current position - this will be used as reference for future tiles
         roomGridPositions[0] = this.transform.position;
@@ -102,7 +99,7 @@ public class RoomGeneration : MonoBehaviour
         }
 
         GenerateFloor();
-        GenerateDoorways();
+        //GenerateDoorways();
         //GenerateWalls();
     }
     //generate room grid x by z
@@ -189,14 +186,14 @@ public class RoomGeneration : MonoBehaviour
                         doorway.transform.Rotate(0, -90, 0, Space.Self);
                         door.transform.Rotate(0, 90, 0, Space.Self);
                         doorway.transform.position += new Vector3(0, 1, -0.25f);
-                        door.transform.position += new Vector3(0, 0, 0);
+                        door.transform.position += new Vector3(0.75f, -1, 0);
                         break;
                     case 1:
                         direction = "North"; 
                         doorway.transform.Rotate(0, 90, 0, Space.Self);
                         door.transform.Rotate(0, 90, 0, Space.Self);
                         doorway.transform.position += new Vector3(0, 1, 0.25f);
-                        door.transform.position += new Vector3(0, 0, 0);
+                        door.transform.position += new Vector3(-0.75f, -1, 0);
                         break;
                 }
                 switch(edgeID.y) 
@@ -206,19 +203,19 @@ public class RoomGeneration : MonoBehaviour
                         doorway.transform.Rotate(0, 0, 0, Space.Self);
                         door.transform.Rotate(0, 90, 0, Space.Self);
                         doorway.transform.position += new Vector3(-0.25f, 1, 0);
-                        door.transform.position += new Vector3(0, 0, 0);
+                        door.transform.position += new Vector3(0, -1, -0.75f);
                         break;
                     case 1:
                         direction = "East";
                         doorway.transform.Rotate(0, 180, 0, Space.Self);
                         door.transform.Rotate(0, 90, 0, Space.Self);
                         doorway.transform.position += new Vector3(0.25f, 1, 0);
-                        door.transform.position += new Vector3(0, 0, 0);
+                        door.transform.position += new Vector3(0, -1, 0.75f);
                         break;
                 }
 
                 doorway.name = "Room" + roomID + direction + "Doorway";
-                door.name = "Room" + roomID + direction + "Door";
+                door.transform.GetChild(0).GetChild(0).name = "Room" + roomID + direction + "Door";
 
                 //find first null position in array and add doorway
                 for(int i = 0; i < doorObjects.Length; i++) 

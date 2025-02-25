@@ -314,7 +314,7 @@ MonoBehaviour:
   playerCamera: {fileID: 5022982567547155934}
   interactionPromptText: {fileID: 408251515721017303}
   a: {fileID: 1875127274234875169}
-  movementSpeed: 2.5
+  movementSpeed: 5
   dodgeMask:
     serializedVersion: 2
     m_Bits: 128

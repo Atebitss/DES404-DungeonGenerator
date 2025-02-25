@@ -694,7 +694,7 @@ GameObject:
   - component: {fileID: 1945132723}
   m_Layer: 0
   m_Name: SceneManager
-  m_TagString: Untagged
+  m_TagString: SceneManager
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -779,7 +779,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4bdb70d58032f6548990ecc3fe0b286b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerPrefab: {fileID: 2783768033875945984, guid: 07888939a1f59d349b73cd0353289295, type: 3}
   dbugEnabled: 0
   basicRoom: {fileID: 4597496329373697504, guid: 8ab234d5dca0f924da914ca87cc9e3df, type: 3}
   dbugTile: {fileID: 6787671552346119472, guid: aa2f3d0dd74341a4db2fc987025a5892, type: 3}
@@ -795,13 +794,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4e4367cd3edc664f83e443b40584045, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  AM: {fileID: 0}
-  PC: {fileID: 0}
   devMode: 0
   amPrefab: {fileID: 4065216700189244488, guid: 924cc0721c1d6e841a3aff4bc23543af, type: 3}
   playerPrefab: {fileID: 2783768033875945984, guid: 07888939a1f59d349b73cd0353289295, type: 3}
   enemyPrefab: {fileID: 3375864117963020452, guid: 46bfd7227e5fe13448287a98bbe35f7b, type: 3}
   doorPrefab: {fileID: 7151845054247194810, guid: ec6fe55e299e1054496342b441da8b59, type: 3}
+  AM: {fileID: 0}
+  player: {fileID: 0}
+  PC: {fileID: 0}
 --- !u!1 &2000653574
 GameObject:
   m_ObjectHideFlags: 0

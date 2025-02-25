@@ -4,6 +4,10 @@ using UnityEngine;
 
 public abstract class AbstractDoorScript : MonoBehaviour
 {
+    //scripts
+    AbstractSceneManager ASM;
+    void Start(){ASM = GameObject.Find("SceneManager").GetComponent<AbstractSceneManager>();}
+
     //~~~~~health~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     public int health;
     public int GetHealth() { return health; }
@@ -30,6 +34,7 @@ public abstract class AbstractDoorScript : MonoBehaviour
 
 
     //~~~~~state~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    [SerializeField] private bool busy = false;
     [SerializeField] private bool isOpen = false;
     [SerializeField] private bool isLocked = false;
     [SerializeField] private Animator a;
@@ -42,51 +47,88 @@ public abstract class AbstractDoorScript : MonoBehaviour
         //interaction
     public void InteractWithDoor()
     {
-        //if is locked & player has key, unlock door & play unlock sound
-        //if is locked & player doesnt have key, play locked sound
-        //if is not locked & is open, close door & play close sound
-        //if is not locked & is not open, open door & play open sound
-        if(isLocked /*&& playerController.CheckForItemID(keyID)*/)
+        if(!busy)
         {
-            //locked & has key
-            isLocked = false;
-            //play(doorUnlockSound)
-            //playerController.DestroyItemByID(keyID)
-            UpdateDoorMaterial();
-        }
-        else if(isLocked /*&& !playerController.CheckForItemID(keyID)*/)
-        {
-            //locked & does not have key
-            //play(doorLockedSound)
-        }
-        else if (!isLocked && isOpen)
-        {
-            //closing door
-            a.SetBool("closing", true); //run close animation
-            isOpen = false; //update state
-            //play(doorClosingSound) //play closing audio
-            UpdateDoorMaterial(); //update visual
-            ResetDoorStates(); //reset animation state
-        }
-        else if (!isLocked && !isOpen)
-        {
-            //opening door
-            a.SetBool("opening", true);
-            isOpen = true;
-            //play(doorClosingSound)
-            UpdateDoorMaterial();
-            ResetDoorStates();
-        }
+            busy = true;
+            //find door direction based on name
+            string edge = "";
+            if (gameObject.name.Contains("North")) edge = "North";
+            else if (gameObject.name.Contains("South")) edge = "South"; 
+            else if (gameObject.name.Contains("East")) edge = "East";
+            else if (gameObject.name.Contains("West")) edge = "West";
 
+            int direction = 0;
+            switch(edge)
+            {
+                case "North":
+                    if (ASM.GetPlayerPosition().z > transform.position.z) direction = 1; //if player is north of door, open door clockwise
+                    else direction = -1; //else if player is south of door, open door anticlockwise
+                    break;
+                case "South":
+                    if (ASM.GetPlayerPosition().z > transform.position.z) direction = -1; //if player is south of door, open door anticlockwise
+                    else direction = 1; //else if player is north of door, open door clockwise
+                    break;
+                case "East":
+                    if (ASM.GetPlayerPosition().x > transform.position.x) direction = 1; //if player is east of door, open door anticlockwise
+                    else direction = -1; //else if player is west of door, open door clockwise
+                    break;
+                case "West":
+                    if (ASM.GetPlayerPosition().x > transform.position.x) direction = -1; //if player is west of door, open door anticlockwise
+                    else direction = 1; //else if player is east of door, open door clockwise
+                    break;
+            }
+
+            //if is locked & player has key, unlock door & play unlock sound
+            //if is locked & player doesnt have key, play locked sound
+            //if is not locked & is open, close door & play close sound
+            //if is not locked & is not open, open door & play open sound
+            /*if(isLocked /*&& playerController.CheckForItemID(keyID)/)
+            {
+                //locked & has key
+                isLocked = false;
+                //play(doorUnlockSound)
+                //playerController.DestroyItemByID(keyID)
+                UpdateDoorMaterial();
+            }
+            else if(isLocked /*&& !playerController.CheckForItemID(keyID)/)
+            {
+                //locked & does not have key
+                //play(doorLockedSound)
+            }
+            else*/ if (!isLocked && isOpen)
+            {
+                //closing door
+                Debug.Log(direction);
+                a.SetInteger("openDirection", direction);
+                a.SetBool("isOpen", false); //run close animation
+                isOpen = false; //update state
+                //play(doorClosingSound) //play closing audio
+                UpdateDoorMaterial(); //update visual
+                ResetDoorStates(direction); //reset animation state
+            }
+            else if (!isLocked && !isOpen)
+            {
+                Debug.Log(direction);
+                //opening door
+                a.SetInteger("openDirection", direction);
+                a.SetBool("isOpen", true);
+                isOpen = true;
+                //play(doorOpeningSound)
+                UpdateDoorMaterial();
+                ResetDoorStates(direction);
+            }
+        }
     }
-    private void ResetDoorStates()
+    private void ResetDoorStates(int direction)
     {
         AnimationClip[] clips = a.runtimeAnimatorController.animationClips;
         string clipName = "";
         float clipLength = 0f;
 
-        if (!isOpen) { clipName = "Door90AnticlockClose"; }
-        else if (isOpen) { clipName = "Door90AnticlockOpen"; }
+        if (!isOpen && direction == -1) { clipName = "DoorCloseAnticlockwise"; }
+        else if (!isOpen && direction == 1) { clipName = "DoorCloseClockwise"; }
+        else if (isOpen && direction == -1) { clipName = "DoorOpenAnticlockwise"; }
+        else if (isOpen && direction == 1) { clipName = "DoorOpenClockwise"; }
 
         foreach (AnimationClip clip in clips) { if (clip.name == clipName) { clipLength = clip.length; } }
 
@@ -94,8 +136,8 @@ public abstract class AbstractDoorScript : MonoBehaviour
     }
     private void ResetAnimationBooleans()
     {
-        a.SetBool("closing", false);
-        a.SetBool("opening", false);
+        a.SetInteger("openDirection", 0);
+        busy = false;
     }
     //~~~~~state~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -110,7 +110,7 @@ public class PlayerController : MonoBehaviour
     //~~~~~movement~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     [Header("-Movement")]
     //moving
-    [SerializeField] private float movementSpeed = 2.5f; //players movement velocity
+    [SerializeField] private float movementSpeed = 5f; //players movement velocity
     private Quaternion targetPlayerRot = Quaternion.identity; //used to lerp player rotation
     private Vector3 movement = Vector3.zero; //players movement directions
     private Vector3 playerVelocity = Vector3.zero; //used to calc movement
