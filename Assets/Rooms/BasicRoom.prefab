@@ -1,5 +1,67 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &469064154802980280
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3378373673973806310}
+  m_Layer: 0
+  m_Name: RoomWallsParent
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3378373673973806310
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 469064154802980280}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 826198305112378332}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2729574626349579445
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2301009215014517183}
+  m_Layer: 0
+  m_Name: RoomDoorsParent
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2301009215014517183
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2729574626349579445}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 826198305112378332}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4597496329373697504
 GameObject:
   m_ObjectHideFlags: 0
@@ -10,7 +72,6 @@ GameObject:
   m_Component:
   - component: {fileID: 826198305112378332}
   - component: {fileID: 8784915282644977535}
-  - component: {fileID: 5954052190374237668}
   m_Layer: 0
   m_Name: BasicRoom
   m_TagString: Untagged
@@ -32,6 +93,10 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1823617746266596404}
+  - {fileID: 6527273333158653974}
+  - {fileID: 3378373673973806310}
+  - {fileID: 2301009215014517183}
+  - {fileID: 3528257480180212796}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &8784915282644977535
@@ -46,24 +111,57 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d92b1edc4e856a341997c0478719fd8e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dbugEnabled: 1
+  dbugEnabled: 0
   baseDbugMat: {fileID: 2100000, guid: e8a11bef448ed1b4382b0b5eebb590ca, type: 2}
   matDbugEmpty: {fileID: 2100000, guid: b935ea7b19223f444a7418c023851217, type: 2}
   matDbugWall: {fileID: 2100000, guid: 40ce6f7b8d8dcb645bd3b910de554598, type: 2}
   matDbugDoor: {fileID: 2100000, guid: 1e2c8f73981c08a43ab9d2b91837d8e3, type: 2}
   dbugMarker: {fileID: 6787671552346119472, guid: aa2f3d0dd74341a4db2fc987025a5892, type: 3}
   dbugText: {fileID: 8348211830089719479}
-  roomCollider: {fileID: 5954052190374237668}
-  testFloorTile: {fileID: 8997730621713062801, guid: 194148bec6d799e49a67d416d13f91fe, type: 3}
-  testWallSection: {fileID: 7488329685454604500, guid: 3b8c557c9a2a6e94ab002f1cfa145344, type: 3}
-  testDoorwaySection: {fileID: 3211954936950896000, guid: 54cba25e58c59794b8b1902b38839397, type: 3}
---- !u!65 &5954052190374237668
+  roomCollider: {fileID: 5780578494968400953}
+  dbugFloorTile: {fileID: 8997730621713062801, guid: 194148bec6d799e49a67d416d13f91fe, type: 3}
+  wallSection: {fileID: 7488329685454604500, guid: 3b8c557c9a2a6e94ab002f1cfa145344, type: 3}
+  doorwaySection: {fileID: 3211954936950896000, guid: 54cba25e58c59794b8b1902b38839397, type: 3}
+  doorPrefab: {fileID: 7151845054247194810, guid: ec6fe55e299e1054496342b441da8b59, type: 3}
+--- !u!1 &7502486605377064533
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3528257480180212796}
+  - component: {fileID: 5780578494968400953}
+  m_Layer: 0
+  m_Name: RoomColliderParent
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3528257480180212796
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7502486605377064533}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 826198305112378332}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &5780578494968400953
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4597496329373697504}
+  m_GameObject: {fileID: 7502486605377064533}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -314,3 +412,34 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!1 &9030274857178099960
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6527273333158653974}
+  m_Layer: 0
+  m_Name: RoomFloorParent
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6527273333158653974
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9030274857178099960}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 826198305112378332}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

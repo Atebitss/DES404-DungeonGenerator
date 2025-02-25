@@ -35,14 +35,15 @@ public class DungeonGeneration : MonoBehaviour
     private int bossRoomID, entryRoomID; //important room ids
     private int[] treasureRoomIDs, specialRoomIDs; //unique room ids
     private int numOfTreasureRooms, numOfSpecialRooms; //number of unique rooms
-    Vector2 boundsCenter, bossRoomCenter, entryRoomCenter; //unique centers
-    Vector2[] roomCenters, treasureRoomCenters, specialRoomCenters; //coMGon centers
+    Vector2 boundsCenter, bossRoomCenter, entryRoomCenter, mapCenter; //unique centers
+    Vector2[] roomCenters, treasureRoomCenters, specialRoomCenters; //common centers
     private Vector2[] roomPositions; //bottom left corners of rooms literal positions
 
     //room info
     [Header("Room Objects")]
     [SerializeField] private GameObject basicRoom, dbugTile; //prefabs
     private GameObject[] roomObjects; //spawned objects
+    public GameObject GetRoomObject(int index) { return roomObjects[index]; }
     private int[] roomPosX, roomPosZ, roomBoundsX, roomBoundsZ; //room tile positions & bounds
     private string[] roomStates, roomScales; //types & sizes of rooms
 
@@ -268,6 +269,7 @@ public class DungeonGeneration : MonoBehaviour
         this.gridPositions = gridPositions;
         mapBoundsMin = new Vector2(0, 0);
         mapBoundsMax = new Vector2(boundsX, boundsZ);
+        mapCenter = new Vector2(boundsX / 2, boundsZ / 2);
 
         //begin generation
         StartCoroutine(GenerateDungeon());
@@ -429,6 +431,10 @@ public class DungeonGeneration : MonoBehaviour
                             roomPosZ[curRoomsSpawned] = Random.Range(roomPosZ[targetRoomID], roomPosZ[targetRoomID] + roomBoundsZ[targetRoomID] - roomBoundsZ[curRoomsSpawned]);
                             break;
                     }
+
+                    //visual wait update
+                    if (MG.isVisualEnabled()) { yield return new WaitForSeconds(.1f); }
+                    else { yield return null; }
                 }
                 else //if making large or medium rooms, find a random position within dungeon area without allowing the new room to pass the area bounds
                 {
@@ -461,15 +467,21 @@ public class DungeonGeneration : MonoBehaviour
                             //Debug.Log(newPosZ + "   " + (newPosZ + roomBoundsZ[curRoomsSpawned]) + "   / " + boundsZ);
 
                             //if the new position doesnt over lap another room and has distance from other rooms
-                            if (AreCellsUnoccupied(newPosX, newPosZ, roomBoundsX[curRoomsSpawned], roomBoundsZ[curRoomsSpawned]) && !AreNeighboursClose(roomPosX[curRoomsSpawned], roomPosZ[curRoomsSpawned], roomBoundsX[curRoomsSpawned], roomBoundsZ[curRoomsSpawned], scale))
+                            if (AreCellsUnoccupied(newPosX, newPosZ, roomBoundsX[curRoomsSpawned], roomBoundsZ[curRoomsSpawned]) && !AreNeighboursClose(newPosX, newPosZ, roomBoundsX[curRoomsSpawned], roomBoundsZ[curRoomsSpawned], scale))
                             {
                                 //update room position
                                 roomPosX[curRoomsSpawned] = newPosX;
                                 roomPosZ[curRoomsSpawned] = newPosZ;
                                 if (dbugEnabled) { MG.UpdateHUDDbugText("grid pos' clear, creating room @ " + gridPositions[roomPosX[curRoomsSpawned], roomPosZ[curRoomsSpawned]]); }
                                 roomPositions[curRoomsSpawned] = new Vector2(gridPositions[roomPosX[curRoomsSpawned], roomPosZ[curRoomsSpawned]].x, gridPositions[roomPosX[curRoomsSpawned], roomPosZ[curRoomsSpawned]].y);
+                                
                                 //set room location
                                 placed = true;
+                                
+                                //visual wait update
+                                if (MG.isVisualEnabled()) { yield return new WaitForSeconds(.1f); }
+                                else { yield return null; }
+
                                 break;
                             }
                             
@@ -479,6 +491,45 @@ public class DungeonGeneration : MonoBehaviour
                     }
 
                     if (!placed) { attempts++; } //if still unable to place, iterate loop
+                }
+            }
+
+            //move medium rooms to the center of the map
+            if (scale == 2 || scale == 1)
+            {
+                //get the center of map
+                float centerX = mapCenter.x;
+                float centerY = mapCenter.y;
+
+                //attempt to move the room by one step toward map center until there is a neighbour close
+                while(!AreNeighboursClose(roomPosX[curRoomsSpawned], roomPosZ[curRoomsSpawned], roomBoundsX[curRoomsSpawned], roomBoundsZ[curRoomsSpawned], scale))
+                {
+                    //calc if room center is to the left or right of map center
+                    int moveX = 0;
+                    if (roomCenters[curRoomsSpawned].x < centerX) moveX = 1; 
+                    else if (roomCenters[curRoomsSpawned].x > centerX) moveX = -1;
+
+                    //calc if room center is to the top or bottom of map center
+                    int moveY = 0;
+                    if (roomCenters[curRoomsSpawned].y < centerY) moveY = 1; 
+                    else if (roomCenters[curRoomsSpawned].y > centerY) moveY = -1;
+
+                    //if moveX and moveY are both 0, room center is aligned with map center
+                    if (moveX == 0 && moveY == 0) { break; }
+
+                    //move room by one step
+                    roomPosX[curRoomsSpawned] += moveX;
+                    roomPosZ[curRoomsSpawned] += moveY;
+
+                    //update room center
+                    roomCenters[curRoomsSpawned] = new Vector2( roomPosX[curRoomsSpawned] + (roomBoundsX[curRoomsSpawned] / 2), roomPosZ[curRoomsSpawned] + (roomBoundsZ[curRoomsSpawned] / 2));
+
+                    //update room position
+                    roomPositions[curRoomsSpawned] = new Vector2(roomPosX[curRoomsSpawned], roomPosZ[curRoomsSpawned]);
+
+                    //visual wait update
+                    if (MG.isVisualEnabled()) { yield return new WaitForSeconds(.1f); }
+                    else { yield return null; }
                 }
             }
 
@@ -552,6 +603,10 @@ public class DungeonGeneration : MonoBehaviour
                     MG.UpdateHUDDbugText("lowering scale, " + scale);
                     //MG.UpdateHUDDbugText("large: " + largeRoomNum + ", medium: " + mediumRoomNum + ", small: " + smallRoomNum);
                 }
+                
+                //visual wait update
+                if (MG.isVisualEnabled()) { yield return new WaitForSeconds(.1f); }
+                else { yield return null; }
             }
             else if (roomSpawnAttempts == ((largeRoomNum + mediumRoomNum) - 1))
             {
@@ -575,6 +630,10 @@ public class DungeonGeneration : MonoBehaviour
                     MG.UpdateHUDDbugText("lowering scale, " + scale);
                     //MG.UpdateHUDDbugText("large: " + largeRoomNum + ", medium: " + mediumRoomNum + ", small: " + smallRoomNum);
                 }
+                
+                //visual wait update
+                if (MG.isVisualEnabled()) { yield return new WaitForSeconds(.1f); }
+                else { yield return null; }
             }
             else if (roomSpawnAttempts == ((largeRoomNum + mediumRoomNum + smallRoomNum) - 1))
             {
@@ -599,6 +658,11 @@ public class DungeonGeneration : MonoBehaviour
                     //MG.UpdateHUDDbugText("large: " + largeRoomNum + ", medium: " + mediumRoomNum + ", small: " + smallRoomNum);
                     MG.UpdateHUDDbugText("total: " + curRoomsSpawned);
                 }
+                
+                //visual wait update
+                if (MG.isVisualEnabled()) { yield return new WaitForSeconds(.1f); }
+                else { yield return null; }
+
                 break;
             }
         }
@@ -629,27 +693,24 @@ public class DungeonGeneration : MonoBehaviour
     private bool AreNeighboursClose(int roomPosX, int roomPosZ, int roomBoundsX, int roomBoundsZ, int scale)
     {
         if (dbugEnabled) { MG.UpdateHUDDbugText("DG, AreNeighboursClose"); }
-        //check if any grid states within x radius are occupied by other rooms to ensure spacing
+        //check if any grid states within a radius 5% of map dist are occupied by other rooms to ensure spacing
+        
+        //get 5% of total area
+        int radius = (totalSpace * 2) / 1000;
 
-        int radius = ((boundsX * boundsZ) / 2500);
-        //Debug.Log("z_radius: " + radius);
-        //set radius depending on scale
         switch(scale)
         {
             case 0:
-                //small rooms are attached to parents, not needed skip
-                //Debug.Log("scale small skipping");
+                //small rooms attached to parents, no spacing needed
                 return false;
             case 1:
+                //medium rooms use half the radius
+                radius = radius / 2;
                 if (radius < 1) radius = 1;
-                else if (radius > 5) { radius = 5; }
-                radius = (radius / 2);
-                //Debug.Log("scale medium radius " + radius);
                 break;
             case 2:
-                if(radius < 1) { radius = 1; }
-                else if (radius > 5) { radius = 5; }
-                //Debug.Log("scale large radius " + radius);
+                //large rooms use full radius
+                if (radius < 1) radius = 1;
                 break;
         }
 
@@ -671,7 +732,7 @@ public class DungeonGeneration : MonoBehaviour
                     if (x >= roomPosX && x < (roomPosX + roomBoundsX) && z >= roomPosZ && z < (roomPosZ + roomBoundsZ)) { continue; }
 
                     //check if select grid state is room related, return true
-                    if (MG.GetGridState(x, z) == "Wall" || MG.GetGridState(x, z) == "Doorway" || MG.GetGridState(x, z) == "WallCorner" || MG.GetGridState(x, z).StartsWith("Room")) { return true; }
+                    if (MG.GetGridState(x, z) == "Hallway" || MG.GetGridState(x, z) == "Wall" || MG.GetGridState(x, z) == "Doorway" || MG.GetGridState(x, z) == "WallCorner" || MG.GetGridState(x, z).StartsWith("Room")) { return true; }
                 }
             }
         }
@@ -1230,10 +1291,10 @@ public class DungeonGeneration : MonoBehaviour
                 //find room center and distance from entry and boss room center
                 Vector2 roomCenter = roomCenters[roomID];
                 float distRoomToBoss = Vector2.Distance(bossRoomCenter, roomCenter); //distance from current room to boss room
-                Debug.Log(roomID + " to boss: " + distRoomToBoss + "/ " + ((boundsX*boundsZ) / 200));
+                //Debug.Log(roomID + " to boss: " + distRoomToBoss + "/ " + ((boundsX*boundsZ) / 200));
                 if (distRoomToBoss < ((boundsX*boundsZ) / 200)) { continue; } //if current room close to boss room (within 5% of dungeon bounds), skip
                 float distRoomToEntry = Vector2.Distance(entryRoomCenter, roomCenter); //distance from current room to entry room
-                Debug.Log(roomID + " to entry: " + distRoomToEntry + "/ " + ((boundsX*boundsZ) / 200));
+                //Debug.Log(roomID + " to entry: " + distRoomToEntry + "/ " + ((boundsX*boundsZ) / 200));
                 if (distRoomToEntry < ((boundsX*boundsZ) / 200)) { continue; } //if current room close to entry room (within 5% of dungeon bounds), skip
                 float distFromRoomToEntryAndBoss = (distRoomToBoss + distRoomToEntry); //combine distances
 
@@ -1244,7 +1305,7 @@ public class DungeonGeneration : MonoBehaviour
                     {
                         //Debug.Log(treasureRoomIDs[i]);
                         float distRoomToTreasure = Vector2.Distance(treasureRoomCenters[i], roomCenter); //distance from current room to current treasure room
-                        Debug.Log(roomID + ": " + distRoomToTreasure + "/ " + ((boundsX*boundsZ) / 200));
+                        //Debug.Log(roomID + ": " + distRoomToTreasure + "/ " + ((boundsX*boundsZ) / 200));
                         if (distRoomToTreasure < ((boundsX*boundsZ) / 200)) { continue; } //if current room close to current treasure room (within 5% of dungeon bounds), skip
                         distFromRoomToEntryAndBoss += distRoomToTreasure; //otherwise, add distance to combination
                     }
@@ -1257,7 +1318,7 @@ public class DungeonGeneration : MonoBehaviour
                     {
                         //Debug.Log(specialRoomIDs[i]);
                         float distRoomToSpecial = Vector2.Distance(specialRoomCenters[i], roomCenter); //distance from current room to current special room
-                        Debug.Log(roomID + " to special " + i + ": " + distRoomToSpecial + "/ " + ((boundsX*boundsZ) / 200));
+                        //Debug.Log(roomID + " to special " + i + ": " + distRoomToSpecial + "/ " + ((boundsX*boundsZ) / 200));
                         if (distRoomToSpecial < ((boundsX*boundsZ) / 200)) { continue; } //if current room close to current special room (within 5% of dungeon bounds), skip
                         distFromRoomToEntryAndBoss += distRoomToSpecial; //otherwise, add distance to combination
                     }
@@ -1265,7 +1326,7 @@ public class DungeonGeneration : MonoBehaviour
                 //if (dbugEnabled) { MG.UpdateHUDDbugText("roomID: " + roomID + " - " + roomCenter + ", " + distFromRoomToEntryAndBoss); }
 
                 //if room further than last nearest & room is empty
-                Debug.Log(distFromRoomToEntryAndBoss + " > " + distFromEntryAndBoss);
+                //Debug.Log(distFromRoomToEntryAndBoss + " > " + distFromEntryAndBoss);
                 if (distFromRoomToEntryAndBoss > distFromEntryAndBoss && roomStates[roomID] == "Empty")
                 {
                     //update trackers and add room id to special array

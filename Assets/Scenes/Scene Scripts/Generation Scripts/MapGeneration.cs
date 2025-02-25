@@ -1,4 +1,4 @@
- using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using UnityEngine.UI;
@@ -50,8 +50,13 @@ public class MapGeneration : MonoBehaviour
     public int GetTotalSpace() { return totalSpace; }
 
     //map grid
-    private string[,] gridStates; //what fills the grid square, if anything
     private Vector2[,] gridPositions; //literal positions
+    private string[,] gridStates; //what fills the grid square, if anything
+    public void UpdateGridState(int posX, int posZ, string gridState) //update tile state
+    {
+        gridStates[posX, posZ] = gridState;
+    }
+    public string GetGridState(int posX, int posZ) { /*Debug.Log(gridStates[posX, posZ]);*/ return gridStates[posX, posZ]; }
 
 
 
@@ -123,7 +128,6 @@ public class MapGeneration : MonoBehaviour
         if(genAttempts > 1) { DG.ResetDungeon(); }
         DG.BeginDungeonGeneration(treasureRoomsMax, treasureRoomsMin, specialRoomsMax, specialRoomsMin, boundsX, boundsZ, totalSpace, gridPositions);
     }
-
     private void DefineBounds()
     {
         Debug.Log("MG, Defining Dungeon Bounds");
@@ -135,7 +139,6 @@ public class MapGeneration : MonoBehaviour
         //Debug.Log("X*Z = total");
         //Debug.Log(boundsX + "*" + boundsZ + " = " + totalSpace);
     }
-
     private void DefineGrid()
     {
         Debug.Log("MG, Defining Dungeon Grid");
@@ -178,7 +181,6 @@ public class MapGeneration : MonoBehaviour
             }
         }
     }
-
     private int ConvertPosToPosID(Vector2 pos) //convert 2D position to grid position
     {
         //Debug.Log("vector2int: " + pos);
@@ -186,12 +188,6 @@ public class MapGeneration : MonoBehaviour
         return ((int)pos.x * boundsZ + (int)pos.y) + 1;
     }
 
-
-    public void UpdateGridState(int posX, int posZ, string gridState) //update tile state
-    {
-        gridStates[posX, posZ] = gridState;
-    }
-    public string GetGridState(int posX, int posZ) { /*Debug.Log(gridStates[posX, posZ]);*/ return gridStates[posX, posZ]; }
 
 
     public void UpdateDbugTileTextMoveCost(int posX, int posZ, float moveCost) //update tile debug text with PathGeneration movement cost (for hallway pathfinding)

@@ -31,14 +31,15 @@ public class RoomGeneration : MonoBehaviour
     //room info
     private bool entered = false;
 
-    [SerializeField] private GameObject testFloorTile;
+    [SerializeField] private GameObject dbugFloorTile;
     private GameObject floorObject;
     private float tileXOffset, tileZOffset;
 
     private Vector2[] doorPositions;
     private GameObject[] doorObjects = new GameObject[4];
+    public GameObject[] GetDoorObjects() { return doorObjects; }
 
-    [SerializeField] private GameObject testWallSection, testDoorwaySection;
+    [SerializeField] private GameObject wallSection, doorwaySection, doorPrefab;
     private GameObject[] wallObjects = new GameObject[4]; //0 - bottom, 1 - top, 2 - left, 3 - right
     private bool[] wallHasDoorway = new bool[4]; //0 - bottom, 1 - top, 2 - left, 3 - right
     private float sectionXOffset, sectionZOffset;
@@ -53,16 +54,6 @@ public class RoomGeneration : MonoBehaviour
 
 
 
-    /*void Awake()
-    {
-        this.roomBoundsX = 12;
-        this.roomBoundsZ = 10;
-        this.roomID = 0;
-        this.roomSize = "Medium";
-        this.roomType = "Study";
-
-        //Begin();
-    }*/
     public void Wake(int roomID, int roomPosX, int roomPosZ, int roomBoundsX, int roomBoundsZ, string roomSize, string roomType, Vector3 literalPosition)
     {
         if (dbugEnabled) { Debug.Log("ID: " + roomID + "   size: " + roomSize + "   type: " + roomType + "   x: " + roomBoundsX + ", z: " + roomBoundsZ); }
@@ -82,71 +73,38 @@ public class RoomGeneration : MonoBehaviour
         roomCenter = new Vector3(roomPosX + (roomBoundsX / 2f), 0, roomPosZ + (roomBoundsZ / 2f));
         //https://stackoverflow.com/questions/2304052/check-if-a-number-has-a-decimal-place-is-a-whole-number
         //using modulo (%) 1 checks if there is a decimal component
-        //if so, add 0.1f to the center to offset the collider
-        if((roomBoundsX / 2f) % 1 != 0){roomCenter.x -= 0.5f;}
-        if((roomBoundsZ / 2f) % 1 != 0){roomCenter.z -= 0.5f;}
+        //if so, add half a tile to the center to offset the collider
+        if((roomBoundsX / 2f) % 1 != 0){roomCenter.x -= (tileXOffset / 2f);}
+        if((roomBoundsZ / 2f) % 1 != 0){roomCenter.z -= (tileZOffset / 2f);}
 
         roomCollider.transform.localPosition = roomCenter;
         roomCollider.transform.localScale = new Vector3(roomBoundsX, 0.5f, roomBoundsZ);
 
-        if(MG.isDbugEnabled()){dbugText.SetActive(true);}
-        else{dbugText.SetActive(false);}
+        //if(MG.isDbugEnabled()){dbugText.SetActive(true);}
+        //else{dbugText.SetActive(false);}
+        dbugText.SetActive(false);
 
         //set grid positions size to (x*z)
         roomGridPositions = new Vector3[(roomBoundsX * roomBoundsZ)];
 
         //set tile x & z offsets
-        tileXOffset = testFloorTile.transform.localScale.x;
-        tileZOffset = testFloorTile.transform.localScale.z;
+        tileXOffset = dbugFloorTile.transform.localScale.x;
+        tileZOffset = dbugFloorTile.transform.localScale.z;
 
         //set first position to current position - this will be used as reference for future tiles
         roomGridPositions[0] = this.transform.position;
 
         //for(int i = 0; i < roomGridPositions.Length; i++) { Debug.Log("grid pos " + (i + 1) + ": " + roomGridPositions[i]); }
-        GenerateFloor();
         if (dbugEnabled)
         {
             UpdateGridDbug();
             UpdateTextDbug();
         }
+
+        GenerateFloor();
         GenerateDoorways();
         //GenerateWalls();
     }
-    
-
-
-    private void OnCollisionEnter(Collision col)
-    {
-        if(col.gameObject.tag == "Player" && !entered)
-        {
-            //lock doors and start combat
-            entered = true;
-
-            //lock doors
-            for(int i = 0; i < doorObjects.Length; i++)
-            {
-                AbstractDoorScript curDoorScript = doorObjects[i].GetComponent<AbstractDoorScript>();
-                curDoorScript.LockDoor();
-                //run animation
-            }
-
-            //start combat
-            enemyCount = Random.Range(enemyMin, enemyMax);
-            Vector3 playerPos = ASM.GetPlayerPosition();
-            Vector3[] enemyPositions = new Vector3[enemyCount];
-            for(int i = 0; i < enemyCount; i++)
-            {
-                //find random position within room
-                //check radius around player, if enemy is out with radius
-                //check radius around position for walls, if no walls
-                //check radius around position for other enemies, if no enemies
-                //spawn enemy
-            }
-        }
-    }
-
-
-
     //generate room grid x by z
     private void GenerateFloor()
     {
@@ -194,16 +152,88 @@ public class RoomGeneration : MonoBehaviour
 
         Vector3 tempPos = new Vector3(x, -1, z);
         //Debug.Log("tempPos: " + tempPos);
-        floorObject = Instantiate(testFloorTile, tempPos, Quaternion.identity);
+        floorObject = Instantiate(dbugFloorTile, tempPos, Quaternion.identity);
+        floorObject.transform.parent = this.transform.GetChild(1);
         floorObject.transform.localScale = new Vector3(((float)roomBoundsX / 2), floorObject.transform.localScale.y, ((float)roomBoundsZ / 2));
-        floorObject.transform.parent = this.transform;
     }
-
     private void GenerateDoorways()
     {
+        //check each grid position along room bounds for doorways
+        for (int pos = 0; pos < roomGridStates.Length; pos++)
+        {
+            //check if position is on room edge
+            Vector2 edgeID = new Vector2(0, 0);
+            if(pos < roomBoundsX){edgeID = new Vector2(-1, 0);} //bottom
+            else if(pos >= (roomGridStates.Length - roomBoundsX)){edgeID = new Vector2(1, 0);} //top
+            else if(pos % roomBoundsX == 0){edgeID = new Vector2(0, -1);} //left
+            else if(pos % roomBoundsX == (roomBoundsX - 1)){edgeID = new Vector2(0, 1);} //right
+
+
+            //if position is edge and state is doorway
+            if (edgeID != new Vector2(0, 0) && roomGridStates[pos] == "Doorway")
+            {
+                //create door at position
+                GameObject doorway = Instantiate(doorwaySection, roomGridPositions[pos], Quaternion.identity);
+                doorway.transform.parent = this.transform.GetChild(3); //parent it to the doorway parent
+
+                //Vector3 doorPosition = roomGridPositions[pos] + new Vector3(0.5f, 0, 0.5f); // Offset by 0.5 to get center
+                GameObject door = Instantiate(doorPrefab, roomGridPositions[pos], Quaternion.identity);
+                door.transform.parent = doorway.transform; //parent it to the door parent
+
+                //name door based on room number and direction
+                string direction = "";
+                switch(edgeID.x)
+                {
+                    case -1:
+                        direction = "South";
+                        doorway.transform.Rotate(0, -90, 0, Space.Self);
+                        door.transform.Rotate(0, 90, 0, Space.Self);
+                        doorway.transform.position += new Vector3(0, 1, -0.25f);
+                        door.transform.position += new Vector3(0, 0, 0);
+                        break;
+                    case 1:
+                        direction = "North"; 
+                        doorway.transform.Rotate(0, 90, 0, Space.Self);
+                        door.transform.Rotate(0, 90, 0, Space.Self);
+                        doorway.transform.position += new Vector3(0, 1, 0.25f);
+                        door.transform.position += new Vector3(0, 0, 0);
+                        break;
+                }
+                switch(edgeID.y) 
+                {
+                    case -1:
+                        direction = "West";
+                        doorway.transform.Rotate(0, 0, 0, Space.Self);
+                        door.transform.Rotate(0, 90, 0, Space.Self);
+                        doorway.transform.position += new Vector3(-0.25f, 1, 0);
+                        door.transform.position += new Vector3(0, 0, 0);
+                        break;
+                    case 1:
+                        direction = "East";
+                        doorway.transform.Rotate(0, 180, 0, Space.Self);
+                        door.transform.Rotate(0, 90, 0, Space.Self);
+                        doorway.transform.position += new Vector3(0.25f, 1, 0);
+                        door.transform.position += new Vector3(0, 0, 0);
+                        break;
+                }
+
+                doorway.name = "Room" + roomID + direction + "Doorway";
+                door.name = "Room" + roomID + direction + "Door";
+
+                //find first null position in array and add doorway
+                for(int i = 0; i < doorObjects.Length; i++) 
+                {
+                    if(doorObjects[i] == null) 
+                    {
+                        doorObjects[i] = door;
+                        break;
+                    }
+                }
+            }
+        }
+
 
     }
-
     private void GenerateWalls()
     {
         //debug
@@ -217,32 +247,64 @@ public class RoomGeneration : MonoBehaviour
 
         //top wall
         tempPos = new Vector3((roomGridPositions[roomGridPositions.Length - 1].x + this.transform.position.x) / 2, 1, roomGridPositions[roomGridPositions.Length - 1].z + 0.375f);
-        wallObjects[0] = Instantiate(testWallSection, tempPos, Quaternion.identity);   //creates the new wall
+        wallObjects[0] = Instantiate(wallSection, tempPos, Quaternion.identity);   //creates the new wall
         wallObjects[0].transform.localScale = new Vector3(wallObjects[0].transform.localScale.x, wallObjects[0].transform.localScale.y, zScale);   //sets the size of the wall
         wallObjects[0].transform.Rotate(0, 90, 0, Space.Self);   //rotates the wall
 
         //bottom wall
         tempPos = new Vector3((roomGridPositions[roomGridPositions.Length - 1].x + this.transform.position.x) / 2, 1, roomGridPositions[0].z - 0.375f);
-        wallObjects[1] = Instantiate(testWallSection, tempPos, Quaternion.identity);   //creates the new wall
+        wallObjects[1] = Instantiate(wallSection, tempPos, Quaternion.identity);   //creates the new wall
         wallObjects[1].transform.localScale = new Vector3(wallObjects[1].transform.localScale.x, wallObjects[1].transform.localScale.y, zScale);   //sets the size of the wall
         wallObjects[1].transform.Rotate(0, -90, 0, Space.Self);   //rotates the wall
 
 
         //left wall
         tempPos = new Vector3(roomGridPositions[0].x - 0.375f, 1, (roomGridPositions[roomGridPositions.Length - 1].z + this.transform.position.z) / 2);
-        wallObjects[2] = Instantiate(testWallSection, tempPos, Quaternion.identity);   //creates the new wall
+        wallObjects[2] = Instantiate(wallSection, tempPos, Quaternion.identity);   //creates the new wall
         wallObjects[2].transform.localScale = new Vector3(wallObjects[2].transform.localScale.x, wallObjects[2].transform.localScale.y, xScale);   //sets the size of the wall
         wallObjects[2].transform.Rotate(0, 0, 0, Space.Self);   //rotates the wall
 
         //right wall
         tempPos = new Vector3(roomGridPositions[roomGridPositions.Length - 1].x + 0.375f, 1, (roomGridPositions[roomGridPositions.Length - 1].z + this.transform.position.z) / 2);
-        wallObjects[3] = Instantiate(testWallSection, tempPos, Quaternion.identity);   //creates the new wall
+        wallObjects[3] = Instantiate(wallSection, tempPos, Quaternion.identity);   //creates the new wall
         wallObjects[3].transform.localScale = new Vector3(wallObjects[3].transform.localScale.x, wallObjects[3].transform.localScale.y, xScale);   //sets the size of the wall
         wallObjects[3].transform.Rotate(0, 180, 0, Space.Self);   //rotates the wall
 
 
         for (int gridPos = 0; gridPos < roomBoundsX; gridPos++){ /*Debug.Log("marking grid" + gridPos + " as Wall");*/ roomGridStates[gridPos] = "Wall"; } //update grid state with wall ID
         for (int wall = 0; wall < wallObjects.Length; wall++) { if (wallObjects[wall] != null) { wallObjects[wall].transform.parent = this.transform; } }
+    }
+
+    
+
+    private void OnCollisionEnter(Collision col)
+    {
+        if(col.gameObject.tag == "Player" && !entered)
+        {
+            //lock doors and start combat
+            entered = true;
+
+            //lock doors
+            for(int i = 0; i < doorObjects.Length; i++)
+            {
+                AbstractDoorScript curDoorScript = doorObjects[i].GetComponent<AbstractDoorScript>();
+                curDoorScript.LockDoor();
+                //run animation
+            }
+
+            //start combat
+            enemyCount = Random.Range(enemyMin, enemyMax);
+            Vector3 playerPos = ASM.GetPlayerPosition();
+            Vector3[] enemyPositions = new Vector3[enemyCount];
+            for(int i = 0; i < enemyCount; i++)
+            {
+                //find random position within room
+                //check radius around player, if enemy is out with radius
+                //check radius around position for walls, if no walls
+                //check radius around position for other enemies, if no enemies
+                //spawn enemy
+            }
+        }
     }
 
 
