@@ -153,6 +153,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   health: 1
+  busy: 0
   isOpen: 0
   isLocked: 0
   a: {fileID: 8162492440024748058}
@@ -207,7 +208,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
 --- !u!1 &7151845054247194810
 GameObject:
   m_ObjectHideFlags: 0

@@ -111,7 +111,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d92b1edc4e856a341997c0478719fd8e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dbugEnabled: 0
+  dbugEnabled: 1
   baseDbugMat: {fileID: 2100000, guid: e8a11bef448ed1b4382b0b5eebb590ca, type: 2}
   matDbugEmpty: {fileID: 2100000, guid: b935ea7b19223f444a7418c023851217, type: 2}
   matDbugWall: {fileID: 2100000, guid: 40ce6f7b8d8dcb645bd3b910de554598, type: 2}
