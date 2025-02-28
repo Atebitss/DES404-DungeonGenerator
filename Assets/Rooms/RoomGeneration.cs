@@ -90,7 +90,8 @@ public class RoomGeneration : MonoBehaviour
         //set first position to current position - this will be used as reference for future tiles
         roomGridPositions[0] = this.transform.position;
 
-        //for(int i = 0; i < roomGridPositions.Length; i++) { Debug.Log("grid pos " + (i + 1) + ": " + roomGridPositions[i]); }
+
+
         GenerateFloor();
         GenerateDoorways();
         GenerateWalls();
@@ -235,7 +236,7 @@ public class RoomGeneration : MonoBehaviour
 
 
     }
-    private void GenerateWalls()
+    private void GenerateWalls() //~~~FIX THIS LATER, IDK WHAT TO DO WITH THIS~~~
     {
         for (int wallIndex = 0; wallIndex < 4; wallIndex++) // loop through 4 walls
         {
@@ -284,7 +285,7 @@ public class RoomGeneration : MonoBehaviour
                     wallStartIndex = 0;
                     wallEndIndex = roomBoundsX * roomBoundsZ;
                     tileStep = roomBoundsX;
-                    wallPos = new Vector3(wallOffset, 1, (roomBoundsZ / 2f) - (tileZOffset / 2f));
+                    wallPos = new Vector3((wallOffset - 1), 1, (roomBoundsZ / 2f) - (tileZOffset / 2f));
                     scale = new Vector3(1, 1, roomBoundsZ / 2f);
                     wallRotation = 0;
                     break;
@@ -303,6 +304,8 @@ public class RoomGeneration : MonoBehaviour
                     tempDoorIndexArray[doorCount] = tileIndex;
                     doorIndexArray = tempDoorIndexArray;
                     doorCount++;
+
+                    Debug.Log("door " + doorCount + " found at: " + tileIndex);
                 }
             }
 
@@ -315,12 +318,13 @@ public class RoomGeneration : MonoBehaviour
                 fullWall.transform.localScale = scale;
                 fullWall.transform.Rotate(0, wallRotation, 0, Space.Self);
             }
-            else // If doors exist, create wall segments
+            /*else // If doors exist, create wall segments
             {
                 //if i == 0, create wall segment from start to first door
                 //if i > 0, create wall segment from previous door to current door
                 //if i == doorCount, create wall segment from last door to end of wall
 
+                float prevEndPos = 0;
                 int prevIndex = wallStartIndex;
                 int distToNext = 0;
 
@@ -332,12 +336,10 @@ public class RoomGeneration : MonoBehaviour
                         if(i == doorCount)
                         {
                             distToNext = ((wallEndIndex - doorIndexArray[i - 1]) / roomBoundsX); 
-                            Debug.Log("distToNext: " + distToNext + ", wallEndIndex: " + wallEndIndex + ", doorIndexArray[i]: " + doorIndexArray[i - 1]);
                         }
                         else
                         {
                             distToNext = ((doorIndexArray[i] - prevIndex) / roomBoundsX);
-                            Debug.Log("distToNext: " + distToNext + ", prevIndex: " + prevIndex + ", doorIndexArray[i]: " + doorIndexArray[i]);
                         }
                     }
                     else
@@ -345,15 +347,12 @@ public class RoomGeneration : MonoBehaviour
                         if(i == doorCount)
                         {
                             distToNext = (wallEndIndex - doorIndexArray[i - 1]);
-                            Debug.Log("distToNext: " + distToNext + ", wallEndIndex: " + wallEndIndex + ", doorIndexArray[i]: " + doorIndexArray[i - 1]);
                         }
                         else
                         {
                             distToNext = (doorIndexArray[i] - prevIndex);
-                            Debug.Log("distToNext: " + distToNext + ", prevIndex: " + prevIndex + ", doorIndexArray[i]: " + doorIndexArray[i]);
                         }
                     }
-
 
                     GameObject segmentWall = Instantiate(wallSection, Vector3.zero, Quaternion.identity);
                     segmentWall.name = "Room" + roomID + direction + "WallSegment" + i;
@@ -362,20 +361,149 @@ public class RoomGeneration : MonoBehaviour
                     switch(wallIndex)
                     {
                         case 0: //top wall (north)
-                            wallPos = new Vector3(((distToNext / 2f) - tileXOffset), 1, roomBoundsZ - wallOffset);
-                            scale = new Vector3(1, 1, ((distToNext / 2f) - (tileXOffset / 2f)));
+                            if(i != 0 && i != doorCount)
+                            {
+                                Debug.Log("doorIndexArray[i]: " + doorIndexArray[i] + ", prevIndex: " + prevIndex);
+                                if((doorIndexArray[i] - prevIndex) == 3)
+                                {
+                                    Debug.Log("wall segment " + i + " destroyed");
+                                    Destroy(segmentWall);
+                                    break;
+                                }
+                            }
+
+                            if(i == 0) //if first segment
+                            {
+                                segmentWall.name = "i == 0";
+                                wallPos = new Vector3((prevEndPos + (distToNext / 2f) - tileXOffset), 1, roomBoundsZ - wallOffset);
+                                scale = new Vector3(1, 1, ((distToNext / 2f) - (tileXOffset / 2f))); 
+                                prevIndex = doorIndexArray[i]; 
+                            }
+                            else if(i > 0 && i < doorCount && doorCount > 1 ) //if middle segment and there is more than one door
+                            {
+                                //~~~POSITION (7, -1, 4) & SCALE (7.5, 1, 4.5), SPAWNS WALLS FINE~~~
+                                segmentWall.name = "i > 0 && i < doorCount && doorCount > 1";
+                                wallPos = new Vector3((prevEndPos + (distToNext / 2f) - (tileXOffset * 1.5f)), 1, roomBoundsZ - wallOffset);
+                                scale = new Vector3(1, 1, ((distToNext / 2f) - (tileXOffset * 1.5f))); 
+                                prevIndex = doorIndexArray[i];
+                            }
+                            else if(i == doorCount && doorCount == 1) //if last segment and there is only one door
+                            {
+                                segmentWall.name = "i == doorCount && doorCount == 1";
+                                wallPos = new Vector3((prevEndPos + (distToNext / 2f) - tileXOffset), 1, roomBoundsZ - wallOffset);
+                                scale = new Vector3(1, 1, ((distToNext / 2f) - tileXOffset)); 
+                                prevIndex = wallEndIndex; 
+                            }
+                            else if(i == doorCount && doorCount > 1) //if last segment and there is more than one door
+                            {
+                                //~~~POSITION (7, -1, 4) & SCALE (7.5, 1, 4.5), SPAWNS WALLS FINE~~~
+                                //~~~POSITION (6.5, -1, 4) & SCALE (7, 1, 4.5), SPAWNS WALL WITHOUT OFFSET~~~
+                                //~~~POSITION (7, -1, 4) & SCALE (7.5, 1, 4.5), SPAWNS WALL HALF WAY THROUGH DOOR~~~
+                                segmentWall.name = "i == doorCount && doorCount > 1";
+                                if(doorIndexArray[i-1] - doorIndexArray[i-2] == 3) 
+                                {
+                                    // Adjacent doors, adjust wall center position
+                                    //wallPos = new Vector3((prevEndPos - (distToNext / 2f)) + tileXOffset, 1, roomBoundsZ - wallOffset);
+                                } 
+                                else 
+                                {
+                                    wallPos = new Vector3((prevEndPos - (distToNext / 2f)) + (tileXOffset / 2f), 1, roomBoundsZ - wallOffset);
+                                }
+                                scale = new Vector3(1, 1, ((distToNext / 2f) - tileXOffset)); 
+                                prevIndex = wallEndIndex; 
+                            }
+                            else //if not first or segment and there is less than one door (shouldnt happen)
+                            {
+                                segmentWall.name = "else";
+                                wallPos = new Vector3((prevEndPos + (distToNext / 2f) - tileXOffset), 1, roomBoundsZ - wallOffset);
+                                scale = new Vector3(1, 1, ((distToNext / 2f) - tileXOffset)); 
+                                prevIndex = doorIndexArray[i]; 
+                            }
                             break;
                         case 1: //bottom wall (south)
-                            wallPos = new Vector3(((distToNext / 2f) - tileXOffset), 1, (wallOffset - 1));
-                            scale = new Vector3(1, 1, ((distToNext / 2f) - (tileXOffset / 2f)));
+                            if(i != 0 && i != doorCount)
+                            {
+                                Debug.Log("doorIndexArray[i]: " + doorIndexArray[i] + ", prevIndex: " + prevIndex);
+                                if((doorIndexArray[i] - prevIndex) == 3)
+                                {
+                                    Debug.Log("wall segment " + i + " destroyed");
+                                    Destroy(segmentWall);
+                                    break;
+                                }
+                            }
+
+                            
+                            
+                            wallPos = new Vector3((prevEndPos + (distToNext / 2f) - tileXOffset), 1, (wallOffset - 1));
+                            if(i == 0){ scale = new Vector3(1, 1, ((distToNext / 2f) - (tileXOffset / 2f))); prevIndex = doorIndexArray[i]; }
+                            else if(i == doorCount) { scale = new Vector3(1, 1, ((distToNext / 2f) - tileXOffset)); prevIndex = wallEndIndex; }
+                            else{ scale = new Vector3(1, 1, ((distToNext / 2f) - tileXOffset)); prevIndex = doorIndexArray[i]; }
+
+
+                            if(i == 0) //if first segment
+                            {
+                                segmentWall.name = "i == 0";
+                                wallPos = new Vector3((prevEndPos + (distToNext / 2f) - tileXOffset), 1, (wallOffset - 1));
+                                scale = new Vector3(1, 1, ((distToNext / 2f) - (tileXOffset / 2f))); 
+                                prevIndex = doorIndexArray[i]; 
+                            }
+                            else if(i == doorCount && doorCount == 1) //if last segment and there is only one door
+                            {
+                                segmentWall.name = "i == doorCount && doorCount == 1";
+                                wallPos = new Vector3((prevEndPos + (distToNext / 2f) - tileXOffset), 1, (wallOffset - 1));
+                                scale = new Vector3(1, 1, ((distToNext / 2f) - tileXOffset)); 
+                                prevIndex = wallEndIndex; 
+                            }
+                            else if(i == doorCount && doorCount > 1) //if last segment and there is more than one door
+                            {
+                                segmentWall.name = "i == doorCount && doorCount > 1";
+                                Debug.Log("distToNext: " + distToNext + ", prevEndPos: " + prevEndPos + ", tileXOffset: " + tileXOffset);
+                                wallPos = new Vector3((prevEndPos - (distToNext / 2f) + (tileXOffset / 2f)), 1, (wallOffset - 1));
+                                scale = new Vector3(1, 1, ((distToNext / 2f) - tileXOffset)); 
+                                prevIndex = wallEndIndex; 
+                            }
+                            else if(i > 0 && i < doorCount && doorCount > 1 ) //if middle segment and there is more than one door
+                            {
+                                segmentWall.name = "i > 0 && i < doorCount && doorCount > 1";
+                                wallPos = new Vector3((prevEndPos + (distToNext / 2f) - (tileXOffset * 1.5f)), 1, (wallOffset - 1));
+                                scale = new Vector3(1, 1, ((distToNext / 2f) - (tileXOffset * 1.5f))); 
+                                prevIndex = wallEndIndex;
+                            }
+                            else //if not first or segment and there is less than one door (shouldnt happen)
+                            {
+                                segmentWall.name = "else";
+                                wallPos = new Vector3((prevEndPos + (distToNext / 2f) - tileXOffset), 1, (wallOffset - 1));
+                                scale = new Vector3(1, 1, ((distToNext / 2f) - tileXOffset)); 
+                                prevIndex = doorIndexArray[i]; 
+                            }
                             break;
                         case 2: //right wall (east)
-                            wallPos = new Vector3(roomBoundsX - wallOffset, 1, ((distToNext / 2f) - tileZOffset));
-                            scale = new Vector3(1, 1, ((distToNext / 2f) - (tileZOffset / 2f)));
+                            if(i == doorCount) 
+                            {
+                                wallPos = new Vector3(roomBoundsX - wallOffset, 1, (prevEndPos + ((distToNext / 2f) - (tileZOffset / 2f))));
+                                scale = new Vector3(1, 1, ((distToNext / 2f) - (tileZOffset / 2f))); 
+                                prevIndex = wallEndIndex;
+                            }
+                            else
+                            {
+                                wallPos = new Vector3(roomBoundsX - wallOffset, 1, (prevEndPos + ((distToNext / 2f) - tileZOffset)));
+                                scale = new Vector3(1, 1, ((distToNext / 2f) - (tileZOffset / 2f))); 
+                                prevIndex = doorIndexArray[i];
+                            }
                             break;
                         case 3: //left wall (west)
-                            wallPos = new Vector3((wallOffset - 1), 1, ((distToNext / 2f) - tileZOffset));
-                            scale = new Vector3(1, 1, ((distToNext / 2f) - (tileZOffset / 2f)));
+                            if(i == doorCount) 
+                            {
+                                wallPos = new Vector3((wallOffset - 1), 1, (prevEndPos + ((distToNext / 2f) - tileZOffset)));
+                                scale = new Vector3(1, 1, ((distToNext / 2f) - tileZOffset)); 
+                                prevIndex = wallEndIndex;
+                            }
+                            else
+                            {
+                                wallPos = new Vector3((wallOffset - 1), 1, (prevEndPos + ((distToNext / 2f) - tileZOffset)));
+                                scale = new Vector3(1, 1, ((distToNext / 2f) - (tileZOffset / 2f))); 
+                                prevIndex = doorIndexArray[i];
+                            }
                             break;
                     }
 
@@ -383,9 +511,9 @@ public class RoomGeneration : MonoBehaviour
                     segmentWall.transform.localScale = scale;
                     segmentWall.transform.Rotate(0, wallRotation, 0, Space.Self);
 
-                    //add something that tracks previous distance used to use as reference for next start position
+                    prevEndPos += (distToNext + (tileXOffset * 1.5f));
                 }
-            }
+            }*/
         }
     }
 
@@ -463,6 +591,14 @@ public class RoomGeneration : MonoBehaviour
                     break;
                 case "Doorway":
                     if (curObjRend.material != matDbugDoor) { curObjRend.material = matDbugDoor; }
+                    break;
+                case "DoorwayEdge":
+                    if (curObjRend.material != matDbugDoor)
+                    {
+                        Material newMat = new Material(matDbugDoor);
+                        newMat.color = newMat.color / 4; 
+                        curObjRend.material = newMat; 
+                    }
                     break;
             }
         }
