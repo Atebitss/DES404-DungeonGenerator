@@ -16,6 +16,7 @@ public class PathGeneration : MonoBehaviour
     //map creation
     private int boundsX, boundsZ; //map generation
     private Vector2 startPos, targetPos;
+    private int scale;
 
 
 
@@ -30,7 +31,7 @@ public class PathGeneration : MonoBehaviour
 
 
 
-    public IEnumerator BeginPathGeneration(Vector2 startPos, Vector2 targetPos, int boundsX, int boundsZ)
+    public IEnumerator BeginPathGeneration(Vector2 startPos, Vector2 targetPos, int boundsX, int boundsZ, int scale)
     {
         if (dbugEnabled) { MG.UpdateHUDDbugText("PG, Begin Path Generation"); }
 
@@ -40,6 +41,7 @@ public class PathGeneration : MonoBehaviour
 
         this.startPos = startPos;
         this.targetPos = targetPos;
+        this.scale = scale;
 
         //begin path generation
         yield return StartCoroutine(GeneratePath(FindPath()));
@@ -202,7 +204,7 @@ public class PathGeneration : MonoBehaviour
         }
 
         //check if current checked tile is adjacent to a corner to avoid strange hallways
-        if(IsAdjacentToWallCorner(x, z)) { moveCost = wallCornerCost; }
+        if(scale == 2 || scale == 1) { if(IsAdjacentToWallCorner(x, z)) { moveCost = wallCornerCost; } }
 
         return moveCost;
     }
@@ -218,7 +220,7 @@ public class PathGeneration : MonoBehaviour
                 int neighbourX = (x + xOffset);
                 int neighbourZ = (z + zOffset);
 
-                //if neighbour is wihtin bounds
+                //if neighbour is wihtin bounds and is not a hallway
                 if (neighbourX >= 0 && neighbourX < boundsX && neighbourZ >= 0 && neighbourZ < boundsZ)
                 {
                     //if neighbour is a wall corner, return true

@@ -400,6 +400,7 @@ public class DungeonGeneration : MonoBehaviour
 
             int maxAttempts = 3;
             int attempts = 0;
+            bool placed = false;
             while (attempts < maxAttempts) //while spawn tried less than 3 times
             {
                 if (dbugEnabled) { MG.UpdateHUDDbugText("placement attempt " + attempts); }
@@ -446,7 +447,7 @@ public class DungeonGeneration : MonoBehaviour
                 //if the room doesnt over lap another and has distance from other rooms
                 if (AreCellsUnoccupied(roomPosX[curRoomsSpawned], roomPosZ[curRoomsSpawned], roomBoundsX[curRoomsSpawned], roomBoundsZ[curRoomsSpawned]) && !AreNeighboursClose(roomPosX[curRoomsSpawned], roomPosZ[curRoomsSpawned], roomBoundsX[curRoomsSpawned], roomBoundsZ[curRoomsSpawned], scale))
                 {
-                    if (dbugEnabled) { MG.UpdateHUDDbugText("grid pos' clear, creating room @ " + gridPositions[roomPosX[curRoomsSpawned], roomPosZ[curRoomsSpawned]]); }
+                    if (dbugEnabled) { MG.UpdateHUDDbugText("first try grid pos' clear, creating room @ " + gridPositions[roomPosX[curRoomsSpawned], roomPosZ[curRoomsSpawned]]); }
                     roomPositions[curRoomsSpawned] = new Vector2(gridPositions[roomPosX[curRoomsSpawned], roomPosZ[curRoomsSpawned]].x, gridPositions[roomPosX[curRoomsSpawned], roomPosZ[curRoomsSpawned]].y);
                     //set new room location
                     break;
@@ -455,7 +456,6 @@ public class DungeonGeneration : MonoBehaviour
                 else
                 {
                     //move room within a small area attempting to find empty space
-                    bool placed = false;
                     for (int offsetX = -5; offsetX <= 5 && !placed; offsetX++) //check along x
                     {
                         for (int offsetZ = -5; offsetZ <= 5 && !placed; offsetZ++) //check along z
@@ -473,7 +473,7 @@ public class DungeonGeneration : MonoBehaviour
                                 //update room position
                                 roomPosX[curRoomsSpawned] = newPosX;
                                 roomPosZ[curRoomsSpawned] = newPosZ;
-                                if (dbugEnabled) { MG.UpdateHUDDbugText("grid pos' clear, creating room @ " + gridPositions[roomPosX[curRoomsSpawned], roomPosZ[curRoomsSpawned]]); }
+                                if (dbugEnabled) { MG.UpdateHUDDbugText("retry grid pos' clear, creating room @ " + gridPositions[roomPosX[curRoomsSpawned], roomPosZ[curRoomsSpawned]]); }
                                 roomPositions[curRoomsSpawned] = new Vector2(gridPositions[roomPosX[curRoomsSpawned], roomPosZ[curRoomsSpawned]].x, gridPositions[roomPosX[curRoomsSpawned], roomPosZ[curRoomsSpawned]].y);
                                 
                                 //set room location
@@ -485,14 +485,14 @@ public class DungeonGeneration : MonoBehaviour
 
                                 break;
                             }
-                            
                         }
 
-                        if (placed) { break; }
+                        if(placed){break;}
                     }
-
-                    if (!placed) { attempts++; } //if still unable to place, iterate loop
                 }
+
+                if (!placed) { attempts++; } //if still unable to place, iterate loop
+                else if (placed) { break; }
             }
 
             //move medium rooms to the center of the map
@@ -906,7 +906,7 @@ public class DungeonGeneration : MonoBehaviour
                         if (dbugEnabled) { MG.UpdateHUDDbugText("joining cur:" + roomID + " & target:" + targetRoomID); }
 
                         //start room to room path generation
-                        yield return StartCoroutine(PG.BeginPathGeneration(startPos, targetPos, boundsX, boundsZ));
+                        yield return StartCoroutine(PG.BeginPathGeneration(startPos, targetPos, boundsX, boundsZ, scale));
                         if (MG.isVisualEnabled()) { yield return new WaitForSeconds(.1f); }
                         else { yield return null; }
                     }
@@ -955,7 +955,7 @@ public class DungeonGeneration : MonoBehaviour
                     if (dbugEnabled) { MG.UpdateHUDDbugText("joining cur:" + roomID + " & target:" + nearestRoomID); }
 
                     //start room to room path generation
-                    yield return StartCoroutine(PG.BeginPathGeneration(startPos, targetPos, boundsX, boundsZ));
+                    yield return StartCoroutine(PG.BeginPathGeneration(startPos, targetPos, boundsX, boundsZ, scale));
                     if (MG.isVisualEnabled()) { yield return new WaitForSeconds(.1f); }
                     else { yield return null; }
                 }
@@ -974,7 +974,7 @@ public class DungeonGeneration : MonoBehaviour
                 if (dbugEnabled) { MG.UpdateHUDDbugText("joining cur:" + roomID + " & target:" + parentRoomID); }
 
                 //start room to room path generation
-                yield return StartCoroutine(PG.BeginPathGeneration(startPos, targetPos, boundsX, boundsZ));
+                yield return StartCoroutine(PG.BeginPathGeneration(startPos, targetPos, boundsX, boundsZ, scale));
                 if (MG.isVisualEnabled()) { yield return new WaitForSeconds(.1f); }
                 else { yield return null; }
             }
@@ -1954,7 +1954,10 @@ public class DungeonGeneration : MonoBehaviour
             if (MG.isVisualEnabled()) { yield return new WaitForSeconds(.1f); }
         }
 
-        ASM.SpawnPlayer(new Vector3(entryRoomCenter.x, 0.1f, entryRoomCenter.y));
-        currentPlayer = ASM.GetPlayerObject();
+        //ASM.SpawnPlayer(new Vector3(entryRoomCenter.x, 0.1f, entryRoomCenter.y));
+        //currentPlayer = ASM.GetPlayerObject();
+
+        yield return new WaitForSeconds(1f);
+        MG.RegenerateDungeon();
     }
 }
