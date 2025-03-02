@@ -41,9 +41,7 @@ public class AbstractSceneManager : MonoBehaviour
 
 
     //combat manager
-    /*public CombatManager CM;
-    public void SetCombatManager(CombatManager newCM) { CM = newCM; }
-    public CombatManager GetCombatManager() { return CM; }*/
+    public virtual void SpawnEnemies(Vector3[] positions){}
 
 
     

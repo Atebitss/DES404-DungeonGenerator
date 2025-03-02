@@ -23,17 +23,20 @@ public class EnemyWeaponColliderManager : MonoBehaviour
     {
         //Debug.Log("attack disabled on " + this.gameObject.name);
         attacking = false;
+        hasHitPlayer = false;
     }
 
 
+    private bool hasHitPlayer = false;
     private void OnTriggerEnter(Collider col)
     {
         //Debug.Log(col.gameObject.name);
-        if (attacking && col.gameObject.tag == "Player")
+        if (attacking && col.gameObject.tag == "Player" && !hasHitPlayer)
         {
             //Debug.Log("player found");
             col.gameObject.GetComponent<PlayerController>().AlterCurrentHealthPoints(-attackDamage);
             AM.Play("Sword_Hit" + Random.Range(1, 3));
+            hasHitPlayer = true;
         }
     }
 }

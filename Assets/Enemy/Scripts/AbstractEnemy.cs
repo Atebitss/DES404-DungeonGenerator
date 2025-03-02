@@ -71,7 +71,7 @@ public abstract class AbstractEnemy : MonoBehaviour
     public int GetHealth() { return health; }
     public void SetHealth(int newHealth) { health = newHealth; HealthCheck(); }
     public void AlterHealth(int change) { health += change; HealthCheck(); }
-    private void HealthCheck() { if (health <= 0) { Destroy(this.gameObject); } }
+    private void HealthCheck() { if (health <= 0) {  Destroy(this.gameObject); } }
     //~~~~~health~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
@@ -81,8 +81,8 @@ public abstract class AbstractEnemy : MonoBehaviour
     //attack
     [HideInInspector] public bool attacking = false; //tracker false to allow for first attack
     public float attackCooldownTimer = 0f, attackStartTime = 0f; //used to reset attack timer
-    [SerializeField] public float attackCooldownMax = 5f;
-    [SerializeField] public int attackDamage = 5; //dafault damage
+    [SerializeField] public float attackCooldownMax = 2.5f;
+    [SerializeField] public int attackDamage = 1; //dafault damage
     [SerializeField] public float attackSpeed = 1f; //default speed
     [SerializeField] public float attackDistance = 1.5f; //default attack distance
 
@@ -148,50 +148,53 @@ public abstract class AbstractEnemy : MonoBehaviour
 
     private void UpdateEnemyMovement()
     {
-        //check if player is within close range
-        if(EDCNear.IsPlayerNear())
+        if(!attacking && isActive)
         {
-            //if the player is near the enemy
-            //stop movement and update tracker
-            if(!playerNear) { playerNear = true; }
-
-            //begin attack movement
-            if (!attacking) //if not attacking
+            //check if player is within close range
+            if(EDCNear.IsPlayerNear())
             {
-                //calc distance between enemy and player
-                float distToPlayer = Vector3.Distance(transform.position, PC.transform.position);
-                //Debug.Log(attackDistance + " / " + distToPlayer);
+                //if the player is near the enemy
+                //stop movement and update tracker
+                if(!playerNear) { playerNear = true; }
 
-                //if distance greater than melee distance, move into melee range
-                if (distToPlayer > attackDistance) 
+                //begin attack movement
+                if (!attacking) //if not attacking
                 {
-                    Vector3 directionToPlayer = (PC.transform.position - transform.position).normalized;
-                    Vector3 seperationForce = CalculateSeperationForce();
-                    Vector3 newMovement = (directionToPlayer + seperationForce).normalized * movementSpeed;
+                    //calc distance between enemy and player
+                    float distToPlayer = Vector3.Distance(transform.position, PC.transform.position);
+                    //Debug.Log(attackDistance + " / " + distToPlayer);
 
-                    enemyRigid.velocity = new Vector3(newMovement.x, enemyRigid.velocity.y, newMovement.z);
-                }
-                else if(distToPlayer <= attackDistance)
-                {
-                    Vector3 seperationForce = CalculateSeperationForce();
-                    Vector3 newMovement = new Vector3((seperationForce.x * movementSpeed), enemyRigid.velocity.y, (seperationForce.z * movementSpeed));
-                    enemyRigid.velocity = newMovement;
-                    Attack();
-                    Invoke("Retreat", retreatTime);
+                    //if distance greater than melee distance, move into melee range
+                    if (distToPlayer > attackDistance) 
+                    {
+                        Vector3 directionToPlayer = (PC.transform.position - transform.position).normalized;
+                        Vector3 seperationForce = CalculateSeperationForce();
+                        Vector3 newMovement = (directionToPlayer + seperationForce).normalized * movementSpeed;
+
+                        enemyRigid.velocity = new Vector3(newMovement.x, enemyRigid.velocity.y, newMovement.z);
+                    }
+                    else if(distToPlayer <= attackDistance)
+                    {
+                        Vector3 seperationForce = CalculateSeperationForce();
+                        Vector3 newMovement = new Vector3((seperationForce.x * movementSpeed), enemyRigid.velocity.y, (seperationForce.z * movementSpeed));
+                        enemyRigid.velocity = newMovement;
+                        Attack();
+                        Invoke("Retreat", retreatTime);
+                    }
                 }
             }
-        }
-        else
-        {
-            //if enemy is moving as normal
-            //update tracker
-            if (playerNear) { playerNear = false; }
+            else
+            {
+                //if enemy is moving as normal
+                //update tracker
+                if (playerNear) { playerNear = false; }
 
-            //add velocity force in forward direction
-            Vector3 seperationForce = CalculateSeperationForce();
-            Vector3 newMovement = (transform.forward + seperationForce).normalized * movementSpeed;
+                //add velocity force in forward direction
+                Vector3 seperationForce = CalculateSeperationForce();
+                Vector3 newMovement = (transform.forward + seperationForce).normalized * movementSpeed;
 
-            enemyRigid.velocity = new Vector3(newMovement.x, enemyRigid.velocity.y, newMovement.z);
+                enemyRigid.velocity = new Vector3(newMovement.x, enemyRigid.velocity.y, newMovement.z);
+            }
         }
     }
     private Vector3 CalculateSeperationForce()

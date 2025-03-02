@@ -702,7 +702,7 @@ public class DungeonGeneration : MonoBehaviour
         //check if any grid states within a radius 5% of map dist are occupied by other rooms to ensure spacing
         
         //get 5% of total area
-        int radius = (totalSpace * 2) / 1000;
+        int radius = 6;//(totalSpace * 2) / 1000;
 
         switch(scale)
         {
@@ -1954,10 +1954,10 @@ public class DungeonGeneration : MonoBehaviour
             if (MG.isVisualEnabled()) { yield return new WaitForSeconds(.1f); }
         }
 
-        //ASM.SpawnPlayer(new Vector3(entryRoomCenter.x, 0.1f, entryRoomCenter.y));
-        //currentPlayer = ASM.GetPlayerObject();
+        ASM.SpawnPlayer(new Vector3(entryRoomCenter.x, 0.1f, entryRoomCenter.y));
+        currentPlayer = ASM.GetPlayerObject();
 
-        yield return new WaitForSeconds(1f);
-        MG.RegenerateDungeon();
+        //yield return new WaitForSeconds(1f);
+        //MG.RegenerateDungeon();
     }
 }

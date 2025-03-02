@@ -17,6 +17,7 @@ public class RoomGeneration : MonoBehaviour
     //relevant scripts
     private AbstractSceneManager ASM;
     private MapGeneration MG;
+    private RoomColliderManager RCM;
 
 
     //generation info
@@ -30,24 +31,24 @@ public class RoomGeneration : MonoBehaviour
 
     //room info
     private bool entered = false;
-
+    public bool GetRoomEntered() { return entered; }
+    public void SetRoomEntered(bool entered) { this.entered = entered; }
+    
     [SerializeField] private GameObject dbugFloorTile;
     private GameObject floorObject;
     private float tileXOffset, tileZOffset;
 
     private Vector2[] doorPositions;
-    private GameObject[] doorObjects = new GameObject[4];
+    private GameObject[] doorObjects = new GameObject[0];
     public GameObject[] GetDoorObjects() { return doorObjects; }
 
     [SerializeField] private GameObject wallSection, doorwaySection, doorPrefab;
-    private GameObject[] wallObjects = new GameObject[4]; //0 - bottom, 1 - top, 2 - left, 3 - right
+    private GameObject[] wallObjects = new GameObject[0]; //0 - bottom, 1 - top, 2 - left, 3 - right
     private float sectionXOffset, sectionZOffset;
 
 
     //enemy info
-    private int enemyCount = 0;
-    public int GetEnemyCount() { return enemyCount; }
-    private int enemyMin = 0, enemyMax = 4;
+    private int enemyMin = 4, enemyMax = 7;
     public void SetEnemyMin(int min) { enemyMin = min; }
     public void SetEnemyMax(int max) { enemyMax = max; }
 
@@ -78,7 +79,8 @@ public class RoomGeneration : MonoBehaviour
 
         //move and scale room collider
         roomCollider.transform.localPosition = roomCenter;
-        roomCollider.transform.localScale = new Vector3(roomBoundsX, 0.5f, roomBoundsZ);
+        roomCollider.transform.localScale = new Vector3((roomBoundsX - (tileXOffset * 2f)), 0.5f, (roomBoundsZ - (tileZOffset * 2f)));
+        roomCollider.GetComponent<RoomColliderManager>().SetColliderVariables(this);
 
         //if(MG.isDbugEnabled()){dbugText.SetActive(true);}
         //else{dbugText.SetActive(false);}
@@ -102,7 +104,6 @@ public class RoomGeneration : MonoBehaviour
             UpdateGridDbug();
             UpdateTextDbug();
         }
-
     }
     //generate room grid x by z
     private void GenerateFloor()
@@ -222,15 +223,14 @@ public class RoomGeneration : MonoBehaviour
                 door.transform.GetChild(0).GetChild(0).name = "Room" + roomID + direction + "Door" + doorCount;
                 doorCount++;
 
-                //find first null position in array and add doorway
-                for(int i = 0; i < doorObjects.Length; i++) 
+                //increase array size by 1 and add door
+                GameObject[] newDoorObjects = new GameObject[doorObjects.Length + 1];
+                for(int i = 0; i < doorObjects.Length; i++)
                 {
-                    if(doorObjects[i] == null) 
-                    {
-                        doorObjects[i] = door;
-                        break;
-                    }
+                    newDoorObjects[i] = doorObjects[i];
                 }
+                newDoorObjects[doorObjects.Length] = door;
+                doorObjects = newDoorObjects;
             }
         }
 
@@ -519,38 +519,6 @@ public class RoomGeneration : MonoBehaviour
 
 
 
-    private void OnCollisionEnter(Collision col)
-    {
-        if(col.gameObject.tag == "Player" && !entered)
-        {
-            //lock doors and start combat
-            entered = true;
-
-            //lock doors
-            for(int i = 0; i < doorObjects.Length; i++)
-            {
-                AbstractDoorScript curDoorScript = doorObjects[i].GetComponent<AbstractDoorScript>();
-                curDoorScript.LockDoor();
-                //run animation
-            }
-
-            //start combat
-            enemyCount = Random.Range(enemyMin, enemyMax);
-            Vector3 playerPos = ASM.GetPlayerPosition();
-            Vector3[] enemyPositions = new Vector3[enemyCount];
-            for(int i = 0; i < enemyCount; i++)
-            {
-                //find random position within room
-                //check radius around player, if enemy is out with radius
-                //check radius around position for walls, if no walls
-                //check radius around position for other enemies, if no enemies
-                //spawn enemy
-            }
-        }
-    }
-
-
-
     private void GenerateObjects()
     {
 
@@ -602,5 +570,117 @@ public class RoomGeneration : MonoBehaviour
                     break;
             }
         }
+    }
+
+
+
+    private bool playerInRoom = false; //used to check if player is still in room before starting combat
+    public void SetPlayerInRoom(bool inRoom) { playerInRoom = inRoom; } //updated by RoomColliderManager
+    public IEnumerator RoomEntered() //called by RoomColliderManager when player enters room
+    {
+        yield return new WaitForSeconds(0.25f); //wait for player to enter room
+        Debug.Log("playerInRoom: " + playerInRoom + ", entered: " + entered);
+        if(playerInRoom && !entered){StartCombat();} //if player is in room and room is not entered, start combat
+    }
+    private void StartCombat()
+    {
+        //update room state
+        entered = true;
+
+        if(!roomType.Contains("Entry") && !roomType.Contains("Treasure") && !roomType.Contains("Special"))
+        {
+            //lock doors
+            for(int i = 0; i < doorObjects.Length; i++)
+            {
+                doorObjects[i].transform.GetChild(0).transform.GetChild(0).GetComponent<AbstractDoorScript>().LockDoor();
+            }
+
+            //generate enemies
+            GenerateEnemies();
+        }
+    }
+    private void GenerateEnemies()
+    {
+        //start combat
+        int enemyCount = Random.Range(enemyMin, enemyMax);
+        Vector3[] enemyPositions = new Vector3[enemyCount];
+
+        for(int currentEnemyIndex = 0; currentEnemyIndex < enemyCount; currentEnemyIndex++)
+        {
+            int attempts = 0, maxAttempts = 3;
+            bool enemySpawned = false;
+            while(attempts < maxAttempts && !enemySpawned)
+            {
+                //find random position within room
+                Vector3 randomPos = new Vector3(Random.Range(0, roomBoundsX), 0.5f, Random.Range(0, roomBoundsZ));
+                randomPos.x += literalPosition.x;
+                randomPos.z += literalPosition.z;
+
+                //find if distance between generated position and player is less than 1/100th of the room size
+                Vector3 playerPos = ASM.GetPlayerPosition();
+                bool playerNearBy = Vector3.Distance(randomPos, playerPos) > ((roomBoundsX * roomBoundsZ) * 0.25f);
+
+                //check radius around position for walls
+                bool wallInRadius = false;
+                float checkRadius = 1f;
+                Collider[] hitColliders = Physics.OverlapSphere(randomPos, checkRadius);
+                for(int colliderIndex = 0; colliderIndex < hitColliders.Length; colliderIndex++)
+                {
+                    if(hitColliders[colliderIndex].gameObject.CompareTag("Wall"))
+                    {
+                        wallInRadius = true;
+                        break;
+                    }
+                }
+
+                //check radius around position for other enemies
+                bool enemyInRadius = false;
+                Collider[] enemyColliders = Physics.OverlapSphere(randomPos, checkRadius);
+                for(int enemyIndex = 0; enemyIndex < enemyColliders.Length; enemyIndex++) 
+                {
+                    if(enemyColliders[enemyIndex].gameObject.CompareTag("Enemy"))
+                    {
+                        enemyInRadius = true;
+                        break;
+                    }
+                }
+
+                //if player is not near by, enemy is not in radius, and there are no walls in radius, spawn enemy
+                if(!playerNearBy && !enemyInRadius && !wallInRadius)
+                {
+                    Debug.Log("spawning enemy at: " + randomPos);
+                    Debug.Log("playerNearBy: " + playerNearBy + ", enemyInRadius: " + enemyInRadius + ", wallInRadius: " + wallInRadius);
+                    enemyPositions[currentEnemyIndex] = randomPos;
+                    enemySpawned = true;
+                    break;
+                }
+                else
+                {
+                    Debug.Log("failed to spawn enemy, attempts: " + attempts);
+                    Debug.Log("playerNearBy: " + playerNearBy + ", enemyInRadius: " + enemyInRadius + ", wallInRadius: " + wallInRadius);
+                    attempts++;
+                }
+            }
+
+            if(!enemySpawned)
+            {
+                Debug.Log("failed to spawn enemy, attempts: " + attempts);
+                
+                // Create new array with one less position
+                Vector3[] newPositions = new Vector3[enemyPositions.Length - 1];
+                
+                // Copy all positions before current index
+                for(int positionIndex = 0; positionIndex < currentEnemyIndex; positionIndex++)
+                {
+                    newPositions[positionIndex] = enemyPositions[positionIndex];
+                }
+                
+                enemyPositions = newPositions;
+                currentEnemyIndex--; // Decrement index to try this position again with new array
+            }
+        }
+
+        Debug.Log("enemyPositions: " + enemyPositions.Length);
+        ASM.SpawnEnemies(enemyPositions);
     }
 }

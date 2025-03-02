@@ -7,6 +7,8 @@ TagManager:
   - Door
   - Enemy
   - SceneManager
+  - Floor
+  - Wall
   layers:
   - Default
   - TransparentFX

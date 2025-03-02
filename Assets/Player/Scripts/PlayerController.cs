@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.Threading;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.HID;
-using UnityEngine.Windows;
 
 public class PlayerController : MonoBehaviour
 {
@@ -24,10 +23,7 @@ public class PlayerController : MonoBehaviour
     public void SetDDC(DbugDisplayController DDC) { this.DDC = DDC; }
 
 
-    private void Awake()
-    {
-        dodgeLayer = (int)Mathf.Log(dodgeMask.value, 2);
-    }
+
     private void Start()
     {
         SM = GameObject.FindWithTag("SceneManager").GetComponent<AbstractSceneManager>();
@@ -35,6 +31,9 @@ public class PlayerController : MonoBehaviour
 
         PWCM.SetWeaponDamage(attackDamage);
         PWCM.SetAM(AM);
+
+        maxHealthBarWidth = healthBarRect.sizeDelta.x;
+        UpdateHealthBar();
     }
 
 
@@ -43,8 +42,8 @@ public class PlayerController : MonoBehaviour
         if (DDC != null) { UpdateDDC(); }
         UpdatePlayerMovement();
         UpdatePlayerLooking();
-        UpdateInteractionPrompt();
         UpdatePlayerStates();
+        UpdateInteractionPrompt();
     }
 
 
@@ -91,15 +90,6 @@ public class PlayerController : MonoBehaviour
         DDC.playerInvincible = invincible;
         DDC.playerInvincibilityTimer = invincibilityTimer;
         DDC.playerInvincibilityStartTime = invincibilityStartTime;
-    }
-
-
-
-    private float GetCurAnimLength()
-    {
-        //find legnth of current animation
-        foreach (AnimationClip clip in a.runtimeAnimatorController.animationClips) { if (a.GetCurrentAnimatorStateInfo(0).IsName(clip.name)) { return clip.length; } }
-        return -1;
     }
     //~~~~~misc~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -253,9 +243,10 @@ public class PlayerController : MonoBehaviour
 
     //~~~~~attacking~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     [Header("-Attacking")]
-    private bool attacking = false; //tracker false to allow for first attack
-    private float attackCooldownTimer = 0f, attackStartTime = 0f; //used to reset attack timer
-    [SerializeField] private float attackCooldownMax = 1f;
+    private bool attacking = false; //tracker false to allow for first attack, updated in UpdatePlayerStates when attack cooldown timer is 0
+    private float attackCooldownTimer = 0f, attackStartTime = 0f; //used to reset attack timer in UpdatePlayerStates
+    [SerializeField] private float lightAttackCooldownMax = 0.5f, heavyAttackCooldownMax = 2f;
+    private float lightAttackAnimLength = 0f, heavyAttackAnimLength = 0f;
     private int attackComboDamage = 0; //additional damage
     private int lightAttackComboCounter = 0; //combo tracker set to one to skip first rotation
     private float lightAttackComboTimer = 0f, lightAttackComboStartTime = 0f; //used to reset combo timer
@@ -269,6 +260,8 @@ public class PlayerController : MonoBehaviour
 
     public void OnLightAttack(InputAction.CallbackContext ctx)
     {
+        lightAttackAnimLength = FindAnimationLength("swordLightAttack30degrees");
+
         if (ctx.performed && attackCooldownTimer <= 0 && !attacking)
         {
             //Debug.Log("light attack");
@@ -281,7 +274,7 @@ public class PlayerController : MonoBehaviour
 
 
             //track light attack
-            attackCooldownTimer = attackCooldownMax;
+            attackCooldownTimer = lightAttackCooldownMax;
             lightAttackComboTimer = lightAttackComboTimerMax;
             lightAttackComboStartTime = Time.time; //track when last combo hit started
 
@@ -299,35 +292,59 @@ public class PlayerController : MonoBehaviour
 
             //update sword swing animation
             a.SetInteger("lightSwingCombo", lightAttackComboCounter);
-            PWCM.EnableAttackCheck((GetCurAnimLength() * 2));
+            PWCM.EnableAttackCheck((lightAttackAnimLength - 0.1f));
 
-            if (lightAttackComboCounter == 3) { lightAttackComboCounter = 0; } //reset counter
+            if (lightAttackComboCounter == 3) 
+            {
+                 lightAttackComboCounter = 0; //reset counter
+                Invoke("ResetLightAttackAnimInt", (lightAttackAnimLength - 0.1f));
+            }
         }
     }
+    private void ResetLightAttackAnimInt() { a.SetInteger("lightSwingCombo", lightAttackComboCounter); }
+
     public void OnHeavyAttack(InputAction.CallbackContext ctx)
     {
+        heavyAttackAnimLength = FindAnimationLength("swordHeavyAttackCleave");
         if (ctx.performed && attackCooldownTimer <= 0 && !attacking)
         {
             Debug.Log("heavy attack");
-
-            attackCooldownTimer = attackCooldownMax;
+            attackCooldownTimer = heavyAttackCooldownMax;
 
             if (lightAttackComboCounter != 0)  //reset light attack
             {
+                Debug.Log("reset light attack");
                 lightAttackComboCounter = 0;
                 lightAttackComboTimer = 0;
                 a.SetInteger("lightSwingCombo", lightAttackComboCounter);
             }
 
+            Debug.Log("play heavy attack");
             AM.Play("Sword_SwingCleave");
-
             a.SetBool("attackingHeavy", true);
-            PWCM.EnableAttackCheck((GetCurAnimLength() * 2));
 
-            Invoke("ResetHeavyAttackAnimBool", (GetCurAnimLength() * 2));
+            Debug.Log("enable attack check");
+            PWCM.EnableAttackCheck((heavyAttackAnimLength - 0.1f));
+
+            Debug.Log("invoke reset heavy attack, " + (heavyAttackAnimLength - 0.1f));
+            Invoke("ResetHeavyAttackAnimBool", (heavyAttackAnimLength - 0.1f));
         }
     }
-    private void ResetHeavyAttackAnimBool() { a.SetBool("attackingHeavy", false); }
+    private void ResetHeavyAttackAnimBool() { Debug.Log("reset heavy attack"); a.SetBool("attackingHeavy", false); }
+
+
+    private float FindAnimationLength(string clipName)
+    {
+        //find length of attack animations
+        foreach (AnimationClip clip in a.runtimeAnimatorController.animationClips)
+        {
+            if (clip.name == clipName)
+            {
+                return clip.length;
+            }
+        }
+        return 0f;
+    }
     //~~~~~attacking~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
@@ -372,9 +389,48 @@ public class PlayerController : MonoBehaviour
         //Debug.Log("interact reset");
         interacting = false;
     }
+    //~~~~~interaction~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+
+
+    //~~~~~HUD~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    [Header("-HUD")]
+    [SerializeField] private TMP_Text healthText;
+    [SerializeField] private RectTransform healthBarRect;
+    [SerializeField] private Image healthBarImage;
+    private float maxHealthBarWidth;
+
+    private void UpdateHealthBar()
+    {
+        //Debug.Log("invincible: " + invincible);
+        //update health bar
+        float hpPercentage = (float)healthPointsCurrent / (float)healthPointsMax;
+        healthBarRect.sizeDelta = new Vector2(maxHealthBarWidth * hpPercentage, healthBarRect.sizeDelta.y);
+        healthText.text = healthPointsCurrent + " / " + healthPointsMax;
+
+        if(invincible)
+        {
+            healthBarImage.color = Color.magenta;
+        }
+        else if (hpPercentage > 0.5f && hpPercentage <= 1f && !invincible)
+        {
+            healthBarImage.color = Color.green; // Healthy
+        }
+        else if (hpPercentage > 0.2f && hpPercentage <= 0.5f && !invincible)
+        {
+            healthBarImage.color = Color.yellow; // Warning
+        }
+        else if (hpPercentage <= 0.2f && !invincible)
+        {
+            healthBarImage.color = Color.red; // Critical
+        }
+    }
 
     private void UpdateInteractionPrompt()
     {
+        //update interaction prompt
         RaycastHit hit;
         Debug.DrawRay(playerCamera.transform.position, (playerCamera.transform.forward * interactDistance), Color.red, 1f);
         if (Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward, out hit, interactDistance, interactionMask))
@@ -383,7 +439,8 @@ public class PlayerController : MonoBehaviour
         }
         else { interactionPromptText.text = ""; }
     }
-    //~~~~~interaction~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    //~~~~~HUD~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 
@@ -403,10 +460,10 @@ public class PlayerController : MonoBehaviour
     private float invincibilityStartTime = 0f;
 
     //health points
-    public void SetCurrentHealthPoints(int newHealth) { if (!invincible) { healthPointsCurrent = newHealth; HealthCheck(); } }
-    public void AlterCurrentHealthPoints(int alter) { if(!invincible) { healthPointsCurrent += alter; HealthCheck(); } }
+    public void SetCurrentHealthPoints(int newHealth) { if (!invincible) { Debug.Log("setting health: " + newHealth); healthPointsCurrent = newHealth; HealthCheck(); UpdateHealthBar(); } }
+    public void AlterCurrentHealthPoints(int alter) { if(!invincible) { Debug.Log("altering health: " + alter); healthPointsCurrent += alter; HealthCheck(); UpdateHealthBar(); } }
     public int GetCurrentHealthPoints() { return healthPointsCurrent; }
-    private void HealthCheck() { if (healthPointsCurrent <= 0) { Destroy(this.gameObject); } }
+    private void HealthCheck() { if (healthPointsCurrent <= 0) { Debug.Log("health check: " + healthPointsCurrent); UpdateHealthBar(); Destroy(this.gameObject); } }
 
     public void AlterMaxHealthPoints(int alter) { healthPointsMax += alter; }
     public int GetMaxHealthPoints() { return healthPointsMax; }
@@ -451,11 +508,25 @@ public class PlayerController : MonoBehaviour
         {
             invincible = true; //set tracker true
             invincibilityStartTime = Time.time; //track when invisibility started
+            UpdateHealthBar();
+            
         }
-        else if (permaInvincible && !invincible) { invincible = true; } 
+        else if (permaInvincible && !invincible) 
+        {
+            invincible = true; 
+            invincibilityTimer = 1f;
+            UpdateHealthBar();
+        } 
 
-        if (invincibilityTimer > 0) { invincibilityTimer -= Time.deltaTime; } //count down timer
-        if (invincibilityTimer <= 0 && !permaInvincible) { invincibilityTimer = 0; invincibilityStartTime = 0; invincible = false; } //when timer runs out, set tracker false
+        if (invincibilityTimer > 0 && !permaInvincible) { invincibilityTimer -= Time.deltaTime; } //count down timer
+        if (invincibilityTimer <= 0 && !permaInvincible) 
+        { 
+            //when timer runs out, set tracker false
+            invincibilityTimer = 0; 
+            invincibilityStartTime = 0; 
+            invincible = false; 
+            UpdateHealthBar();
+        } 
 
 
 
@@ -486,4 +557,10 @@ public class PlayerController : MonoBehaviour
         }
     }
     //~~~~~stats~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+    private void OnDestroy()
+    {
+        Debug.Log("player destroyed");
+    }
 }

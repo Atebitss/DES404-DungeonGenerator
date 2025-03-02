@@ -21,12 +21,12 @@ public abstract class AbstractDoorScript : MonoBehaviour
     {
         if (health <= 0)
         {
-            Debug.Log(this.gameObject.name + " has broken!");
+            //Debug.Log(this.gameObject.name + " has broken!");
             Destroy(this.gameObject);
         }
         else
         {
-            Debug.Log(this.gameObject.name + " HP: " + health);
+            //Debug.Log(this.gameObject.name + " HP: " + health);
         }
     }
     //~~~~~health~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -34,22 +34,18 @@ public abstract class AbstractDoorScript : MonoBehaviour
 
 
     //~~~~~state~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    [SerializeField] private bool busy = false;
+    [SerializeField] private bool isBusy = false;
     [SerializeField] private bool isOpen = false;
     [SerializeField] private bool isLocked = false;
     [SerializeField] private Animator a;
-
-    public void LockDoor() { isLocked = true; UpdateDoorMaterial(); /*run animation*/ }
-    public void UnlockDoor() { isLocked = false; UpdateDoorMaterial(); /*run animation*/ }
-    public bool IsLocked() { return isLocked; }
 
 
         //interaction
     public void InteractWithDoor()
     {
-        if(!busy)
+        if(!isBusy && !isLocked)
         {
-            busy = true;
+            isBusy = true;
             //find door direction based on name
             string edge = "";
             if (gameObject.name.Contains("North")) edge = "North";
@@ -78,13 +74,13 @@ public abstract class AbstractDoorScript : MonoBehaviour
                     break;
             }
 
-            //if is locked & player has key, unlock door & play unlock sound
-            //if is locked & player doesnt have key, play locked sound
-            //if is not locked & is open, close door & play close sound
-            //if is not locked & is not open, open door & play open sound
+            //if is isLocked & player has key, unlock door & play unlock sound
+            //if is isLocked & player doesnt have key, play isLocked sound
+            //if is not isLocked & is open, close door & play close sound
+            //if is not isLocked & is not open, open door & play open sound
             /*if(isLocked /*&& playerController.CheckForItemID(keyID)/)
             {
-                //locked & has key
+                //isLocked & has key
                 isLocked = false;
                 //play(doorUnlockSound)
                 //playerController.DestroyItemByID(keyID)
@@ -92,33 +88,62 @@ public abstract class AbstractDoorScript : MonoBehaviour
             }
             else if(isLocked /*&& !playerController.CheckForItemID(keyID)/)
             {
-                //locked & does not have key
-                //play(doorLockedSound)
+                //isLocked & does not have key
+                //play(doorisLockedSound)
             }
-            else*/ if (!isLocked && isOpen)
+            else*/ if (!isLocked)
             {
-                //closing door
-                Debug.Log(direction);
                 a.SetInteger("openDirection", direction);
-                a.SetBool("isOpen", false); //run close animation
-                isOpen = false; //update state
-                //play(doorClosingSound) //play closing audio
-                UpdateDoorMaterial(); //update visual
+                if(isOpen) { CloseDoor(); }
+                else if(!isOpen) { OpenDoor(); }
                 ResetDoorStates(direction); //reset animation state
-            }
-            else if (!isLocked && !isOpen)
-            {
-                Debug.Log(direction);
-                //opening door
-                a.SetInteger("openDirection", direction);
-                a.SetBool("isOpen", true);
-                isOpen = true;
-                //play(doorOpeningSound)
-                UpdateDoorMaterial();
-                ResetDoorStates(direction);
             }
         }
     }
+    private void OpenDoor()
+    {
+        //Debug.Log("Opening " + gameObject.name);
+        a.SetBool("isOpen", true);
+        isOpen = true;
+        //play(doorOpeningSound)
+        UpdateDoorMaterial();
+    }
+    private void CloseDoor()
+    {
+        //Debug.Log("Closing " + gameObject.name);
+        a.SetBool("isOpen", false); //run close animation
+        isOpen = false; //update state
+        //play(doorClosingSound) //play closing audio
+        UpdateDoorMaterial(); //update visual
+    }
+    public void LockDoor() 
+    {
+        //Debug.Log("Locking " + gameObject.name);
+        if(isOpen) { a.SetInteger("openDirection", 2); CloseDoor(); }
+        isLocked = true; 
+        UpdateDoorMaterial();
+    }
+    public void UnlockDoor() { isLocked = false; UpdateDoorMaterial(); }
+    public bool GetIsLocked() { return isLocked; }
+    //~~~~~state~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+    //~~~~~visual~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    [SerializeField] private Renderer r;
+    [SerializeField] private Material open, closed, locked;
+
+    public void UpdateDoorMaterial()
+    {
+        if (isLocked) { r.material = locked; }
+        else if (!isLocked && isOpen) { r.material = open; }
+        else if (!isLocked && !isOpen) { r.material = closed; }
+    }
+    //~~~~~visual~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+    //~~~~~reset~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     private void ResetDoorStates(int direction)
     {
         AnimationClip[] clips = a.runtimeAnimatorController.animationClips;
@@ -137,21 +162,6 @@ public abstract class AbstractDoorScript : MonoBehaviour
     private void ResetAnimationBooleans()
     {
         a.SetInteger("openDirection", 0);
-        busy = false;
+        isBusy = false;
     }
-    //~~~~~state~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-
-    //~~~~~visual~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    [SerializeField] private Renderer r;
-    [SerializeField] private Material open, closed, locked;
-
-    public void UpdateDoorMaterial()
-    {
-        if (isLocked) { r.material = locked; }
-        else if (!isLocked && isOpen) { r.material = open; }
-        else if (!isLocked && !isOpen) { r.material = closed; }
-    }
-    //~~~~~visual~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 }

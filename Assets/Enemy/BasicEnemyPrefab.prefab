@@ -293,8 +293,8 @@ MonoBehaviour:
   attacking: 0
   attackCooldownTimer: 0
   attackStartTime: 0
-  attackCooldownMax: 5
-  attackDamage: 5
+  attackCooldownMax: 2.5
+  attackDamage: 1
   attackSpeed: 1
   attackDistance: 1.5
   weaponParent: {fileID: 7034578543878992195}
@@ -303,6 +303,10 @@ MonoBehaviour:
   EDCNear: {fileID: 1847250764447816529}
   EDCFar: {fileID: 8692641826929463634}
   movementSpeed: 2.5
+  seperationDistance: 2.5
+  seperationWeight: 2.5
+  retreatSpeed: 5
+  retreatTime: 2
   lookSensitivity: 2.5
 --- !u!82 &5414379114799386796
 AudioSource:

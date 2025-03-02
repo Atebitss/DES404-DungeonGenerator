@@ -11,6 +11,7 @@ public class EnemyController : AbstractEnemy
         PC = SM.GetPlayerController();
 
         health = 1;
+        attackDamage = 1;
     }
     private void Start()
     {
