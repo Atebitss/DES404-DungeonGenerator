@@ -14,7 +14,7 @@ public abstract class AbstractEnemy : MonoBehaviour
     [SerializeField] private Rigidbody enemyRigid; //enemy rigidbody used for physics interactions
     [SerializeField] private Animator a; //player animator used for running animations
 
-    [HideInInspector] public AbstractSceneManager SM;
+    [HideInInspector] public AbstractSceneManager ASM;
     [HideInInspector] public AudioManager AM;
     [HideInInspector] public PlayerController PC;
 
@@ -45,7 +45,7 @@ public abstract class AbstractEnemy : MonoBehaviour
     }
     public void UpdateEnemyStates()
     {
-        if (health <= 0) { Destroy(this.gameObject); }
+        HealthCheck();
 
 
         if (attackCooldownTimer > 0 && !attacking)
@@ -70,8 +70,8 @@ public abstract class AbstractEnemy : MonoBehaviour
     public int health;
     public int GetHealth() { return health; }
     public void SetHealth(int newHealth) { health = newHealth; HealthCheck(); }
-    public void AlterHealth(int change) { health += change; HealthCheck(); }
-    private void HealthCheck() { if (health <= 0) {  Destroy(this.gameObject); } }
+    public void AlterHealth(int change) { /*Debug.Log("altering health: " + change);*/ health += change; HealthCheck(); }
+    private void HealthCheck() { /*Debug.Log("health check: " + health);*/ if (health <= 0) { ASM.DestroyEnemy(this.transform.parent.gameObject); Destroy(this.transform.parent.gameObject); } }
     //~~~~~health~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 

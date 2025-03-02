@@ -6,9 +6,9 @@ public class EnemyController : AbstractEnemy
 {
     private void Awake()
     {
-        SM = GameObject.FindWithTag("SceneManager").GetComponent<AbstractSceneManager>();
-        AM = SM.GetAudioManager();
-        PC = SM.GetPlayerController();
+        ASM = GameObject.FindWithTag("SceneManager").GetComponent<AbstractSceneManager>();
+        AM = ASM.GetAudioManager();
+        PC = ASM.GetPlayerController();
 
         health = 1;
         attackDamage = 1;

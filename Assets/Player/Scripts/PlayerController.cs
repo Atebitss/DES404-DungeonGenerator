@@ -16,7 +16,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private TMP_Text interactionPromptText; //object interaction display
     [SerializeField] private Animator a; //player animator used for running animations
 
-    private AbstractSceneManager SM;
+    private AbstractSceneManager ASM;
     private AudioManager AM;
 
     private DbugDisplayController DDC; //debug display
@@ -26,8 +26,8 @@ public class PlayerController : MonoBehaviour
 
     private void Start()
     {
-        SM = GameObject.FindWithTag("SceneManager").GetComponent<AbstractSceneManager>();
-        AM = SM.GetAudioManager();
+        ASM = GameObject.FindWithTag("SceneManager").GetComponent<AbstractSceneManager>();
+        AM = ASM.GetAudioManager();
 
         PWCM.SetWeaponDamage(attackDamage);
         PWCM.SetAM(AM);
@@ -58,13 +58,13 @@ public class PlayerController : MonoBehaviour
 
         //stats
         DDC.playerHealthCurrent = healthPointsCurrent;
-        DDC.playerHealthMax = healthPointsMax;
+        DDC.playerHealthMax = healthPointASMax;
         DDC.playerHealthPerSecond = 0f;
         DDC.playerStaminaCurrent = staminaPointsCurrent;
-        DDC.playerStaminaMax = staminaPointsMax;
+        DDC.playerStaminaMax = staminaPointASMax;
         DDC.playerStaminaPerSecond = 0f;
         DDC.playerMagicCurrent = magicPointsCurrent;
-        DDC.playerMagicMax = magicPointsMax;
+        DDC.playerMagicMax = magicPointASMax;
         DDC.playerMagicPerSecond = 0f;
         DDC.playerAttackDamage = attackDamage;
         DDC.playerAttackSpeed = attackSpeed;
@@ -406,9 +406,9 @@ public class PlayerController : MonoBehaviour
     {
         //Debug.Log("invincible: " + invincible);
         //update health bar
-        float hpPercentage = (float)healthPointsCurrent / (float)healthPointsMax;
+        float hpPercentage = (float)healthPointsCurrent / (float)healthPointASMax;
         healthBarRect.sizeDelta = new Vector2(maxHealthBarWidth * hpPercentage, healthBarRect.sizeDelta.y);
-        healthText.text = healthPointsCurrent + " / " + healthPointsMax;
+        healthText.text = healthPointsCurrent + " / " + healthPointASMax;
 
         if(invincible)
         {
@@ -449,11 +449,11 @@ public class PlayerController : MonoBehaviour
     //~~~~~stats~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     [Header("-Stat")]
     [SerializeField] private int healthPointsCurrent = 10;
-    [SerializeField] private int healthPointsMax = 10;
+    [SerializeField] private int healthPointASMax = 10;
     [SerializeField] private int staminaPointsCurrent = 10;
-    [SerializeField] private int staminaPointsMax = 10;
+    [SerializeField] private int staminaPointASMax = 10;
     [SerializeField] private int magicPointsCurrent = 10;
-    [SerializeField] private int magicPointsMax = 10;
+    [SerializeField] private int magicPointASMax = 10;
     [SerializeField] private int StrengthPoints = 1, DexterityPoints = 1, IntelligencePoints = 1, WisdomPoints = 1;
     [SerializeField] private bool invincible = false, permaInvincible = false;
     [SerializeField] private float invincibilityTimer = 0f;
@@ -463,24 +463,24 @@ public class PlayerController : MonoBehaviour
     public void SetCurrentHealthPoints(int newHealth) { if (!invincible) { Debug.Log("setting health: " + newHealth); healthPointsCurrent = newHealth; HealthCheck(); UpdateHealthBar(); } }
     public void AlterCurrentHealthPoints(int alter) { if(!invincible) { Debug.Log("altering health: " + alter); healthPointsCurrent += alter; HealthCheck(); UpdateHealthBar(); } }
     public int GetCurrentHealthPoints() { return healthPointsCurrent; }
-    private void HealthCheck() { if (healthPointsCurrent <= 0) { Debug.Log("health check: " + healthPointsCurrent); UpdateHealthBar(); Destroy(this.gameObject); } }
+    private void HealthCheck() { if (healthPointsCurrent <= 0) { Debug.Log("health check: " + healthPointsCurrent); UpdateHealthBar(); ASM.DestroyPlayer(); } }
 
-    public void AlterMaxHealthPoints(int alter) { healthPointsMax += alter; }
-    public int GetMaxHealthPoints() { return healthPointsMax; }
+    public void AlterMaxHealthPoints(int alter) { healthPointASMax += alter; }
+    public int GetMaxHealthPoints() { return healthPointASMax; }
 
     //stamina points
     public void AlterCurrentStaminaPoints(int alter) { staminaPointsCurrent += alter; }
     public int GetCurrentStaminaPoints() { return staminaPointsCurrent; }
 
-    public void AlterMaxStaminaPoints(int alter) { staminaPointsMax += alter; }
-    public int GetMaxStaminaPoints() { return staminaPointsMax; }
+    public void AlterMaxStaminaPoints(int alter) { staminaPointASMax += alter; }
+    public int GetMaxStaminaPoints() { return staminaPointASMax; }
 
     //magic points
     public void AlterCurrentMagicPoints(int alter) { magicPointsCurrent += alter; }
     public int GetCurrentMagicPoints() { return magicPointsCurrent; }
 
-    public void AlterMaxMagicPoints(int alter) { magicPointsMax += alter; }
-    public int GetMaxMagicPoints() { return magicPointsMax; }
+    public void AlterMaxMagicPoints(int alter) { magicPointASMax += alter; }
+    public int GetMaxMagicPoints() { return magicPointASMax; }
 
     //other stats
     //stength

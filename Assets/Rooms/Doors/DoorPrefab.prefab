@@ -68,6 +68,7 @@ GameObject:
   - component: {fileID: 8670460704459178000}
   - component: {fileID: 6438208282852800025}
   - component: {fileID: 8101444903286160388}
+  - component: {fileID: 425661174769985959}
   m_Layer: 3
   m_Name: Door
   m_TagString: Door
@@ -153,7 +154,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   health: 1
-  busy: 0
+  isBusy: 0
   isOpen: 0
   isLocked: 0
   a: {fileID: 8162492440024748058}
@@ -207,8 +208,29 @@ Rigidbody:
   m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 1
+  m_Constraints: 126
+  m_CollisionDetection: 0
+--- !u!65 &425661174769985959
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6652337933876020100}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &7151845054247194810
 GameObject:
   m_ObjectHideFlags: 0

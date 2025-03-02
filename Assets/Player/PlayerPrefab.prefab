@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 710692867093648824}
   - component: {fileID: 4917552337210674047}
   - component: {fileID: 3565896714354243369}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: HealthBar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -438,11 +438,11 @@ MonoBehaviour:
   healthBarRect: {fileID: 710692867093648824}
   healthBarImage: {fileID: 3565896714354243369}
   healthPointsCurrent: 10
-  healthPointsMax: 10
+  healthPointASMax: 10
   staminaPointsCurrent: 10
-  staminaPointsMax: 10
+  staminaPointASMax: 10
   magicPointsCurrent: 10
-  magicPointsMax: 10
+  magicPointASMax: 10
   StrengthPoints: 1
   DexterityPoints: 1
   IntelligencePoints: 1
@@ -557,7 +557,7 @@ GameObject:
   - component: {fileID: 4760816060601231220}
   - component: {fileID: 5022982567547155934}
   - component: {fileID: 1115242724380623365}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: PlayerCamera
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -647,7 +647,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2934956139314843675}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: PlayerPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -681,7 +681,7 @@ GameObject:
   m_Component:
   - component: {fileID: 290556020595848979}
   - component: {fileID: 1613815276584963693}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: PlayerWeaponTrail
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -817,7 +817,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1822611885805128085}
   - component: {fileID: 1875127274234875169}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: PlayerWeaponParent
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -872,7 +872,7 @@ GameObject:
   - component: {fileID: 3695976310893028198}
   - component: {fileID: 2433320279493083248}
   - component: {fileID: 408251515721017303}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: InteractionPrompt
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1006,7 +1006,7 @@ GameObject:
   - component: {fileID: 7937022422418334478}
   - component: {fileID: 5485464583722619537}
   - component: {fileID: 405076100582398847}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: HealthNumbers
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1141,7 +1141,7 @@ GameObject:
   - component: {fileID: 7176919094591941176}
   - component: {fileID: 4274115588673511934}
   - component: {fileID: 2351247655044640334}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: PlayerHUD
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1244,7 +1244,7 @@ GameObject:
   - component: {fileID: 220255132329050269}
   - component: {fileID: 476481944717201029}
   - component: {fileID: 1711117160582974335}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Crosshair
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1319,7 +1319,7 @@ GameObject:
   - component: {fileID: 8141258313737904200}
   - component: {fileID: 2512358818096743204}
   - component: {fileID: 1790025894137436451}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: HealthBackground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1396,7 +1396,7 @@ GameObject:
   - component: {fileID: 3893601458084420648}
   - component: {fileID: 9089044825197818188}
   - component: {fileID: 8198623938989953886}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: PlayerWeaponCollider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1511,7 +1511,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 277970848915608920}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: HealthVisual
   m_TagString: Untagged
   m_Icon: {fileID: 0}
