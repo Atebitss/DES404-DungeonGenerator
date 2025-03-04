@@ -120,10 +120,9 @@ MonoBehaviour:
   dbugText: {fileID: 8348211830089719479}
   roomCollider: {fileID: 5780578494968400953}
   dbugFloorTile: {fileID: 8997730621713062801, guid: 194148bec6d799e49a67d416d13f91fe, type: 3}
-  wallSection: {fileID: 7488329685454604500, guid: 3b8c557c9a2a6e94ab002f1cfa145344, type: 3}
-  doorwaySection: {fileID: 3211954936950896000, guid: 54cba25e58c59794b8b1902b38839397, type: 3}
+  wallSectionPrefab: {fileID: 7488329685454604500, guid: 86ecb343b54eb2f4885869843c8e6be3, type: 3}
+  doorwaySectionPrefab: {fileID: 3211954936950896000, guid: 54cba25e58c59794b8b1902b38839397, type: 3}
   doorPrefab: {fileID: 7151845054247194810, guid: ec6fe55e299e1054496342b441da8b59, type: 3}
-  enemyPrefab: {fileID: 3375864117963020452, guid: 46bfd7227e5fe13448287a98bbe35f7b, type: 3}
 --- !u!1 &7502486605377064533
 GameObject:
   m_ObjectHideFlags: 0

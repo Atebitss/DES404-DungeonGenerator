@@ -218,6 +218,10 @@ public class MapGeneration : MonoBehaviour
                     break;
                 case "Hallway": newMat = matDbugHallway; break;
                 case "Doorway": newMat = matDbugDoorway; break;
+                case "DoorwayEdge":
+                    newMat = new Material(matDbugDoorway);
+                    newMat.color = newMat.color / 4;
+                    break;
                 case "Boss": newMat = matDbugRoomBoss; break;
                 case "Entry": newMat = matDbugRoomEntry; break;
                 case "Treasure": newMat = matDbugRoomTreasure; break;

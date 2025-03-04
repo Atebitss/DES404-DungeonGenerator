@@ -301,6 +301,15 @@ public class DungeonGeneration : MonoBehaviour
 
         yield return StartCoroutine(GenerateRooms()); //spawn rooms
 
+        yield return StartCoroutine(PG.CreateHallways()); //create hallways
+
+        //spawn player
+        ASM.SpawnPlayer(new Vector3(entryRoomCenter.x, 0.1f, entryRoomCenter.y));
+        currentPlayer = ASM.GetPlayerObject();
+
+        //yield return new WaitForSeconds(1f);
+        //MG.RegenerateDungeon();
+
         //if (currentPlayer == null) { currentPlayer = Instantiate(playerPrefab, new Vector3(entryRoomCenter.x, 0, entryRoomCenter.y), Quaternion.identity); }
 
         if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon generation complete"); }
@@ -1955,11 +1964,5 @@ public class DungeonGeneration : MonoBehaviour
             roomObjects[roomID].GetComponent<RoomGeneration>().Wake(roomID, roomPosX[roomID], roomPosZ[roomID], roomBoundsX[roomID], roomBoundsZ[roomID], roomScales[roomID], roomStates[roomID], instantiatePos); //wake room script
             if (MG.isVisualEnabled()) { yield return new WaitForSeconds(.1f); }
         }
-
-        ASM.SpawnPlayer(new Vector3(entryRoomCenter.x, 0.1f, entryRoomCenter.y));
-        currentPlayer = ASM.GetPlayerObject();
-
-        //yield return new WaitForSeconds(1f);
-        //MG.RegenerateDungeon();
     }
 }

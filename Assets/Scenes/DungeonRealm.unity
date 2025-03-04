@@ -726,7 +726,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5fc84d788842a714d91d94917e44a74e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dbugEnabled: 0
+  dbugEnabled: 1
+  hallwayFloorPrefab: {fileID: 8997730621713062801, guid: a92346e935984e84facab4bfc2e06413, type: 3}
+  hallwayWallPrefab: {fileID: 7488329685454604500, guid: 86ecb343b54eb2f4885869843c8e6be3, type: 3}
   wallCost: 25
   wallCornerCost: 500
   hallwayCost: 1
@@ -751,8 +753,8 @@ MonoBehaviour:
   treasureRoomsMin: 3
   specialRoomsMax: 3
   specialRoomsMin: 3
-  dbugEnabled: 0
-  showDbugTiles: 0
+  dbugEnabled: 1
+  showDbugTiles: 1
   visualDemo: 0
   defaultCamera: {fileID: 963194227}
   baseDbugMat: {fileID: 2100000, guid: e8a11bef448ed1b4382b0b5eebb590ca, type: 2}
@@ -779,7 +781,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4bdb70d58032f6548990ecc3fe0b286b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dbugEnabled: 0
+  dbugEnabled: 1
   basicRoom: {fileID: 4597496329373697504, guid: 8ab234d5dca0f924da914ca87cc9e3df, type: 3}
   dbugTile: {fileID: 6787671552346119472, guid: aa2f3d0dd74341a4db2fc987025a5892, type: 3}
 --- !u!114 &1945132726
@@ -794,7 +796,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4e4367cd3edc664f83e443b40584045, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  devMode: 0
+  devMode: 1
   amPrefab: {fileID: 4065216700189244488, guid: 924cc0721c1d6e841a3aff4bc23543af, type: 3}
   playerPrefab: {fileID: 2783768033875945984, guid: 07888939a1f59d349b73cd0353289295, type: 3}
   enemyPrefab: {fileID: 3375864117963020452, guid: 46bfd7227e5fe13448287a98bbe35f7b, type: 3}

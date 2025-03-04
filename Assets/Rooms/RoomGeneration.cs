@@ -56,7 +56,7 @@ public class RoomGeneration : MonoBehaviour
         }
     }
 
-    [SerializeField] private GameObject wallSection, doorwaySection, doorPrefab;
+    [SerializeField] private GameObject wallSectionPrefab, doorwaySectionPrefab, doorPrefab;
     private GameObject[] wallObjects = new GameObject[0]; //0 - bottom, 1 - top, 2 - left, 3 - right
     private float sectionXOffset, sectionZOffset;
 
@@ -201,7 +201,7 @@ public class RoomGeneration : MonoBehaviour
             if (edgeID != new Vector2(0, 0) && roomGridStates[pos] == "Doorway")
             {
                 //create door at position
-                GameObject doorway = Instantiate(doorwaySection, roomGridPositions[pos], Quaternion.identity);
+                GameObject doorway = Instantiate(doorwaySectionPrefab, roomGridPositions[pos], Quaternion.identity);
                 doorway.transform.parent = this.transform.GetChild(3); //parent it to the doorway parent
 
                 //Vector3 doorPosition = roomGridPositions[pos] + new Vector3(0.5f, 0, 0.5f); // Offset by 0.5 to get center
@@ -216,15 +216,15 @@ public class RoomGeneration : MonoBehaviour
                         direction = "South";
                         doorway.transform.Rotate(0, -90, 0, Space.Self);
                         door.transform.Rotate(0, 90, 0, Space.Self);
-                        doorway.transform.position += new Vector3(0, 1, -0.25f);
-                        door.transform.position += new Vector3(0.75f, -1, 0);
+                        doorway.transform.position += new Vector3(0, 1, -0.75f);
+                        door.transform.position += new Vector3(0.75f, -1, 0.35f);
                         break;
                     case 1:
                         direction = "North"; 
                         doorway.transform.Rotate(0, 90, 0, Space.Self);
                         door.transform.Rotate(0, 90, 0, Space.Self);
-                        doorway.transform.position += new Vector3(0, 1, 0.25f);
-                        door.transform.position += new Vector3(-0.75f, -1, 0);
+                        doorway.transform.position += new Vector3(0, 1, 0.75f);
+                        door.transform.position += new Vector3(-0.75f, -1, -0.35f);
                         break;
                 }
                 switch(edgeID.y) 
@@ -233,15 +233,15 @@ public class RoomGeneration : MonoBehaviour
                         direction = "West";
                         doorway.transform.Rotate(0, 0, 0, Space.Self);
                         door.transform.Rotate(0, 90, 0, Space.Self);
-                        doorway.transform.position += new Vector3(-0.25f, 1, 0);
-                        door.transform.position += new Vector3(0, -1, -0.75f);
+                        doorway.transform.position += new Vector3(-0.75f, 1, 0);
+                        door.transform.position += new Vector3(0.35f, -1, -0.75f);
                         break;
                     case 1:
                         direction = "East";
                         doorway.transform.Rotate(0, 180, 0, Space.Self);
                         door.transform.Rotate(0, 90, 0, Space.Self);
-                        doorway.transform.position += new Vector3(0.25f, 1, 0);
-                        door.transform.position += new Vector3(0, -1, 0.75f);
+                        doorway.transform.position += new Vector3(0.75f, 1, 0);
+                        door.transform.position += new Vector3(-0.35f, -1, 0.75f);
                         break;
                 }
 
@@ -266,16 +266,9 @@ public class RoomGeneration : MonoBehaviour
     {
         for (int wallIndex = 0; wallIndex < 4; wallIndex++) // loop through 4 walls
         {
-            int[] doorIndexArray = new int[0]; 
-            int doorCount = 0; 
-            string direction = ""; 
-
+            string direction = "";
             int wallStartIndex = 0, wallEndIndex = 0, tileStep = 1, wallRotation = 0;
-            bool isHorizontal = false;
-            float wallOffset = 0.75f;
-
-            Vector3 wallPos = Vector3.zero;
-            Vector3 scale = Vector3.one;
+            Vector3 wallOffset = Vector2.zero;
 
             switch (wallIndex)
             {
@@ -283,67 +276,71 @@ public class RoomGeneration : MonoBehaviour
                     direction = "North";
                     wallStartIndex = roomBoundsX * (roomBoundsZ - 1);
                     wallEndIndex = roomBoundsX * roomBoundsZ;
-                    isHorizontal = true;
-                    wallPos = new Vector3((roomBoundsX / 2f) - (tileXOffset / 2f), 1, roomBoundsZ - wallOffset);
-                    scale = new Vector3(1, 1, roomBoundsX / 2f);
+                    wallOffset = new Vector3(0, 0, 0.25f);
                     wallRotation = 90;
+                    tileStep = 1;
                     break;
                 case 1: // Bottom Wall (South)
                     direction = "South";
                     wallStartIndex = 0;
                     wallEndIndex = roomBoundsX;
-                    isHorizontal = true;
-                    wallPos = new Vector3((roomBoundsX / 2f) - (tileXOffset / 2f), 1, (wallOffset - 1));
-                    scale = new Vector3(1, 1, roomBoundsX / 2f);
+                    wallOffset = new Vector3(0, 0, -0.25f);
                     wallRotation = -90;
+                    tileStep = 1;
                     break;
                 case 2: // Right Wall (East)
                     direction = "East";
                     wallStartIndex = roomBoundsX - 1;
                     wallEndIndex = roomBoundsX * roomBoundsZ;
-                    tileStep = roomBoundsX;
-                    wallPos = new Vector3(roomBoundsX - wallOffset, 1, (roomBoundsZ / 2f) - (tileZOffset / 2f));
-                    scale = new Vector3(1, 1, roomBoundsZ / 2f);
+                    wallOffset = new Vector3(0.25f, 0, 0);
                     wallRotation = 180;
+                    tileStep = roomBoundsX;
                     break;
                 case 3: // Left Wall (West)
                     direction = "West";
                     wallStartIndex = 0;
                     wallEndIndex = roomBoundsX * roomBoundsZ;
-                    tileStep = roomBoundsX;
-                    wallPos = new Vector3((wallOffset - 1), 1, (roomBoundsZ / 2f) - (tileZOffset / 2f));
-                    scale = new Vector3(1, 1, roomBoundsZ / 2f);
+                    wallOffset = new Vector3(-0.25f, 0, 0);
                     wallRotation = 0;
+                    tileStep = roomBoundsX;
                     break;
             }
 
-            // Find doors in the wall
+            //create wall sections along the wall
             for (int tileIndex = wallStartIndex; tileIndex < wallEndIndex; tileIndex += tileStep)
             {
-                if (roomGridStates[tileIndex] == "Doorway")
+                if (roomGridStates[tileIndex] == "Wall" || roomGridStates[tileIndex] == "WallCorner")
                 {
-                    int[] tempDoorIndexArray = new int[doorCount + 1];
-                    for (int doorID = 0; doorID < doorCount; doorID++)
-                    {
-                        tempDoorIndexArray[doorID] = doorIndexArray[doorID];
-                    }
-                    tempDoorIndexArray[doorCount] = tileIndex;
-                    doorIndexArray = tempDoorIndexArray;
-                    doorCount++;
-
-                    //Debug.Log("door " + doorCount + " found at: " + tileIndex);
+                    //create wall segment
+                    GameObject wallSection = Instantiate(wallSectionPrefab, (roomGridPositions[tileIndex] + wallOffset), Quaternion.identity);
+                    wallSection.name = "Room" + roomID + direction + "WallSegment" + tileIndex;
+                    wallSection.transform.parent = this.transform.GetChild(2);
+                    wallSection.transform.Rotate(0, wallRotation, 0, Space.Self);
                 }
             }
 
-            if (doorCount == 0) // If no doors, create a full wall
+            /*if (doorCount == 0) // If no doors, create a full wall
             {
-                GameObject fullWall = Instantiate(wallSection, Vector3.zero, Quaternion.identity);
+                GameObject fullWall = Instantiate(wallSectionPrefab, Vector3.zero, Quaternion.identity);
                 fullWall.name = "Room" + roomID + direction + "Wall";
                 fullWall.transform.parent = this.transform.GetChild(2);
                 fullWall.transform.localPosition = wallPos;
                 fullWall.transform.localScale = scale;
                 fullWall.transform.Rotate(0, wallRotation, 0, Space.Self);
             }
+            else
+            {
+                for (int tileIndex = wallStartIndex; tileIndex < wallEndIndex; tileIndex += tileStep)
+                {
+                    if (roomGridStates[tileIndex] == "Wall" || roomGridStates[tileIndex] == "WallCorner")
+                    {
+                        //create wall segment
+                        GameObject wallSection = Instantiate(wallSectionPrefab, roomGridPositions[tileIndex], Quaternion.identity);
+                        wallSection.name = "Room" + roomID + direction + "WallSegment" + tileIndex;
+                        wallSection.transform.parent = this.transform.GetChild(2);
+                    }
+                }
+            }*/
             /*else // If doors exist, create wall segments
             {
                 //if i == 0, create wall segment from start to first door
@@ -380,9 +377,9 @@ public class RoomGeneration : MonoBehaviour
                         }
                     }
 
-                    GameObject segmentWall = Instantiate(wallSection, Vector3.zero, Quaternion.identity);
-                    segmentWall.name = "Room" + roomID + direction + "WallSegment" + i;
-                    segmentWall.transform.parent = this.transform.GetChild(2);
+                    GameObject wallSection = Instantiate(wallSectionPrefab, Vector3.zero, Quaternion.identity);
+                    wallSection.name = "Room" + roomID + direction + "WallSegment" + i;
+                    wallSection.transform.parent = this.transform.GetChild(2);
 
                     switch(wallIndex)
                     {
@@ -393,14 +390,14 @@ public class RoomGeneration : MonoBehaviour
                                 if((doorIndexArray[i] - prevIndex) == 3)
                                 {
                                     Debug.Log("wall segment " + i + " destroyed");
-                                    Destroy(segmentWall);
+                                    Destroy(wallSection);
                                     break;
                                 }
                             }
 
                             if(i == 0) //if first segment
                             {
-                                segmentWall.name = "i == 0";
+                                wallSection.name = "i == 0";
                                 wallPos = new Vector3((prevEndPos + (distToNext / 2f) - tileXOffset), 1, roomBoundsZ - wallOffset);
                                 scale = new Vector3(1, 1, ((distToNext / 2f) - (tileXOffset / 2f))); 
                                 prevIndex = doorIndexArray[i]; 
@@ -408,14 +405,14 @@ public class RoomGeneration : MonoBehaviour
                             else if(i > 0 && i < doorCount && doorCount > 1 ) //if middle segment and there is more than one door
                             {
                                 //~~~POSITION (7, -1, 4) & SCALE (7.5, 1, 4.5), SPAWNS WALLS FINE~~~
-                                segmentWall.name = "i > 0 && i < doorCount && doorCount > 1";
+                                wallSection.name = "i > 0 && i < doorCount && doorCount > 1";
                                 wallPos = new Vector3((prevEndPos + (distToNext / 2f) - (tileXOffset * 1.5f)), 1, roomBoundsZ - wallOffset);
                                 scale = new Vector3(1, 1, ((distToNext / 2f) - (tileXOffset * 1.5f))); 
                                 prevIndex = doorIndexArray[i];
                             }
                             else if(i == doorCount && doorCount == 1) //if last segment and there is only one door
                             {
-                                segmentWall.name = "i == doorCount && doorCount == 1";
+                                wallSection.name = "i == doorCount && doorCount == 1";
                                 wallPos = new Vector3((prevEndPos + (distToNext / 2f) - tileXOffset), 1, roomBoundsZ - wallOffset);
                                 scale = new Vector3(1, 1, ((distToNext / 2f) - tileXOffset)); 
                                 prevIndex = wallEndIndex; 
@@ -425,7 +422,7 @@ public class RoomGeneration : MonoBehaviour
                                 //~~~POSITION (7, -1, 4) & SCALE (7.5, 1, 4.5), SPAWNS WALLS FINE~~~
                                 //~~~POSITION (6.5, -1, 4) & SCALE (7, 1, 4.5), SPAWNS WALL WITHOUT OFFSET~~~
                                 //~~~POSITION (7, -1, 4) & SCALE (7.5, 1, 4.5), SPAWNS WALL HALF WAY THROUGH DOOR~~~
-                                segmentWall.name = "i == doorCount && doorCount > 1";
+                                wallSection.name = "i == doorCount && doorCount > 1";
                                 if(doorIndexArray[i-1] - doorIndexArray[i-2] == 3) 
                                 {
                                     // Adjacent doors, adjust wall center position
@@ -440,7 +437,7 @@ public class RoomGeneration : MonoBehaviour
                             }
                             else //if not first or segment and there is less than one door (shouldnt happen)
                             {
-                                segmentWall.name = "else";
+                                wallSection.name = "else";
                                 wallPos = new Vector3((prevEndPos + (distToNext / 2f) - tileXOffset), 1, roomBoundsZ - wallOffset);
                                 scale = new Vector3(1, 1, ((distToNext / 2f) - tileXOffset)); 
                                 prevIndex = doorIndexArray[i]; 
@@ -453,7 +450,7 @@ public class RoomGeneration : MonoBehaviour
                                 if((doorIndexArray[i] - prevIndex) == 3)
                                 {
                                     Debug.Log("wall segment " + i + " destroyed");
-                                    Destroy(segmentWall);
+                                    Destroy(wallSection);
                                     break;
                                 }
                             }
@@ -468,21 +465,21 @@ public class RoomGeneration : MonoBehaviour
 
                             if(i == 0) //if first segment
                             {
-                                segmentWall.name = "i == 0";
+                                wallSection.name = "i == 0";
                                 wallPos = new Vector3((prevEndPos + (distToNext / 2f) - tileXOffset), 1, (wallOffset - 1));
                                 scale = new Vector3(1, 1, ((distToNext / 2f) - (tileXOffset / 2f))); 
                                 prevIndex = doorIndexArray[i]; 
                             }
                             else if(i == doorCount && doorCount == 1) //if last segment and there is only one door
                             {
-                                segmentWall.name = "i == doorCount && doorCount == 1";
+                                wallSection.name = "i == doorCount && doorCount == 1";
                                 wallPos = new Vector3((prevEndPos + (distToNext / 2f) - tileXOffset), 1, (wallOffset - 1));
                                 scale = new Vector3(1, 1, ((distToNext / 2f) - tileXOffset)); 
                                 prevIndex = wallEndIndex; 
                             }
                             else if(i == doorCount && doorCount > 1) //if last segment and there is more than one door
                             {
-                                segmentWall.name = "i == doorCount && doorCount > 1";
+                                wallSection.name = "i == doorCount && doorCount > 1";
                                 Debug.Log("distToNext: " + distToNext + ", prevEndPos: " + prevEndPos + ", tileXOffset: " + tileXOffset);
                                 wallPos = new Vector3((prevEndPos - (distToNext / 2f) + (tileXOffset / 2f)), 1, (wallOffset - 1));
                                 scale = new Vector3(1, 1, ((distToNext / 2f) - tileXOffset)); 
@@ -490,14 +487,14 @@ public class RoomGeneration : MonoBehaviour
                             }
                             else if(i > 0 && i < doorCount && doorCount > 1 ) //if middle segment and there is more than one door
                             {
-                                segmentWall.name = "i > 0 && i < doorCount && doorCount > 1";
+                                wallSection.name = "i > 0 && i < doorCount && doorCount > 1";
                                 wallPos = new Vector3((prevEndPos + (distToNext / 2f) - (tileXOffset * 1.5f)), 1, (wallOffset - 1));
                                 scale = new Vector3(1, 1, ((distToNext / 2f) - (tileXOffset * 1.5f))); 
                                 prevIndex = wallEndIndex;
                             }
                             else //if not first or segment and there is less than one door (shouldnt happen)
                             {
-                                segmentWall.name = "else";
+                                wallSection.name = "else";
                                 wallPos = new Vector3((prevEndPos + (distToNext / 2f) - tileXOffset), 1, (wallOffset - 1));
                                 scale = new Vector3(1, 1, ((distToNext / 2f) - tileXOffset)); 
                                 prevIndex = doorIndexArray[i]; 
@@ -533,9 +530,9 @@ public class RoomGeneration : MonoBehaviour
                             break;
                     }
 
-                    segmentWall.transform.localPosition = wallPos;
-                    segmentWall.transform.localScale = scale;
-                    segmentWall.transform.Rotate(0, wallRotation, 0, Space.Self);
+                    wallSection.transform.localPosition = wallPos;
+                    wallSection.transform.localScale = scale;
+                    wallSection.transform.Rotate(0, wallRotation, 0, Space.Self);
 
                     prevEndPos += (distToNext + (tileXOffset * 1.5f));
                 }
@@ -736,7 +733,7 @@ public class RoomGeneration : MonoBehaviour
                 }
             }
 
-            if(!enemySpawned)
+            if(!enemySpawned && enemyPositions.Length > 0)
             {
                 //Debug.Log("failed to spawn enemy, attempts: " + attempts);
                 
