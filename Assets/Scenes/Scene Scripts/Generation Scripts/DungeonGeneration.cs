@@ -252,8 +252,9 @@ public class DungeonGeneration : MonoBehaviour
         mapBoundsMin = new Vector2();
         mapBoundsMax = new Vector2();
 
+        if(PG.GetHallwayParents().Length > 0) { PG.DestroyHallways(); }
         if(ASM.GetEnemyObjects().Length > 0) { ASM.DestroyEnemyObjects(); }
-        if (currentPlayer != null) { Destroy(currentPlayer); }
+        if(ASM.GetPlayerController() != null) { ASM.DestroyPlayer(); }
     }
 
     public void BeginDungeonGeneration(int treasureRoomsMax, int treasureRoomsMin, int specialRoomsMax, int specialRoomsMin, int boundsX, int boundsZ, int totalSpace, Vector2[,] gridPositions)
@@ -1171,7 +1172,7 @@ public class DungeonGeneration : MonoBehaviour
                 {
                     string gridState = MG.GetGridState(x, z);
                     //if pos is empty room
-                    if (gridState != "Wall" && gridState != "Doorway" && gridState != "WallCorner")
+                    if (gridState != "Wall" && gridState != "Doorway" && gridState != "WallCorner" && gridState != "DoorwayEdge")
                     {
                         //update grid state, debug text, and debug material
                         if (dbugEnabled) { MG.UpdateHUDDbugText("grid pos @ X: " + x + ", Z: " + z + " is now part of room" + curRoomsSpawned); }

@@ -424,7 +424,7 @@ MonoBehaviour:
   jumpForce: 10
   lookSensitivity: 5
   lightAttackCooldownMax: 0.5
-  heavyAttackCooldownMax: 2
+  heavyAttackCooldownMax: 1
   lightAttackComboTimerMax: 1
   weaponParent: {fileID: 4954393113427719825}
   weaponAttackCollider: {fileID: 8225045803689722017}

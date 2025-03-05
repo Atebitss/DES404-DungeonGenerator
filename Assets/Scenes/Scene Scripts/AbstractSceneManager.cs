@@ -31,7 +31,7 @@ public class AbstractSceneManager : MonoBehaviour
 
     public PlayerController PC;
     public void SetPlayerController (PlayerController newPC) {  PC = newPC; SetPlayerObject(newPC.gameObject); }
-    public PlayerController GetPlayerController () { return PC; }
+    public PlayerController GetPlayerController() { return PC; }
     public void SpawnPlayer(Vector3 pos)
     {
         player = Instantiate(playerPrefab, pos, Quaternion.identity);

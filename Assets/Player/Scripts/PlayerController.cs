@@ -245,7 +245,7 @@ public class PlayerController : MonoBehaviour
     [Header("-Attacking")]
     private bool attacking = false; //tracker false to allow for first attack, updated in UpdatePlayerStates when attack cooldown timer is 0
     private float attackCooldownTimer = 0f, attackStartTime = 0f; //used to reset attack timer in UpdatePlayerStates
-    [SerializeField] private float lightAttackCooldownMax = 0.5f, heavyAttackCooldownMax = 2f;
+    [SerializeField] private float lightAttackCooldownMax = 0.5f, heavyAttackCooldownMax = 1f;
     private float lightAttackAnimLength = 0f, heavyAttackAnimLength = 0f;
     private int attackComboDamage = 0; //additional damage
     private int lightAttackComboCounter = 0; //combo tracker set to one to skip first rotation
@@ -557,10 +557,4 @@ public class PlayerController : MonoBehaviour
         }
     }
     //~~~~~stats~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-    private void OnDestroy()
-    {
-        Debug.Log("player destroyed");
-    }
 }

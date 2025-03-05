@@ -15,18 +15,19 @@ public class PathGeneration : MonoBehaviour
 
     //map creation
     private int boundsX, boundsZ; //map generation
-    private Vector2 startPos, targetPos;
-    private int scale;
+    private Vector2 startPos, targetPos; //start and end position of the path
+    private int scale; //room scale
 
     //hallway creation
-    private GameObject hallwayParent;
-    private GameObject[] hallwayParents = new GameObject[0];
+    private GameObject hallwayParent; //the current hallway parent
+    private GameObject[] hallwayParents = new GameObject[0]; //every hallway parent
+    public GameObject[] GetHallwayParents() { return hallwayParents; }
     [SerializeField] private GameObject hallwayFloorPrefab, hallwayWallPrefab;
-    private GameObject[][] hallwayWalls = new GameObject[0][]; //jagged 2D array to store hallway walls per hallway (hallway count, wall count)
-    private Dictionary<int, Vector2[]> hallwayPaths = new Dictionary<int, Vector2[]>(); //dictionary holds hallwayIndex & hallway positions
-    private int wallIndex = 0;
-    private int hallwayCount = 0;
-    private int hallwayParentIndex = 0;
+    private GameObject[][] hallwayWalls = new GameObject[0][], hallwayFloors = new GameObject[0][]; //jagged 2D array to store hallway walls/floors per hallway (hallway count, wall/floor count)
+    private Dictionary<int, Vector2[]> hallwayPaths = new Dictionary<int, Vector2[]>(); //holds hallwayIndex & hallway positions
+    private int wallIndex = 0, floorIndex = 0; //how many walls/floors there are per hallway
+    private int hallwayCount = 0; //how many hallways there are
+    private int hallwayParentIndex = 0; //how many hallway parents there are (replacing this with count breaks things idk why)
 
     private void Awake()
     {
@@ -63,12 +64,18 @@ public class PathGeneration : MonoBehaviour
         newHallwayParents[hallwayCount - 1].transform.parent = hallwayParent.gameObject.transform; //parent new parent to parent parent
         hallwayParents = newHallwayParents; //update reference
 
+        GameObject[][] newHallwayFloors = new GameObject[hallwayCount][]; //create new array to fill with previous array content
+        for (int hallwayIndex = 0; hallwayIndex < hallwayFloors.Length; hallwayIndex++){ newHallwayFloors[hallwayIndex] = hallwayFloors[hallwayIndex]; } //copy existing hallways
+        newHallwayFloors[hallwayCount - 1] = new GameObject[0]; //initialize new hallway's floor array
+        hallwayFloors = newHallwayFloors; //update reference
+
         GameObject[][] newHallwayWalls = new GameObject[hallwayCount][]; //create new array to fill with previous array content
         for (int hallwayIndex = 0; hallwayIndex < hallwayWalls.Length; hallwayIndex++){ newHallwayWalls[hallwayIndex] = hallwayWalls[hallwayIndex]; } //copy existing hallways
         newHallwayWalls[hallwayCount - 1] = new GameObject[0]; //initialize new hallway's wall array
         hallwayWalls = newHallwayWalls; //update reference
 
         wallIndex = 0; //reset wall index for new hallway
+
 
         //begin path generation
         yield return StartCoroutine(GeneratePath(FindPath()));
@@ -421,10 +428,25 @@ public class PathGeneration : MonoBehaviour
             int xPos = (int)hallwayPaths[hallwayParentIndex][sectionIndex].x;
             int zPos = (int)hallwayPaths[hallwayParentIndex][sectionIndex].y;
 
+
             //create main hallway floor
             GameObject hallwayFloor = Instantiate(hallwayFloorPrefab, new Vector3(xPos, -1, zPos), Quaternion.identity);
             hallwayFloor.transform.parent = hallwayParents[hallwayParentIndex].transform;
             hallwayFloor.name = "Hallway" + hallwayParentIndex + "Floor" + sectionIndex;
+
+            //increase floor array size
+            int hallwayIndex = hallwayCount - 1; //find current hallway index
+            int oldSzie = hallwayWalls[hallwayIndex].Length; //find previous array length
+
+            GameObject[] newFloors = new GameObject[(oldSzie + 1)]; //create new array +1 larger than previous
+            for(int floorIndex = 0; floorIndex < oldSzie; floorIndex++){ newFloors[floorIndex] = hallwayFloors[hallwayIndex][floorIndex]; } //fill new array with old content
+
+            newFloors[oldSzie] = hallwayFloor; //add new floor section to end of new array
+            hallwayFloors[hallwayIndex] = newFloors; //update old array with new array
+
+            floorIndex++; //increase floor section index
+            
+
 
             //create hallway walls
             for(int adjacentIndex = 0; adjacentIndex < 4; adjacentIndex++)
@@ -475,9 +497,6 @@ public class PathGeneration : MonoBehaviour
                     hallwayWall.transform.Rotate(0, wallRotation, 0, Space.Self);
 
                     //increase wall array size
-                    int hallwayIndex = hallwayCount - 1; //find current hallway index
-                    int oldSzie = hallwayWalls[hallwayIndex].Length; //find previous array length
-
                     GameObject[] newWalls = new GameObject[(oldSzie + 1)]; //create new array +1 larger than previous
                     for(int wallIndex = 0; wallIndex < oldSzie; wallIndex++){ newWalls[wallIndex] = hallwayWalls[hallwayIndex][wallIndex]; } //fill new array with old content
 
@@ -487,6 +506,16 @@ public class PathGeneration : MonoBehaviour
                     wallIndex++; //increase wall section index
                 }
             }
+        }
+    }
+
+
+
+    public void DestroyHallways()
+    {
+        for(int parentIndex = 0; parentIndex < hallwayParents.Length; parentIndex++)
+        {
+            Destroy(hallwayParents[parentIndex]);
         }
     }
 }
