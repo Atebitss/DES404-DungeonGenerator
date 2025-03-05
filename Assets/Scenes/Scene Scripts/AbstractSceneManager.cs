@@ -12,7 +12,7 @@ public class AbstractSceneManager : MonoBehaviour
     //prefabs
     [SerializeField] public GameObject amPrefab;
     [SerializeField] public GameObject playerPrefab;
-    [SerializeField] public GameObject enemyPrefab;
+    [SerializeField] public GameObject smallEnemyPrefab, largeEnemyPrefab;
     [SerializeField] public GameObject doorPrefab;
 
 
@@ -57,9 +57,14 @@ public class AbstractSceneManager : MonoBehaviour
         //spawn enemies
         for(int i = 0; i < enemyObjects.Length; i++)
         {
-            Debug.Log("spawning enemy" + i + " / " + enemyObjects.Length);
-            enemyObjects[i] = Instantiate(enemyPrefab, positions[i], Quaternion.identity);
-            Debug.Log("enemyObjects" + i + " / " + enemyObjects.Length + ": " + enemyObjects[i]);
+            GameObject curEnemyPrefabType = null;
+            if (Random.Range(0, 10) >= 8) { curEnemyPrefabType = largeEnemyPrefab; }
+            else { curEnemyPrefabType = smallEnemyPrefab; }
+
+            //Debug.Log("spawning " + curEnemyPrefabType + i + " / " + enemyObjects.Length);
+            enemyObjects[i] = Instantiate(curEnemyPrefabType, positions[i], Quaternion.identity);
+
+            //Debug.Log("enemyObjects" + i + " / " + enemyObjects.Length + ": " + enemyObjects[i]);
             enemyObjects[i].transform.GetChild(0).GetComponent<AbstractEnemy>().ASM = this;
             enemyObjects[i].name = "Enemy" + i;
         }
@@ -76,12 +81,12 @@ public class AbstractSceneManager : MonoBehaviour
     }
     public void DestroyEnemy(GameObject enemy)
     {
-        Debug.Log("removing enemy from array: " + enemy);
+        //Debug.Log("removing enemy from array: " + enemy);
         // Find index of enemy to remove
         int removeIndex = -1;
         for(int i = 0; i < enemyObjects.Length; i++)
         {
-            Debug.Log("enemyObjects" + i + " / " + enemyObjects.Length + ": " + enemyObjects[i]);
+            //Debug.Log("enemyObjects" + i + " / " + enemyObjects.Length + ": " + enemyObjects[i]);
             if(enemyObjects[i] == enemy)
             {
                 removeIndex = i;
@@ -109,7 +114,7 @@ public class AbstractSceneManager : MonoBehaviour
             enemyObjects = newArray;
         }
 
-        Debug.Log("enemy objects: " + (enemyObjects.Length));
+        //Debug.Log("enemy objects: " + (enemyObjects.Length));
     }
 
 

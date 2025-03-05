@@ -799,7 +799,8 @@ MonoBehaviour:
   devMode: 1
   amPrefab: {fileID: 4065216700189244488, guid: 924cc0721c1d6e841a3aff4bc23543af, type: 3}
   playerPrefab: {fileID: 2783768033875945984, guid: 07888939a1f59d349b73cd0353289295, type: 3}
-  enemyPrefab: {fileID: 3375864117963020452, guid: 46bfd7227e5fe13448287a98bbe35f7b, type: 3}
+  smallEnemyPrefab: {fileID: 3375864117963020452, guid: 46bfd7227e5fe13448287a98bbe35f7b, type: 3}
+  largeEnemyPrefab: {fileID: 3375864117963020452, guid: 73e0bdc0c73c3084d9f86851aacbc54b, type: 3}
   doorPrefab: {fileID: 7151845054247194810, guid: ec6fe55e299e1054496342b441da8b59, type: 3}
   AM: {fileID: 0}
   player: {fileID: 0}

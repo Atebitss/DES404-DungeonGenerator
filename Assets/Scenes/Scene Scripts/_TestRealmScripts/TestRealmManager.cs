@@ -11,7 +11,7 @@ public class TestRealmManager : AbstractSceneManager
         int maxEnemies = 0;// = Random.Range(10, 10);
         for (int i = 0; i < maxEnemies; i++)
         {
-            Instantiate(enemyPrefab, new Vector3(Random.Range(-5, 5), 0, Random.Range(5, 15)), Quaternion.identity);
+            Instantiate(smallEnemyPrefab, new Vector3(Random.Range(-5, 5), 0, Random.Range(5, 15)), Quaternion.identity);
         }
     }
 }

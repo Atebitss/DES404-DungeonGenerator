@@ -2,12 +2,6 @@ using UnityEngine;
 using System.Collections.Generic;
 public abstract class AbstractEnemy : MonoBehaviour
 {
-    /*
-     * ~~~~~~TO DO~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     * add player detector for attack trigger & movement trigger
-     * add attack trigger to start attacking when within x distance of player
-     * add movement trigger to stop moving when within x distance of player
-     */
     //~~~~~misc~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     [Header("-Misc")]
     [SerializeField] private bool isActive = true;
@@ -32,12 +26,17 @@ public abstract class AbstractEnemy : MonoBehaviour
     //~~~~~state updates~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     private void Start()
     {
+        ASM = GameObject.FindWithTag("SceneManager").GetComponent<AbstractSceneManager>();
+        AM = ASM.GetAudioManager();
+        PC = ASM.GetPlayerController();
+        EWCM.SetAM(AM);
+        EWCM.SetWeaponDamage(attackDamage);
     }
     private void FixedUpdate()
     {
         UpdateEnemyStates();
 
-        if (isActive)
+        if (isActive && PC != null)
         {
             UpdateEnemyLooking();
             UpdateEnemyMovement();
@@ -230,11 +229,11 @@ public abstract class AbstractEnemy : MonoBehaviour
         return seperationForce;
     }
     
-    
     private void Retreat()
     {
         enemyRigid.velocity = new Vector3((-enemyRigid.transform.forward.x * retreatSpeed), enemyRigid.velocity.y, (-enemyRigid.transform.forward.z * retreatSpeed));
     }
+
 
     private void UpdateEnemyLooking()
     {
