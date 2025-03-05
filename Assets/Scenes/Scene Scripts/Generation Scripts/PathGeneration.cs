@@ -36,10 +36,6 @@ public class PathGeneration : MonoBehaviour
         DG = this.gameObject.GetComponent<DungeonGeneration>();
 
         if (dbugEnabled) { MG.UpdateHUDDbugText("PG, Awake"); }
-
-        //create hallway parent object
-        hallwayParent = new GameObject("HallwayParent");
-        hallwayParent.transform.parent = this.gameObject.transform;
     }
 
 
@@ -55,6 +51,13 @@ public class PathGeneration : MonoBehaviour
         this.startPos = startPos;
         this.targetPos = targetPos;
         this.scale = scale;
+
+        if(hallwayParent == null)
+        {
+            //create hallway parent object
+            hallwayParent = new GameObject("HallwayParent");
+            hallwayParent.transform.parent = this.gameObject.transform;
+        }
 
         hallwayCount++; //increase hallway count
 
@@ -511,11 +514,28 @@ public class PathGeneration : MonoBehaviour
 
 
 
-    public void DestroyHallways()
+    public void ResetHallways()
     {
-        for(int parentIndex = 0; parentIndex < hallwayParents.Length; parentIndex++)
+        Destroy(hallwayParent);
+        /*
+        for (int parentIndex = hallwayParents.Length - 1; parentIndex >= 0; parentIndex--) //counting from highest to lowest
         {
-            Destroy(hallwayParents[parentIndex]);
-        }
+            if (hallwayParents[parentIndex] != null)
+            {
+                Destroy(hallwayParents[parentIndex]); //destroy all hallways
+            }
+        }*/
+
+        //reset the arrays
+        hallwayPaths = new Dictionary<int, Vector2[]>();
+        hallwayFloors = new GameObject[0][];
+        hallwayWalls = new GameObject[0][];
+        hallwayParents = new GameObject[0];
+
+        //reset indexs
+        hallwayParentIndex = 0;
+        hallwayCount = 0;
+        floorIndex = 0;
+        wallIndex = 0;
     }
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-public class DbugDisplayController : MonoBehaviour
+public class DbugDisplayManager : MonoBehaviour
 {
     //text
     [SerializeField] private TMP_Text DbugText;

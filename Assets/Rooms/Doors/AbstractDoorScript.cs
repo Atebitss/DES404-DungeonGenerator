@@ -36,7 +36,9 @@ public abstract class AbstractDoorScript : MonoBehaviour
     //~~~~~state~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     [SerializeField] private bool isBusy = false;
     [SerializeField] private bool isOpen = false;
+    public bool GetIsOpen() { return isOpen; }
     [SerializeField] private bool isLocked = false;
+    public bool GetIsLocked() { return isLocked; }
     [SerializeField] private Animator a;
 
 
@@ -100,7 +102,7 @@ public abstract class AbstractDoorScript : MonoBehaviour
             }
         }
     }
-    private void OpenDoor()
+    public void OpenDoor()
     {
         //Debug.Log("Opening " + gameObject.name);
         a.SetBool("isOpen", true);
@@ -108,7 +110,7 @@ public abstract class AbstractDoorScript : MonoBehaviour
         //play(doorOpeningSound)
         UpdateDoorMaterial();
     }
-    private void CloseDoor()
+    public void CloseDoor()
     {
         //Debug.Log("Closing " + gameObject.name);
         a.SetBool("isOpen", false); //run close animation
@@ -124,7 +126,6 @@ public abstract class AbstractDoorScript : MonoBehaviour
         UpdateDoorMaterial();
     }
     public void UnlockDoor() { isLocked = false; UpdateDoorMaterial(); }
-    public bool GetIsLocked() { return isLocked; }
     //~~~~~state~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 

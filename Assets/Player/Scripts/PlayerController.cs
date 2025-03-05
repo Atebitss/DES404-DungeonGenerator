@@ -16,11 +16,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private TMP_Text interactionPromptText; //object interaction display
     [SerializeField] private Animator a; //player animator used for running animations
 
-    private AbstractSceneManager ASM;
-    private AudioManager AM;
-
-    private DbugDisplayController DDC; //debug display
-    public void SetDDC(DbugDisplayController DDC) { this.DDC = DDC; }
+    private AbstractSceneManager ASM; //scene manager
+    private AudioManager AM; //audio manager
+    private DbugDisplayManager DDM; //debug manager
 
 
 
@@ -28,6 +26,7 @@ public class PlayerController : MonoBehaviour
     {
         ASM = GameObject.FindWithTag("SceneManager").GetComponent<AbstractSceneManager>();
         AM = ASM.GetAudioManager();
+        DDM = this.gameObject.transform.parent.GetChild(1).GetComponent<DbugDisplayManager>();
 
         PWCM.SetWeaponDamage(attackDamage);
         PWCM.SetAM(AM);
@@ -39,7 +38,7 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (DDC != null) { UpdateDDC(); }
+        if (ASM.GetDevMode()) { UpdateDDM(); }
         UpdatePlayerMovement();
         UpdatePlayerLooking();
         UpdatePlayerStates();
@@ -47,49 +46,49 @@ public class PlayerController : MonoBehaviour
     }
 
 
-    private void UpdateDDC()
+    private void UpdateDDM()
     {
         //world space
-        DDC.playerJumping = jumping;
-        DDC.playerGrounded = grounded;
-        DDC.playerPosition = playerRigid.position;
-        DDC.playerVelocity = playerVelocity;
-        DDC.playerMovement = movement;
+        DDM.playerJumping = jumping;
+        DDM.playerGrounded = grounded;
+        DDM.playerPosition = playerRigid.position;
+        DDM.playerVelocity = playerVelocity;
+        DDM.playerMovement = movement;
 
         //stats
-        DDC.playerHealthCurrent = healthPointsCurrent;
-        DDC.playerHealthMax = healthPointASMax;
-        DDC.playerHealthPerSecond = 0f;
-        DDC.playerStaminaCurrent = staminaPointsCurrent;
-        DDC.playerStaminaMax = staminaPointASMax;
-        DDC.playerStaminaPerSecond = 0f;
-        DDC.playerMagicCurrent = magicPointsCurrent;
-        DDC.playerMagicMax = magicPointASMax;
-        DDC.playerMagicPerSecond = 0f;
-        DDC.playerAttackDamage = attackDamage;
-        DDC.playerAttackSpeed = attackSpeed;
+        DDM.playerHealthCurrent = healthPointsCurrent;
+        DDM.playerHealthMax = healthPointASMax;
+        DDM.playerHealthPerSecond = 0f;
+        DDM.playerStaminaCurrent = staminaPointsCurrent;
+        DDM.playerStaminaMax = staminaPointASMax;
+        DDM.playerStaminaPerSecond = 0f;
+        DDM.playerMagicCurrent = magicPointsCurrent;
+        DDM.playerMagicMax = magicPointASMax;
+        DDM.playerMagicPerSecond = 0f;
+        DDM.playerAttackDamage = attackDamage;
+        DDM.playerAttackSpeed = attackSpeed;
 
         //dodge
-        DDC.playerDodging = dodging;
-        DDC.playerDodgeCooldownTimer = dodgeCooldownTimer;
-        DDC.playerDodgeStartTime = dodgeStartTime;
-        DDC.playerDodgeVelocity = dodgeVelocity;
+        DDM.playerDodging = dodging;
+        DDM.playerDodgeCooldownTimer = dodgeCooldownTimer;
+        DDM.playerDodgeStartTime = dodgeStartTime;
+        DDM.playerDodgeVelocity = dodgeVelocity;
 
         //attack
-        DDC.playerAttacking = attacking;
-        DDC.playerAttackCooldownTimer = attackCooldownTimer;
-        DDC.playerAttackStartTime = attackStartTime;
+        DDM.playerAttacking = attacking;
+        DDM.playerAttackCooldownTimer = attackCooldownTimer;
+        DDM.playerAttackStartTime = attackStartTime;
 
         //attack combo
-        DDC.playerComboing = comboing;
-        DDC.lightAttackComboCounter = lightAttackComboCounter;
-        DDC.playerLightAttackComboTimer = lightAttackComboTimer;
-        DDC.playerLightAttackComboStartTime = lightAttackComboStartTime;
+        DDM.playerComboing = comboing;
+        DDM.lightAttackComboCounter = lightAttackComboCounter;
+        DDM.playerLightAttackComboTimer = lightAttackComboTimer;
+        DDM.playerLightAttackComboStartTime = lightAttackComboStartTime;
 
         //invincibility
-        DDC.playerInvincible = invincible;
-        DDC.playerInvincibilityTimer = invincibilityTimer;
-        DDC.playerInvincibilityStartTime = invincibilityStartTime;
+        DDM.playerInvincible = invincible;
+        DDM.playerInvincibilityTimer = invincibilityTimer;
+        DDM.playerInvincibilityStartTime = invincibilityStartTime;
     }
     //~~~~~misc~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

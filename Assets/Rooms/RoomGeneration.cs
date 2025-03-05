@@ -41,6 +41,7 @@ public class RoomGeneration : MonoBehaviour
     private Vector2[] doorPositions;
     private GameObject[] doorObjects = new GameObject[0];
     public GameObject[] GetDoorObjects() { return doorObjects; }
+    private GameObject doorClosedPreCombat;
     public void LockDoors()
     {
         for(int i = 0; i < doorObjects.Length; i++)
@@ -76,6 +77,8 @@ public class RoomGeneration : MonoBehaviour
             if(ASM.GetEnemyObjects().Length == 0)
             {
                 UnlockDoors();
+                //open doors locked pre combat
+                doorClosedPreCombat.transform.GetChild(0).transform.GetChild(0).GetComponent<AbstractDoorScript>().InteractWithDoor();
                 running = false;
             }
         }
@@ -357,9 +360,12 @@ public class RoomGeneration : MonoBehaviour
         running = true;
 
         //lock doors
-        for(int i = 0; i < doorObjects.Length; i++)
+        for(int doorIndex = 0; doorIndex < doorObjects.Length; doorIndex++)
         {
-            doorObjects[i].transform.GetChild(0).transform.GetChild(0).GetComponent<AbstractDoorScript>().LockDoor();
+            AbstractDoorScript curADS = doorObjects[doorIndex].transform.GetChild(0).transform.GetChild(0).GetComponent<AbstractDoorScript>();
+
+            if (curADS.GetIsOpen()) { doorClosedPreCombat = doorObjects[doorIndex]; }
+            curADS.LockDoor();
         }
 
         //generate enemies

@@ -60,7 +60,7 @@ public class MapGeneration : MonoBehaviour
 
 
 
-    private void ResetMap()
+    public void ResetMap()
     {
         Debug.Log("MG, Reset Map");
 

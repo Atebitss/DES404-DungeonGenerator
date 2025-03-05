@@ -5,7 +5,7 @@ public class AbstractSceneManager : MonoBehaviour
 {
     //debug info
     [SerializeField] private bool devMode = false;
-    public bool isDevMode() { return devMode; }
+    public bool GetDevMode() { return devMode; }
 
 
 
@@ -35,13 +35,12 @@ public class AbstractSceneManager : MonoBehaviour
     public void SpawnPlayer(Vector3 pos)
     {
         player = Instantiate(playerPrefab, pos, Quaternion.identity);
+        Debug.Log(player.name);
         PC = player.transform.GetChild(0).gameObject.GetComponent<PlayerController>();
     }
     public void DestroyPlayer()
     {
-        DestroyEnemyObjects(); 
-        if(this.GetComponent<DungeonGeneration>() != null){ this.GetComponent<DungeonGeneration>().ResetDungeon(); }
-        Destroy(player);
+        if (player != null) { Destroy(player); }
     }
     public Vector3 GetPlayerPosition() { if(PC != null) { return PC.transform.position; } else { return Vector3.zero; } }
 
@@ -70,7 +69,7 @@ public class AbstractSceneManager : MonoBehaviour
     {
         for(int i = 0; i < enemyObjects.Length; i++)
         {
-            Destroy(enemyObjects[i]);
+            if (enemyObjects[i] != null) { Destroy(enemyObjects[i]); }
         }
         
         enemyObjects = new GameObject[0];
@@ -120,4 +119,5 @@ public class AbstractSceneManager : MonoBehaviour
     {
         AM = Instantiate(amPrefab, new Vector3(0, 0, 0), Quaternion.identity).GetComponent<AudioManager>();
     }
+    virtual public void RestartScene(){}
 }

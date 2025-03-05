@@ -216,45 +216,44 @@ public class DungeonGeneration : MonoBehaviour
 
     public void ResetDungeon()
     {
-        if (dbugEnabled) { MG.UpdateHUDDbugText("DG, Reset Dungeon"); }
+        if (roomPositions != null)
+        {
+            if (dbugEnabled) { MG.UpdateHUDDbugText("DG, Reset Dungeon"); }
 
-        //clear the room objects
-        for (int i = 0; i < numOfRooms; i++) { if (roomObjects[i] != null) { Destroy(roomObjects[i]); } }
+            //clear the room objects
+            for (int i = 0; i < numOfRooms; i++) { if (roomObjects[i] != null) { Destroy(roomObjects[i]); } }
 
-        //reset room positions and bounds
-        roomPositions = new Vector2[0];
-        roomCenters = new Vector2[0];
-        roomPosX = new int[0];
-        roomPosZ = new int[0];
-        roomBoundsX = new int[0];
-        roomBoundsZ = new int[0];
-        roomStates = new string[0];
+            //reset room positions and bounds
+            roomPositions = new Vector2[0];
+            roomCenters = new Vector2[0];
+            roomPosX = new int[0];
+            roomPosZ = new int[0];
+            roomBoundsX = new int[0];
+            roomBoundsZ = new int[0];
+            roomStates = new string[0];
 
-        //reset room type trackers
-        for (int i = 0; i < usedTypeLargeIDs.Length; i++) { if (usedTypeLargeIDs[i] != 0) { usedTypeLargeIDs[i] = -1; } }
-        for (int i = 0; i < usedTypeMediumIDs.Length; i++) { if (usedTypeMediumIDs[i] != 0) { usedTypeMediumIDs[i] = -1; } }
-        for (int i = 0; i < usedSpecialRoomIDs.Length; i++) { if (usedSpecialRoomIDs[i] != 0) { usedSpecialRoomIDs[i] = -1; } }
-        for (int i = 0; i < usedTreasureRoomIDs.Length; i++) { if (usedTreasureRoomIDs[i] != 0) { usedTreasureRoomIDs[i] = -1; } }
+            //reset room type trackers
+            for (int i = 0; i < usedTypeLargeIDs.Length; i++) { if (usedTypeLargeIDs[i] != 0) { usedTypeLargeIDs[i] = -1; } }
+            for (int i = 0; i < usedTypeMediumIDs.Length; i++) { if (usedTypeMediumIDs[i] != 0) { usedTypeMediumIDs[i] = -1; } }
+            for (int i = 0; i < usedSpecialRoomIDs.Length; i++) { if (usedSpecialRoomIDs[i] != 0) { usedSpecialRoomIDs[i] = -1; } }
+            for (int i = 0; i < usedTreasureRoomIDs.Length; i++) { if (usedTreasureRoomIDs[i] != 0) { usedTreasureRoomIDs[i] = -1; } }
 
-        //reset stats
-        largeRoomNum = 0;
-        mediumRoomNum = 0;
-        smallRoomNum = 0;
-        curRoomsSpawned = 0;
-        posNumOfRooms = 0;
-        numOfRooms = 0;
-        totalSpace = 0;
-        boundsX = 0;
-        boundsZ = 0;
-        specialRoomsFound = 0;
-        treasureRoomsFound = 0;
-        scale = 2;
-        mapBoundsMin = new Vector2();
-        mapBoundsMax = new Vector2();
-
-        if(PG.GetHallwayParents().Length > 0) { PG.DestroyHallways(); }
-        if(ASM.GetEnemyObjects().Length > 0) { ASM.DestroyEnemyObjects(); }
-        if(ASM.GetPlayerController() != null) { ASM.DestroyPlayer(); }
+            //reset stats
+            largeRoomNum = 0;
+            mediumRoomNum = 0;
+            smallRoomNum = 0;
+            curRoomsSpawned = 0;
+            posNumOfRooms = 0;
+            numOfRooms = 0;
+            totalSpace = 0;
+            boundsX = 0;
+            boundsZ = 0;
+            specialRoomsFound = 0;
+            treasureRoomsFound = 0;
+            scale = 2;
+            mapBoundsMin = new Vector2();
+            mapBoundsMax = new Vector2();
+        }
     }
 
     public void BeginDungeonGeneration(int treasureRoomsMax, int treasureRoomsMin, int specialRoomsMax, int specialRoomsMin, int boundsX, int boundsZ, int totalSpace, Vector2[,] gridPositions)
