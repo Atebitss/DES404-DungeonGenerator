@@ -407,46 +407,40 @@ public class RoomGeneration : MonoBehaviour
     {
         //start combat
         int enemyCount = Random.Range(enemyMin, enemyMax);
-        Vector3[] enemyPositions = new Vector3[enemyCount];
-        Debug.Log("enemyCount: " + enemyCount);
+        Vector3[] enemyPositions = new Vector3[0];
+        //Debug.Log("enemyCount: " + enemyCount);
 
-        for(int currentEnemyIndex = 0; currentEnemyIndex < (enemyCount - 1); currentEnemyIndex++)
+        //for each enemy to be spawned
+        for(int currentEnemyIndex = 0; currentEnemyIndex < enemyCount; currentEnemyIndex++)
         {
+            //Debug.Log("curEnemyIndex: " + currentEnemyIndex);
             int attempts = 0, maxAttempts = 3;
-            bool enemySpawned = false;
-            while(attempts < maxAttempts && !enemySpawned)
+            bool posValid = false;
+            while(attempts < maxAttempts && !posValid)
             {
                 //find random position within room
-                Vector3 randomPos = new Vector3(Random.Range(0, roomBoundsX), 0.5f, Random.Range(0, roomBoundsZ));
-                randomPos.x += literalPosition.x;
-                randomPos.z += literalPosition.z;
+                Vector3 spawnPos = new Vector3((Random.Range(0, roomBoundsX) + literalPosition.x), 0.5f, (Random.Range(0, roomBoundsZ) + literalPosition.z));
 
-                float checkDistance = ((roomBoundsX * roomBoundsZ) * 0.01f);
+                float checkDistance = ((roomBoundsX * roomBoundsZ) * 0.01f); //1/100th the room size
 
-                //find if distance between generated position and player is less than 1/100th of the room size
-                Vector3 playerPos = ASM.GetPlayerPosition();
-                bool playerNearBy = Vector3.Distance(randomPos, playerPos) < checkDistance;
-                Debug.Log("dist(randPos, playerPos): " + Vector3.Distance(randomPos, playerPos) + " within " + checkDistance + ": " + playerNearBy);
+                //find if distance between generated position and player is less than 1/100th the room
+                Vector3 playerPos = ASM.GetPlayerPosition(); //get current player position from abstract scene manager (run every attempt incase player moves)
+                bool playerNearBy = Vector3.Distance(spawnPos, playerPos) < checkDistance; //check if distance between spawn pos & player pos is less than check distance (if false, no player near; if true, player near)
 
-                //check radius around position for walls
-                bool wallInRadius = false;
-                Collider[] hitColliders = Physics.OverlapSphere(randomPos, checkDistance);
-                for(int colliderIndex = 0; colliderIndex < hitColliders.Length; colliderIndex++)
+                //check radius around position for walls & other enemies
+                bool wallInRadius = false, enemyInRadius = false;
+                Collider[] hitColliders = Physics.OverlapSphere(spawnPos, checkDistance); //check for colliders within radius of check distance around spawn pos
+                for(int colliderIndex = 0; colliderIndex < hitColliders.Length; colliderIndex++) //for each collider found
                 {
                     if(hitColliders[colliderIndex].gameObject.CompareTag("Wall"))
                     {
+                        //if its a wall, set bool to true
                         wallInRadius = true;
                         break;
                     }
-                }
-
-                //check radius around position for other enemies
-                bool enemyInRadius = false;
-                Collider[] enemyColliders = Physics.OverlapSphere(randomPos, checkDistance);
-                for(int enemyIndex = 0; enemyIndex < enemyColliders.Length; enemyIndex++) 
-                {
-                    if(enemyColliders[enemyIndex].gameObject.CompareTag("Enemy"))
+                    else if(hitColliders[colliderIndex].gameObject.CompareTag("Enemy"))
                     {
+                        //if its an enemy, set bool to true
                         enemyInRadius = true;
                         break;
                     }
@@ -455,40 +449,21 @@ public class RoomGeneration : MonoBehaviour
                 //if player is not near by, enemy is not in radius, and there are no walls in radius, spawn enemy
                 if(!playerNearBy && !enemyInRadius && !wallInRadius)
                 {
-                    Debug.Log("spawning enemy" + currentEnemyIndex + "/" + enemyPositions.Length);
-                    Debug.Log("playerNearBy: " + playerNearBy + ", enemyInRadius: " + enemyInRadius + ", wallInRadius: " + wallInRadius);
-                    enemyPositions[currentEnemyIndex] = randomPos;
-                    enemySpawned = true;
+                    //expand enemy positions array and add new pos
+                    Vector3[] tempEnemyPositions = new Vector3[enemyPositions.Length + 1]; //new increased array
+                    for(int enemyIndex = 0; enemyIndex < enemyPositions.Length; enemyIndex++){ tempEnemyPositions[enemyIndex] = enemyPositions[enemyIndex]; } //copy old content
+                    tempEnemyPositions[(tempEnemyPositions.Length - 1)] = spawnPos; //add new data to last position
+                    enemyPositions = tempEnemyPositions; //update old array with new array
+                    posValid = true; //ensure while break
                     break;
                 }
-                else
-                {
-                    Debug.Log("failed to spawn enemy, attempts: " + attempts);
-                    //Debug.Log("playerNearBy: " + playerNearBy + ", enemyInRadius: " + enemyInRadius + ", wallInRadius: " + wallInRadius);
-                    attempts++;
-                }
-            }
-
-            if(!enemySpawned && enemyPositions.Length > 0)
-            {
-                //Debug.Log("failed to spawn enemy, attempts: " + attempts);
-                
-                // Create new array with one less position
-                Vector3[] newPositions = new Vector3[enemyPositions.Length - 1];
-                
-                // Copy all positions before current index
-                for(int positionIndex = 0; positionIndex < currentEnemyIndex; positionIndex++)
-                {
-                    newPositions[positionIndex] = enemyPositions[positionIndex];
-                }
-                
-                enemyPositions = newPositions;
-                currentEnemyIndex--; // Decrement index to try this position again with new array
+                //otherwise increase attempts
+                else { attempts++; }
+                //if max attempts reached & posValid false, exit loop, move to next enemy
             }
         }
 
-        //Debug.Log("enemyPositions: " + enemyPositions.Length);
-        ASM.SpawnEnemies(enemyPositions);
+        if (enemyPositions.Length > 0){ ASM.SpawnEnemies(enemyPositions); }
     }
 
 
