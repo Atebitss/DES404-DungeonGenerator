@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 public class AbstractSceneManager : MonoBehaviour
 {
     //debug info
@@ -12,8 +13,17 @@ public class AbstractSceneManager : MonoBehaviour
     //prefabs
     [SerializeField] public GameObject amPrefab;
     [SerializeField] public GameObject playerPrefab;
-    [SerializeField] public GameObject smallEnemyPrefab, largeEnemyPrefab;
     [SerializeField] public GameObject doorPrefab;
+
+
+
+    //Generation Managers
+    private MapGeneration MG;
+    public MapGeneration GetMG() { if (MG != null) { return MG; } return null; }
+    private DungeonGeneration DG;
+    public DungeonGeneration GetDG() { if (DG != null) { return DG; } return null; }
+    private PathGeneration PG;
+    public PathGeneration GetPG() { if (PG != null) { return PG; } return null; }
 
 
 
@@ -50,24 +60,45 @@ public class AbstractSceneManager : MonoBehaviour
     private GameObject[] enemyObjects = new GameObject[0];
     public GameObject[] GetEnemyObjects() { return enemyObjects; }
 
-    public void SpawnEnemies(Vector3[] positions)
+
+    public void SpawnEnemy(GameObject enemy, Vector3 position)
     {
-        enemyObjects = new GameObject[positions.Length - 1];
+        int existingCount = enemyObjects.Length; //current number of enemies tracked
+        int newCount = (existingCount + 1); //new enemies to add + cur
 
-        //spawn enemies
-        for(int i = 0; i < enemyObjects.Length; i++)
+        GameObject[] newEnemyObjects = new GameObject[newCount]; //create a new array with the updated size
+        for (int i = 0; i < existingCount; i++) { newEnemyObjects[i] = enemyObjects[i]; } //copy old data to new array
+
+        //spawn new enemies and add to new array
+        int index = existingCount;
+        newEnemyObjects[index] = Instantiate(enemy, position, Quaternion.identity);
+
+        newEnemyObjects[index].transform.GetChild(0).GetComponent<AbstractEnemy>().ASM = this;
+        if (!newEnemyObjects[index].name.Contains("boss")) { newEnemyObjects[index].name = "Enemy" + index; }
+        else { newEnemyObjects[index].name = "Boss" + enemy.transform.GetChild(0).GetComponent<AbstractEnemy>().type; }
+
+        enemyObjects = newEnemyObjects; //replace old array with new array
+    }
+    public void SpawnEnemies(GameObject[] enemies, Vector3[] positions)
+    {
+        int existingCount = enemyObjects.Length; //current number of enemies tracked
+        int newCount = existingCount + enemies.Length; //new enemies to add + cur
+
+        GameObject[] newEnemyObjects = new GameObject[newCount]; //create a new array with the updated size
+        for (int i = 0; i < existingCount; i++) { newEnemyObjects[i] = enemyObjects[i]; } //copy old data to new array
+
+        //spawn new enemies and add to new array
+        for (int i = 0; i < enemies.Length; i++)
         {
-            GameObject curEnemyPrefabType = null;
-            if (Random.Range(0, 10) >= 8) { curEnemyPrefabType = largeEnemyPrefab; }
-            else { curEnemyPrefabType = smallEnemyPrefab; }
+            int index = existingCount + i;
+            newEnemyObjects[index] = Instantiate(enemies[i], positions[i], Quaternion.identity);
 
-            //Debug.Log("spawning " + curEnemyPrefabType + i + " / " + enemyObjects.Length);
-            enemyObjects[i] = Instantiate(curEnemyPrefabType, positions[i], Quaternion.identity);
-
-            //Debug.Log("enemyObjects" + i + " / " + enemyObjects.Length + ": " + enemyObjects[i]);
-            enemyObjects[i].transform.GetChild(0).GetComponent<AbstractEnemy>().ASM = this;
-            enemyObjects[i].name = "Enemy" + i;
+            newEnemyObjects[index].transform.GetChild(0).GetComponent<AbstractEnemy>().ASM = this;
+            if (!newEnemyObjects[index].name.Contains("boss")) { newEnemyObjects[index].name = "Enemy" + index; }
+            else { newEnemyObjects[index].name = "Boss" + newEnemyObjects[index].GetComponent<AbstractEnemy>().type; }
         }
+
+        enemyObjects = newEnemyObjects; //replace old array with new array
     }
 
     public void DestroyEnemyObjects()
@@ -123,6 +154,9 @@ public class AbstractSceneManager : MonoBehaviour
     void Start()
     {
         AM = Instantiate(amPrefab, new Vector3(0, 0, 0), Quaternion.identity).GetComponent<AudioManager>();
+        MG = this.gameObject.GetComponent<MapGeneration>();
+        DG = this.gameObject.GetComponent<DungeonGeneration>();
+        PG = this.gameObject.GetComponent<PathGeneration>();
     }
     virtual public void RestartScene(){}
 }

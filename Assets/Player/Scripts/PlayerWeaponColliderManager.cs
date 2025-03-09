@@ -8,8 +8,10 @@ public class PlayerWeaponColliderManager : MonoBehaviour
     private int attackDamage = 1;
     private GameObject[] colObjs = new GameObject[0];
     private AudioManager AM;
+    private ParticleSystem PS;
 
 
+    public void SetHitParticle(ParticleSystem newPS) { PS = newPS; }
     public void SetWeaponDamage(int newDamage) { attackDamage = newDamage; }
     public void SetAM(AudioManager newAM) { AM = newAM; }
 
@@ -32,9 +34,13 @@ public class PlayerWeaponColliderManager : MonoBehaviour
         //Debug.Log(col.gameObject.name);
         if (attacking && col.gameObject.tag == "Enemy")
         {
-            Debug.Log("enemy found");
+            //Debug.Log("enemy found");
             col.gameObject.GetComponent<AbstractEnemy>().AlterHealth(-attackDamage);
+            col.gameObject.GetComponent<AbstractEnemy>().MoveEPS(col.ClosestPoint(transform.position));
             AM.Play("Sword_Hit" + Random.Range(1, 3));
+            PS.Play();
+            Invoke("StopPS", 0.5f);
         }
     }
+    private void StopPS() { PS.Stop(); }
 }

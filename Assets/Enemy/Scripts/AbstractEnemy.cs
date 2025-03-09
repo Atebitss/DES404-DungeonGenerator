@@ -24,17 +24,27 @@ public abstract class AbstractEnemy : MonoBehaviour
 
 
     //~~~~~state updates~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    public string type = "";
+    public bool boss = false;
+    public bool dual = false;
     private void Start()
     {
         ASM = GameObject.FindWithTag("SceneManager").GetComponent<AbstractSceneManager>();
         AM = ASM.GetAudioManager();
         PC = ASM.GetPlayerController();
-        EWCM.SetAM(AM);
-        EWCM.SetWeaponDamage(attackDamage);
+        for (int i = 0; i < weaponAttackColliders.Length; i++)
+        {
+            EWCMs[i].SetAM(AM);
+            EWCMs[i].SetWeaponDamage(attackDamage);
+        }
+        //Debug.Log("AE.setBool, dual: " + dual);
+        if (boss) { a.SetBool("dual", dual); }
     }
     private void FixedUpdate()
     {
         UpdateEnemyStates();
+
+        if (boss) { UpdateBossStates(); }
 
         if (isActive && PC != null)
         {
@@ -42,7 +52,8 @@ public abstract class AbstractEnemy : MonoBehaviour
             UpdateEnemyMovement();
         }
     }
-    public void UpdateEnemyStates()
+    virtual public void UpdateBossStates() {}
+    private void UpdateEnemyStates()
     {
         HealthCheck();
 
@@ -87,8 +98,8 @@ public abstract class AbstractEnemy : MonoBehaviour
 
     //weapon
     [SerializeField] private GameObject weaponParent; //weapon parent
-    [SerializeField] private GameObject weaponAttackCollider; //weapon collider
-    [SerializeField] public EnemyWeaponColliderManager EWCM; //weapon collider script
+    [SerializeField] private GameObject[] weaponAttackColliders; //weapon colliders
+    [SerializeField] public EnemyWeaponColliderManager[] EWCMs; //weapon collider scripts
 
     //detection
     private bool playerNear = false;
@@ -103,11 +114,16 @@ public abstract class AbstractEnemy : MonoBehaviour
 
             attackCooldownTimer = attackCooldownMax;
 
+
             AM.Play("Sword_Swing1");
 
             a.SetBool("attacking", true);
             //Debug.Log(GetCurAnimLength());
-            EWCM.EnableAttackCheck((GetCurAnimLength() * 2));
+            //this will probably need changed later as not all colliders should be activated at once
+            for (int i = 0; i < weaponAttackColliders.Length; i++)
+            {
+                EWCMs[i].EnableAttackCheck((GetCurAnimLength() * 2));
+            }
 
             Invoke("ResetAttackAnimBool", (GetCurAnimLength() * 2));
         }
@@ -115,6 +131,16 @@ public abstract class AbstractEnemy : MonoBehaviour
     private void ResetAttackAnimBool() { a.SetBool("attacking", false); }
 
     public void DamagePlayer() { PC.AlterCurrentHealthPoints(-attackDamage); }
+
+
+    [SerializeField] private ParticleSystem EPS;
+    public void MoveEPS(Vector3 hitPos) 
+    {
+        EPS.gameObject.transform.position = hitPos;
+        EPS.Play();
+        Invoke("StopPS", 0.5f);
+    }
+    private void StopPS() { EPS.Stop(); }
     //~~~~~attacking~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 

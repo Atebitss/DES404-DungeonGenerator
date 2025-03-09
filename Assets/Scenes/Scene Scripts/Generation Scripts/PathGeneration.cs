@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -345,20 +346,53 @@ public class PathGeneration : MonoBehaviour
             {
                 for (int z = Mathf.Min(startZ, endZ); z <= Mathf.Max(startZ, endZ); z++)
                 {
-                    if (MG.GetGridState(x, z) == "Empty")
+                    if(MG.GetGridState(x, z).Contains("Room"))
+                    {
+                        continue;
+                    }
+                    else if (MG.GetGridState(x, z) == "Empty")
                     {
                         //set grid states and update material for hallways
                         //if (dbugEnabled) { MG.UpdateHUDDbugText("setting position x:" + x + ", y:" + z + " as hallway"); }
                         MG.UpdateDbugTileMat(x, z, "Hallway");
                         MG.UpdateDbugTileTextGridState(x, z, "Hallway");
                         MG.UpdateGridState(x, z, "Hallway"); //mark the grid position as a hallway
-                    
+
                         Vector2[] newHallwaySectionPositions = new Vector2[hallwaySectionPositions.Length + 1]; //new array with increased size
-                        for (int i = 0; i < hallwaySectionPositions.Length; i++) { newHallwaySectionPositions[i] = hallwaySectionPositions[i]; } //copy old array to new arary
+                        for (int sectionIndex = 0; sectionIndex < hallwaySectionPositions.Length; sectionIndex++) { newHallwaySectionPositions[sectionIndex] = hallwaySectionPositions[sectionIndex]; } //copy old array to new arary
                         hallwaySectionPositions = newHallwaySectionPositions; //replace old array with new arary
 
                         hallwaySectionPositions[hallwaySectionIndex] = new Vector2(x, z); //update last new array position
                         hallwaySectionIndex++; //increase index
+
+                        //check 8 adjacent neighbour positions
+                        for (int xOffset = -1; xOffset <= 1; xOffset++)
+                        {
+                            for (int zOffset = -1; zOffset <= 1; zOffset++)
+                            {
+                                if (xOffset == 0 && zOffset == 0) { continue; } //skip current tile
+
+                                int neighbourX = (x + xOffset);
+                                int neighbourZ = (z + zOffset);
+
+                                if (neighbourX >= 0 && neighbourX < boundsX && neighbourZ >= 0 && neighbourZ < boundsZ) //if adjacent position is within bounds
+                                {
+                                    if (MG.GetGridState(neighbourX, neighbourZ) == "Empty") //if adjacent position is a wall
+                                    {
+                                        MG.UpdateDbugTileMat(neighbourX, neighbourZ, "Hallway"); //update material
+                                        MG.UpdateDbugTileTextGridState(neighbourX, neighbourZ, "Hallway"); //update debug text
+                                        MG.UpdateGridState(neighbourX, neighbourZ, "Hallway"); //update grid state
+
+                                        newHallwaySectionPositions = new Vector2[hallwaySectionPositions.Length + 1]; //new array with increased size
+                                        for (int sectionIndex = 0; sectionIndex < hallwaySectionPositions.Length; sectionIndex++) { newHallwaySectionPositions[sectionIndex] = hallwaySectionPositions[sectionIndex]; } //copy old array to new arary
+                                        hallwaySectionPositions = newHallwaySectionPositions; //replace old array with new arary
+
+                                        hallwaySectionPositions[hallwaySectionIndex] = new Vector2(neighbourX, neighbourZ); //update last new array position
+                                        hallwaySectionIndex++; //increase index
+                                    }
+                                }
+                            }
+                        }
                     }
                     else if (MG.GetGridState(x, z) == "Wall")
                     {
@@ -384,16 +418,16 @@ public class PathGeneration : MonoBehaviour
                         //mark adjacent walls as doorway edges
                         for (int i = -1; i <= 1; i += 2) //loop for two directions (-1 and 1)
                         {
-                            int neighborX = x + (offsetX * i); //find adjacent position
-                            int neighborZ = z + (offsetZ * i); //if offset is 0, will have no effect
+                            int neighbourX = x + (offsetX * i); //find adjacent position
+                            int neighbourZ = z + (offsetZ * i); //if offset is 0, will have no effect
 
-                            if (neighborX >= 0 && neighborX < boundsX && neighborZ >= 0 && neighborZ < boundsZ) //if adjacent position is within bounds
+                            if (neighbourX >= 0 && neighbourX < boundsX && neighbourZ >= 0 && neighbourZ < boundsZ) //if adjacent position is within bounds
                             {
-                                if (MG.GetGridState(neighborX, neighborZ) == "Wall") //if adjacent position is a wall
+                                if (MG.GetGridState(neighbourX, neighbourZ) == "Wall") //if adjacent position is a wall
                                 {
-                                    MG.UpdateDbugTileMat(neighborX, neighborZ, "DoorwayEdge"); //update material
-                                    MG.UpdateDbugTileTextGridState(neighborX, neighborZ, "DoorwayEdge"); //update debug text
-                                    MG.UpdateGridState(neighborX, neighborZ, "DoorwayEdge"); //update grid state
+                                    MG.UpdateDbugTileMat(neighbourX, neighbourZ, "DoorwayEdge"); //update material
+                                    MG.UpdateDbugTileTextGridState(neighbourX, neighbourZ, "DoorwayEdge"); //update debug text
+                                    MG.UpdateGridState(neighbourX, neighbourZ, "DoorwayEdge"); //update grid state
                                 }
                             }
                         }
@@ -462,25 +496,25 @@ public class PathGeneration : MonoBehaviour
                         xOffset = 1;
                         zOffset = 0;
                         wallRotation = 180;
-                        spawnOffset = new Vector2(0.5f, 0);
+                        spawnOffset = new Vector2(-0.5f, 0);
                         break;
                     case 1: //left
                         xOffset = -1;
                         zOffset = 0;
                         wallRotation = 0;
-                        spawnOffset = new Vector2(-0.5f, 0);
+                        spawnOffset = new Vector2(0.5f, 0);
                         break;
                     case 2: //up
                         xOffset = 0;
                         zOffset = 1;
                         wallRotation = 90;
-                        spawnOffset = new Vector2(0, 0.5f);
+                        spawnOffset = new Vector2(0, -0.5f);
                         break;
                     case 3: //down
                         xOffset = 0;
                         zOffset = -1;
                         wallRotation = -90;
-                        spawnOffset = new Vector2(0, -0.5f);
+                        spawnOffset = new Vector2(0, 0.5f);
                         break;
                 }
                 

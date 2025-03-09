@@ -30,6 +30,7 @@ public class PlayerController : MonoBehaviour
 
         PWCM.SetWeaponDamage(attackDamage);
         PWCM.SetAM(AM);
+        PWCM.SetHitParticle(PPS);
 
         maxHealthBarWidth = healthBarRect.sizeDelta.x;
         UpdateHealthBar();
@@ -157,13 +158,13 @@ public class PlayerController : MonoBehaviour
     }
     public IEnumerator Dodge()
     {
-        gameObject.layer = 8;
         yield return new WaitForFixedUpdate(); // Wait until the next physics frame
 
         dodgeStartTime = Time.time; //remember time when dodge started
         dodgeCooldownTimer = dodgeCDMax; //set cooldown timer
         dodging = true; //set tracker to true
-        Debug.Log("Dodge start");
+        //
+        //Debug.Log("Dodge start");
 
         MakePlayerInvincible(dodgeDuration);
 
@@ -198,8 +199,7 @@ public class PlayerController : MonoBehaviour
             {
                 playerRigid.velocity = Vector3.zero; //reset velocity
                 //for (int i = 0; i < dodgeLayerIDs.Length; i++) { Physics.IgnoreLayerCollision(gameObject.layer, dodgeLayerIDs[i], false); } //allow dodging through enemies
-                Debug.Log("Dodge end");
-                gameObject.layer = 6;
+                //Debug.Log("Dodge end");
                 dodging = false; //set tracker to false
             }
         }
@@ -256,6 +256,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private int attackDamage = 5; //dafault damage
     [SerializeField] private float attackSpeed = 1f; //default speed
     private bool comboing = false;
+    [SerializeField] private ParticleSystem PPS;
 
     public void OnLightAttack(InputAction.CallbackContext ctx)
     {

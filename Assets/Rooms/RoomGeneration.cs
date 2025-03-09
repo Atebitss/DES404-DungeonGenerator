@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using UnityEngine;
 using TMPro;
 using static UnityEditor.PlayerSettings;
+using UnityEditorInternal.Profiling.Memory.Experimental.FileFormat;
 
 public class RoomGeneration : MonoBehaviour
 {
@@ -22,15 +23,15 @@ public class RoomGeneration : MonoBehaviour
 
     //generation info
     [SerializeField] private Collider roomCollider;
-    private int roomID = -1, roomPosX = -1, roomPosZ = -1, roomBoundsX = -1, roomBoundsZ = -1; //room size
-    private string roomSize = "", roomType = "";
-    private Vector3[] roomGridPositions;
-    private Vector3 literalPosition, roomCenter;
+    [SerializeField] private int roomID = -1, roomPosX = -1, roomPosZ = -1, roomBoundsX = -1, roomBoundsZ = -1; //room size
+    [SerializeField] private string roomSize = "", roomType = "";
+    [SerializeField] private Vector3[] roomGridPositions;
+    [SerializeField] private Vector3 literalPosition, roomCenter;
     private string[] roomGridStates; //current 'state' of grid position (state ie. Wall, Doorway, Corner, Table, Chair)
 
 
     //room info
-    private bool entered = false, running = false;
+    [SerializeField] private bool entered = false, running = false;
     public bool GetRoomEntered() { return entered; }
     public void SetRoomEntered(bool entered) { this.entered = entered; }
     
@@ -63,9 +64,13 @@ public class RoomGeneration : MonoBehaviour
 
 
     //enemy info
-    private int enemyMin = 4, enemyMax = 7;
+    [SerializeField] private int enemyMin = 4, enemyMax = 7;
     public void SetEnemyMin(int min) { enemyMin = min; }
     public void SetEnemyMax(int max) { enemyMax = max; }
+
+    [SerializeField] private GameObject[] validEnemyTypes, validBossTypes;
+    private void GetValidEnemyTypes() { validEnemyTypes = ASM.GetDG().GetEnemyTypes(); }
+    private void GetValidBossTypes() { validBossTypes = ASM.GetDG().GetBossTypes(); }
 
 
 
@@ -78,7 +83,7 @@ public class RoomGeneration : MonoBehaviour
             {
                 UnlockDoors();
                 //open doors locked pre combat
-                doorClosedPreCombat.transform.GetChild(0).transform.GetChild(0).GetComponent<AbstractDoorScript>().InteractWithDoor();
+                if (doorClosedPreCombat != null) { doorClosedPreCombat.transform.GetChild(0).transform.GetChild(0).GetComponent<AbstractDoorScript>().InteractWithDoor(); }
                 running = false;
             }
         }
@@ -120,6 +125,9 @@ public class RoomGeneration : MonoBehaviour
 
         //set first position to current position - this will be used as reference for future tiles
         roomGridPositions[0] = this.transform.position;
+
+        GetValidEnemyTypes();
+        GetValidBossTypes();
 
 
 
@@ -262,10 +270,8 @@ public class RoomGeneration : MonoBehaviour
                 doorObjects = newDoorObjects;
             }
         }
-
-
     }
-    private void GenerateWalls() //~~~FIX THIS LATER, IDK WHAT TO DO WITH THIS~~~
+    private void GenerateWalls()
     {
         for (int wallIndex = 0; wallIndex < 4; wallIndex++) // loop through 4 walls
         {
@@ -326,13 +332,6 @@ public class RoomGeneration : MonoBehaviour
 
 
 
-    private void GenerateObjects()
-    {
-
-    }
-
-
-
     private bool playerInRoom = false; //used to check if player is still in room before starting combat
     public void SetPlayerInRoom(bool inRoom) { playerInRoom = inRoom; } //updated by RoomColliderManager
     public IEnumerator RoomEntered() //called by RoomColliderManager when player enters room
@@ -372,6 +371,29 @@ public class RoomGeneration : MonoBehaviour
         GenerateEnemies();
     }
 
+    private void StartBoss()
+    {
+        //update room state
+        entered = true;
+        running = true;
+
+        //lock doors
+        for (int doorIndex = 0; doorIndex < doorObjects.Length; doorIndex++)
+        {
+            AbstractDoorScript curADS = doorObjects[doorIndex].transform.GetChild(0).transform.GetChild(0).GetComponent<AbstractDoorScript>();
+
+            if (curADS.GetIsOpen()) { doorClosedPreCombat = doorObjects[doorIndex]; }
+            curADS.LockDoor();
+        }
+
+        //generate boss
+        GenerateBoss();
+
+        //generate enemies
+        GenerateEnemies();
+    }  
+
+
     private void StartTreasure()
     {
         //update room state
@@ -388,25 +410,24 @@ public class RoomGeneration : MonoBehaviour
         //spawn special
     }
 
+
     private void StartEntry()
     {
         //update room state
         entered = true;
 
         //run intro
-    }
-
-    private void StartBoss()
-    {
-        //update room state
-        entered = true;
-
-        //generate boss
-
-        //generate enemies
-        GenerateEnemies();
-    }    
+    }  
     
+
+
+    private void GenerateBoss()
+    {
+        //find random boss type
+        GameObject bossType = validBossTypes[Random.Range(0, (validBossTypes.Length - 1))];
+        Debug.Log("bossType: " + bossType.name);
+        ASM.SpawnEnemy(bossType, (literalPosition + roomCenter));
+    }
 
 
     private void GenerateEnemies()
@@ -414,6 +435,7 @@ public class RoomGeneration : MonoBehaviour
         //start combat
         int enemyCount = Random.Range(enemyMin, enemyMax);
         Vector3[] enemyPositions = new Vector3[0];
+        GameObject[] enemyTypes = new GameObject[0];
         //Debug.Log("enemyCount: " + enemyCount);
 
         //for each enemy to be spawned
@@ -457,9 +479,19 @@ public class RoomGeneration : MonoBehaviour
                 {
                     //expand enemy positions array and add new pos
                     Vector3[] tempEnemyPositions = new Vector3[enemyPositions.Length + 1]; //new increased array
-                    for(int enemyIndex = 0; enemyIndex < enemyPositions.Length; enemyIndex++){ tempEnemyPositions[enemyIndex] = enemyPositions[enemyIndex]; } //copy old content
+                    for (int enemyIndex = 0; enemyIndex < enemyPositions.Length; enemyIndex++) { tempEnemyPositions[enemyIndex] = enemyPositions[enemyIndex]; } //copy old content
                     tempEnemyPositions[(tempEnemyPositions.Length - 1)] = spawnPos; //add new data to last position
                     enemyPositions = tempEnemyPositions; //update old array with new array
+
+                    //expand enemy types array and add new type
+                    GameObject[] tempEnemyTypes = new GameObject[enemyTypes.Length + 1]; //new increased array
+                    for (int enemyIndex = 0; enemyIndex < enemyTypes.Length; enemyIndex++) { tempEnemyTypes[enemyIndex] = enemyTypes[enemyIndex]; } //copy old content
+                    GameObject randType;
+                    if (Random.Range(0, 10) >= 8) { randType = validEnemyTypes[1]; }
+                    else { randType = validEnemyTypes[0]; }
+                    tempEnemyTypes[(tempEnemyTypes.Length - 1)] = randType;
+                    enemyTypes = tempEnemyTypes; //update old array with new array
+
                     posValid = true; //ensure while break
                     break;
                 }
@@ -469,7 +501,7 @@ public class RoomGeneration : MonoBehaviour
             }
         }
 
-        if (enemyPositions.Length > 0){ ASM.SpawnEnemies(enemyPositions); }
+        if (enemyPositions.Length > 0){ ASM.SpawnEnemies(enemyTypes, enemyPositions); }
     }
 
 

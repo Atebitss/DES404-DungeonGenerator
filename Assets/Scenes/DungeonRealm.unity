@@ -782,8 +782,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dbugEnabled: 0
+  largeRoomSizeMin: 20
+  largeRoomSizeMax: 25
+  mediumRoomSizeMin: 10
+  mediumRoomSizeMax: 15
+  smallRoomSizeMin: 5
+  smallRoomSizeMax: 10
   basicRoom: {fileID: 4597496329373697504, guid: 8ab234d5dca0f924da914ca87cc9e3df, type: 3}
   dbugTile: {fileID: 6787671552346119472, guid: aa2f3d0dd74341a4db2fc987025a5892, type: 3}
+  basicSmallEnemyPrefab: {fileID: 3375864117963020452, guid: 46bfd7227e5fe13448287a98bbe35f7b, type: 3}
+  basicLargeEnemyPrefab: {fileID: 3375864117963020452, guid: 73e0bdc0c73c3084d9f86851aacbc54b, type: 3}
+  bossBeserkEnemyPrefab: {fileID: 3375864117963020452, guid: 8110b73675a7f4247a2368c3a30401c0, type: 3}
 --- !u!114 &1945132726
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -796,11 +805,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4e4367cd3edc664f83e443b40584045, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  devMode: 1
+  devMode: 0
   amPrefab: {fileID: 4065216700189244488, guid: 924cc0721c1d6e841a3aff4bc23543af, type: 3}
   playerPrefab: {fileID: 2783768033875945984, guid: 07888939a1f59d349b73cd0353289295, type: 3}
-  smallEnemyPrefab: {fileID: 3375864117963020452, guid: 46bfd7227e5fe13448287a98bbe35f7b, type: 3}
-  largeEnemyPrefab: {fileID: 3375864117963020452, guid: 73e0bdc0c73c3084d9f86851aacbc54b, type: 3}
   doorPrefab: {fileID: 7151845054247194810, guid: ec6fe55e299e1054496342b441da8b59, type: 3}
   AM: {fileID: 0}
   player: {fileID: 0}
