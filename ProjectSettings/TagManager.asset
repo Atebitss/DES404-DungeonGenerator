@@ -9,6 +9,7 @@ TagManager:
   - SceneManager
   - Floor
   - Wall
+  - Portal
   layers:
   - Default
   - TransparentFX

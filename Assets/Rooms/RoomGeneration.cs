@@ -8,72 +8,20 @@ using UnityEditorInternal.Profiling.Memory.Experimental.FileFormat;
 
 public class RoomGeneration : MonoBehaviour
 {
-    //debug
-    [SerializeField] private bool dbugEnabled = false;
-    [SerializeField] private Material baseDbugMat, matDbugEmpty, matDbugWall, matDbugDoor;
-    [SerializeField] private GameObject dbugMarker, dbugText;
-    private GameObject[] dbugGrid;
-
-
+    //~~~~~misc~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //relevant scripts
     private AbstractSceneManager ASM;
     private MapGeneration MG;
     private RoomColliderManager RCM;
+    //~~~~~misc~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-    //generation info
-    [SerializeField] private Collider roomCollider;
-    [SerializeField] private int roomID = -1, roomPosX = -1, roomPosZ = -1, roomBoundsX = -1, roomBoundsZ = -1; //room size
-    [SerializeField] private string roomSize = "", roomType = "";
-    [SerializeField] private Vector3[] roomGridPositions;
-    [SerializeField] private Vector3 literalPosition, roomCenter;
-    private string[] roomGridStates; //current 'state' of grid position (state ie. Wall, Doorway, Corner, Table, Chair)
 
-
+    //~~~~~running~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //room info
     [SerializeField] private bool entered = false, running = false;
     public bool GetRoomEntered() { return entered; }
     public void SetRoomEntered(bool entered) { this.entered = entered; }
-    
-    [SerializeField] private GameObject dbugFloorTile;
-    private GameObject floorObject;
-    private float tileXOffset, tileZOffset;
-
-    private Vector2[] doorPositions;
-    private GameObject[] doorObjects = new GameObject[0];
-    public GameObject[] GetDoorObjects() { return doorObjects; }
-    private GameObject doorClosedPreCombat;
-    public void LockDoors()
-    {
-        for(int i = 0; i < doorObjects.Length; i++)
-        {
-            doorObjects[i].transform.GetChild(0).transform.GetChild(0).GetComponent<AbstractDoorScript>().LockDoor();
-        }
-    }
-    public void UnlockDoors()
-    {
-        for(int i = 0; i < doorObjects.Length; i++)
-        {
-            doorObjects[i].transform.GetChild(0).transform.GetChild(0).GetComponent<AbstractDoorScript>().UnlockDoor();
-        }
-    }
-
-    [SerializeField] private GameObject wallSectionPrefab, doorwaySectionPrefab, doorPrefab;
-    private GameObject[] wallObjects = new GameObject[0]; //0 - bottom, 1 - top, 2 - left, 3 - right
-    private float sectionXOffset, sectionZOffset;
-
-
-    //enemy info
-    [SerializeField] private int enemyMin = 4, enemyMax = 7;
-    public void SetEnemyMin(int min) { enemyMin = min; }
-    public void SetEnemyMax(int max) { enemyMax = max; }
-
-    [SerializeField] private GameObject[] validEnemyTypes, validBossTypes;
-    private void GetValidEnemyTypes() { validEnemyTypes = ASM.GetDG().GetEnemyTypes(); }
-    private void GetValidBossTypes() { validBossTypes = ASM.GetDG().GetBossTypes(); }
-
-
-
     public void FixedUpdate()
     {
         if(running)
@@ -81,6 +29,12 @@ public class RoomGeneration : MonoBehaviour
             //Debug.Log("running: " + running + "   enemies: " + ASM.GetEnemyObjects().Length);
             if(ASM.GetEnemyObjects().Length == 0)
             {
+                if (bossRoom) //if boss room over, spawn way down
+                {
+                    portalObject = Instantiate(portalPrefab, (literalPosition + roomCenter), Quaternion.identity);
+                    portalObject.GetComponent<PortalManager>().SetASM(ASM);
+                    portalObject.transform.parent = this.transform.GetChild(1);
+                }
                 UnlockDoors();
                 //open doors locked pre combat
                 if (doorClosedPreCombat != null) { doorClosedPreCombat.transform.GetChild(0).transform.GetChild(0).GetComponent<AbstractDoorScript>().InteractWithDoor(); }
@@ -88,6 +42,58 @@ public class RoomGeneration : MonoBehaviour
             }
         }
     }
+    //~~~~~running~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+    //~~~~~generation~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //generation info
+    [SerializeField] private Collider roomCollider;
+    [SerializeField] private int roomID = -1, roomPosX = -1, roomPosZ = -1, roomBoundsX = -1, roomBoundsZ = -1; //room size
+    [SerializeField] private string roomSize = "", roomType = "";
+    private string[] roomGridStates; //current 'state' of grid position (state ie. Wall, Doorway, Corner, Table, Chair)
+
+    //floors
+    [SerializeField] private GameObject floorPrefab;
+    private GameObject floorObject;
+    private float tileXOffset, tileZOffset;
+    [SerializeField] private Vector3[] roomGridPositions;
+    [SerializeField] private Vector3 literalPosition, roomCenter;
+
+    //walls
+    [SerializeField] private GameObject wallSectionPrefab;
+    private GameObject[] wallObjects = new GameObject[0]; //0 - bottom, 1 - top, 2 - left, 3 - right
+    private float sectionXOffset, sectionZOffset;
+
+    //doors
+    [SerializeField] private GameObject doorwaySectionPrefab, doorPrefab;
+    private Vector2[] doorPositions;
+    private GameObject[] doorObjects = new GameObject[0];
+    public GameObject[] GetDoorObjects() { return doorObjects; }
+    private GameObject doorClosedPreCombat;
+    public void LockDoors()
+    {
+        for (int i = 0; i < doorObjects.Length; i++)
+        {
+            doorObjects[i].transform.GetChild(0).transform.GetChild(0).GetComponent<AbstractDoorScript>().LockDoor();
+        }
+    }
+    public void UnlockDoors()
+    {
+        for (int i = 0; i < doorObjects.Length; i++)
+        {
+            doorObjects[i].transform.GetChild(0).transform.GetChild(0).GetComponent<AbstractDoorScript>().UnlockDoor();
+        }
+    }
+
+    //portal
+    [SerializeField] private GameObject portalPrefab;
+    private GameObject portalObject;
+    private Vector2 portalPos;
+    public GameObject GetPortalObject() { return portalObject; }
+
+
+
     public void Wake(int roomID, int roomPosX, int roomPosZ, int roomBoundsX, int roomBoundsZ, string roomSize, string roomType, Vector3 literalPosition)
     {
         if (dbugEnabled) { Debug.Log("ID: " + roomID + "   size: " + roomSize + "   type: " + roomType + "   x: " + roomBoundsX + ", z: " + roomBoundsZ); }
@@ -129,12 +135,9 @@ public class RoomGeneration : MonoBehaviour
         GetValidEnemyTypes();
         GetValidBossTypes();
 
-
-
         GenerateFloor();
         GenerateDoorways();
         GenerateWalls();
-
 
         if (dbugEnabled)
         {
@@ -189,7 +192,7 @@ public class RoomGeneration : MonoBehaviour
 
         Vector3 tempPos = new Vector3(x, -1, z);
         //Debug.Log("tempPos: " + tempPos);
-        floorObject = Instantiate(dbugFloorTile, tempPos, Quaternion.identity);
+        floorObject = Instantiate(floorPrefab, tempPos, Quaternion.identity);
         floorObject.transform.parent = this.transform.GetChild(1);
         floorObject.transform.localScale = new Vector3(((float)roomBoundsX / 2), floorObject.transform.localScale.y, ((float)roomBoundsZ / 2));
     }
@@ -329,9 +332,11 @@ public class RoomGeneration : MonoBehaviour
             }
         }
     }
+    //~~~~~generation~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 
+    //~~~~~room interaction~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     private bool playerInRoom = false; //used to check if player is still in room before starting combat
     public void SetPlayerInRoom(bool inRoom) { playerInRoom = inRoom; } //updated by RoomColliderManager
     public IEnumerator RoomEntered() //called by RoomColliderManager when player enters room
@@ -349,7 +354,6 @@ public class RoomGeneration : MonoBehaviour
             else if(roomType.Contains("Boss")){StartBoss();}
         } 
     }
-
 
 
     private void StartCombat()
@@ -376,6 +380,7 @@ public class RoomGeneration : MonoBehaviour
         //update room state
         entered = true;
         running = true;
+        bossRoom = true;
 
         //lock doors
         for (int doorIndex = 0; doorIndex < doorObjects.Length; doorIndex++)
@@ -417,8 +422,23 @@ public class RoomGeneration : MonoBehaviour
         entered = true;
 
         //run intro
-    }  
-    
+    }
+    //~~~~~room interaction~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+    //~~~~~enemies~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //enemy info
+    [SerializeField] private bool bossRoom = false;
+    [SerializeField] private int enemyMin = 4, enemyMax = 7;
+    public void SetEnemyMin(int min) { enemyMin = min; }
+    public void SetEnemyMax(int max) { enemyMax = max; }
+
+    //enemy types
+    [SerializeField] private GameObject[] validEnemyTypes, validBossTypes;
+    private void GetValidEnemyTypes() { validEnemyTypes = ASM.GetDG().GetEnemyTypes(); }
+    private void GetValidBossTypes() { validBossTypes = ASM.GetDG().GetBossTypes(); }
+
 
 
     private void GenerateBoss()
@@ -449,9 +469,9 @@ public class RoomGeneration : MonoBehaviour
                 //find random position within room
                 Vector3 spawnPos = new Vector3((Random.Range(0, roomBoundsX) + literalPosition.x), 0.5f, (Random.Range(0, roomBoundsZ) + literalPosition.z));
 
-                float checkDistance = ((roomBoundsX * roomBoundsZ) * 0.01f); //1/100th the room size
+                float checkDistance = tileXOffset;
 
-                //find if distance between generated position and player is less than 1/100th the room
+                //find if distance between generated position and player is less than checkDistance
                 Vector3 playerPos = ASM.GetPlayerPosition(); //get current player position from abstract scene manager (run every attempt incase player moves)
                 bool playerNearBy = Vector3.Distance(spawnPos, playerPos) < checkDistance; //check if distance between spawn pos & player pos is less than check distance (if false, no player near; if true, player near)
 
@@ -503,6 +523,16 @@ public class RoomGeneration : MonoBehaviour
 
         if (enemyPositions.Length > 0){ ASM.SpawnEnemies(enemyTypes, enemyPositions); }
     }
+    //~~~~~enemies~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+    //~~~~~debug~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //debug
+    [SerializeField] private bool dbugEnabled = false;
+    [SerializeField] private Material baseDbugMat, matDbugEmpty, matDbugWall, matDbugDoor;
+    [SerializeField] private GameObject dbugFloorTile, dbugMarker, dbugText;
+    private GameObject[] dbugGrid;
 
 
 
@@ -551,4 +581,5 @@ public class RoomGeneration : MonoBehaviour
             }
         }
     }
+    //~~~~~debug~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 }

@@ -16,5 +16,11 @@ public class EnemyContollerBoss : AbstractEnemy
 
     override public void UpdateBossStates() 
     {
+        switch (type)
+        {
+            case "bossBeserk":
+
+                break;
+        }
     }
 }

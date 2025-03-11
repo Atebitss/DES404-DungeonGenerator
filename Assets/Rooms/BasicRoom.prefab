@@ -111,18 +111,37 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d92b1edc4e856a341997c0478719fd8e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  entered: 0
+  running: 0
+  roomCollider: {fileID: 5780578494968400953}
+  roomID: -1
+  roomPosX: -1
+  roomPosZ: -1
+  roomBoundsX: -1
+  roomBoundsZ: -1
+  roomSize: 
+  roomType: 
+  floorPrefab: {fileID: 8997730621713062801, guid: 194148bec6d799e49a67d416d13f91fe, type: 3}
+  roomGridPositions: []
+  literalPosition: {x: 0, y: 0, z: 0}
+  roomCenter: {x: 0, y: 0, z: 0}
+  wallSectionPrefab: {fileID: 7488329685454604500, guid: 86ecb343b54eb2f4885869843c8e6be3, type: 3}
+  doorwaySectionPrefab: {fileID: 3211954936950896000, guid: 54cba25e58c59794b8b1902b38839397, type: 3}
+  doorPrefab: {fileID: 7151845054247194810, guid: ec6fe55e299e1054496342b441da8b59, type: 3}
+  portalPrefab: {fileID: 7617092792890805642, guid: e3e984923f2b5b842b4475fece8bccd8, type: 3}
+  bossRoom: 0
+  enemyMin: 4
+  enemyMax: 7
+  validEnemyTypes: []
+  validBossTypes: []
   dbugEnabled: 0
   baseDbugMat: {fileID: 2100000, guid: e8a11bef448ed1b4382b0b5eebb590ca, type: 2}
   matDbugEmpty: {fileID: 2100000, guid: b935ea7b19223f444a7418c023851217, type: 2}
   matDbugWall: {fileID: 2100000, guid: 40ce6f7b8d8dcb645bd3b910de554598, type: 2}
   matDbugDoor: {fileID: 2100000, guid: 1e2c8f73981c08a43ab9d2b91837d8e3, type: 2}
+  dbugFloorTile: {fileID: 8997730621713062801, guid: 194148bec6d799e49a67d416d13f91fe, type: 3}
   dbugMarker: {fileID: 6787671552346119472, guid: aa2f3d0dd74341a4db2fc987025a5892, type: 3}
   dbugText: {fileID: 8348211830089719479}
-  roomCollider: {fileID: 5780578494968400953}
-  dbugFloorTile: {fileID: 8997730621713062801, guid: 194148bec6d799e49a67d416d13f91fe, type: 3}
-  wallSectionPrefab: {fileID: 7488329685454604500, guid: 86ecb343b54eb2f4885869843c8e6be3, type: 3}
-  doorwaySectionPrefab: {fileID: 3211954936950896000, guid: 54cba25e58c59794b8b1902b38839397, type: 3}
-  doorPrefab: {fileID: 7151845054247194810, guid: ec6fe55e299e1054496342b441da8b59, type: 3}
 --- !u!1 &7502486605377064533
 GameObject:
   m_ObjectHideFlags: 0

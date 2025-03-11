@@ -245,7 +245,7 @@ public class PlayerController : MonoBehaviour
     private bool attacking = false; //tracker false to allow for first attack, updated in UpdatePlayerStates when attack cooldown timer is 0
     private float attackCooldownTimer = 0f, attackStartTime = 0f; //used to reset attack timer in UpdatePlayerStates
     [SerializeField] private float lightAttackCooldownMax = 0.5f, heavyAttackCooldownMax = 1f;
-    private float lightAttackAnimLength = 0f, heavyAttackAnimLength = 0f;
+    private float lightAttackAnimLength = 0.5f, heavyAttackAnimLength = 1f;
     private int attackComboDamage = 0; //additional damage
     private int lightAttackComboCounter = 0; //combo tracker set to one to skip first rotation
     private float lightAttackComboTimer = 0f, lightAttackComboStartTime = 0f; //used to reset combo timer
@@ -260,7 +260,8 @@ public class PlayerController : MonoBehaviour
 
     public void OnLightAttack(InputAction.CallbackContext ctx)
     {
-        lightAttackAnimLength = FindAnimationLength("swordLightAttack30degrees");
+        //lightAttackAnimLength = FindAnimationLength("swordLightAttack30degrees");
+        //Debug.Log("lightAttackAnimLength: " + lightAttackAnimLength);
 
         if (ctx.performed && attackCooldownTimer <= 0 && !attacking)
         {
@@ -296,41 +297,47 @@ public class PlayerController : MonoBehaviour
 
             if (lightAttackComboCounter == 3) 
             {
-                 lightAttackComboCounter = 0; //reset counter
                 Invoke("ResetLightAttackAnimInt", (lightAttackAnimLength - 0.1f));
             }
         }
     }
-    private void ResetLightAttackAnimInt() { a.SetInteger("lightSwingCombo", lightAttackComboCounter); }
+    private void ResetLightAttackAnimInt()
+    {
+        lightAttackComboCounter = 0; //reset counters
+        lightAttackComboTimer = 0;
+        a.SetInteger("lightSwingCombo", lightAttackComboCounter); 
+    }
 
     public void OnHeavyAttack(InputAction.CallbackContext ctx)
     {
-        heavyAttackAnimLength = FindAnimationLength("swordHeavyAttackCleave");
+        //heavyAttackAnimLength = FindAnimationLength("swordHeavyAttackCleave");
+        //Debug.Log("heavyAttackAnimLength: " + heavyAttackAnimLength);
+
         if (ctx.performed && attackCooldownTimer <= 0 && !attacking)
         {
-            Debug.Log("heavy attack");
+            //Debug.Log("heavy attack");
             attackCooldownTimer = heavyAttackCooldownMax;
 
             if (lightAttackComboCounter != 0)  //reset light attack
             {
-                Debug.Log("reset light attack");
+                //Debug.Log("reset light attack");
                 lightAttackComboCounter = 0;
                 lightAttackComboTimer = 0;
                 a.SetInteger("lightSwingCombo", lightAttackComboCounter);
             }
 
-            Debug.Log("play heavy attack");
+            //Debug.Log("play heavy attack");
             AM.Play("Sword_SwingCleave");
             a.SetBool("attackingHeavy", true);
 
-            Debug.Log("enable attack check");
-            PWCM.EnableAttackCheck((heavyAttackAnimLength - 0.1f));
+            //Debug.Log("enable attack check");
+            PWCM.EnableAttackCheck((FindAnimationLength("swordHeavyAttackCleave") - 0.1f));
 
-            Debug.Log("invoke reset heavy attack, " + (heavyAttackAnimLength - 0.1f));
-            Invoke("ResetHeavyAttackAnimBool", (heavyAttackAnimLength - 0.1f));
+            //Debug.Log("invoke reset heavy attack, " + (heavyAttackAnimLength - 0.1f));
+            Invoke("ResetHeavyAttackAnimBool", FindAnimationLength("swordHeavyAttackCleave"));
         }
     }
-    private void ResetHeavyAttackAnimBool() { Debug.Log("reset heavy attack"); a.SetBool("attackingHeavy", false); }
+    private void ResetHeavyAttackAnimBool() { /*Debug.Log("reset heavy attack");*/ a.SetBool("attackingHeavy", false); }
 
 
     private float FindAnimationLength(string clipName)
@@ -377,6 +384,11 @@ public class PlayerController : MonoBehaviour
                         //Debug.Log("door, " + hit.collider.GetComponent<AbstractDoorScript>());
                         hit.collider.GetComponent<AbstractDoorScript>().InteractWithDoor();
                         break;
+                    case "Portal":
+                        //Debug.Log("portal, " + hit.collider.GetComponent<PortalManager>());
+                        hit.collider.GetComponent<PortalManager>().InteractWithPortal();
+                        break;
+
                 }
             }
 

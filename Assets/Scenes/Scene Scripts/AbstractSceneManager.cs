@@ -158,5 +158,13 @@ public class AbstractSceneManager : MonoBehaviour
         DG = this.gameObject.GetComponent<DungeonGeneration>();
         PG = this.gameObject.GetComponent<PathGeneration>();
     }
+
+    public void EndFloor()
+    {
+        Debug.Log("Floor complete");
+        //would contain scene change to post level
+        //and update dungeon stats
+        RestartScene();
+    }
     virtual public void RestartScene(){}
 }

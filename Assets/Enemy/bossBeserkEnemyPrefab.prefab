@@ -296,7 +296,7 @@ MonoBehaviour:
   attacking: 0
   attackCooldownTimer: 0
   attackStartTime: 0
-  attackCooldownMax: 1
+  attackCooldownMax: 2.5
   attackDamage: 2
   attackSpeed: 1
   attackDistance: 2.5

@@ -429,7 +429,7 @@ MonoBehaviour:
   weaponParent: {fileID: 4954393113427719825}
   weaponAttackCollider: {fileID: 8225045803689722017}
   PWCM: {fileID: 8198623938989953886}
-  attackDamage: 1
+  attackDamage: 100
   attackSpeed: 1
   PPS: {fileID: 2532494437381932349}
   interactionMask:
@@ -449,7 +449,7 @@ MonoBehaviour:
   IntelligencePoints: 1
   WisdomPoints: 1
   invincible: 0
-  permaInvincible: 0
+  permaInvincible: 1
   invincibilityTimer: 0
 --- !u!82 &631621802871244450
 AudioSource:
