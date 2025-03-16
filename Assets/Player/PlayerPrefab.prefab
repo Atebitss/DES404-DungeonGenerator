@@ -185,7 +185,7 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.225
+  m_Radius: 0.5
   m_Height: 1.625
   m_Direction: 1
   m_Center: {x: 0, y: -0.67499995, z: 0.075}
@@ -208,7 +208,7 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.225
+  m_Radius: 0.5
   m_Height: 1.625
   m_Direction: 1
   m_Center: {x: 0, y: -0.67499995, z: 0.075}
@@ -449,7 +449,7 @@ MonoBehaviour:
   IntelligencePoints: 1
   WisdomPoints: 1
   invincible: 0
-  permaInvincible: 1
+  permaInvincible: 0
   invincibilityTimer: 0
 --- !u!82 &631621802871244450
 AudioSource:

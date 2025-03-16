@@ -50,10 +50,11 @@ public class AbstractSceneManager : MonoBehaviour
     public void SpawnPlayer(Vector3 pos)
     {
         player = Instantiate(playerPrefab, pos, Quaternion.identity);
-        Debug.Log(player.name);
+        //Debug.Log(player.name);
         PC = player.transform.GetChild(0).gameObject.GetComponent<PlayerController>();
         SetADDM(PC.GetADDM());
-        ADM.Wake();
+
+        ADM.Wake(this);
     }
     public void DestroyPlayer()
     {
@@ -156,7 +157,7 @@ public class AbstractSceneManager : MonoBehaviour
 
     
     //when scene starts
-    void Start()
+    void Awake()
     {
         AM = Instantiate(amPrefab, new Vector3(0, 0, 0), Quaternion.identity).GetComponent<AudioManager>();
         MG = this.gameObject.GetComponent<MapGeneration>();

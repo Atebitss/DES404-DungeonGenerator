@@ -158,7 +158,7 @@ public class PlayerController : MonoBehaviour
         //(Space / Button South) + (WASD/ Left Thumbstick)
         if (ctx.performed && dodgeCooldownTimer <= 0 && !dodging) //if dodge cooldown is not active and the player is not currently dodging
         {
-            Debug.Log("dodge");
+            //Debug.Log("dodge");
             StartCoroutine(Dodge());
         }
     }
@@ -495,10 +495,10 @@ public class PlayerController : MonoBehaviour
     private float invincibilityStartTime = 0f;
 
     //health points
-    public void SetCurrentHealthPoints(int newHealth) { if (!invincible) { Debug.Log("setting health: " + newHealth); healthPointsCurrent = newHealth; HealthCheck(); UpdateHealthBar(); } }
-    public void AlterCurrentHealthPoints(int alter) { if(!invincible) { Debug.Log("altering health: " + alter); healthPointsCurrent += alter; HealthCheck(); UpdateHealthBar(); ADM.DamageTaken(); } }
+    public void SetCurrentHealthPoints(int newHealth) { if (!invincible) { /*Debug.Log("setting health: " + newHealth);*/ healthPointsCurrent = newHealth; HealthCheck(); UpdateHealthBar(); } }
+    public void AlterCurrentHealthPoints(int alter) { if(!invincible) { /*Debug.Log("altering health: " + alter);*/ healthPointsCurrent += alter; HealthCheck(); UpdateHealthBar(); ADM.DamageTaken(); } }
     public int GetCurrentHealthPoints() { return healthPointsCurrent; }
-    private void HealthCheck() { if (healthPointsCurrent <= 0) { Debug.Log("health check: " + healthPointsCurrent); UpdateHealthBar(); ASM.DestroyPlayer(); } }
+    private void HealthCheck() { if (healthPointsCurrent <= 0) { /*Debug.Log("health check: " + healthPointsCurrent);*/ UpdateHealthBar(); ASM.DestroyPlayer(); } }
 
     public void AlterMaxHealthPoints(int alter) { healthPointASMax += alter; }
     public int GetMaxHealthPoints() { return healthPointASMax; }

@@ -11,9 +11,9 @@ public class AdaptiveDifficultyManager : MonoBehaviour
     private AdaptiveDifficultyDisplayManager ADDM;
     private RoomGeneration RG;
 
-    public void Wake()
+    public void Wake(AbstractSceneManager newASM)
     {
-        ASM = GameObject.Find("SceneManager").GetComponent<AbstractSceneManager>();
+        ASM = newASM;
         PC = ASM.GetPlayerController();
         ADDM = PC.GetADDM();
         ADDM.SetADM(this);
@@ -41,7 +41,7 @@ public class AdaptiveDifficultyManager : MonoBehaviour
     private float startTime = 0f, endTime = 0f;
     public void StartStatWatch(RoomGeneration newRG)
     {
-        Debug.Log("Starting stat watch");
+        //Debug.Log("Starting stat watch");
         RG = newRG;
         ResetTrackers();
 
@@ -54,12 +54,12 @@ public class AdaptiveDifficultyManager : MonoBehaviour
             float totalRoomClearTime = 0f;
             for (int i = 0; i < roomClearTimes.Length; i++)
             {
-                Debug.Log("roomClearTimes[" + i + "]: " + roomClearTimes[i]);
+                //Debug.Log("roomClearTimes[" + i + "]: " + roomClearTimes[i]);
                 totalRoomClearTime += roomClearTimes[i];
-                Debug.Log("totalRoomClearTime: " + totalRoomClearTime);
+                //Debug.Log("totalRoomClearTime: " + totalRoomClearTime);
             }
             avgRoomClearTime = (totalRoomClearTime / roomClearTimes.Length);
-            Debug.Log("avgRoomClearTime: " + avgRoomClearTime);
+            //Debug.Log("avgRoomClearTime: " + avgRoomClearTime);
 
             if(ADDM != null) 
             {
@@ -73,7 +73,7 @@ public class AdaptiveDifficultyManager : MonoBehaviour
 
     public void EndStatWatch()
     {
-        Debug.Log("Ending stat watch");
+        //Debug.Log("Ending stat watch");
 
         endTime = Time.time;
         if(ADDM != null) 
@@ -128,12 +128,12 @@ public class AdaptiveDifficultyManager : MonoBehaviour
         float totalTime = 0f;
         for (int i = 0; i < timeIndexsOfDamageLastTaken.Length - 1; i++)
         {
-            Debug.Log("timeIndexsOfDamageLastTaken[" + i + "]: " + timeIndexsOfDamageLastTaken[i]);
+            //Debug.Log("timeIndexsOfDamageLastTaken[" + i + "]: " + timeIndexsOfDamageLastTaken[i]);
             totalTime += timeIndexsOfDamageLastTaken[i];
-            Debug.Log("totalTime: " + totalTime);
+            //Debug.Log("totalTime: " + totalTime);
         }
         avgTimeBetweenDamageTaken = totalTime / timeIndexsOfDamageLastTaken.Length;
-        Debug.Log("avgTimeBetweenDamageTaken: " + avgTimeBetweenDamageTaken);
+        //Debug.Log("avgTimeBetweenDamageTaken: " + avgTimeBetweenDamageTaken);
         if (ADDM != null) 
         {
             ADDM.timesDamageTaken = timeIndexsOfDamageLastTaken; 
@@ -182,96 +182,89 @@ public class AdaptiveDifficultyManager : MonoBehaviour
     private float skillScore = 100f; //used to determine player skill level
     public void RunDifficultyAdapter()
     {
-        Debug.Log("Running difficulty adapter");
+        //Debug.Log("Running difficulty adapter");
 
         //difficulty change based on stats
         //calculate average time between damage taken
-        Debug.Log("");
         float maxExpectedTimeBetweenDamage = 15f;
-        Debug.Log("(avgTimeBetweenDamageTaken / maxExpectedTimeBetweenDamage): " + (avgTimeBetweenDamageTaken / maxExpectedTimeBetweenDamage));
+        //Debug.Log("(avgTimeBetweenDamageTaken / maxExpectedTimeBetweenDamage): " + (avgTimeBetweenDamageTaken / maxExpectedTimeBetweenDamage));
         skillScore += (avgTimeBetweenDamageTaken / maxExpectedTimeBetweenDamage);
-        Debug.Log("skillScore: " + skillScore);
+        //Debug.Log("skillScore: " + skillScore);
 
 
         //calculate attack accuracy
-        Debug.Log("");
         float accuracy = 0f;
         if (numOfAttacks > 0) { accuracy = (((float)numOfHits / (float)numOfAttacks)); }
-        Debug.Log("numOfHits: " + numOfHits + " / numOfAttacks: " + numOfAttacks);
-        Debug.Log("accuracy: " + accuracy);
+        //Debug.Log("numOfHits: " + numOfHits + " / numOfAttacks: " + numOfAttacks);
+        //Debug.Log("accuracy: " + accuracy);
         skillScore += accuracy;
-        Debug.Log("skillScore: " + skillScore);
+        //Debug.Log("skillScore: " + skillScore);
 
 
         //calculate dodge effectiveness
-        Debug.Log("");
         float dodgeEffectiveness = 0f;
         if (numOfDodges > 0) { dodgeEffectiveness = (((float)numOfHitsDodged / (float)numOfDodges)); }
-        Debug.Log("numOfHitsDodged: " + numOfHitsDodged + " / numOfDodges: " + numOfDodges);
-        Debug.Log("dodgeEffectiveness: " + dodgeEffectiveness);
+        //Debug.Log("numOfHitsDodged: " + numOfHitsDodged + " / numOfDodges: " + numOfDodges);
+        //Debug.Log("dodgeEffectiveness: " + dodgeEffectiveness);
         skillScore += dodgeEffectiveness;
-        Debug.Log("skillScore: " + skillScore);
+        //Debug.Log("skillScore: " + skillScore);
 
 
         //add combo useage
-        Debug.Log("");
-        Debug.Log("combosPerformed: " + combosPerformed);
+        //Debug.Log("combosPerformed: " + combosPerformed);
         skillScore += combosPerformed;
-        Debug.Log("skillScore: " + skillScore);
+        //Debug.Log("skillScore: " + skillScore);
 
 
         //calculate average room clear time
-        Debug.Log("");
         float totalRoomClearTime = 0f;
         for (int i = 0; i < roomClearTimes.Length; i++)
         {
-            Debug.Log("roomClearTimes[" + i + "]: " + roomClearTimes[i]);
+            //Debug.Log("roomClearTimes[" + i + "]: " + roomClearTimes[i]);
             totalRoomClearTime += roomClearTimes[i];
-            Debug.Log("totalRoomClearTime: " + totalRoomClearTime);
+            //Debug.Log("totalRoomClearTime: " + totalRoomClearTime);
         }
         avgRoomClearTime = (totalRoomClearTime / roomClearTimes.Length);
-        Debug.Log("avgRoomClearTime: " + avgRoomClearTime);
+        //Debug.Log("avgRoomClearTime: " + avgRoomClearTime);
         if (roomClearTimes.Length > 0) { skillScore -= (avgRoomClearTime / 10f); }
-        Debug.Log("skillScore: " + skillScore);
+        //Debug.Log("skillScore: " + skillScore);
 
 
         //add rooms cleared
-        Debug.Log("");
-        Debug.Log("roomsCleared: " + roomsCleared);
+        //Debug.Log("roomsCleared: " + roomsCleared);
         skillScore += ((float)roomsCleared / 10f);
-        Debug.Log("skillScore: " + skillScore);
+        //Debug.Log("skillScore: " + skillScore);
 
 
         //difficulty change based on skillScore
-        Debug.Log("");
-        Debug.Log("final skillScore: " + skillScore);
+        //Debug.Log("final skillScore: " + skillScore);
         if (skillScore <= 25f)
         {
-            Debug.Log("difficulty: beginner");
+            //Debug.Log("difficulty: beginner");
             RG.SetRoomDifficulty(-1);
             RG.SetPlayerSkillScore(skillScore);
         }
         else if (skillScore > 25f && skillScore <= 75f)
         {
-            Debug.Log("difficulty: easy");
+            //Debug.Log("difficulty: easy");
             RG.SetRoomDifficulty(0);
             RG.SetPlayerSkillScore(skillScore);
         }
         else if (skillScore > 75f && skillScore <= 125f)
         {
-            Debug.Log("difficulty: normal");
+            //Debug.Log("difficulty: normal");
             RG.SetRoomDifficulty(1);
             RG.SetPlayerSkillScore(skillScore);
         }
         else if (skillScore > 125f && skillScore <= 175f)
         {
-            Debug.Log("difficulty: hard");
+            //Debug.Log("difficulty: hard");
             RG.SetRoomDifficulty(2);
             RG.SetPlayerSkillScore(skillScore);
         }
         else if (skillScore > 175f)
         {
-            Debug.Log("difficulty: dire");
+            //Debug.Log("difficulty: dire");
             RG.SetRoomDifficulty(3);
             RG.SetPlayerSkillScore(skillScore);
         }

@@ -294,10 +294,11 @@ MonoBehaviour:
   attacking: 0
   attackCooldownTimer: 0
   attackStartTime: 0
-  attackCooldownMax: 1.5
+  attackCooldownMax: 5
   attackDamage: 1
   attackSpeed: 1.5
   attackDistance: 1.5
+  attackStage: 0
   weaponParent: {fileID: 7034578543878992195}
   weaponAttackColliders:
   - {fileID: 1701483941685567264}
@@ -305,13 +306,14 @@ MonoBehaviour:
   - {fileID: 6178674796021915901}
   EDCNear: {fileID: 1847250764447816529}
   EDCFar: {fileID: 8692641826929463634}
-  EPS: {fileID: 8600202053329603697}
   movementSpeed: 2.5
   seperationDistance: 2.5
   seperationWeight: 2.5
-  retreatSpeed: 5
-  retreatTime: 2
+  dodging: 0
+  dodgeForce: 5
+  dodgeTime: 1
   lookSensitivity: 2.5
+  EPS: {fileID: 8600202053329603697}
 --- !u!82 &5414379114799386796
 AudioSource:
   m_ObjectHideFlags: 0

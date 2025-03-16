@@ -1,5 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Collections;
+using Unity.Android.Gradle;
 public abstract class AbstractEnemy : MonoBehaviour
 {
     //~~~~~misc~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -17,7 +19,14 @@ public abstract class AbstractEnemy : MonoBehaviour
     private float GetCurAnimLength()
     {
         //find legnth of current animation
-        foreach (AnimationClip clip in a.runtimeAnimatorController.animationClips) { if (a.GetCurrentAnimatorStateInfo(0).IsName(clip.name)) { return clip.length; } }
+        foreach (AnimationClip clip in a.runtimeAnimatorController.animationClips) 
+        {
+            if (a.GetCurrentAnimatorStateInfo(0).IsName(clip.name)) 
+            {
+                //Debug.Log("clip name: " + clip.name + ", clip length: " + clip.length);
+                return clip.length; 
+            }
+        }
         return -1;
     }
     //~~~~~misc~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -30,6 +39,7 @@ public abstract class AbstractEnemy : MonoBehaviour
     public bool dual = false;
     private void Start()
     {
+        //Debug.Log("enemy start: " + this.gameObject.name);
         ASM = GameObject.FindWithTag("SceneManager").GetComponent<AbstractSceneManager>();
         AM = ASM.GetAudioManager();
         ADM = ASM.GetComponent<AdaptiveDifficultyManager>();
@@ -40,14 +50,14 @@ public abstract class AbstractEnemy : MonoBehaviour
             EWCMs[i].SetWeaponDamage(attackDamage);
             if (ADM != null) { EWCMs[i].SetADM(ADM); }
         }
-        //Debug.Log("AE.setBool, dual: " + dual);
-        if (boss) { a.SetBool("dual", dual); }
+
+        if (boss) { UpdateBossStates(); }
+        //Debug.Log("dual: " + dual);
+        a.SetBool("dual", dual); 
     }
     private void FixedUpdate()
     {
         UpdateEnemyStates();
-
-        if (boss) { UpdateBossStates(); }
 
         if (isActive && PC != null)
         {
@@ -60,19 +70,10 @@ public abstract class AbstractEnemy : MonoBehaviour
     {
         HealthCheck();
 
-
-        if (attackCooldownTimer > 0 && !attacking)
-        {
-            attacking = true; //set tracker
-            attackStartTime = Time.time; //track when attack started
-        }
-
         if (attackCooldownTimer > 0) { attackCooldownTimer -= Time.deltaTime; } //count down timer
         if (attackCooldownTimer <= 0) //when timer runs out, set tracker false
         {
             attackCooldownTimer = 0;
-            attackStartTime = 0;
-            attacking = false;
         }
     }
     //~~~~~state updates~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -92,12 +93,13 @@ public abstract class AbstractEnemy : MonoBehaviour
     //~~~~~attacking~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     [Header("-Attacking")]
     //attack
-    [HideInInspector] public bool attacking = false; //tracker false to allow for first attack
-    public float attackCooldownTimer = 0f, attackStartTime = 0f; //used to reset attack timer
+    [SerializeField] public bool attacking = false; //tracker false to allow for first attack
+    [SerializeField] public float attackCooldownTimer = 0f, attackStartTime = 0f; //used to reset attack timer
     [SerializeField] public float attackCooldownMax = 2.5f;
     [SerializeField] public int attackDamage = 1; //dafault damage
     [SerializeField] public float attackSpeed = 1f; //default speed
     [SerializeField] public float attackDistance = 1.5f; //default attack distance
+    [SerializeField] private int attackStage = 0; //used to track attack stage
 
     //weapon
     [SerializeField] private GameObject weaponParent; //weapon parent
@@ -109,41 +111,61 @@ public abstract class AbstractEnemy : MonoBehaviour
     [SerializeField] private EnemyDetectionColliderNear EDCNear;
     [SerializeField] private EnemyDetectionColliderFar EDCFar;
 
-    private void Attack()
+    private void BeginAttack()
     {
         if (attackCooldownTimer <= 0 && !attacking)
         {
             //Debug.Log("enemy attack");
-
             attackCooldownTimer = attackCooldownMax;
-
-
-            AM.Play("Sword_Swing1");
-
-            a.SetBool("attacking", true);
-            //Debug.Log(GetCurAnimLength());
-            //this will probably need changed later as not all colliders should be activated at once
-            for (int i = 0; i < weaponAttackColliders.Length; i++)
-            {
-                EWCMs[i].EnableAttackCheck((GetCurAnimLength() * 2));
-            }
-
-            Invoke("ResetAttackAnimBool", (GetCurAnimLength() * 2));
+            attacking = true; //set tracker
+            attackStartTime = Time.time; //track when attack started
+            StartCoroutine(AttackPrepare());
         }
     }
-    private void ResetAttackAnimBool() { a.SetBool("attacking", false); }
-
-    public void DamagePlayer() { PC.AlterCurrentHealthPoints(-attackDamage); }
-
-
-    [SerializeField] private ParticleSystem EPS;
-    public void MoveEPS(Vector3 hitPos) 
+    private IEnumerator AttackPrepare()
     {
-        EPS.gameObject.transform.position = hitPos;
-        EPS.Play();
-        Invoke("StopPS", 0.5f);
+        //Debug.Log("attackCooldownTimer: " + attackCooldownTimer);
+        //Debug.Log("attacking: " + attacking);
+
+        //prepare attack
+        //Debug.Log("attack prepare");
+        a.SetBool("attacking", true);
+        a.SetInteger("attackStage", 1);
+        yield return new WaitForSeconds(0.1f); //wait for animation to start
+        yield return new WaitForSeconds((GetCurAnimLength() + (0.5f / attackSpeed))); //wait aniamtion length + overhead time
+
+
+        //swing attack
+        //Debug.Log("swing attack");
+        a.SetInteger("attackStage", 2);
+        yield return new WaitForSeconds(0.1f); //wait for animation to start
+        for (int i = 0; i < weaponAttackColliders.Length; i++)
+        {
+            //~~~ CHANGE LATER SO ONLY APPROPRIATE COLLIDER IS ENABLED ~~~//
+            EWCMs[i].EnableAttackCheck((GetCurAnimLength()));
+        }
+        AM.Play("Sword_Swing1");
+        yield return new WaitForSeconds(GetCurAnimLength()); //exact animation length
+
+
+        //reset attack
+        //Debug.Log("reset attack");
+        a.SetInteger("attackStage", 3);
+        yield return new WaitForSeconds(0.1f); //wait for animation to start
+        yield return new WaitForSeconds(GetCurAnimLength());
+
+
+        //idle
+        yield return new WaitForSeconds(0.1f); //wait for animation to start
+        //Debug.Log("return to idle");
+        a.SetBool("attacking", false);
+        a.SetInteger("attackStage", 0);
+
+        yield return new WaitForSeconds(0.1f); //wait for animation to start
+        attacking = false; //reset tracker
+
+        Retreat();
     }
-    private void StopPS() { EPS.Stop(); }
     //~~~~~attacking~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
@@ -163,10 +185,11 @@ public abstract class AbstractEnemy : MonoBehaviour
     public void SetSeperationWeight(int newWeight) { seperationWeight = newWeight; }
 
     //retreating
-    [SerializeField] private float retreatSpeed = 5f; //retreat speed
-    public void SetRetreatSpeed(int newSpeed) { retreatSpeed = newSpeed; }
-    [SerializeField] private float retreatTime = 2f; //retreat time
-    public void SetRetreatTime(int newTime) { retreatTime = newTime; }
+    [SerializeField] private bool dodging = false; //dodge tracker
+    [SerializeField] private float dodgeForce = 5f; //dodge force
+    public void SetDodgeForce(int newForce) { dodgeForce = newForce; }
+    [SerializeField] private float dodgeTime = 1f; //dodge time
+    public void SetDodgeTime(int newTime) { dodgeTime = newTime; }
 
     //looking
     [SerializeField] private float lookSensitivity = 2.5f; //enemy looking velocity
@@ -176,7 +199,7 @@ public abstract class AbstractEnemy : MonoBehaviour
 
     private void UpdateEnemyMovement()
     {
-        if(!attacking && isActive)
+        if(!attacking && !dodging && isActive)
         {
             //check if player is within close range
             if(EDCNear.IsPlayerNear())
@@ -186,29 +209,25 @@ public abstract class AbstractEnemy : MonoBehaviour
                 if(!playerNear) { playerNear = true; }
 
                 //begin attack movement
-                if (!attacking) //if not attacking
+                //calc distance between enemy and player
+                float distToPlayer = Vector3.Distance(transform.position, PC.transform.position);
+                //Debug.Log(attackDistance + " / " + distToPlayer);
+
+                //if distance greater than melee distance, move into melee range
+                if (distToPlayer > attackDistance) 
                 {
-                    //calc distance between enemy and player
-                    float distToPlayer = Vector3.Distance(transform.position, PC.transform.position);
-                    //Debug.Log(attackDistance + " / " + distToPlayer);
+                    Vector3 directionToPlayer = (PC.transform.position - transform.position).normalized;
+                    Vector3 seperationForce = CalculateSeperationForce();
+                    Vector3 newMovement = (directionToPlayer + seperationForce).normalized * movementSpeed;
 
-                    //if distance greater than melee distance, move into melee range
-                    if (distToPlayer > attackDistance) 
-                    {
-                        Vector3 directionToPlayer = (PC.transform.position - transform.position).normalized;
-                        Vector3 seperationForce = CalculateSeperationForce();
-                        Vector3 newMovement = (directionToPlayer + seperationForce).normalized * movementSpeed;
-
-                        enemyRigid.velocity = new Vector3(newMovement.x, enemyRigid.velocity.y, newMovement.z);
-                    }
-                    else if(distToPlayer <= attackDistance)
-                    {
-                        Vector3 seperationForce = CalculateSeperationForce();
-                        Vector3 newMovement = new Vector3((seperationForce.x * movementSpeed), enemyRigid.velocity.y, (seperationForce.z * movementSpeed));
-                        enemyRigid.velocity = newMovement;
-                        Attack();
-                        Invoke("Retreat", retreatTime);
-                    }
+                    enemyRigid.velocity = new Vector3(newMovement.x, enemyRigid.velocity.y, newMovement.z);
+                }
+                else if(distToPlayer <= attackDistance)
+                {
+                    Vector3 seperationForce = CalculateSeperationForce();
+                    Vector3 newMovement = new Vector3((seperationForce.x * movementSpeed), enemyRigid.velocity.y, (seperationForce.z * movementSpeed));
+                    enemyRigid.velocity = newMovement;
+                    BeginAttack();
                 }
             }
             else
@@ -260,15 +279,19 @@ public abstract class AbstractEnemy : MonoBehaviour
     
     private void Retreat()
     {
-        enemyRigid.velocity = new Vector3((-enemyRigid.transform.forward.x * retreatSpeed), enemyRigid.velocity.y, (-enemyRigid.transform.forward.z * retreatSpeed));
+        dodging = true;
+        Vector3 dodgeVelocity = ((-enemyRigid.transform.forward * dodgeForce).normalized * (dodgeForce / dodgeTime));
+        enemyRigid.AddForce(dodgeVelocity - enemyRigid.velocity, ForceMode.VelocityChange); //set immediate velocity to calced velocity
+        Invoke("StopDodge", dodgeTime);
     }
+    private void StopDodge() { dodging = false; }
 
 
     private void UpdateEnemyLooking()
     {
         if (!attacking)
         {
-            Vector3 weaponOffset = (enemyRigid.transform.right * -0.5f) + (enemyRigid.transform.up * 0.1f) + (enemyRigid.transform.forward * -0.5f);
+            Vector3 weaponOffset = (enemyRigid.transform.right * -0.5f) + (enemyRigid.transform.up) + (enemyRigid.transform.forward * -0.5f);
             weaponParent.transform.position = ((enemyRigid.transform.position + weaponOffset) + enemyRigid.transform.forward);
             weaponParent.transform.rotation = enemyRigid.transform.rotation;
         }
@@ -279,4 +302,17 @@ public abstract class AbstractEnemy : MonoBehaviour
         enemyRigid.transform.rotation = Quaternion.Lerp(enemyRigid.transform.rotation, targetEnemyRot, Time.deltaTime * lookSensitivity);
     }
     //~~~~~movement~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+    //~~~~~visual feedback~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    [SerializeField] private ParticleSystem EPS;
+    public void MoveEPS(Vector3 hitPos)
+    {
+        EPS.gameObject.transform.position = hitPos;
+        EPS.Play();
+        Invoke("StopPS", 0.5f);
+    }
+    private void StopPS() { EPS.Stop(); }
+    //~~~~~visual feedback~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 }

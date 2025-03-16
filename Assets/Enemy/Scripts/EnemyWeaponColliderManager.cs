@@ -32,7 +32,7 @@ public class EnemyWeaponColliderManager : MonoBehaviour
     private bool hasHitPlayer = false;
     private void OnTriggerEnter(Collider col)
     {
-        //Debug.Log(col.gameObject.name);
+        //Debug.Log(col.gameObject.name + ", " + col.gameObject.tag + ", attacking: " + attacking + ", hit player: " + hasHitPlayer);
         if (attacking && col.gameObject.tag == "Player" && !hasHitPlayer)
         {
             //Debug.Log("player found");

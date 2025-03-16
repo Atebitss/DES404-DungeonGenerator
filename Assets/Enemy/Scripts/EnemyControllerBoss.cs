@@ -6,20 +6,27 @@ public class EnemyControllerBoss : AbstractEnemy
 {    private void Awake()
     {
         //update basic stats
-        health = 20;
-        attackDamage = 1;
-        type = "bossBeserk";
         boss = true;
-        dual = true;
-        Debug.Log("ECB, dual: " + dual);
     }
 
     override public void UpdateBossStates() 
     {
-        switch (type)
+        Debug.Log("UpdateBossStates");
+        int randBossTypeID = Random.Range(0, 0);
+        Debug.Log("randBossTypeID: " + randBossTypeID);
+        switch (randBossTypeID)
         {
-            case "bossBeserk":
+            case 0:
+                type = "bossBeserk";
+                dual = true;
 
+                health = 20;
+                attackDamage = 1;
+                Debug.Log("id: " + randBossTypeID);
+                Debug.Log("type: " + type);
+                Debug.Log("dual: " + dual);
+                Debug.Log("health: " + health);
+                Debug.Log("attackDamage: " + attackDamage);
                 break;
         }
     }

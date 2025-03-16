@@ -285,9 +285,6 @@ MonoBehaviour:
   isActive: 1
   enemyRigid: {fileID: 5759717008156093597}
   a: {fileID: 1935557783522769971}
-  ASM: {fileID: 0}
-  AM: {fileID: 0}
-  PC: {fileID: 0}
   type: 
   boss: 0
   dual: 0
@@ -295,10 +292,11 @@ MonoBehaviour:
   attacking: 0
   attackCooldownTimer: 0
   attackStartTime: 0
-  attackCooldownMax: 2.5
+  attackCooldownMax: 3
   attackDamage: 3
   attackSpeed: 1
   attackDistance: 2
+  attackStage: 0
   weaponParent: {fileID: 7034578543878992195}
   weaponAttackColliders:
   - {fileID: 1701483941685567264}
@@ -306,13 +304,13 @@ MonoBehaviour:
   - {fileID: 6178674796021915901}
   EDCNear: {fileID: 1847250764447816529}
   EDCFar: {fileID: 8692641826929463634}
-  EPS: {fileID: 1802212081214071756}
   movementSpeed: 2
   seperationDistance: 4
   seperationWeight: 3
   retreatSpeed: 5
   retreatTime: 2
   lookSensitivity: 2
+  EPS: {fileID: 1802212081214071756}
 --- !u!82 &5414379114799386796
 AudioSource:
   m_ObjectHideFlags: 0

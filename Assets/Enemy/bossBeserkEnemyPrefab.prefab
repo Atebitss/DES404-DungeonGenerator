@@ -196,7 +196,6 @@ GameObject:
   - component: {fileID: 5613823005629515241}
   - component: {fileID: 5759717008156093597}
   - component: {fileID: 7318853923346722591}
-  - component: {fileID: 7067119043692281086}
   - component: {fileID: 5414379114799386796}
   m_Layer: 7
   m_Name: EnemyCharacter
@@ -286,20 +285,18 @@ MonoBehaviour:
   isActive: 1
   enemyRigid: {fileID: 5759717008156093597}
   a: {fileID: 1935557783522769971}
-  ASM: {fileID: 0}
-  AM: {fileID: 0}
-  PC: {fileID: 0}
   type: 
   boss: 0
   dual: 0
-  health: 10
+  health: 20
   attacking: 0
   attackCooldownTimer: 0
   attackStartTime: 0
-  attackCooldownMax: 2.5
+  attackCooldownMax: 3
   attackDamage: 2
   attackSpeed: 1
   attackDistance: 2.5
+  attackStage: 0
   weaponParent: {fileID: 7034578543878992195}
   weaponAttackColliders:
   - {fileID: 1701483941685567264}
@@ -309,54 +306,14 @@ MonoBehaviour:
   - {fileID: 7684243928832391058}
   EDCNear: {fileID: 1847250764447816529}
   EDCFar: {fileID: 8692641826929463634}
-  EPS: {fileID: 8026072965031143694}
   movementSpeed: 4
   seperationDistance: 2.5
   seperationWeight: 2.5
-  retreatSpeed: 10
-  retreatTime: 2
+  dodging: 0
+  dodgeForce: 5
+  dodgeTime: 1
   lookSensitivity: 5
---- !u!114 &7067119043692281086
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2385460803242839561}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6901c60dd32993b49826f765d7a6fe62, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  isActive: 1
-  enemyRigid: {fileID: 5759717008156093597}
-  a: {fileID: 1935557783522769971}
-  ASM: {fileID: 0}
-  AM: {fileID: 0}
-  PC: {fileID: 0}
-  type: 
-  boss: 0
-  dual: 0
-  health: 20
-  attacking: 0
-  attackCooldownTimer: 0
-  attackStartTime: 0
-  attackCooldownMax: 1
-  attackDamage: 3
-  attackSpeed: 3
-  attackDistance: 2
-  weaponParent: {fileID: 7034578543878992195}
-  weaponAttackColliders: []
-  EWCMs: []
-  EDCNear: {fileID: 1847250764447816529}
-  EDCFar: {fileID: 8692641826929463634}
-  EPS: {fileID: 0}
-  movementSpeed: 3
-  seperationDistance: 5
-  seperationWeight: 5
-  retreatSpeed: 10
-  retreatTime: 1
-  lookSensitivity: 5
+  EPS: {fileID: 8026072965031143694}
 --- !u!82 &5414379114799386796
 AudioSource:
   m_ObjectHideFlags: 0

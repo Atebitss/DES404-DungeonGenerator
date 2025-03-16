@@ -238,6 +238,7 @@ GameObject:
   m_Component:
   - component: {fileID: 357799855}
   - component: {fileID: 357799854}
+  - component: {fileID: 357799856}
   m_Layer: 0
   m_Name: _TestRealmManager
   m_TagString: SceneManager
@@ -267,7 +268,7 @@ MonoBehaviour:
   smallEnemyPrefab: {fileID: 3375864117963020452, guid: 46bfd7227e5fe13448287a98bbe35f7b, type: 3}
   largeEnemtPrefab: {fileID: 3375864117963020452, guid: 73e0bdc0c73c3084d9f86851aacbc54b, type: 3}
   bossBeserkPrefab: {fileID: 3375864117963020452, guid: 8110b73675a7f4247a2368c3a30401c0, type: 3}
-  curTestEnemyPrefab: {fileID: 3375864117963020452, guid: 46bfd7227e5fe13448287a98bbe35f7b, type: 3}
+  curTestEnemyPrefab: {fileID: 3375864117963020452, guid: 8110b73675a7f4247a2368c3a30401c0, type: 3}
 --- !u!4 &357799855
 Transform:
   m_ObjectHideFlags: 0
@@ -283,6 +284,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &357799856
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 357799853}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dad98337c342fc54289699d4435ffa6a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &376707768
 GameObject:
   m_ObjectHideFlags: 0
