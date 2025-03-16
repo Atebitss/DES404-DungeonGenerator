@@ -81,7 +81,7 @@ GameObject:
   - component: {fileID: 6178674796021915901}
   m_Layer: 7
   m_Name: EnemyWeaponColliderL
-  m_TagString: Untagged
+  m_TagString: EnemyWeapon
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -502,7 +502,7 @@ GameObject:
   - component: {fileID: 7684243928832391058}
   m_Layer: 7
   m_Name: EnemyWeaponColliderR
-  m_TagString: Untagged
+  m_TagString: EnemyWeapon
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyContollerBoss : AbstractEnemy
+public class EnemyControllerBoss : AbstractEnemy
 {    private void Awake()
     {
         //update basic stats

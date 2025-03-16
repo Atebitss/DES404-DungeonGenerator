@@ -8,9 +8,10 @@ public abstract class AbstractEnemy : MonoBehaviour
     [SerializeField] private Rigidbody enemyRigid; //enemy rigidbody used for physics interactions
     [SerializeField] private Animator a; //player animator used for running animations
 
-    [HideInInspector] public AbstractSceneManager ASM;
-    [HideInInspector] public AudioManager AM;
-    [HideInInspector] public PlayerController PC;
+    private AbstractSceneManager ASM;
+    private AdaptiveDifficultyManager ADM;
+    private AudioManager AM;
+    private PlayerController PC;
 
 
     private float GetCurAnimLength()
@@ -31,11 +32,13 @@ public abstract class AbstractEnemy : MonoBehaviour
     {
         ASM = GameObject.FindWithTag("SceneManager").GetComponent<AbstractSceneManager>();
         AM = ASM.GetAudioManager();
+        ADM = ASM.GetComponent<AdaptiveDifficultyManager>();
         PC = ASM.GetPlayerController();
         for (int i = 0; i < weaponAttackColliders.Length; i++)
         {
             EWCMs[i].SetAM(AM);
             EWCMs[i].SetWeaponDamage(attackDamage);
+            if (ADM != null) { EWCMs[i].SetADM(ADM); }
         }
         //Debug.Log("AE.setBool, dual: " + dual);
         if (boss) { a.SetBool("dual", dual); }

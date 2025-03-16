@@ -24,6 +24,11 @@ public class AbstractSceneManager : MonoBehaviour
     public DungeonGeneration GetDG() { if (DG != null) { return DG; } return null; }
     private PathGeneration PG;
     public PathGeneration GetPG() { if (PG != null) { return PG; } return null; }
+    private AdaptiveDifficultyManager ADM;
+    public AdaptiveDifficultyManager GetADM() { if (ADM != null) { return ADM; } return null; }
+    private AdaptiveDifficultyDisplayManager ADDM;
+    public void SetADDM(AdaptiveDifficultyDisplayManager newADDM) { ADDM = newADDM; }
+    public AdaptiveDifficultyDisplayManager GetADDM() { if (ADDM != null) { return ADDM; } return null; }
 
 
 
@@ -47,6 +52,8 @@ public class AbstractSceneManager : MonoBehaviour
         player = Instantiate(playerPrefab, pos, Quaternion.identity);
         Debug.Log(player.name);
         PC = player.transform.GetChild(0).gameObject.GetComponent<PlayerController>();
+        SetADDM(PC.GetADDM());
+        ADM.Wake();
     }
     public void DestroyPlayer()
     {
@@ -73,7 +80,6 @@ public class AbstractSceneManager : MonoBehaviour
         int index = existingCount;
         newEnemyObjects[index] = Instantiate(enemy, position, Quaternion.identity);
 
-        newEnemyObjects[index].transform.GetChild(0).GetComponent<AbstractEnemy>().ASM = this;
         if (!newEnemyObjects[index].name.Contains("boss")) { newEnemyObjects[index].name = "Enemy" + index; }
         else { newEnemyObjects[index].name = "Boss" + enemy.transform.GetChild(0).GetComponent<AbstractEnemy>().type; }
 
@@ -93,7 +99,6 @@ public class AbstractSceneManager : MonoBehaviour
             int index = existingCount + i;
             newEnemyObjects[index] = Instantiate(enemies[i], positions[i], Quaternion.identity);
 
-            newEnemyObjects[index].transform.GetChild(0).GetComponent<AbstractEnemy>().ASM = this;
             if (!newEnemyObjects[index].name.Contains("boss")) { newEnemyObjects[index].name = "Enemy" + index; }
             else { newEnemyObjects[index].name = "Boss" + newEnemyObjects[index].GetComponent<AbstractEnemy>().type; }
         }
@@ -157,6 +162,7 @@ public class AbstractSceneManager : MonoBehaviour
         MG = this.gameObject.GetComponent<MapGeneration>();
         DG = this.gameObject.GetComponent<DungeonGeneration>();
         PG = this.gameObject.GetComponent<PathGeneration>();
+        ADM = this.gameObject.GetComponent<AdaptiveDifficultyManager>();
     }
 
     public void EndFloor()

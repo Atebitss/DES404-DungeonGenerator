@@ -7,10 +7,12 @@ public class EnemyWeaponColliderManager : MonoBehaviour
     private bool attacking = false;
     private int attackDamage = 1;
     private AudioManager AM;
+    private AdaptiveDifficultyManager ADM;
 
 
     public void SetWeaponDamage(int newDamage) { attackDamage = newDamage; }
     public void SetAM(AudioManager newAM) { AM = newAM; }
+    public void SetADM(AdaptiveDifficultyManager newADM) { ADM = newADM; }
 
 
     public void EnableAttackCheck(float attackAnimDur)

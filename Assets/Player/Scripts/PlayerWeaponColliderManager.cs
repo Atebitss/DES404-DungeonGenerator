@@ -8,12 +8,14 @@ public class PlayerWeaponColliderManager : MonoBehaviour
     private int attackDamage = 1;
     private GameObject[] colObjs = new GameObject[0];
     private AudioManager AM;
+    private AdaptiveDifficultyManager ADM;
     private ParticleSystem PS;
 
 
     public void SetHitParticle(ParticleSystem newPS) { PS = newPS; }
     public void SetWeaponDamage(int newDamage) { attackDamage = newDamage; }
     public void SetAM(AudioManager newAM) { AM = newAM; }
+    public void SetADM(AdaptiveDifficultyManager newADM) { ADM = newADM; }
 
 
     public void EnableAttackCheck(float attackAnimDur)
@@ -39,6 +41,7 @@ public class PlayerWeaponColliderManager : MonoBehaviour
             col.gameObject.GetComponent<AbstractEnemy>().MoveEPS(col.ClosestPoint(transform.position));
             AM.Play("Sword_Hit" + Random.Range(1, 3));
             PS.Play();
+            ADM.AttackSuccess();
             Invoke("StopPS", 0.5f);
         }
     }

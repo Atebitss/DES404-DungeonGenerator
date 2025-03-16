@@ -6,7 +6,7 @@ using UnityEngine;
 public class DbugDisplayManager : MonoBehaviour
 {
     //text
-    [SerializeField] private TMP_Text DbugText;
+    [SerializeField] private TMP_Text dbugText;
 
     //player world space
     public bool playerJumping = false, playerGrounded = false;
@@ -51,7 +51,7 @@ public class DbugDisplayManager : MonoBehaviour
     private void FixedUpdate() { UpdateDisplayText(); }
     private void UpdateDisplayText()
     {
-        DbugText.text =
+        dbugText.text =
             "Jumping: " + playerJumping +
             "   Grounded: " + playerGrounded +
             "\nPosition: " + playerPosition +
@@ -73,7 +73,6 @@ public class DbugDisplayManager : MonoBehaviour
             "   Combo Timer: " + playerLightAttackComboTimer +
             "/Combo Start: " + playerLightAttackComboStartTime +
             "\nInvincible: " + playerInvincible +
-            "   Invincible Timer: " + playerInvincibilityTimer +
-            "/Invincible Start: " + playerInvincibilityStartTime;
+            "   Invincible Timer: " + playerInvincibilityTimer;
     }
 }

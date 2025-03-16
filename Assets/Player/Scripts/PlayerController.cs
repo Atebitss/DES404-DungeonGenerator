@@ -19,17 +19,23 @@ public class PlayerController : MonoBehaviour
     private AbstractSceneManager ASM; //scene manager
     private AudioManager AM; //audio manager
     private DbugDisplayManager DDM; //debug manager
+    private AdaptiveDifficultyManager ADM; //adaptive difficulty manager
+    private AdaptiveDifficultyDisplayManager ADDM; //adaptive difficulty display manager
+    public AdaptiveDifficultyDisplayManager GetADDM() { return ADDM; }
 
 
 
-    private void Start()
+    private void Awake()
     {
         ASM = GameObject.FindWithTag("SceneManager").GetComponent<AbstractSceneManager>();
         AM = ASM.GetAudioManager();
+        ADM = ASM.GetComponent<AdaptiveDifficultyManager>();
         DDM = this.gameObject.transform.parent.GetChild(1).GetComponent<DbugDisplayManager>();
+        ADDM = this.gameObject.transform.parent.GetChild(1).GetComponent<AdaptiveDifficultyDisplayManager>();
 
         PWCM.SetWeaponDamage(attackDamage);
         PWCM.SetAM(AM);
+        if (ADM != null) { PWCM.SetADM(ADM); }
         PWCM.SetHitParticle(PPS);
 
         maxHealthBarWidth = healthBarRect.sizeDelta.x;
@@ -163,8 +169,9 @@ public class PlayerController : MonoBehaviour
         dodgeStartTime = Time.time; //remember time when dodge started
         dodgeCooldownTimer = dodgeCDMax; //set cooldown timer
         dodging = true; //set tracker to true
-        //
         //Debug.Log("Dodge start");
+
+        if (ADM != null) { ADM.DodgeRan(); } //update adaptive difficulty
 
         MakePlayerInvincible(dodgeDuration);
 
@@ -205,6 +212,16 @@ public class PlayerController : MonoBehaviour
         }
 
         if (dodgeCooldownTimer > 0) { dodgeCooldownTimer -= Time.deltaTime; } //count down cooldown
+    }
+    private void OnTriggerEnter(Collider col)
+    {
+        if (dodging)
+        {
+            if (col.gameObject.tag == "EnemyWeapon")
+            {
+                if (ADM != null) { ADM.DodgeSuccess(); } //update adaptive difficulty
+            }
+        }
     }
 
 
@@ -280,6 +297,9 @@ public class PlayerController : MonoBehaviour
             lightAttackComboStartTime = Time.time; //track when last combo hit started
 
 
+            if (ADM != null) { ADM.AttackRan(); } //update adaptive difficulty
+
+
             //switch depending on combo
             if (lightAttackComboCounter == 0) { AM.Play("Sword_Swing1"); }
             else if (lightAttackComboCounter == 1) { AM.Play("Sword_Swing2"); }
@@ -298,6 +318,7 @@ public class PlayerController : MonoBehaviour
             if (lightAttackComboCounter == 3) 
             {
                 Invoke("ResetLightAttackAnimInt", (lightAttackAnimLength - 0.1f));
+                ADM.ComboPerformed();
             }
         }
     }
@@ -325,6 +346,8 @@ public class PlayerController : MonoBehaviour
                 lightAttackComboTimer = 0;
                 a.SetInteger("lightSwingCombo", lightAttackComboCounter);
             }
+
+            if (ADM != null) { ADM.AttackRan(); } //update adaptive difficulty
 
             //Debug.Log("play heavy attack");
             AM.Play("Sword_SwingCleave");
@@ -473,7 +496,7 @@ public class PlayerController : MonoBehaviour
 
     //health points
     public void SetCurrentHealthPoints(int newHealth) { if (!invincible) { Debug.Log("setting health: " + newHealth); healthPointsCurrent = newHealth; HealthCheck(); UpdateHealthBar(); } }
-    public void AlterCurrentHealthPoints(int alter) { if(!invincible) { Debug.Log("altering health: " + alter); healthPointsCurrent += alter; HealthCheck(); UpdateHealthBar(); } }
+    public void AlterCurrentHealthPoints(int alter) { if(!invincible) { Debug.Log("altering health: " + alter); healthPointsCurrent += alter; HealthCheck(); UpdateHealthBar(); ADM.DamageTaken(); } }
     public int GetCurrentHealthPoints() { return healthPointsCurrent; }
     private void HealthCheck() { if (healthPointsCurrent <= 0) { Debug.Log("health check: " + healthPointsCurrent); UpdateHealthBar(); ASM.DestroyPlayer(); } }
 

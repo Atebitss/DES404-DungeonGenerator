@@ -13,6 +13,7 @@ public class RoomGeneration : MonoBehaviour
     private AbstractSceneManager ASM;
     private MapGeneration MG;
     private RoomColliderManager RCM;
+    private AdaptiveDifficultyManager ADM;
     //~~~~~misc~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
@@ -39,6 +40,12 @@ public class RoomGeneration : MonoBehaviour
                 //open doors locked pre combat
                 if (doorClosedPreCombat != null) { doorClosedPreCombat.transform.GetChild(0).transform.GetChild(0).GetComponent<AbstractDoorScript>().InteractWithDoor(); }
                 running = false;
+
+                if (ADM != null) 
+                {
+                    ADM.RoomCleared();
+                    ADM.RunDifficultyAdapter(); 
+                }
             }
         }
     }
@@ -108,7 +115,8 @@ public class RoomGeneration : MonoBehaviour
         this.literalPosition = literalPosition;
 
         ASM = GameObject.Find("SceneManager").gameObject.GetComponent<AbstractSceneManager>();
-        MG = GameObject.Find("SceneManager").gameObject.GetComponent<MapGeneration>();
+        MG = ASM.gameObject.GetComponent<MapGeneration>();
+        ADM = ASM.gameObject.GetComponent<AdaptiveDifficultyManager>();
 
         //set tile x & z offsets
         tileXOffset = dbugFloorTile.transform.localScale.x;
@@ -343,7 +351,10 @@ public class RoomGeneration : MonoBehaviour
     {
         yield return new WaitForSeconds(0.25f); //wait for player to enter room
         //Debug.Log("playerInRoom: " + playerInRoom + ", entered: " + entered);
-        if(playerInRoom && !entered)
+
+        if (ASM.GetADDM() != null) { ASM.GetADDM().currentDifficulty = roomDifficulty; }
+
+        if (playerInRoom && !entered)
         {
             //if player is in room and room is not entered, start appropriate room event
             Debug.Log("roomType: " + roomType);
@@ -371,6 +382,9 @@ public class RoomGeneration : MonoBehaviour
             curADS.LockDoor();
         }
 
+        //start adaptive difficulty stat watcher
+        if (ADM != null) { ADM.StartStatWatch(this); }
+
         //generate enemies
         GenerateEnemies();
     }
@@ -390,6 +404,9 @@ public class RoomGeneration : MonoBehaviour
             if (curADS.GetIsOpen()) { doorClosedPreCombat = doorObjects[doorIndex]; }
             curADS.LockDoor();
         }
+
+        //start adaptive difficulty stat watcher
+        if (ADM != null) { ADM.StartStatWatch(this); }
 
         //generate boss
         GenerateBoss();
@@ -428,6 +445,12 @@ public class RoomGeneration : MonoBehaviour
 
 
     //~~~~~enemies~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //adaptive difficulty
+    [SerializeField] private int roomDifficulty = 0;
+    public void SetRoomDifficulty(int newDifficulty) { roomDifficulty = newDifficulty; }
+    [SerializeField] private float playerSkillScore = 0f;
+    public void SetPlayerSkillScore(float newScore) { playerSkillScore = newScore; }
+
     //enemy info
     [SerializeField] private bool bossRoom = false;
     [SerializeField] private int enemyMin = 4, enemyMax = 7;
