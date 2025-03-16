@@ -8,6 +8,7 @@ using TMPro;
 public class MapGeneration : MonoBehaviour
 {
     //relevant scripts
+    private AbstractSceneManager ASM;
     private DungeonGeneration DG;
     private PathGeneration PG;
 
@@ -25,10 +26,10 @@ public class MapGeneration : MonoBehaviour
     [Header("Debug Settings")]
     [SerializeField] private bool dbugEnabled = false;
     [SerializeField] private bool showDbugTiles = false;
-    public bool isDbugEnabled() { return dbugEnabled; }
+    public bool IsDbugEnabled() { return dbugEnabled; }
 
     [SerializeField] private bool visualDemo = false;
-    public bool isVisualEnabled() { return visualDemo; }
+    public bool IsVisualEnabled() { return visualDemo; }
 
 
     [Header("Debug Materials")]
@@ -62,7 +63,8 @@ public class MapGeneration : MonoBehaviour
 
     public void ResetMap()
     {
-        Debug.Log("MG, Reset Map");
+        //Debug.Log("MG, Reset Map");
+        if (dbugEnabled) { UpdateHUDDbugText("Dungeon Generation: Resetting Map"); }
 
         if (dbugEnabled && showDbugTiles)
         {
@@ -92,29 +94,32 @@ public class MapGeneration : MonoBehaviour
 
 
 
-    private void Awake() 
+    private void Start()
     {
-        Debug.Log("MG Awake");
+        if (dbugEnabled) { UpdateHUDDbugText("Map Generation: Starting"); }
+        //Debug.Log("MG Awake");
 
         //set up references
-        DG = this.gameObject.GetComponent<DungeonGeneration>();
-        PG = this.gameObject.GetComponent<PathGeneration>();
+        ASM = this.gameObject.GetComponent<AbstractSceneManager>();
+        DG = ASM.GetDG();
+        PG = ASM.GetPG();
     }
     
     public void RegenerateDungeon()
     {
-        Debug.Log("MG, Regenerating Dungeon");
+        if (dbugEnabled) { UpdateHUDDbugText("Map Generation: Regenerating"); }
+        //Debug.Log("MG, Regenerating Dungeon");
 
         //prime & begin generation
-        ResetMap();
         BeginMapGeneration(); 
     }
 
     private void BeginMapGeneration()
     {
-        Debug.Log("MG, Beginning Map Generation");
+        if (dbugEnabled) { UpdateHUDDbugText("Map Generation: Beginning"); }
+        //Debug.Log("MG, Beginning Map Generation");
 
-        Debug.Log("New dungeon generation: " + genAttempts);
+        //Debug.Log("New dungeon generation: " + genAttempts);
         genAttempts++;
 
         //generate dungeon area & fill space
@@ -125,12 +130,13 @@ public class MapGeneration : MonoBehaviour
         defaultCamera.transform.position = new Vector3((boundsX / 2), (((boundsX / 2) + (boundsZ / 2)) * 0.8f), (boundsZ / 2));
 
         //begin dungeon generation within bounds
-        if(genAttempts > 1) { DG.ResetDungeon(); }
+        //if(genAttempts > 1) { ASM.RestartScene(); }
         DG.BeginDungeonGeneration(treasureRoomsMax, treasureRoomsMin, specialRoomsMax, specialRoomsMin, boundsX, boundsZ, totalSpace, gridPositions);
     }
     private void DefineBounds()
     {
-        Debug.Log("MG, Defining Dungeon Bounds");
+        if (dbugEnabled) { UpdateHUDDbugText("Map Generation: Defining Bounds"); }
+        //Debug.Log("MG, Defining Dungeon Bounds");
 
         //define dungeon area
         boundsZ = Random.Range(mapBoundsMin, mapBoundsMax);   //z extent
@@ -141,7 +147,8 @@ public class MapGeneration : MonoBehaviour
     }
     private void DefineGrid()
     {
-        Debug.Log("MG, Defining Dungeon Grid");
+        if (dbugEnabled) { UpdateHUDDbugText("Map Generation: Defining Grid"); }
+        //Debug.Log("MG, Defining Dungeon Grid");
 
         //fill dungeon area with grid
         gridStates = new string[boundsX, boundsZ];      //states of grid positions

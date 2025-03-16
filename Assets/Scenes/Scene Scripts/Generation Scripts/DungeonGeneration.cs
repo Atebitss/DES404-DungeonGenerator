@@ -84,7 +84,7 @@ public class DungeonGeneration : MonoBehaviour
         PG = this.gameObject.GetComponent<PathGeneration>();
         ASM = this.gameObject.GetComponent<AbstractSceneManager>();
 
-        if (dbugEnabled) { MG.UpdateHUDDbugText("DG, Awake"); }
+        if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Awake"); }
         dungeonType = "Bandit";//dungeonTypes[Random.Range(0, 2)];
 
         //initialise dungeon & room types
@@ -96,7 +96,7 @@ public class DungeonGeneration : MonoBehaviour
     private void InitialiseDungeonTypes()
     {
         //sets up possible dungeon types
-        if (dbugEnabled) { MG.UpdateHUDDbugText("DG, Initialising Room Types"); }
+        if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Initialising Room Types"); }
 
         //add type of dungeon and allowed room IDs
         switch (dungeonType)
@@ -245,10 +245,10 @@ public class DungeonGeneration : MonoBehaviour
     {
         if (roomPositions != null)
         {
-            if (dbugEnabled) { MG.UpdateHUDDbugText("DG, Reset Dungeon"); }
+            if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Resetting Dungeon"); }
 
             //clear the room objects
-            for (int i = 0; i < numOfRooms; i++) { if (roomObjects[i] != null) { Destroy(roomObjects[i]); } }
+            for (int i = 0; i < roomObjects.Length; i++) { if (roomObjects[i] != null) { Destroy(roomObjects[i]); } }
 
             //reset room positions and bounds
             roomPositions = new Vector2[0];
@@ -305,18 +305,16 @@ public class DungeonGeneration : MonoBehaviour
     }
     private IEnumerator GenerateDungeon()
     {
-        if (dbugEnabled) { MG.UpdateHUDDbugText("DG, Generating Dungeon"); }
+        if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Generating " + dungeonType + " Dungeon"); }
 
         //choose dungeon type (will be influenced elsewhere later)
-        if (dbugEnabled) { MG.UpdateHUDDbugText("dungeon type: " + dungeonType); }
 
         DetermineNumOfRooms(); //calclulate number of possible rooms
 
         yield return StartCoroutine(PlotRooms()); //place rooms within dungeon area
 
         ReinitialiseWithNewLimit(); //reset arrays with placed rooms
-        if (dbugEnabled) { MG.UpdateHUDDbugText("L: " + largeRoomNum + ", M: " + mediumRoomNum + ", S: " + smallRoomNum + ", TOTAL: " + (largeRoomNum + mediumRoomNum + smallRoomNum) + "/" + numOfRooms); }
-        //Debug.Log("L: " + largeRoomNum + ", M: " + mediumRoomNum + ", S: " + smallRoomNum + ", TOTAL: " + (largeRoomNum + mediumRoomNum + smallRoomNum) + "/" + numOfRooms);
+        if (dbugEnabled) { MG.UpdateHUDDbugText("L: " + largeRoomNum + ", M: " + mediumRoomNum + ", S: " + smallRoomNum + ", TOTAL: " + numOfRooms + "/" + (largeRoomNum + mediumRoomNum + smallRoomNum)); }
         //yield return new WaitForSeconds(50f);
 
         yield return StartCoroutine(DefineImportantRooms()); //sets room types to unique & reward types
@@ -330,27 +328,26 @@ public class DungeonGeneration : MonoBehaviour
         yield return StartCoroutine(PG.CreateHallways()); //create hallways
 
         //spawn player
-        ASM.SpawnPlayer(new Vector3(entryRoomCenter.x, 0.1f, entryRoomCenter.y));
-        currentPlayer = ASM.GetPlayerObject();
+        //ASM.SpawnPlayer(new Vector3(entryRoomCenter.x, 0.1f, entryRoomCenter.y));
+        //currentPlayer = ASM.GetPlayerObject();
 
-        //yield return new WaitForSeconds(1f);
-        //MG.RegenerateDungeon();
+        yield return new WaitForSeconds(5f);
+        ASM.RestartScene();
 
         //if (currentPlayer == null) { currentPlayer = Instantiate(playerPrefab, new Vector3(entryRoomCenter.x, 0, entryRoomCenter.y), Quaternion.identity); }
 
-        if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon generation complete"); }
+        if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Generation Complete"); }
     }
 
 
 
     private void DetermineNumOfRooms()
     {
-        if (dbugEnabled) { MG.UpdateHUDDbugText("DG, Defining Initial Number Of Rooms"); }
+        if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Calculating Number of Rooms"); }
 
         //determine number of rooms to be spawned
         posNumOfRooms = Random.Range(((totalSpace / boundsX) / 2), ((totalSpace / boundsZ) / 2));
         //numOfRooms = 5;
-        if (dbugEnabled) { MG.UpdateHUDDbugText("number of rooms to spawn: " + posNumOfRooms); }
 
         //number of X sized rooms based on a percentage of possible number of rooms to be spawned
         float tempLargeRoomNum = ((float)posNumOfRooms / 100) * 15; //large rooms = 15% of map
@@ -360,11 +357,9 @@ public class DungeonGeneration : MonoBehaviour
         mediumRoomNum = (int)tempMediumRoomNum;
         smallRoomNum = (int)tempSmallRoomNum;
         if (smallRoomNum > (largeRoomNum + mediumRoomNum)) { smallRoomNum = (largeRoomNum + mediumRoomNum - 1); }
-        if (dbugEnabled) { MG.UpdateHUDDbugText("large: " + largeRoomNum + ", medium: " + mediumRoomNum + ", small: " + smallRoomNum); }
 
         numOfRooms = largeRoomNum + mediumRoomNum + smallRoomNum; //total number of possible rooms
-        if (dbugEnabled) { MG.UpdateHUDDbugText("new number of rooms to spawn: " + numOfRooms); }
-        Debug.Log("L: " + largeRoomNum + ", M: " + mediumRoomNum + ", S: " + smallRoomNum + ", TOTAL: " + (largeRoomNum + mediumRoomNum + smallRoomNum) + "/" + numOfRooms);
+        //Debug.Log("L: " + largeRoomNum + ", M: " + mediumRoomNum + ", S: " + smallRoomNum + ", TOTAL: " + (largeRoomNum + mediumRoomNum + smallRoomNum) + "/" + numOfRooms);
 
         //update arrays to reflect new number of rooms
         roomPositions = new Vector2[numOfRooms];
@@ -375,7 +370,7 @@ public class DungeonGeneration : MonoBehaviour
         roomStates = new string[numOfRooms];
         roomScales = new string[numOfRooms];
         roomCenters = new Vector2[numOfRooms];
-        if (dbugEnabled) { MG.UpdateHUDDbugText("largest possible size of rooms: " + totalSpace / posNumOfRooms); }
+        //if (dbugEnabled) { MG.UpdateHUDDbugText("largest possible size of rooms: " + totalSpace / posNumOfRooms); }
     }
 
 
@@ -391,18 +386,19 @@ public class DungeonGeneration : MonoBehaviour
         ~ update cells
         */
 
-        if (dbugEnabled) { MG.UpdateHUDDbugText("DG, Plot Room Positions"); }
+        if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Plotting Rooms"); }
 
 
         //for each room
         for (int roomSpawnAttempts = 0; roomSpawnAttempts < numOfRooms; roomSpawnAttempts++)
         {
             //plot room positions within grid
-            if (dbugEnabled) { MG.UpdateHUDDbugText("room " + curRoomsSpawned + ", " + roomSpawnAttempts + "/" + numOfRooms); }
+            if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: "); }
+            if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Plotting Room " + curRoomsSpawned + "/" + numOfRooms); }
 
             if (scale == 2) //large rooms
             {
-                if (dbugEnabled) { MG.UpdateHUDDbugText("large: " + curRoomsSpawned + "/" + largeRoomNum); }
+                if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Plotting Room " + curRoomsSpawned + "/" + numOfRooms + ", Large"); }
 
                 //define room bounds
                 //roomBoundsX[curRoomsSpawned] = Random.Range(((boundsX / 2) / 2), ((boundsX / 2) / 3)); //x length will be between 1/4 & 1/6 (ie. 30)
@@ -413,7 +409,7 @@ public class DungeonGeneration : MonoBehaviour
             else if (scale == 1) //medium rooms
             {
                 //break;
-                if (dbugEnabled) { MG.UpdateHUDDbugText("medium: " + (curRoomsSpawned - largeRoomNum) + "/" + mediumRoomNum); }
+                if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Plotting Room " + curRoomsSpawned + "/" + numOfRooms + ", Medium"); }
 
                 //define room bounds
                 //roomBoundsX[curRoomsSpawned] = Random.Range(((boundsX / 2) / 4), ((boundsX / 2) / 5)); //x length will be between 1/8 & 1/10 (ie. 16)
@@ -424,7 +420,7 @@ public class DungeonGeneration : MonoBehaviour
             else if (scale == 0) //small rooms
             {
                 //break;
-                if (dbugEnabled) { MG.UpdateHUDDbugText("small: " + (curRoomsSpawned - (largeRoomNum + mediumRoomNum)) + "/" + smallRoomNum); }
+                if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Plotting Room " + curRoomsSpawned + "/" + numOfRooms + ", Small"); }
 
                 //define room bounds
                 //roomBoundsX[curRoomsSpawned] = Random.Range(((boundsX / 2) / 6), ((boundsX / 2) / 7)); //x length will be between 1/12 & 1/14 (ie. 11)
@@ -436,7 +432,7 @@ public class DungeonGeneration : MonoBehaviour
             }
             else 
             {
-                if (dbugEnabled) { MG.UpdateHUDDbugText("scale past room gen"); }
+                //if (dbugEnabled) { MG.UpdateHUDDbugText("scale past room gen"); }
                 break; 
             } //no rooms found
 
@@ -445,14 +441,14 @@ public class DungeonGeneration : MonoBehaviour
             bool placed = false;
             while (attempts < maxAttempts) //while spawn tried less than 3 times
             {
-                if (dbugEnabled) { MG.UpdateHUDDbugText("placement attempt " + attempts); }
+                if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Plotting Room " + curRoomsSpawned + "/" + numOfRooms + ", try " + attempts); }
 
                 //generate room positions
                 if (scale == 0) //if making small rooms, find positions adjacent to large or medium rooms
                 {
                     int targetRoomID = curRoomsSpawned - (largeRoomNum + mediumRoomNum); //target room is always equal to number of rooms - (number of rooms - 1)
                     int wallSide = Random.Range(0, 4); //used to decide what edge of the parent room that the new small room will attach to
-                    if (dbugEnabled) { MG.UpdateHUDDbugText("(" + largeRoomNum + " + " + mediumRoomNum + ") - " + curRoomsSpawned + " = " + targetRoomID); }
+                    //if (dbugEnabled) { MG.UpdateHUDDbugText("(" + largeRoomNum + " + " + mediumRoomNum + ") - " + curRoomsSpawned + " = " + targetRoomID); }
 
                     switch (wallSide)
                     {
@@ -477,7 +473,7 @@ public class DungeonGeneration : MonoBehaviour
                     }
 
                     //visual wait update
-                    if (MG.isVisualEnabled()) { yield return new WaitForSeconds(.1f); }
+                    if (MG.IsVisualEnabled()) { yield return new WaitForSeconds(.1f); }
                     else { yield return null; }
                 }
                 else //if making large or medium rooms, find a random position within dungeon area without allowing the new room to pass the area bounds
@@ -489,7 +485,7 @@ public class DungeonGeneration : MonoBehaviour
                 //if the room doesnt over lap another and has distance from other rooms
                 if (AreCellsUnoccupied(roomPosX[curRoomsSpawned], roomPosZ[curRoomsSpawned], roomBoundsX[curRoomsSpawned], roomBoundsZ[curRoomsSpawned]) && !AreNeighboursClose(roomPosX[curRoomsSpawned], roomPosZ[curRoomsSpawned], roomBoundsX[curRoomsSpawned], roomBoundsZ[curRoomsSpawned], scale))
                 {
-                    if (dbugEnabled) { MG.UpdateHUDDbugText("first try grid pos' clear, creating room @ " + gridPositions[roomPosX[curRoomsSpawned], roomPosZ[curRoomsSpawned]]); }
+                    //if (dbugEnabled) { MG.UpdateHUDDbugText("first try grid pos' clear, creating room @ " + gridPositions[roomPosX[curRoomsSpawned], roomPosZ[curRoomsSpawned]]); }
                     roomPositions[curRoomsSpawned] = new Vector2(gridPositions[roomPosX[curRoomsSpawned], roomPosZ[curRoomsSpawned]].x, gridPositions[roomPosX[curRoomsSpawned], roomPosZ[curRoomsSpawned]].y);
                     //set new room location
                     break;
@@ -515,14 +511,14 @@ public class DungeonGeneration : MonoBehaviour
                                 //update room position
                                 roomPosX[curRoomsSpawned] = newPosX;
                                 roomPosZ[curRoomsSpawned] = newPosZ;
-                                if (dbugEnabled) { MG.UpdateHUDDbugText("retry grid pos' clear, creating room @ " + gridPositions[roomPosX[curRoomsSpawned], roomPosZ[curRoomsSpawned]]); }
+                                //if (dbugEnabled) { MG.UpdateHUDDbugText("retry grid pos' clear, creating room @ " + gridPositions[roomPosX[curRoomsSpawned], roomPosZ[curRoomsSpawned]]); }
                                 roomPositions[curRoomsSpawned] = new Vector2(gridPositions[roomPosX[curRoomsSpawned], roomPosZ[curRoomsSpawned]].x, gridPositions[roomPosX[curRoomsSpawned], roomPosZ[curRoomsSpawned]].y);
                                 
                                 //set room location
                                 placed = true;
                                 
                                 //visual wait update
-                                if (MG.isVisualEnabled()) { yield return new WaitForSeconds(.1f); }
+                                if (MG.IsVisualEnabled()) { yield return new WaitForSeconds(.1f); }
                                 else { yield return null; }
 
                                 break;
@@ -576,18 +572,18 @@ public class DungeonGeneration : MonoBehaviour
                     roomPositions[curRoomsSpawned] = new Vector2(roomPosX[curRoomsSpawned], roomPosZ[curRoomsSpawned]);
 
                     //visual wait update
-                    if (MG.isVisualEnabled()) { yield return new WaitForSeconds(.1f); }
+                    if (MG.IsVisualEnabled()) { yield return new WaitForSeconds(.1f); }
                     else { yield return null; }
                 }
             }
 
             //once out of loop, either due to finding a valid space or running out of tries
             //Debug.Log(attempts + " v " + maxAttempts);
-            if (attempts == maxAttempts) { if (dbugEnabled) { MG.UpdateHUDDbugText("room" + curRoomsSpawned + " removed"); } }
+            if (attempts == maxAttempts) { if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Removing Room " + curRoomsSpawned + "/" + numOfRooms); } }
             if (attempts != maxAttempts)
             {
                 //update grid states
-                if (dbugEnabled) { MG.UpdateHUDDbugText("room" + curRoomsSpawned + " added @ x" + roomPosX[curRoomsSpawned] + ", z" + roomPosZ[curRoomsSpawned]); }
+                if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Spawning Room " + curRoomsSpawned + "/" + numOfRooms); }
                 for (int x = roomPosX[curRoomsSpawned]; x < (roomPosX[curRoomsSpawned] + roomBoundsX[curRoomsSpawned]); x++)
                 {
                     for (int z = roomPosZ[curRoomsSpawned]; z < (roomPosZ[curRoomsSpawned] + roomBoundsZ[curRoomsSpawned]); z++)
@@ -595,7 +591,7 @@ public class DungeonGeneration : MonoBehaviour
                         //for each tile covered by the room 
                         if (dbugEnabled)
                         {
-                            MG.UpdateHUDDbugText("grid pos @ X: " + x + ", Z: " + z + " is now part of room" + curRoomsSpawned);
+                            //MG.UpdateHUDDbugText("grid pos @ X: " + x + ", Z: " + z + " is now part of room" + curRoomsSpawned);
                             MG.UpdateDbugTileTextGridState(x, z, "Room");
                             MG.UpdateDbugTileMat(x, z, "Room");
                         }
@@ -623,93 +619,91 @@ public class DungeonGeneration : MonoBehaviour
                 roomCenters[curRoomsSpawned] = new Vector2(roomPosX[curRoomsSpawned] + (roomBoundsX[curRoomsSpawned] / 2), roomPosZ[curRoomsSpawned] + (roomBoundsZ[curRoomsSpawned] / 2));
                 //find and set room center
                 curRoomsSpawned++; //iterate loop to next room
-                if (MG.isVisualEnabled()) { yield return new WaitForSeconds(.1f); }
+                if (MG.IsVisualEnabled()) { yield return new WaitForSeconds(.1f); }
                 else { yield return null; }
             }
 
 
             //after each room being created
-            if (dbugEnabled) { MG.UpdateHUDDbugText("current room spawn attempts: " + roomSpawnAttempts); }
+            //if (dbugEnabled) { MG.UpdateHUDDbugText("current room spawn attempts: " + roomSpawnAttempts); }
             if (roomSpawnAttempts == (largeRoomNum - 1))
             {
                 //if the number of rooms attempted to spawn is equal to the total number of large rooms
                 largeRoomNum = curRoomsSpawned; //update total number of large rooms
-                if (dbugEnabled) { MG.UpdateHUDDbugText("large rooms plotted"); }
+                if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Plotted Large Rooms"); }
 
                 //begin updating grid states with room edges
                 yield return StartCoroutine(DefineWalls());
-                //if (dbugEnabled) { MG.UpdateHUDDbugText("large rooms walled"); }
+                if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Walled Large Rooms"); }
 
                 //begin updating grid states with hallways between rooms
                 yield return StartCoroutine(DefineHallways());
-                //if (dbugEnabled) { MG.UpdateHUDDbugText("large rooms hallwayed"); }
+                if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Connected Large Rooms"); }
 
                 //after spawning every large room, lower scale to medium
                 scale--;
                 //yield return new WaitForSeconds(10f);
                 if (dbugEnabled)
                 {
-                    MG.UpdateHUDDbugText("lowering scale, " + scale);
+                    //MG.UpdateHUDDbugText("lowering scale, " + scale);
                     //MG.UpdateHUDDbugText("large: " + largeRoomNum + ", medium: " + mediumRoomNum + ", small: " + smallRoomNum);
                 }
                 
                 //visual wait update
-                if (MG.isVisualEnabled()) { yield return new WaitForSeconds(.1f); }
+                if (MG.IsVisualEnabled()) { yield return new WaitForSeconds(.1f); }
                 else { yield return null; }
             }
             else if (roomSpawnAttempts == ((largeRoomNum + mediumRoomNum) - 1))
             {
                 mediumRoomNum = curRoomsSpawned - largeRoomNum; //update total number of medium rooms
-                if (dbugEnabled) { MG.UpdateHUDDbugText("medium rooms plotted"); }
+                if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Plotted Medium Rooms"); }
 
                 //begin updating grid states with room edges
                 yield return StartCoroutine(DefineWalls());
-                //if (dbugEnabled) { MG.UpdateHUDDbugText("medium rooms walled"); }
+                if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Walled Medium Rooms"); }
 
                 //begin updating grid states with hallways between rooms
                 yield return StartCoroutine(DefineHallways());
-                //if (dbugEnabled) { MG.UpdateHUDDbugText("medium rooms hallwayed"); }
-
+                if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Connected Medium Rooms"); }
 
                 //after spawning every medium room, lower scale to small
                 scale--;
                 //yield return new WaitForSeconds(10f);
                 if (dbugEnabled)
                 {
-                    MG.UpdateHUDDbugText("lowering scale, " + scale);
+                    //MG.UpdateHUDDbugText("lowering scale, " + scale);
                     //MG.UpdateHUDDbugText("large: " + largeRoomNum + ", medium: " + mediumRoomNum + ", small: " + smallRoomNum);
                 }
                 
                 //visual wait update
-                if (MG.isVisualEnabled()) { yield return new WaitForSeconds(.1f); }
+                if (MG.IsVisualEnabled()) { yield return new WaitForSeconds(.1f); }
                 else { yield return null; }
             }
             else if (roomSpawnAttempts == ((largeRoomNum + mediumRoomNum + smallRoomNum) - 1))
             {
                 smallRoomNum = curRoomsSpawned - (largeRoomNum + mediumRoomNum); //update total number of small rooms
-                if (dbugEnabled) { MG.UpdateHUDDbugText("small rooms plotted"); }
+                if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Plotted Small Rooms"); }
 
                 //begin updating grid states with room edges
                 yield return StartCoroutine(DefineWalls());
-                //if (dbugEnabled) { MG.UpdateHUDDbugText("small rooms walled"); }
+                if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Walled Small Rooms"); }
 
                 //begin updating grid states with hallways between rooms
                 yield return StartCoroutine(DefineHallways());
-                //if (dbugEnabled) { MG.UpdateHUDDbugText("small rooms hallwayed"); }
-
+                if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Connected Small Rooms"); } 
 
                 //after spawning every small room, lower scale to 0 and break the loop
                 scale--;
                 //yield return new WaitForSeconds(10f);
                 if (dbugEnabled)
                 {
-                    MG.UpdateHUDDbugText("lowering scale, " + scale);
+                    //MG.UpdateHUDDbugText("lowering scale, " + scale);
                     //MG.UpdateHUDDbugText("large: " + largeRoomNum + ", medium: " + mediumRoomNum + ", small: " + smallRoomNum);
-                    MG.UpdateHUDDbugText("total: " + curRoomsSpawned);
+                    //MG.UpdateHUDDbugText("total: " + curRoomsSpawned);
                 }
                 
                 //visual wait update
-                if (MG.isVisualEnabled()) { yield return new WaitForSeconds(.1f); }
+                if (MG.IsVisualEnabled()) { yield return new WaitForSeconds(.1f); }
                 else { yield return null; }
 
                 break;
@@ -729,10 +723,10 @@ public class DungeonGeneration : MonoBehaviour
             for (int z = roomPosZ; z < (roomPosZ + roomBoundsZ); z++)
             {
                 //if a provided position overlaps a not empty grid position, return false
-                if (dbugEnabled) { MG.UpdateHUDDbugText("grid pos @ X: " + x + ", Z: " + z + " - " + MG.GetGridState(x, z)); }
+                //if (dbugEnabled) { MG.UpdateHUDDbugText("grid pos @ X: " + x + ", Z: " + z + " - " + MG.GetGridState(x, z)); }
                 if (MG.GetGridState(x, z) != "Empty") 
                 {
-                    if (dbugEnabled) { MG.UpdateHUDDbugText("grid pos @ X: " + x + ", Z: " + z + " not empty"); }
+                    //if (dbugEnabled) { MG.UpdateHUDDbugText("grid pos @ X: " + x + ", Z: " + z + " not empty"); }
                     return false; 
                 }
             }
@@ -741,7 +735,7 @@ public class DungeonGeneration : MonoBehaviour
     }
     private bool AreNeighboursClose(int roomPosX, int roomPosZ, int roomBoundsX, int roomBoundsZ, int scale)
     {
-        if (dbugEnabled) { MG.UpdateHUDDbugText("DG, AreNeighboursClose"); }
+        //if (dbugEnabled) { MG.UpdateHUDDbugText("DG, AreNeighboursClose"); }
         //check if any grid states within a radius 5% of map dist are occupied by other rooms to ensure spacing
         
         //get 5% of total area
@@ -791,7 +785,7 @@ public class DungeonGeneration : MonoBehaviour
 
     private IEnumerator DefineWalls()
     {
-        if (dbugEnabled) { MG.UpdateHUDDbugText("DG, Define Walls"); }
+        if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Defining Walls"); }
 
         /*
          * get edges of rooms
@@ -799,14 +793,13 @@ public class DungeonGeneration : MonoBehaviour
          * update material colour with half hue
          */
 
-        if (dbugEnabled) { MG.UpdateHUDDbugText("adding walls"); }
         int roomIDStart = 0; //if scale is large, start at room ID 0
         if (scale == 1) { roomIDStart = largeRoomNum; } //if scale is medium, start at first medium room ID 
         else if (scale == 0) { roomIDStart = (largeRoomNum + mediumRoomNum); } //if scale is small, start at first small room ID
 
         for (int roomID = roomIDStart; roomID < curRoomsSpawned; roomID++) //for each room
         {
-            if (dbugEnabled) { MG.UpdateHUDDbugText("adding walls to room" + roomID + " @ x" + roomPosX[roomID] + ", z" + roomPosZ[roomID]); }
+            if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Adding Walls to Room " + roomID); }
             int newX = -1;
             int newZ = -1;
 
@@ -916,17 +909,14 @@ public class DungeonGeneration : MonoBehaviour
                 }
             }
 
-
-            //make iMGediate tiles cost extra
-
-            if (MG.isVisualEnabled()) { yield return new WaitForSeconds(.1f); }
+            if (MG.IsVisualEnabled()) { yield return new WaitForSeconds(.1f); }
             else { yield return null; }
         }
     }
 
     private IEnumerator DefineHallways()
     {
-        if (dbugEnabled) { MG.UpdateHUDDbugText("DG, Define Hallways"); }
+        if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Defining Hallways"); }
 
         //define rooms to be connected using A* and Prims
         if (scale == 2)
@@ -941,16 +931,14 @@ public class DungeonGeneration : MonoBehaviour
                     //if the current room and next room are different IDs
                     if (roomID != (roomID + 1))
                     {
-                        //yield return new WaitForSeconds(.1f);
-                        //if (dbugEnabled) { MG.UpdateHUDDbugText("cur:" + roomID + ", target:" + targetRoomID); }
+                        //yield return WaitForSeconds(.1f);
+                        if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Connecting Large Room " + roomID + " & Room " + (roomID + 1)); }
                         Vector2 startPos = roomCenters[roomID];
                         Vector2 targetPos = roomCenters[(roomID + 1)];
 
-                        if (dbugEnabled) { MG.UpdateHUDDbugText("joining cur:" + roomID + " & target:" + (roomID + 1)); }
-
                         //start room to room path generation
                         yield return StartCoroutine(PG.BeginPathGeneration(startPos, targetPos, boundsX, boundsZ, scale));
-                        if (MG.isVisualEnabled()) { yield return new WaitForSeconds(.1f); }
+                        if (MG.IsVisualEnabled()) { yield return new WaitForSeconds(.1f); }
                         else { yield return null; }
                     }
                 //}
@@ -973,7 +961,7 @@ public class DungeonGeneration : MonoBehaviour
                     //if the current room and next room are different IDs
                     if (roomID != targetRoomID)
                     {
-                        //if (dbugEnabled) { MG.UpdateHUDDbugText("cur:" + roomID + ", target:" + targetRoomID); }
+                        if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Connecting Medium Room " + roomID + " & Room " + targetRoomID); }
 
                         //calculate distance
                         Vector2 curRoomCenter = roomCenters[roomID];
@@ -995,11 +983,11 @@ public class DungeonGeneration : MonoBehaviour
                     Vector2 startPos = roomCenters[roomID];
                     Vector2 targetPos = roomCenters[nearestRoomID];
 
-                    if (dbugEnabled) { MG.UpdateHUDDbugText("joining cur:" + roomID + " & target:" + nearestRoomID); }
+                    //if (dbugEnabled) { MG.UpdateHUDDbugText("joining cur:" + roomID + " & target:" + nearestRoomID); }
 
                     //start room to room path generation
                     yield return StartCoroutine(PG.BeginPathGeneration(startPos, targetPos, boundsX, boundsZ, scale));
-                    if (MG.isVisualEnabled()) { yield return new WaitForSeconds(.1f); }
+                    if (MG.IsVisualEnabled()) { yield return new WaitForSeconds(.1f); }
                     else { yield return null; }
                 }
             }
@@ -1012,13 +1000,11 @@ public class DungeonGeneration : MonoBehaviour
                 int parentRoomID = roomID - (largeRoomNum + mediumRoomNum);
                 Vector2 startPos = roomCenters[roomID];
                 Vector2 targetPos = roomCenters[parentRoomID];
-                //if (dbugEnabled) { MG.UpdateHUDDbugText("start: " + startPos + ", target: " + targetPos); }
-
-                if (dbugEnabled) { MG.UpdateHUDDbugText("joining cur:" + roomID + " & target:" + parentRoomID); }
+                if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Connecting Small Room " + roomID + " & Room " + parentRoomID); }
 
                 //start room to room path generation
                 yield return StartCoroutine(PG.BeginPathGeneration(startPos, targetPos, boundsX, boundsZ, scale));
-                if (MG.isVisualEnabled()) { yield return new WaitForSeconds(.1f); }
+                if (MG.IsVisualEnabled()) { yield return new WaitForSeconds(.1f); }
                 else { yield return null; }
             }
         }
@@ -1029,7 +1015,7 @@ public class DungeonGeneration : MonoBehaviour
 
     private void ReinitialiseWithNewLimit()
     {
-        if (dbugEnabled) { MG.UpdateHUDDbugText("DG, Reinitialise With New Number Of Rooms"); }
+        if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Recalculating Number of Rooms"); }
 
         numOfRooms = curRoomsSpawned; //set room total to current number of spawned rooms
         //if (dbugEnabled) { MG.UpdateHUDDbugText("new number of rooms: " + numOfRooms); }
@@ -1091,26 +1077,26 @@ public class DungeonGeneration : MonoBehaviour
         //find medium or small room furthest away from Boss room to define as Entry room
         //find small rooms furthest from Boss & Entry & other Treasure Rooms to define as Treasure Rooms
         //find medium or small rooms furthest from Boss & Entry & Treasure Rooms & other Special Rooms to define as Special Rooms
-        if (dbugEnabled) { MG.UpdateHUDDbugText("DG, Defining Important Rooms"); }
+        if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Defining Important Rooms"); }
 
         FindBossRoom();
-        if (MG.isVisualEnabled()) { yield return new WaitForSeconds(.1f); }
+        if (MG.IsVisualEnabled()) { yield return new WaitForSeconds(.1f); }
         else { yield return null; }
         FindEntryRoom();
-        if (MG.isVisualEnabled()) { yield return new WaitForSeconds(.1f); }
+        if (MG.IsVisualEnabled()) { yield return new WaitForSeconds(.1f); }
         else { yield return null; }
         FindTreasureRooms();
-        if (MG.isVisualEnabled()) { yield return new WaitForSeconds(.1f); }
+        if (MG.IsVisualEnabled()) { yield return new WaitForSeconds(.1f); }
         else { yield return null; }
         FindSpecialRooms();
-        if (MG.isVisualEnabled()) { yield return new WaitForSeconds(.1f); }
+        if (MG.IsVisualEnabled()) { yield return new WaitForSeconds(.1f); }
         else { yield return null; }
     }
 
     private void FindBossRoom()
     {
         //find large room furthest away from bounds center
-        if (dbugEnabled) { MG.UpdateHUDDbugText("DG, Finding Boss Room"); }
+        if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Defining Boss Room"); }
 
         boundsCenter = new Vector2((boundsX / 2), (boundsZ / 2)); //dungeon area center
         //Debug.Log(boundsCenter);
@@ -1122,7 +1108,7 @@ public class DungeonGeneration : MonoBehaviour
             //find room center and distance from bounds center
             Vector2 roomCenter = roomCenters[roomID];
             float distRoomToCenter = Vector2.Distance(boundsCenter, roomCenter);
-            if (dbugEnabled) { MG.UpdateHUDDbugText("roomID: " + roomID + " - " + roomCenter + ", " + distRoomToCenter); }
+            //if (dbugEnabled) { MG.UpdateHUDDbugText("roomID: " + roomID + " - " + roomCenter + ", " + distRoomToCenter); }
 
             //if room further than last nearest
             if (distRoomToCenter > distFromCenter)
@@ -1130,13 +1116,12 @@ public class DungeonGeneration : MonoBehaviour
                 //update trackers
                 distFromCenter = distRoomToCenter;
                 bossRoomID = roomID;
-                if (dbugEnabled) { MG.UpdateHUDDbugText("new boss room id: " + bossRoomID); }
             }
         }
 
         if (bossRoomID != -1) //if boss room found
         {
-            if (dbugEnabled) { MG.UpdateHUDDbugText("boss room id: " + bossRoomID); }
+            if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Defined Boss Room " + bossRoomID); }
 
             //update room state tracker
             roomStates[bossRoomID] = "Boss";
@@ -1166,7 +1151,7 @@ public class DungeonGeneration : MonoBehaviour
     private void FindEntryRoom()
     {
         //find medium or small room furthest away from Boss room
-        if (dbugEnabled) { MG.UpdateHUDDbugText("DG, Finding Entry Room"); }
+        if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Defining Entry Room"); }
 
         bossRoomCenter = roomCenters[bossRoomID];
         float distFromBoss = 0;
@@ -1178,7 +1163,7 @@ public class DungeonGeneration : MonoBehaviour
             //Debug.Log(roomID);
             Vector2 roomCenter = roomCenters[roomID];
             float distRoomToBoss = Vector2.Distance(bossRoomCenter, roomCenter);
-            if (dbugEnabled) { MG.UpdateHUDDbugText("roomID: " + roomID + " - " + roomCenter + ", " + distRoomToBoss); }
+            //if (dbugEnabled) { MG.UpdateHUDDbugText("roomID: " + roomID + " - " + roomCenter + ", " + distRoomToBoss); }
 
             //if room further than last nearest
             if (distRoomToBoss > distFromBoss)
@@ -1186,13 +1171,13 @@ public class DungeonGeneration : MonoBehaviour
                 //update trackers
                 distFromBoss = distRoomToBoss;
                 entryRoomID = roomID;
-                if (dbugEnabled) { MG.UpdateHUDDbugText("new entry room id: " + entryRoomID); }
+                //if (dbugEnabled) { MG.UpdateHUDDbugText("new entry room id: " + entryRoomID); }
             }
         }
 
         if (entryRoomID != -1) //if entry room found
         {
-            if (dbugEnabled) { MG.UpdateHUDDbugText("entry room id: " + entryRoomID); }
+            if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Defined Entry Room " + entryRoomID); }
 
             //update room state tracker
             roomStates[entryRoomID] = "Entry";
@@ -1207,7 +1192,7 @@ public class DungeonGeneration : MonoBehaviour
                     if (gridState != "Wall" && gridState != "Doorway" && gridState != "WallCorner" && gridState != "DoorwayEdge")
                     {
                         //update grid state, debug text, and debug material
-                        if (dbugEnabled) { MG.UpdateHUDDbugText("grid pos @ X: " + x + ", Z: " + z + " is now part of room" + curRoomsSpawned); }
+                        //if (dbugEnabled) { MG.UpdateHUDDbugText("grid pos @ X: " + x + ", Z: " + z + " is now part of room" + curRoomsSpawned); }
                         MG.UpdateGridState(x, z, "EntryRoom");
                         if (dbugEnabled)
                         {
@@ -1223,8 +1208,7 @@ public class DungeonGeneration : MonoBehaviour
     private void FindTreasureRooms()
     {
         //find small rooms furthest from Boss & Entry & other Treasure Rooms
-        /*if (dbugEnabled) { MG.UpdateHUDDbugText("DG, Finding Treasure Rooms"); }
-        if (dbugEnabled) { Debug.Log("DG, Finding Treasure Rooms"); }*/
+        if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Defining Treasure Rooms"); }
 
         entryRoomCenter = roomCenters[entryRoomID];
         float distFromEntryAndBoss = Vector2.Distance(entryRoomCenter, bossRoomCenter);
@@ -1278,7 +1262,7 @@ public class DungeonGeneration : MonoBehaviour
 
             if (treasureRoomIDs[tR] != -1) //if treasure room found
             {
-                //if (dbugEnabled) { MG.UpdateHUDDbugText("treasure room id: " + treasureRoomIDs[tR]); }
+                if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Defined Treasure Room " + treasureRoomIDs[tR]); }
                 //if (dbugEnabled) { Debug.Log("treasure room id: " + treasureRoomIDs[tR]); }
 
                 //update room state tracker
@@ -1322,7 +1306,7 @@ public class DungeonGeneration : MonoBehaviour
     private void FindSpecialRooms()
     {
         //find medium or small rooms furthest from Boss & Entry & Treasure Rooms & other Special Rooms
-        if (dbugEnabled) { MG.UpdateHUDDbugText("DG, Finding Special Rooms"); }
+        if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Defining Special Rooms"); }
 
         float distFromEntryAndBoss = 0;
         int numOfSpecialRoomsFound = 0;
@@ -1382,13 +1366,13 @@ public class DungeonGeneration : MonoBehaviour
                     //update trackers and add room id to special array
                     distFromEntryAndBoss = distFromRoomToEntryAndBoss;
                     specialRoomIDs[sR] = roomID;
-                    if (dbugEnabled) { MG.UpdateHUDDbugText("new special room id: " + specialRoomIDs[sR]); }
+                    //if (dbugEnabled) { MG.UpdateHUDDbugText("new special room id: " + specialRoomIDs[sR]); }
                 }
             }
 
             if (specialRoomIDs[sR] != -1) //if special room found
             {
-                if (dbugEnabled) { MG.UpdateHUDDbugText("special room id: " + specialRoomIDs[sR]); }
+                if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Defined Special Room " + specialRoomIDs[sR]); }
                 //if (dbugEnabled) { Debug.Log("special room id: " + specialRoomIDs[sR]); }
 
                 //update room state tracker
@@ -1421,7 +1405,7 @@ public class DungeonGeneration : MonoBehaviour
             }
             else 
             {
-                if (dbugEnabled) { MG.UpdateHUDDbugText("No special room found"); }
+                //if (dbugEnabled) { MG.UpdateHUDDbugText("No special room found"); }
                 //if (dbugEnabled) { Debug.Log("No special room found"); }
             }
 
@@ -1434,22 +1418,21 @@ public class DungeonGeneration : MonoBehaviour
 
     private IEnumerator DefineRoomTypes()
     {
-        if (dbugEnabled) { MG.UpdateHUDDbugText("DG, Defining Room Types"); }
+        if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Defining Common Room Types"); }
 
         //if specific dungeon type, layout specific
         //otherwise, assign appropriate rooms
 
         if (dungeonType == "Crypt")
         {
-            if (dbugEnabled) { MG.UpdateHUDDbugText("DG, Assigning dungeon type: Crypts"); }
             //assign all crypt rooms
             for (int roomID = 0; roomID < (largeRoomNum + mediumRoomNum + smallRoomNum); roomID++)
             {
                 //select random room
                 string roomStateTemp = roomStates[roomID];
                 roomStates[roomID] = "Crypt" + roomStateTemp;
-                //if (dbugEnabled) { MG.UpdateHUDDbugText("crypt room" + roomID + " set as " + roomTypeLarge[roomTypeID]); }
-                if (MG.isVisualEnabled()) { yield return new WaitForSeconds(.1f); }
+                if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Defined Common Room " + roomID + " as " + roomStates[roomID]); }
+                if (MG.IsVisualEnabled()) { yield return new WaitForSeconds(.1f); }
             }
         }
         else
@@ -1458,10 +1441,10 @@ public class DungeonGeneration : MonoBehaviour
             string futureBossRoomType = "";
             for (int scale = 2; scale >= 0; scale--) //for each size of room
             {
-                if (dbugEnabled) { MG.UpdateHUDDbugText("scale: " + scale); }
+                //if (dbugEnabled) { MG.UpdateHUDDbugText("scale: " + scale); }
                 if (scale == 2)
                 {
-                    if (dbugEnabled) { MG.UpdateHUDDbugText("DG, Assigning " + largeRoomNum + " large rooms"); }
+                    //if (dbugEnabled) { MG.UpdateHUDDbugText("DG, Assigning " + largeRoomNum + " large rooms"); }
                     //assign large room types
                     string[] largeRoomTypeStrings = new string[largeRoomTypes.Count];
                     largeRoomTypes.Keys.CopyTo(largeRoomTypeStrings, 0); //fill a string array with large room types
@@ -1504,28 +1487,29 @@ public class DungeonGeneration : MonoBehaviour
                             }
                         }
 
-                        if (dbugEnabled)
+                        /*if (dbugEnabled)
                         {
                             MG.UpdateHUDDbugText("roomID: " + roomID);
                             MG.UpdateHUDDbugText("roomTypeID: " + roomTypeID);
                             MG.UpdateHUDDbugText("largeRoomTypeStrings[roomTypeID]: " + largeRoomTypeStrings[roomTypeID]);
                             MG.UpdateHUDDbugText("pre usedTypeLargeIDs[roomID]: " + usedTypeLargeIDs[roomID]);
-                        }
+                        }*/
                         usedTypeLargeIDs[roomID] = roomTypeID;
                         //if (dbugEnabled) { MG.UpdateHUDDbugText("post usedTypeLargeIDs[roomID]: " + usedTypeLargeIDs[roomID]); }
-                        if (dbugEnabled) { MG.UpdateHUDDbugText("room " + roomID + ": large room " + roomID + "/" + largeRoomNum + " set as " + largeRoomTypeStrings[roomTypeID]); }
+                        if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Defined Common Room " + roomID + " as " + largeRoomTypeStrings[roomTypeID]); }
+                        //if (dbugEnabled) { MG.UpdateHUDDbugText("room " + roomID + ": large room " + roomID + "/" + largeRoomNum + " set as " + largeRoomTypeStrings[roomTypeID]); }
 
                         //update room state with found room type
                         if (roomStates[roomID] == "Empty") { roomStates[roomID] = largeRoomTypeStrings[roomTypeID]; }
                         else if(roomStates[roomID] == "Boss") { futureBossRoomType = largeRoomTypeStrings[roomTypeID]; continue; } //function around boss room
                         else { string roomStateTemp = roomStates[roomID]; roomStates[roomID] = roomStateTemp + largeRoomTypeStrings[roomTypeID]; }
 
-                        if (MG.isVisualEnabled()) { yield return new WaitForSeconds(.1f); }
+                        if (MG.IsVisualEnabled()) { yield return new WaitForSeconds(.1f); }
                     }
                 }
                 else if (scale == 1)
                 {
-                    if (dbugEnabled) { MG.UpdateHUDDbugText("DG, Assigning " + mediumRoomNum + " medium rooms"); }
+                    //if (dbugEnabled) { MG.UpdateHUDDbugText("DG, Assigning " + mediumRoomNum + " medium rooms"); }
                     //assign medium room types
                     string[] mediumRoomTypeStrings = new string[mediumRoomTypes.Count];
                     mediumRoomTypes.Keys.CopyTo(mediumRoomTypeStrings, 0);
@@ -1544,7 +1528,7 @@ public class DungeonGeneration : MonoBehaviour
                         if (roomStates[roomID] == "Special")
                         {
                             //assign special room types
-                            if (dbugEnabled) { MG.UpdateHUDDbugText("special medium room"); }
+                            //if (dbugEnabled) { MG.UpdateHUDDbugText("special medium room"); }
                             roomTypeID = Random.Range(0, specialRoomType.Length); //find random special room type
                             while (!valid) //while room invalid
                             {
@@ -1571,18 +1555,19 @@ public class DungeonGeneration : MonoBehaviour
                             roomStates[roomID] = specialRoomType[roomTypeID];
                             if (specialRoomsFound < usedSpecialRoomIDs.Length) { usedSpecialRoomIDs[specialRoomsFound] = roomTypeID; } //add used room to used special array
                             usedTypeMediumIDs[(roomID - largeRoomNum)] = 20; //set used ID to special ID
-                            if (dbugEnabled) { MG.UpdateHUDDbugText("room " + roomID + ": medium special room " + (roomID - largeRoomNum) + "/" + mediumRoomNum + " set as " + specialRoomType[roomTypeID]); }
+                            if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Defined Common Room " + roomID + " as " + specialRoomType[roomTypeID]); }
                             specialRoomsFound++; //increase number of special rooms spawned
-                            if (MG.isVisualEnabled()) { yield return new WaitForSeconds(.1f); }
+                            if (MG.IsVisualEnabled()) { yield return new WaitForSeconds(.1f); }
                             continue;
                         }
                         else if (roomStates[roomID] == "Entry")
                         {
                             //if room state is entry, make room antechamber
-                            if (dbugEnabled) { MG.UpdateHUDDbugText("room " + roomID + ": medium room is already " + roomStates[roomID]); }
+                            //if (dbugEnabled) { MG.UpdateHUDDbugText("room " + roomID + ": medium room is already " + roomStates[roomID]); }
                             roomStates[roomID] = "EntryAntechamber";
                             usedTypeMediumIDs[(roomID - largeRoomNum)] = 21; //set used ID tp antechamber ID
-                            if (MG.isVisualEnabled()) { yield return new WaitForSeconds(.1f); }
+                            if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Defined Common Room " + roomID + " as " + roomStates[roomID]); }
+                            if (MG.IsVisualEnabled()) { yield return new WaitForSeconds(.1f); }
                             continue;
                         }
                         else
@@ -1626,13 +1611,13 @@ public class DungeonGeneration : MonoBehaviour
                             MG.UpdateHUDDbugText("largeRoomNum+mediumRoomNum" + (largeRoomNum + mediumRoomNum));
                         }*/
                         usedTypeMediumIDs[(roomID - largeRoomNum)] = roomTypeID; //set used ID to room type ID
-                        if (dbugEnabled) { MG.UpdateHUDDbugText("room " + roomID + ": medium room " + roomID + "/" + (largeRoomNum + mediumRoomNum) + " set as " + mediumRoomTypeStrings[roomTypeID]); }
-                        if (MG.isVisualEnabled()) { yield return new WaitForSeconds(.1f); }
+                        if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Defined Common Room " + roomID + " as " + mediumRoomTypeStrings[roomTypeID]); }
+                        if (MG.IsVisualEnabled()) { yield return new WaitForSeconds(.1f); }
                     }
                 }
                 else if (scale == 0)
                 {
-                    if (dbugEnabled) { MG.UpdateHUDDbugText("DG, Assigning " + smallRoomNum + " small rooms"); }
+                    //if (dbugEnabled) { MG.UpdateHUDDbugText("DG, Assigning " + smallRoomNum + " small rooms"); }
                     //assign small room types
                     for (int roomID = (largeRoomNum + mediumRoomNum); roomID < (largeRoomNum + mediumRoomNum + smallRoomNum); roomID++)
                     {
@@ -1673,9 +1658,9 @@ public class DungeonGeneration : MonoBehaviour
                             //Debug.Log("adding room state: " + roomTypeID);
                             roomStates[roomID] = roomStates[roomID] + specialRoomType[roomTypeID]; //update room state with special room type
                             if (specialRoomsFound < usedSpecialRoomIDs.Length) { usedSpecialRoomIDs[specialRoomsFound] = roomTypeID; } //add room type ID to special rooms found
-                            if (dbugEnabled) { MG.UpdateHUDDbugText("room " + roomID + ": small special room " + (roomID - largeRoomNum - mediumRoomNum) + "/" + smallRoomNum + " set as " + specialRoomType[roomTypeID]); }
+                            //if (dbugEnabled) { MG.UpdateHUDDbugText("room " + roomID + ": small special room " + (roomID - largeRoomNum - mediumRoomNum) + "/" + smallRoomNum + " set as " + specialRoomType[roomTypeID]); }
                             specialRoomsFound++; //increment special rooms spawned
-                            if (MG.isVisualEnabled()) { yield return new WaitForSeconds(.1f); }
+                            if (MG.IsVisualEnabled()) { yield return new WaitForSeconds(.1f); }
                             continue;
                         }
                         else if (roomStates[roomID] == "Treasure")
@@ -1707,17 +1692,17 @@ public class DungeonGeneration : MonoBehaviour
                             //Debug.Log("adding room state: " + roomTypeID);
                             roomStates[roomID] = roomStates[roomID] + treasureRoomType[roomTypeID]; //update room state with treasure room type
                             if (treasureRoomsFound < usedTreasureRoomIDs.Length) { usedTreasureRoomIDs[treasureRoomsFound] = roomTypeID; } //add treasure room ID to treasure rooms found
-                            if (dbugEnabled) { MG.UpdateHUDDbugText("room " + roomID + ": small treasure room " + (roomID - largeRoomNum - mediumRoomNum) + "/" + smallRoomNum + " set as " + treasureRoomType[roomTypeID]); }
+                            if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Defined Common Room " + roomID + " as " + treasureRoomType[roomTypeID]); }
                             treasureRoomsFound++; //increment treasure rooms found
-                            if (MG.isVisualEnabled()) { yield return new WaitForSeconds(.1f); }
+                            if (MG.IsVisualEnabled()) { yield return new WaitForSeconds(.1f); }
                             continue;
                         }
                         else if (roomStates[roomID] == "Entry")
                         {
                             //if room has been assigned type entry, skip
-                            if (dbugEnabled) { MG.UpdateHUDDbugText("room " + roomID + ": small room is already " + roomStates[roomID]); }
+                            if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Defined Common Room " + roomID + " as " + roomStates[roomID]); }
                             roomStates[roomID] = "Entry";
-                            if (MG.isVisualEnabled()) { yield return new WaitForSeconds(.1f); }
+                            if (MG.IsVisualEnabled()) { yield return new WaitForSeconds(.1f); }
                             continue;
                         }
                         else
@@ -1731,7 +1716,7 @@ public class DungeonGeneration : MonoBehaviour
                                 //depending on the parent room of the small room, assign the small room an appropriate type
                                 //appropriate room types assigned by initialisation
                                 case "Entry":
-                                    if (dbugEnabled) { MG.UpdateHUDDbugText("room " + roomID + ": medium room is already " + roomStates[roomID]); }
+                                    if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Defined Common Room " + roomID + " as " + roomStates[roomID]); }
                                     break;
                                 case "Crypts":
                                 case "Library":
@@ -1812,9 +1797,9 @@ public class DungeonGeneration : MonoBehaviour
                                         //otherwise update room state with found ID
                                         else { roomStates[roomID] = validSmallRoomTypes[roomTypeID]; }
 
-                                        if (dbugEnabled) { MG.UpdateHUDDbugText("room " + roomID + ": small room " + (roomID - largeRoomNum - mediumRoomNum) + "/" + smallRoomNum + " set as " + validSmallRoomTypes[roomTypeID]); }
+                                        if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Defined Common Room " + roomID + " as " + validSmallRoomTypes[roomTypeID]); }
                                     }
-                                    if (MG.isVisualEnabled()) { yield return new WaitForSeconds(.1f); }
+                                    if (MG.IsVisualEnabled()) { yield return new WaitForSeconds(.1f); }
                                     break;
                                 default: //shouldnt occur, added due to old issue i think its fixed now
                                     //Debug.Log("creating secret room");
@@ -1822,8 +1807,8 @@ public class DungeonGeneration : MonoBehaviour
                                     roomStates[(roomID - (largeRoomNum + mediumRoomNum))] = roomStateTemp + "IllusionRoom";
                                     roomStates[roomID] = "SecretRoom"; //set room state to secret
                                     //Debug.Log("room " + (roomID - (largeRoomNum + mediumRoomNum)) + ": room set as " + roomStates[(roomID - (largeRoomNum + mediumRoomNum))]);
-                                    if (dbugEnabled) { MG.UpdateHUDDbugText("room " + roomID + ": small room " + (roomID - largeRoomNum - mediumRoomNum) + "/" + smallRoomNum + " set as " + roomStates[roomID]); }
-                                    if (MG.isVisualEnabled()) { yield return new WaitForSeconds(.1f); }
+                                    if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Defined Common Room " + roomID + " as " + roomStates[roomID]); }
+                                    if (MG.IsVisualEnabled()) { yield return new WaitForSeconds(.1f); }
                                     break;
                             }
                         }
@@ -1980,22 +1965,23 @@ public class DungeonGeneration : MonoBehaviour
     private IEnumerator GenerateRooms()
     {
         //generate rooms
-        if (dbugEnabled) { MG.UpdateHUDDbugText("DG, Generate Room"); }
+        if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Generating Rooms"); }
 
         for (int roomID = 0; roomID < numOfRooms; roomID++)
         {
             //for total number of rooms
-            if (dbugEnabled)
-            {
-                MG.UpdateHUDDbugText("Spawning room " + roomID + " @ " + roomPositions[roomID] + ", size: " + roomBoundsX[roomID] + "*" + roomBoundsZ[roomID]);
+            //if (dbugEnabled)
+            //{
+                //MG.UpdateHUDDbugText("Spawning room " + roomID + " @ " + roomPositions[roomID] + ", size: " + roomBoundsX[roomID] + "*" + roomBoundsZ[roomID]);
                 //Debug.Log(/*top left*/(roomPositions[roomID] + new Vector2(0, 0, roomBoundsZ[roomID])) + "\t" + (roomPositions[roomID] + new Vector2(roomBoundsX[roomID], 0, roomBoundsZ[roomID]))/*top right*/);
                 //Debug.Log(/*bottom left*/roomPositions[roomID] + "\t" + (roomPositions[roomID] + new Vector2(roomBoundsX[roomID], 0,0))/*bottom right*/);
-            }
+            //}
             Vector3 instantiatePos = new Vector3(roomPositions[roomID].x, 0, roomPositions[roomID].y); //assign room position
             roomObjects[roomID] = Instantiate(basicRoom, instantiatePos, Quaternion.identity); //spawn room
             roomObjects[roomID].name = roomScales[roomID] + roomStates[roomID] + roomID; //set room name
             roomObjects[roomID].GetComponent<RoomGeneration>().Wake(roomID, roomPosX[roomID], roomPosZ[roomID], roomBoundsX[roomID], roomBoundsZ[roomID], roomScales[roomID], roomStates[roomID], instantiatePos); //wake room script
-            if (MG.isVisualEnabled()) { yield return new WaitForSeconds(.1f); }
+            if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Generating Room " + roomObjects[roomID]); }
+            if (MG.IsVisualEnabled()) { yield return new WaitForSeconds(.1f); }
         }
     }
 }

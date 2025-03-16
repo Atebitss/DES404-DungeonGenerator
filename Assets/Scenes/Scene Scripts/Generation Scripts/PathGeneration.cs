@@ -20,7 +20,7 @@ public class PathGeneration : MonoBehaviour
     private int scale; //room scale
 
     //hallway creation
-    private GameObject hallwayParent; //the current hallway parent
+    private GameObject hallwayParent = null; //the current hallway parent
     private GameObject[] hallwayParents = new GameObject[0]; //every hallway parent
     public GameObject[] GetHallwayParents() { return hallwayParents; }
     [SerializeField] private GameObject hallwayFloorPrefab, hallwayWallPrefab;
@@ -36,14 +36,14 @@ public class PathGeneration : MonoBehaviour
         MG = this.gameObject.GetComponent<MapGeneration>();
         DG = this.gameObject.GetComponent<DungeonGeneration>();
 
-        if (dbugEnabled) { MG.UpdateHUDDbugText("PG, Awake"); }
+        //if (dbugEnabled) { MG.UpdateHUDDbugText("PG, Awake"); }
     }
 
 
 
     public IEnumerator BeginPathGeneration(Vector2 startPos, Vector2 targetPos, int boundsX, int boundsZ, int scale)
     {
-        if (dbugEnabled) { MG.UpdateHUDDbugText("PG, Begin Path Generation"); }
+        if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Beginning Path Generation"); }
 
         //update data
         this.boundsX = boundsX;
@@ -91,7 +91,7 @@ public class PathGeneration : MonoBehaviour
     private Vector2[] FindPath()
     {
         //find connections between rooms using A*
-        if (dbugEnabled) { MG.UpdateHUDDbugText("PG, Find Path"); }
+        if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Finding Path"); }
 
         int startPosX = (int)startPos.x; //beginning position
         int startPosZ = (int)startPos.y;
@@ -108,7 +108,7 @@ public class PathGeneration : MonoBehaviour
         string targetPosState = MG.GetGridState(targetPosX, targetPosZ);
         int startRoomIndex = int.Parse(startPosState.Substring(4)); //starting room Index
         int targetRoomIndex = int.Parse(targetPosState.Substring(4)); //targetted room Index
-        if (dbugEnabled) { MG.UpdateHUDDbugText("startRoomIndex: " + startRoomIndex + " / targetRoomIndex: " + targetRoomIndex); }
+        if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Finding Path from Room " + startRoomIndex + " to Room " + targetRoomIndex); }
 
 
         //initialise movement costs for all grid positions
@@ -169,7 +169,7 @@ public class PathGeneration : MonoBehaviour
 
                 if (closedSet[neighborPosX, neighborPosZ]) { continue; } //if position closed, skip
 
-                if (MG.isDbugEnabled()) { MG.UpdateDbugTileTextMoveCost(neighborPosX, neighborPosZ, moveCost); } //update checked tile debug text with new cost
+                if (MG.IsDbugEnabled()) { MG.UpdateDbugTileTextMoveCost(neighborPosX, neighborPosZ, moveCost); } //update checked tile debug text with new cost
 
 
                 int tempCostToNext = costToNext[curPosX, curPosZ] + moveCost; //cost of current position
@@ -279,7 +279,7 @@ public class PathGeneration : MonoBehaviour
     private Vector2[] ConstructPath(Vector2[,] previousPos, Vector2 curPos)
     {
         //puts together an array of the path findings previous steps
-        if (dbugEnabled) { MG.UpdateHUDDbugText("PG, Construct Path"); }
+        //if (dbugEnabled) { MG.UpdateHUDDbugText("PG, Construct Path"); }
 
         int pathLength = 0; //track number of tiles in path
         Vector2 tempPos = curPos; //used to track previous position as the path iterates
@@ -321,7 +321,7 @@ public class PathGeneration : MonoBehaviour
     private IEnumerator GeneratePath(Vector2[] path)
     {
         //update map manager with new path
-        if (dbugEnabled) { MG.UpdateHUDDbugText("PG, Generate Path between " + startPos + " & " + targetPos); }
+        //if (dbugEnabled) { MG.UpdateHUDDbugText("PG, Generate Path between " + startPos + " & " + targetPos); }
 
         if (path == null) { yield return null; } //if there's no path, skip
 
@@ -435,7 +435,7 @@ public class PathGeneration : MonoBehaviour
                 }
             }
 
-            if (MG.isVisualEnabled()) { yield return new WaitForSeconds(.1f); }
+            if (MG.IsVisualEnabled()) { yield return new WaitForSeconds(.1f); }
             else { yield return null; }
         }
 
@@ -453,7 +453,7 @@ public class PathGeneration : MonoBehaviour
         {
             CreateHallway();
             hallwayParentIndex++;
-            if (MG.isVisualEnabled()) { yield return new WaitForSeconds(.1f); }
+            if (MG.IsVisualEnabled()) { yield return new WaitForSeconds(.1f); }
             else { yield return null; }
         }
     }
@@ -551,14 +551,6 @@ public class PathGeneration : MonoBehaviour
     public void ResetHallways()
     {
         Destroy(hallwayParent);
-        /*
-        for (int parentIndex = hallwayParents.Length - 1; parentIndex >= 0; parentIndex--) //counting from highest to lowest
-        {
-            if (hallwayParents[parentIndex] != null)
-            {
-                Destroy(hallwayParents[parentIndex]); //destroy all hallways
-            }
-        }*/
 
         //reset the arrays
         hallwayPaths = new Dictionary<int, Vector2[]>();

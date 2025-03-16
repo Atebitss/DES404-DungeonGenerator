@@ -6,12 +6,14 @@ public class DungeonRealmManager : AbstractSceneManager
 {
     override public void RestartScene()
     {
+        MapGeneration MG = this.gameObject.GetComponent<MapGeneration>();
+        if (MG.IsDbugEnabled()) { MG.UpdateHUDDbugText("Dungeon Scene Manager: Restarting Scene"); }
         GameObject SM = this.gameObject;
         DestroyEnemyObjects();
         DestroyPlayer();
-        SM.GetComponent<MapGeneration>().ResetMap();
+        MG.ResetMap();
         SM.GetComponent<DungeonGeneration>().ResetDungeon();
         SM.GetComponent<PathGeneration>().ResetHallways();
-        SM.GetComponent<MapGeneration>().RegenerateDungeon();
+        MG.RegenerateDungeon();
     }
 }

@@ -49,6 +49,7 @@ public class AbstractSceneManager : MonoBehaviour
     public PlayerController GetPlayerController() { return PC; }
     public void SpawnPlayer(Vector3 pos)
     {
+        if (MG.IsDbugEnabled()) { MG.UpdateHUDDbugText("Scene Manager: Spawning Player"); }
         player = Instantiate(playerPrefab, pos, Quaternion.identity);
         //Debug.Log(player.name);
         PC = player.transform.GetChild(0).gameObject.GetComponent<PlayerController>();
@@ -58,6 +59,7 @@ public class AbstractSceneManager : MonoBehaviour
     }
     public void DestroyPlayer()
     {
+        if (MG.IsDbugEnabled()) { MG.UpdateHUDDbugText("Scene Manager: Destroying Player"); }
         if (player != null) { Destroy(player); }
     }
     public Vector3 GetPlayerPosition() { if(PC != null) { return PC.transform.position; } else { return Vector3.zero; } }
@@ -71,6 +73,7 @@ public class AbstractSceneManager : MonoBehaviour
 
     public void SpawnEnemy(GameObject enemy, Vector3 position)
     {
+        if (MG.IsDbugEnabled()) { MG.UpdateHUDDbugText("Scene Manager: Spawning Enemy " + enemy.name); }
         int existingCount = enemyObjects.Length; //current number of enemies tracked
         int newCount = (existingCount + 1); //new enemies to add + cur
 
@@ -88,6 +91,7 @@ public class AbstractSceneManager : MonoBehaviour
     }
     public void SpawnEnemies(GameObject[] enemies, Vector3[] positions)
     {
+        if (MG.IsDbugEnabled()) { MG.UpdateHUDDbugText("Scene Manager: Spawning Enemies"); }
         int existingCount = enemyObjects.Length; //current number of enemies tracked
         int newCount = existingCount + enemies.Length; //new enemies to add + cur
 
@@ -97,6 +101,7 @@ public class AbstractSceneManager : MonoBehaviour
         //spawn new enemies and add to new array
         for (int i = 0; i < enemies.Length; i++)
         {
+            if (MG.IsDbugEnabled()) { MG.UpdateHUDDbugText("Scene Manager: Spawning Enemy " + enemies[i].name); }
             int index = existingCount + i;
             newEnemyObjects[index] = Instantiate(enemies[i], positions[i], Quaternion.identity);
 
@@ -109,7 +114,8 @@ public class AbstractSceneManager : MonoBehaviour
 
     public void DestroyEnemyObjects()
     {
-        for(int i = 0; i < enemyObjects.Length; i++)
+        if (MG.IsDbugEnabled()) { MG.UpdateHUDDbugText("Scene Manager: Destroying Enemies"); }
+        for (int i = 0; i < enemyObjects.Length; i++)
         {
             if (enemyObjects[i] != null) { Destroy(enemyObjects[i]); }
         }
@@ -118,6 +124,7 @@ public class AbstractSceneManager : MonoBehaviour
     }
     public void DestroyEnemy(GameObject enemy)
     {
+        if (MG.IsDbugEnabled()) { MG.UpdateHUDDbugText("Scene Manager: Destroying Enemy " + enemy.name); }
         //Debug.Log("removing enemy from array: " + enemy);
         // Find index of enemy to remove
         int removeIndex = -1;
@@ -168,7 +175,8 @@ public class AbstractSceneManager : MonoBehaviour
 
     public void EndFloor()
     {
-        Debug.Log("Floor complete");
+        if (MG.IsDbugEnabled()) { MG.UpdateHUDDbugText("Scene Manager: Floor Complete"); }
+        //Debug.Log("Floor complete");
         //would contain scene change to post level
         //and update dungeon stats
         RestartScene();

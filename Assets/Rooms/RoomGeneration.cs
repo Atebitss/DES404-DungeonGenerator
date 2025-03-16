@@ -30,6 +30,7 @@ public class RoomGeneration : MonoBehaviour
             //Debug.Log("running: " + running + "   enemies: " + ASM.GetEnemyObjects().Length);
             if(ASM.GetEnemyObjects().Length == 0)
             {
+                if (dbugEnabled) { MG.UpdateHUDDbugText("Room Generation: Room Complete"); }
                 if (bossRoom) //if boss room over, spawn way down
                 {
                     portalObject = Instantiate(portalPrefab, (literalPosition + roomCenter), Quaternion.identity);
@@ -80,6 +81,7 @@ public class RoomGeneration : MonoBehaviour
     private GameObject doorClosedPreCombat;
     public void LockDoors()
     {
+        if (dbugEnabled) { MG.UpdateHUDDbugText("Room Generation: Locking Doors"); }
         for (int i = 0; i < doorObjects.Length; i++)
         {
             doorObjects[i].transform.GetChild(0).transform.GetChild(0).GetComponent<AbstractDoorScript>().LockDoor();
@@ -87,6 +89,7 @@ public class RoomGeneration : MonoBehaviour
     }
     public void UnlockDoors()
     {
+        if (dbugEnabled) { MG.UpdateHUDDbugText("Room Generation: Unlocking Doors"); }
         for (int i = 0; i < doorObjects.Length; i++)
         {
             doorObjects[i].transform.GetChild(0).transform.GetChild(0).GetComponent<AbstractDoorScript>().UnlockDoor();
@@ -103,7 +106,7 @@ public class RoomGeneration : MonoBehaviour
 
     public void Wake(int roomID, int roomPosX, int roomPosZ, int roomBoundsX, int roomBoundsZ, string roomSize, string roomType, Vector3 literalPosition)
     {
-        if (dbugEnabled) { Debug.Log("ID: " + roomID + "   size: " + roomSize + "   type: " + roomType + "   x: " + roomBoundsX + ", z: " + roomBoundsZ); }
+        //if (dbugEnabled) { Debug.Log("ID: " + roomID + "   size: " + roomSize + "   type: " + roomType + "   x: " + roomBoundsX + ", z: " + roomBoundsZ); }
 
         this.roomID = roomID;
         this.roomPosX = roomPosX;
@@ -156,6 +159,7 @@ public class RoomGeneration : MonoBehaviour
     //generate room grid x by z
     private void GenerateFloor()
     {
+        if (dbugEnabled) { MG.UpdateHUDDbugText("Room Generation: Generating Floor"); }
         int pos = 0;
         GameObject dbugParent = null;
         roomGridStates = new string[(roomBoundsX * roomBoundsZ)];
@@ -206,6 +210,7 @@ public class RoomGeneration : MonoBehaviour
     }
     private void GenerateDoorways()
     {
+        if (dbugEnabled) { MG.UpdateHUDDbugText("Room Generation: Generating Doorways"); }
         int doorCount = 0;
 
         //check each grid position along room bounds for doorways
@@ -284,6 +289,7 @@ public class RoomGeneration : MonoBehaviour
     }
     private void GenerateWalls()
     {
+        if (dbugEnabled) { MG.UpdateHUDDbugText("Room Generation: Generating Walls"); }
         for (int wallIndex = 0; wallIndex < 4; wallIndex++) // loop through 4 walls
         {
             string direction = "";
@@ -349,6 +355,7 @@ public class RoomGeneration : MonoBehaviour
     public void SetPlayerInRoom(bool inRoom) { playerInRoom = inRoom; } //updated by RoomColliderManager
     public IEnumerator RoomEntered() //called by RoomColliderManager when player enters room
     {
+        if (dbugEnabled) { MG.UpdateHUDDbugText("Room Generation: Room Entered"); }
         yield return new WaitForSeconds(0.25f); //wait for player to enter room
         //Debug.Log("playerInRoom: " + playerInRoom + ", entered: " + entered);
 
@@ -357,7 +364,7 @@ public class RoomGeneration : MonoBehaviour
         if (playerInRoom && !entered)
         {
             //if player is in room and room is not entered, start appropriate room event
-            Debug.Log("roomType: " + roomType);
+            //Debug.Log("roomType: " + roomType);
             if(!roomType.Contains("Entry") && !roomType.Contains("Treasure") && !roomType.Contains("Special") && !roomType.Contains("Boss")) {StartCombat();} 
             else if(roomType.Contains("Treasure")){StartTreasure(); }
             else if(roomType.Contains("Special")){StartSpecial();}
@@ -369,6 +376,7 @@ public class RoomGeneration : MonoBehaviour
 
     private void StartCombat()
     {
+        if (dbugEnabled) { MG.UpdateHUDDbugText("Room Generation: Starting Combat Room"); }
         //update room state
         entered = true;
         running = true;
@@ -391,6 +399,7 @@ public class RoomGeneration : MonoBehaviour
 
     private void StartBoss()
     {
+        if (dbugEnabled) { MG.UpdateHUDDbugText("Room Generation: Starting Boss Room"); }
         //update room state
         entered = true;
         running = true;
@@ -418,6 +427,7 @@ public class RoomGeneration : MonoBehaviour
 
     private void StartTreasure()
     {
+        if (dbugEnabled) { MG.UpdateHUDDbugText("Room Generation: Starting Treasure Room"); }
         //update room state
         entered = true;
 
@@ -426,6 +436,7 @@ public class RoomGeneration : MonoBehaviour
 
     private void StartSpecial()
     {
+        if (dbugEnabled) { MG.UpdateHUDDbugText("Room Generation: Starting Special Room"); }
         //update room state
         entered = true;
 
@@ -435,6 +446,7 @@ public class RoomGeneration : MonoBehaviour
 
     private void StartEntry()
     {
+        if (dbugEnabled) { MG.UpdateHUDDbugText("Room Generation: Starting Entry Room"); }
         //update room state
         entered = true;
 
@@ -466,9 +478,10 @@ public class RoomGeneration : MonoBehaviour
 
     private void GenerateBoss()
     {
+        if (dbugEnabled) { MG.UpdateHUDDbugText("Room Generation: Generating Boss Enemy"); }
         //find random boss type
         GameObject bossType = validBossTypes[Random.Range(0, (validBossTypes.Length - 1))];
-        Debug.Log("bossType: " + bossType.name);
+        //Debug.Log("bossType: " + bossType.name);
         ASM.SpawnEnemy(bossType, (literalPosition + roomCenter));
     }
 
@@ -477,6 +490,7 @@ public class RoomGeneration : MonoBehaviour
     {
         //start combat
         int enemyCount = Random.Range(enemyMin, enemyMax);
+        if (dbugEnabled) { MG.UpdateHUDDbugText("Room Generation: Generating " + enemyCount + " Enemies"); }
         Vector3[] enemyPositions = new Vector3[0];
         GameObject[] enemyTypes = new GameObject[0];
         //Debug.Log("enemyCount: " + enemyCount);
