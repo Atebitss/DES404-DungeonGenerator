@@ -38,8 +38,8 @@ public class PlayerController : MonoBehaviour
         if (ADM != null) { PWCM.SetADM(ADM); }
         PWCM.SetHitParticle(PPS);
 
-        maxHealthBarWidth = healthBarRect.sizeDelta.x;
-        UpdateHealthBar();
+        maxPlayerHealthBarWidth = playerHealthBarRect.sizeDelta.x;
+        UpdatePlayerHealthBar();
     }
 
 
@@ -64,13 +64,13 @@ public class PlayerController : MonoBehaviour
 
         //stats
         DDM.playerHealthCurrent = healthPointsCurrent;
-        DDM.playerHealthMax = healthPointASMax;
+        DDM.playerHealthMax = healthPointsMax;
         DDM.playerHealthPerSecond = 0f;
         DDM.playerStaminaCurrent = staminaPointsCurrent;
-        DDM.playerStaminaMax = staminaPointASMax;
+        DDM.playerStaminaMax = staminaPointsMax;
         DDM.playerStaminaPerSecond = 0f;
         DDM.playerMagicCurrent = magicPointsCurrent;
-        DDM.playerMagicMax = magicPointASMax;
+        DDM.playerMagicMax = magicPointsMax;
         DDM.playerMagicPerSecond = 0f;
         DDM.playerAttackDamage = attackDamage;
         DDM.playerAttackSpeed = attackSpeed;
@@ -432,36 +432,38 @@ public class PlayerController : MonoBehaviour
 
     //~~~~~HUD~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     [Header("-HUD")]
-    [SerializeField] private TMP_Text healthText;
-    [SerializeField] private RectTransform healthBarRect;
-    [SerializeField] private Image healthBarImage;
-    private float maxHealthBarWidth;
+    [SerializeField] private TMP_Text playerHealthText;
+    [SerializeField] private RectTransform playerHealthBarRect;
+    [SerializeField] private Image playerHealthBarImage;
+    private float maxPlayerHealthBarWidth;
 
-    private void UpdateHealthBar()
+    private void UpdatePlayerHealthBar()
     {
         //Debug.Log("invincible: " + invincible);
         //update health bar
-        float hpPercentage = (float)healthPointsCurrent / (float)healthPointASMax;
-        healthBarRect.sizeDelta = new Vector2(maxHealthBarWidth * hpPercentage, healthBarRect.sizeDelta.y);
-        healthText.text = healthPointsCurrent + " / " + healthPointASMax;
+        float hpPercentage = (float)healthPointsCurrent / (float)healthPointsMax;
+        playerHealthBarRect.sizeDelta = new Vector2(maxPlayerHealthBarWidth * hpPercentage, playerHealthBarRect.sizeDelta.y);
+        playerHealthText.text = healthPointsCurrent + " / " + healthPointsMax;
 
         if(invincible)
         {
-            healthBarImage.color = Color.magenta;
+            playerHealthBarImage.color = Color.magenta;
         }
         else if (hpPercentage > 0.5f && hpPercentage <= 1f && !invincible)
         {
-            healthBarImage.color = Color.green; // Healthy
+            playerHealthBarImage.color = Color.green; // Healthy
         }
         else if (hpPercentage > 0.2f && hpPercentage <= 0.5f && !invincible)
         {
-            healthBarImage.color = Color.yellow; // Warning
+            playerHealthBarImage.color = Color.yellow; // Warning
         }
         else if (hpPercentage <= 0.2f && !invincible)
         {
-            healthBarImage.color = Color.red; // Critical
+            playerHealthBarImage.color = Color.red; // Critical
         }
     }
+
+
 
     private void UpdateInteractionPrompt()
     {
@@ -484,38 +486,46 @@ public class PlayerController : MonoBehaviour
     //~~~~~stats~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     [Header("-Stat")]
     [SerializeField] private int healthPointsCurrent = 10;
-    [SerializeField] private int healthPointASMax = 10;
+    [SerializeField] private int healthPointsMax = 10;
     [SerializeField] private int staminaPointsCurrent = 10;
-    [SerializeField] private int staminaPointASMax = 10;
+    [SerializeField] private int staminaPointsMax = 10;
     [SerializeField] private int magicPointsCurrent = 10;
-    [SerializeField] private int magicPointASMax = 10;
+    [SerializeField] private int magicPointsMax = 10;
     [SerializeField] private int StrengthPoints = 1, DexterityPoints = 1, IntelligencePoints = 1, WisdomPoints = 1;
     [SerializeField] private bool invincible = false, permaInvincible = false;
     [SerializeField] private float invincibilityTimer = 0f;
     private float invincibilityStartTime = 0f;
 
     //health points
-    public void SetCurrentHealthPoints(int newHealth) { if (!invincible) { /*Debug.Log("setting health: " + newHealth);*/ healthPointsCurrent = newHealth; HealthCheck(); UpdateHealthBar(); } }
-    public void AlterCurrentHealthPoints(int alter) { if(!invincible) { /*Debug.Log("altering health: " + alter);*/ healthPointsCurrent += alter; HealthCheck(); UpdateHealthBar(); ADM.DamageTaken(); } }
+    public void SetCurrentHealthPoints(int newHealth) { if (!invincible) { /*Debug.Log("setting health: " + newHealth);*/ healthPointsCurrent = newHealth; HealthCheck(); } }
+    public void AlterCurrentHealthPoints(int alter) { if(!invincible) { /*Debug.Log("altering health: " + alter);*/ healthPointsCurrent += alter; HealthCheck(); ADM.DamageTaken(); } }
     public int GetCurrentHealthPoints() { return healthPointsCurrent; }
-    private void HealthCheck() { if (healthPointsCurrent <= 0) { /*Debug.Log("health check: " + healthPointsCurrent);*/ UpdateHealthBar(); ASM.DestroyPlayer(); } }
+    private void HealthCheck() 
+    { 
+        if (healthPointsCurrent <= 0) 
+        { 
+            /*Debug.Log("health check: " + healthPointsCurrent);*/ 
+            UpdatePlayerHealthBar(); 
+            ASM.DestroyPlayer(); 
+        } 
+    }
 
-    public void AlterMaxHealthPoints(int alter) { healthPointASMax += alter; }
-    public int GetMaxHealthPoints() { return healthPointASMax; }
+    public void AlterMaxHealthPoints(int alter) { healthPointsMax += alter; }
+    public int GetMaxHealthPoints() { return healthPointsMax; }
 
     //stamina points
     public void AlterCurrentStaminaPoints(int alter) { staminaPointsCurrent += alter; }
     public int GetCurrentStaminaPoints() { return staminaPointsCurrent; }
 
-    public void AlterMaxStaminaPoints(int alter) { staminaPointASMax += alter; }
-    public int GetMaxStaminaPoints() { return staminaPointASMax; }
+    public void AlterMaxStaminaPoints(int alter) { staminaPointsMax += alter; }
+    public int GetMaxStaminaPoints() { return staminaPointsMax; }
 
     //magic points
     public void AlterCurrentMagicPoints(int alter) { magicPointsCurrent += alter; }
     public int GetCurrentMagicPoints() { return magicPointsCurrent; }
 
-    public void AlterMaxMagicPoints(int alter) { magicPointASMax += alter; }
-    public int GetMaxMagicPoints() { return magicPointASMax; }
+    public void AlterMaxMagicPoints(int alter) { magicPointsMax += alter; }
+    public int GetMaxMagicPoints() { return magicPointsMax; }
 
     //other stats
     //stength
@@ -543,14 +553,14 @@ public class PlayerController : MonoBehaviour
         {
             invincible = true; //set tracker true
             invincibilityStartTime = Time.time; //track when invisibility started
-            UpdateHealthBar();
+            UpdatePlayerHealthBar();
             
         }
         else if (permaInvincible && !invincible) 
         {
             invincible = true; 
             invincibilityTimer = 1f;
-            UpdateHealthBar();
+            UpdatePlayerHealthBar();
         } 
 
         if (invincibilityTimer > 0 && !permaInvincible) { invincibilityTimer -= Time.deltaTime; } //count down timer
@@ -560,7 +570,7 @@ public class PlayerController : MonoBehaviour
             invincibilityTimer = 0; 
             invincibilityStartTime = 0; 
             invincible = false; 
-            UpdateHealthBar();
+            UpdatePlayerHealthBar();
         } 
 
 

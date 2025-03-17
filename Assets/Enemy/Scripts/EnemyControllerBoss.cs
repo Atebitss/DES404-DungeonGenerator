@@ -11,9 +11,11 @@ public class EnemyControllerBoss : AbstractEnemy
 
     override public void UpdateBossStates() 
     {
-        Debug.Log("UpdateBossStates");
+        //Debug.Log("UpdateBossStates");
+        SetBHDM(GetPC().gameObject.transform.parent.GetChild(1).GetComponent<BossHealthDisplayManager>());
+
         int randBossTypeID = Random.Range(0, 0);
-        Debug.Log("randBossTypeID: " + randBossTypeID);
+        //Debug.Log("randBossTypeID: " + randBossTypeID);
         switch (randBossTypeID)
         {
             case 0:
@@ -22,11 +24,11 @@ public class EnemyControllerBoss : AbstractEnemy
 
                 health = 20;
                 attackDamage = 1;
-                Debug.Log("id: " + randBossTypeID);
+                /*Debug.Log("id: " + randBossTypeID);
                 Debug.Log("type: " + type);
                 Debug.Log("dual: " + dual);
                 Debug.Log("health: " + health);
-                Debug.Log("attackDamage: " + attackDamage);
+                Debug.Log("attackDamage: " + attackDamage);*/
                 break;
         }
     }

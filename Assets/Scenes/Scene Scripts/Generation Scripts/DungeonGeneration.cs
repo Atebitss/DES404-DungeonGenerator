@@ -328,11 +328,11 @@ public class DungeonGeneration : MonoBehaviour
         yield return StartCoroutine(PG.CreateHallways()); //create hallways
 
         //spawn player
-        //ASM.SpawnPlayer(new Vector3(entryRoomCenter.x, 0.1f, entryRoomCenter.y));
-        //currentPlayer = ASM.GetPlayerObject();
+        ASM.SpawnPlayer(new Vector3(entryRoomCenter.x, 0.1f, entryRoomCenter.y));
+        currentPlayer = ASM.GetPlayerObject();
 
-        yield return new WaitForSeconds(5f);
-        ASM.RestartScene();
+        // yield return new WaitForSeconds(5f);
+        //ASM.RestartScene();
 
         //if (currentPlayer == null) { currentPlayer = Instantiate(playerPrefab, new Vector3(entryRoomCenter.x, 0, entryRoomCenter.y), Quaternion.identity); }
 

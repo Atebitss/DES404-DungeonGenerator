@@ -14,6 +14,9 @@ public abstract class AbstractEnemy : MonoBehaviour
     private AdaptiveDifficultyManager ADM;
     private AudioManager AM;
     private PlayerController PC;
+    public PlayerController GetPC() { return PC; }
+    private BossHealthDisplayManager BHDM;
+    public void SetBHDM(BossHealthDisplayManager newBHDM) { BHDM = newBHDM; }
 
 
     private float GetCurAnimLength()
@@ -51,7 +54,11 @@ public abstract class AbstractEnemy : MonoBehaviour
             if (ADM != null) { EWCMs[i].SetADM(ADM); }
         }
 
-        if (boss) { UpdateBossStates(); }
+        if (boss) 
+        {
+            UpdateBossStates();
+            BHDM.Wake(this);
+        }
         //Debug.Log("dual: " + dual);
         a.SetBool("dual", dual); 
     }
@@ -85,7 +92,17 @@ public abstract class AbstractEnemy : MonoBehaviour
     public int GetHealth() { return health; }
     public void SetHealth(int newHealth) { health = newHealth; HealthCheck(); }
     public void AlterHealth(int change) { /*Debug.Log("altering health: " + change);*/ health += change; HealthCheck(); }
-    private void HealthCheck() { /*Debug.Log("health check: " + health);*/ if (health <= 0) { ASM.DestroyEnemy(this.transform.parent.gameObject); Destroy(this.transform.parent.gameObject); } }
+    private void HealthCheck() 
+    { 
+        /*Debug.Log("health check: " + health);*/ 
+        BHDM.UpdateCurrentBossHealth(health);
+
+        if (health <= 0) 
+        {
+            ASM.DestroyEnemy(this.transform.parent.gameObject); 
+            Destroy(this.transform.parent.gameObject); 
+        } 
+    }
     //~~~~~health~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
