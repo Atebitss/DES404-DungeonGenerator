@@ -94,9 +94,9 @@ public abstract class AbstractEnemy : MonoBehaviour
     public void SetHealth(int newHealth) { health = newHealth; HealthCheck(); }
     public void AlterHealth(int change) { /*Debug.Log("altering health: " + change);*/ health += change; HealthCheck(); }
     private void HealthCheck() 
-    { 
-        /*Debug.Log("health check: " + health);*/ 
-        BHDM.UpdateCurrentBossHealth(health);
+    {
+        /*Debug.Log("health check: " + health);*/
+        if (boss) { BHDM.UpdateCurrentBossHealth(health); }
 
         if (health <= 0) 
         {

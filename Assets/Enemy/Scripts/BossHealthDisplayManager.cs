@@ -6,6 +6,7 @@ using UnityEngine.UI;
 
 public class BossHealthDisplayManager : MonoBehaviour
 {
+    [SerializeField] private GameObject bossHealthParent;
     [SerializeField] private TMP_Text bossHealthText;
     [SerializeField] private RectTransform bossHealthBarRect;
     [SerializeField] private Image bossHealthBarImage;
@@ -17,11 +18,11 @@ public class BossHealthDisplayManager : MonoBehaviour
 
     public void EnableBossHealthDisplay()
     {
-        gameObject.SetActive(true);
+        bossHealthParent.SetActive(true);
     }
     public void DisableBossHealthDisplay()
     {
-        gameObject.SetActive(false);
+        bossHealthParent.SetActive(false);
     }
 
 

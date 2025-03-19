@@ -6539,6 +6539,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 50b3ea4cf4310344abb2723c6ea317a9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bossHealthParent: {fileID: 3655077985205348882}
   bossHealthText: {fileID: 9047762778054581458}
   bossHealthBarRect: {fileID: 4846429522671568989}
   bossHealthBarImage: {fileID: 4300067530547893098}
