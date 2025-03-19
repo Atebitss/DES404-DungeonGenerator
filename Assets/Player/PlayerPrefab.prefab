@@ -413,6 +413,7 @@ MonoBehaviour:
   playerCamera: {fileID: 5022982567547155934}
   interactionPromptText: {fileID: 408251515721017303}
   a: {fileID: 1875127274234875169}
+  hitSplashPrefab: {fileID: 2683464079042679606, guid: 03b0fd0cb7bf08349877fd7a75a3598b, type: 3}
   movementSpeed: 5
   dodgeMask:
     serializedVersion: 2
@@ -449,7 +450,7 @@ MonoBehaviour:
   IntelligencePoints: 1
   WisdomPoints: 1
   invincible: 0
-  permaInvincible: 0
+  permaInvincible: 1
   invincibilityTimer: 0
 --- !u!82 &631621802871244450
 AudioSource:

@@ -14,6 +14,17 @@ public class BossHealthDisplayManager : MonoBehaviour
     AbstractEnemy bossController;
 
 
+
+    public void EnableBossHealthDisplay()
+    {
+        gameObject.SetActive(true);
+    }
+    public void DisableBossHealthDisplay()
+    {
+        gameObject.SetActive(false);
+    }
+
+
     public void Wake(AbstractEnemy bossController)
     {
         this.bossController = bossController;

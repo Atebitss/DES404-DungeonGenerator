@@ -17,6 +17,7 @@ public abstract class AbstractEnemy : MonoBehaviour
     public PlayerController GetPC() { return PC; }
     private BossHealthDisplayManager BHDM;
     public void SetBHDM(BossHealthDisplayManager newBHDM) { BHDM = newBHDM; }
+    public BossHealthDisplayManager GetBHDM() { return BHDM; }
 
 
     private float GetCurAnimLength()

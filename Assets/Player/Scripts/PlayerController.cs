@@ -15,6 +15,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Camera playerCamera; //player camera used for looking and object interactions
     [SerializeField] private TMP_Text interactionPromptText; //object interaction display
     [SerializeField] private Animator a; //player animator used for running animations
+    [SerializeField] private GameObject hitSplashPrefab; //hit splash prefab
 
     private AbstractSceneManager ASM; //scene manager
     private AudioManager AM; //audio manager
@@ -22,6 +23,7 @@ public class PlayerController : MonoBehaviour
     private AdaptiveDifficultyManager ADM; //adaptive difficulty manager
     private AdaptiveDifficultyDisplayManager ADDM; //adaptive difficulty display manager
     public AdaptiveDifficultyDisplayManager GetADDM() { return ADDM; }
+    private BossHealthDisplayManager BHDM; //boss health display manager
 
 
 
@@ -34,12 +36,16 @@ public class PlayerController : MonoBehaviour
         ADDM = this.gameObject.transform.parent.GetChild(1).GetComponent<AdaptiveDifficultyDisplayManager>();
 
         PWCM.SetWeaponDamage(attackDamage);
-        PWCM.SetAM(AM);
         if (ADM != null) { PWCM.SetADM(ADM); }
+        PWCM.SetAM(AM);
         PWCM.SetHitParticle(PPS);
+        PWCM.SetHitSplash(hitSplashPrefab);
+        PWCM.SetPC(this);
 
         maxPlayerHealthBarWidth = playerHealthBarRect.sizeDelta.x;
         UpdatePlayerHealthBar();
+        BHDM = this.gameObject.transform.parent.GetChild(1).GetComponent<BossHealthDisplayManager>();
+        BHDM.DisableBossHealthDisplay();
     }
 
 

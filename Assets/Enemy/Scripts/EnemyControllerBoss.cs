@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyControllerBoss : AbstractEnemy
-{    private void Awake()
+{   private void Awake()
     {
         //update basic stats
         boss = true;
@@ -13,6 +13,7 @@ public class EnemyControllerBoss : AbstractEnemy
     {
         //Debug.Log("UpdateBossStates");
         SetBHDM(GetPC().gameObject.transform.parent.GetChild(1).GetComponent<BossHealthDisplayManager>());
+        GetBHDM().EnableBossHealthDisplay();
 
         int randBossTypeID = Random.Range(0, 0);
         //Debug.Log("randBossTypeID: " + randBossTypeID);
@@ -31,5 +32,10 @@ public class EnemyControllerBoss : AbstractEnemy
                 Debug.Log("attackDamage: " + attackDamage);*/
                 break;
         }
+    }
+
+    private void OnDestroy()
+    {
+        GetBHDM().DisableBossHealthDisplay();
     }
 }
