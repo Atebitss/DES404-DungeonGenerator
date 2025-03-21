@@ -9,6 +9,7 @@ public class AdaptiveDifficultyManager : MonoBehaviour
     private PlayerController PC;
     private AbstractSceneManager ASM;
     private AdaptiveDifficultyDisplayManager ADDM;
+    private SkillVisualizationManager SVM;
     private RoomGeneration RG;
 
     public void Wake(AbstractSceneManager newASM)
@@ -17,6 +18,8 @@ public class AdaptiveDifficultyManager : MonoBehaviour
         PC = ASM.GetPlayerController();
         ADDM = PC.GetADDM();
         ADDM.SetADM(this);
+        SVM = PC.GetSVM();
+        SVM.SetADM(this);
     }
     //~~~~~~misc~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -25,6 +28,7 @@ public class AdaptiveDifficultyManager : MonoBehaviour
     //~~~~~~track stats~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //to be tracked throughout a run, reset on death/restart
     private int roomsCleared = 0;
+    public int GetRoomsCleared() { return roomsCleared; }
     public void RoomCleared() 
     {
         roomsCleared++; 
@@ -180,6 +184,7 @@ public class AdaptiveDifficultyManager : MonoBehaviour
 
     //~~~~~~difficulty change~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     private float skillScore = 100f; //used to determine player skill level
+    public float GetSkillScore() { return skillScore; }
     public void RunDifficultyAdapter()
     {
         //Debug.Log("Running difficulty adapter");
@@ -270,6 +275,7 @@ public class AdaptiveDifficultyManager : MonoBehaviour
         }
 
         if (ADDM != null) { ADDM.playerSkillScore = skillScore; }
+        if(SVM != null) { SVM.AddSkillScoreDataPoint(skillScore); }
 
         if (statTracking)
         {

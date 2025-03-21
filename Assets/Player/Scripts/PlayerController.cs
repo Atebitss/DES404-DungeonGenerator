@@ -23,6 +23,8 @@ public class PlayerController : MonoBehaviour
     private AdaptiveDifficultyManager ADM; //adaptive difficulty manager
     private AdaptiveDifficultyDisplayManager ADDM; //adaptive difficulty display manager
     public AdaptiveDifficultyDisplayManager GetADDM() { return ADDM; }
+    private SkillVisualizationManager SVM; //skill visualization manager
+    public SkillVisualizationManager GetSVM() { return SVM; }
     private BossHealthDisplayManager BHDM; //boss health display manager
 
 
@@ -34,6 +36,7 @@ public class PlayerController : MonoBehaviour
         ADM = ASM.GetComponent<AdaptiveDifficultyManager>();
         DDM = this.gameObject.transform.parent.GetChild(1).GetComponent<DbugDisplayManager>();
         ADDM = this.gameObject.transform.parent.GetChild(1).GetComponent<AdaptiveDifficultyDisplayManager>();
+        SVM = this.gameObject.transform.parent.GetChild(1).GetComponent<SkillVisualizationManager>();
 
         PWCM.SetWeaponDamage(attackDamage);
         if (ADM != null) { PWCM.SetADM(ADM); }

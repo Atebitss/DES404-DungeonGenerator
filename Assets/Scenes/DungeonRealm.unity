@@ -727,7 +727,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5fc84d788842a714d91d94917e44a74e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dbugEnabled: 1
+  dbugEnabled: 0
   hallwayFloorPrefab: {fileID: 8997730621713062801, guid: a92346e935984e84facab4bfc2e06413, type: 3}
   hallwayWallPrefab: {fileID: 7488329685454604500, guid: 86ecb343b54eb2f4885869843c8e6be3, type: 3}
   wallCost: 25
@@ -754,9 +754,9 @@ MonoBehaviour:
   treasureRoomsMin: 3
   specialRoomsMax: 3
   specialRoomsMin: 3
-  dbugEnabled: 1
-  showDbugTiles: 1
-  visualDemo: 1
+  dbugEnabled: 0
+  showDbugTiles: 0
+  visualDemo: 0
   defaultCamera: {fileID: 963194227}
   baseDbugMat: {fileID: 2100000, guid: e8a11bef448ed1b4382b0b5eebb590ca, type: 2}
   matDbugEmpty: {fileID: 2100000, guid: b935ea7b19223f444a7418c023851217, type: 2}
@@ -782,7 +782,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4bdb70d58032f6548990ecc3fe0b286b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dbugEnabled: 1
+  dbugEnabled: 0
   largeRoomSizeMin: 20
   largeRoomSizeMax: 25
   mediumRoomSizeMin: 10
@@ -806,7 +806,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4e4367cd3edc664f83e443b40584045, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  devMode: 1
+  devMode: 0
   amPrefab: {fileID: 4065216700189244488, guid: 924cc0721c1d6e841a3aff4bc23543af, type: 3}
   playerPrefab: {fileID: 2783768033875945984, guid: 07888939a1f59d349b73cd0353289295, type: 3}
   doorPrefab: {fileID: 7151845054247194810, guid: ec6fe55e299e1054496342b441da8b59, type: 3}

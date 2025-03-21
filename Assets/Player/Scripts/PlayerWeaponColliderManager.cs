@@ -24,7 +24,7 @@ public class PlayerWeaponColliderManager : MonoBehaviour
 
     public void EnableAttackCheck(float attackAnimDur)
     {
-        Debug.Log("attack enabled");
+        //Debug.Log("attack enabled");
         attacking = true;
         Invoke("OverlapCheck", (attackAnimDur / 2));
         Invoke("DisableAttackCheck", attackAnimDur);
