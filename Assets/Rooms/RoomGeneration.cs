@@ -35,6 +35,7 @@ public class RoomGeneration : MonoBehaviour
                 {
                     portalObject = Instantiate(portalPrefab, (literalPosition + roomCenter), Quaternion.identity);
                     portalObject.GetComponent<PortalManager>().SetASM(ASM);
+                    portalObject.GetComponent<PortalManager>().SetDRM(ASM.GetDG().GetDRM());
                     portalObject.transform.parent = this.transform.GetChild(1);
                 }
                 UnlockDoors();

@@ -450,7 +450,7 @@ MonoBehaviour:
   IntelligencePoints: 1
   WisdomPoints: 1
   invincible: 0
-  permaInvincible: 1
+  permaInvincible: 0
   invincibilityTimer: 0
 --- !u!82 &631621802871244450
 AudioSource:
@@ -6586,6 +6586,9 @@ MonoBehaviour:
   roomsCleared: 0
   roomClearTimes: []
   avgRoomClearTime: 0
+  floorsCleared: 0
+  floorClearTimes: []
+  avgFloorClearTime: 0
 --- !u!114 &3436191850363739005
 MonoBehaviour:
   m_ObjectHideFlags: 0

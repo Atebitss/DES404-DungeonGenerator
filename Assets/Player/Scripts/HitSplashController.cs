@@ -40,9 +40,12 @@ public class HitSplashController : MonoBehaviour
     public void SetLookSensitivity(int newSensitivity) { lookSensitivity = newSensitivity; }
     private void FixedUpdate()
     {
-        //face towards player
-        Vector3 playerLookPosition = new Vector3(PC.transform.position.x, (PC.transform.position.y - 0.5f), PC.transform.position.z);
-        Quaternion targetRot = Quaternion.LookRotation(this.gameObject.transform.position - playerLookPosition);
-        this.gameObject.transform.rotation = targetRot;
+        if (PC != null)
+        {
+            //face towards player
+            Vector3 playerLookPosition = new Vector3(PC.transform.position.x, (PC.transform.position.y - 0.5f), PC.transform.position.z);
+            Quaternion targetRot = Quaternion.LookRotation(this.gameObject.transform.position - playerLookPosition);
+            this.gameObject.transform.rotation = targetRot;
+        }
     }
 }

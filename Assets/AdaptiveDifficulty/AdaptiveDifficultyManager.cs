@@ -12,6 +12,13 @@ public class AdaptiveDifficultyManager : MonoBehaviour
     private SkillVisualizationManager SVM;
     private RoomGeneration RG;
 
+
+    private void Awake()
+    {
+        //where to export the file
+        filePath = Application.persistentDataPath + "/player_stats.txt";
+        //Debug.Log("filePath: " + filePath);
+    }
     public void Wake(AbstractSceneManager newASM)
     {
         ASM = newASM;
@@ -20,6 +27,16 @@ public class AdaptiveDifficultyManager : MonoBehaviour
         ADDM.SetADM(this);
         SVM = PC.GetSVM();
         SVM.SetADM(this);
+
+        StartDataFile();
+    }
+    public void End()
+    {
+        //update data with final stats
+        statsData += "\n~~~PLAYER DEATH~~~\n\n";
+        FillDataFileRoom();
+        FillDataFileFloor();
+        EndDataFile();
     }
     //~~~~~~misc~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -27,16 +44,37 @@ public class AdaptiveDifficultyManager : MonoBehaviour
 
     //~~~~~~track stats~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //to be tracked throughout a run, reset on death/restart
+    //room clears
     private int roomsCleared = 0;
     public int GetRoomsCleared() { return roomsCleared; }
-    public void RoomCleared() 
+    public void RoomCleared()
     {
-        roomsCleared++; 
-        if(ADDM != null) { ADDM.roomsCleared = roomsCleared; }
+        roomsCleared++;
+        if (ADDM != null) { ADDM.roomsCleared = roomsCleared; }
     }
 
     private float avgRoomClearTime = 0f;
     private float[] roomClearTimes = new float[0];
+
+    //floor clears
+    private int floorsCleared = 0;
+    public int GetFloorsCleared() { return floorsCleared; }
+    public void FloorCleared(float clearTime)
+    {
+        floorsCleared++;
+        if (ADDM != null) { ADDM.floorsCleared = floorsCleared; }
+
+        //increase floorClearTimes array and add new data
+        float[] newFloorClearTimes = new float[floorClearTimes.Length + 1];
+        for (int i = 0; i < floorClearTimes.Length; i++) { newFloorClearTimes[i] = floorClearTimes[i]; }
+        newFloorClearTimes[floorClearTimes.Length] = clearTime; //new time
+        floorClearTimes = newFloorClearTimes;
+
+        FillDataFileFloor();
+    }
+
+    private float avgFloorClearTime = 0f;
+    private float[] floorClearTimes = new float[0];
 
 
     //to be tracked throughout a run, reset each room
@@ -65,7 +103,7 @@ public class AdaptiveDifficultyManager : MonoBehaviour
             avgRoomClearTime = (totalRoomClearTime / roomClearTimes.Length);
             //Debug.Log("avgRoomClearTime: " + avgRoomClearTime);
 
-            if(ADDM != null) 
+            if (ADDM != null)
             {
                 ADDM.SetADM(this);
                 ADDM.startTime = startTime;
@@ -80,9 +118,9 @@ public class AdaptiveDifficultyManager : MonoBehaviour
         //Debug.Log("Ending stat watch");
 
         endTime = Time.time;
-        if(ADDM != null) 
+        if (ADDM != null)
         {
-            ADDM.endTime = endTime; 
+            ADDM.endTime = endTime;
             ADDM.roomsCleared = roomsCleared;
         }
 
@@ -110,14 +148,14 @@ public class AdaptiveDifficultyManager : MonoBehaviour
         startTime = 0f;
         endTime = 0f;
 
-        if (ADDM != null) { ADDM.ResetStats(); }
+        if (ADDM != null) { ADDM.ResetRoomStats(); }
     }
 
 
 
     private float[] timeIndexsOfDamageLastTaken = new float[0]; //time of when damage last taken
     private float avgTimeBetweenDamageTaken = 0f;
-    public void DamageTaken() 
+    public void DamageTaken()
     {
         //increase timeIdexsOfDamageLastTaken array size by 1
         //copy old array to new, larger array
@@ -138,44 +176,46 @@ public class AdaptiveDifficultyManager : MonoBehaviour
         }
         avgTimeBetweenDamageTaken = totalTime / timeIndexsOfDamageLastTaken.Length;
         //Debug.Log("avgTimeBetweenDamageTaken: " + avgTimeBetweenDamageTaken);
-        if (ADDM != null) 
+        if (ADDM != null)
         {
-            ADDM.timesDamageTaken = timeIndexsOfDamageLastTaken; 
+            ADDM.timesDamageTaken = timeIndexsOfDamageLastTaken;
             ADDM.avgTimeBetweenDamageTaken = avgTimeBetweenDamageTaken;
         }
     }
 
 
     private int numOfAttacks = 0, numOfHits = 0; //number of swings and hits to detemine accuracy
-    public void AttackRan() 
+    private float accuracy = 0f;
+    public void AttackRan()
     {
         numOfAttacks++;
         if (ADDM != null) { ADDM.numOfAttacks = numOfAttacks; }
     }
-    public void AttackSuccess() 
+    public void AttackSuccess()
     {
-        numOfHits++; 
+        numOfHits++;
         if (ADDM != null) { ADDM.numOfHits = numOfHits; }
     }
 
 
     private int numOfDodges = 0, numOfHitsDodged = 0; //number of dodges and hits dodged to determine dodge percision
-    public void DodgeRan() 
+    private float dodgeEffectiveness = 0f;
+    public void DodgeRan()
     {
-        numOfDodges++; 
+        numOfDodges++;
         if (ADDM != null) { ADDM.numOfDodges = numOfDodges; }
     }
-    public void DodgeSuccess() 
+    public void DodgeSuccess()
     {
-        numOfHitsDodged++; 
+        numOfHitsDodged++;
         if (ADDM != null) { ADDM.numOfHitsDodged = numOfHitsDodged; }
     }
 
 
     private int combosPerformed = 0; //number of combos performed
-    public void ComboPerformed() 
+    public void ComboPerformed()
     {
-        combosPerformed++; 
+        combosPerformed++;
         if (ADDM != null) { ADDM.combosPerformed = combosPerformed; }
     }
     //~~~~~~track stats~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -192,31 +232,29 @@ public class AdaptiveDifficultyManager : MonoBehaviour
         //difficulty change based on stats
         //calculate average time between damage taken
         float maxExpectedTimeBetweenDamage = 15f;
-        //Debug.Log("(avgTimeBetweenDamageTaken / maxExpectedTimeBetweenDamage): " + (avgTimeBetweenDamageTaken / maxExpectedTimeBetweenDamage));
+        //Debug.Log("TimeBetweenDamageTaken score: " + (avgTimeBetweenDamageTaken / maxExpectedTimeBetweenDamage));
         skillScore += (avgTimeBetweenDamageTaken / maxExpectedTimeBetweenDamage);
         //Debug.Log("skillScore: " + skillScore);
 
 
         //calculate attack accuracy
-        float accuracy = 0f;
         if (numOfAttacks > 0) { accuracy = (((float)numOfHits / (float)numOfAttacks)); }
         //Debug.Log("numOfHits: " + numOfHits + " / numOfAttacks: " + numOfAttacks);
-        //Debug.Log("accuracy: " + accuracy);
+        //Debug.Log("accuracy score: " + accuracy);
         skillScore += accuracy;
         //Debug.Log("skillScore: " + skillScore);
 
 
         //calculate dodge effectiveness
-        float dodgeEffectiveness = 0f;
         if (numOfDodges > 0) { dodgeEffectiveness = (((float)numOfHitsDodged / (float)numOfDodges)); }
         //Debug.Log("numOfHitsDodged: " + numOfHitsDodged + " / numOfDodges: " + numOfDodges);
-        //Debug.Log("dodgeEffectiveness: " + dodgeEffectiveness);
+        //Debug.Log("dodge score: " + dodgeEffectiveness);
         skillScore += dodgeEffectiveness;
         //Debug.Log("skillScore: " + skillScore);
 
 
         //add combo useage
-        //Debug.Log("combosPerformed: " + combosPerformed);
+        //Debug.Log("combo scored: " + combosPerformed);
         skillScore += combosPerformed;
         //Debug.Log("skillScore: " + skillScore);
 
@@ -230,14 +268,34 @@ public class AdaptiveDifficultyManager : MonoBehaviour
             //Debug.Log("totalRoomClearTime: " + totalRoomClearTime);
         }
         avgRoomClearTime = (totalRoomClearTime / roomClearTimes.Length);
-        //Debug.Log("avgRoomClearTime: " + avgRoomClearTime);
+        //Debug.Log("RoomClearTime score: " + avgRoomClearTime);
         if (roomClearTimes.Length > 0) { skillScore -= (avgRoomClearTime / 10f); }
         //Debug.Log("skillScore: " + skillScore);
 
 
         //add rooms cleared
-        //Debug.Log("roomsCleared: " + roomsCleared);
+        //Debug.Log("roomsCleared score: " + roomsCleared);
         skillScore += ((float)roomsCleared / 10f);
+        //Debug.Log("skillScore: " + skillScore);
+
+
+        //calculate average floor clear time
+        float totalFloorClearTime = 0f;
+        for (int i = 0; i < floorClearTimes.Length; i++)
+        {
+            //Debug.Log("floorClearTimes[" + i + "]: " + floorClearTimes[i]);
+            totalFloorClearTime += floorClearTimes[i];
+            //Debug.Log("totalFloorClearTime: " + totalFloorClearTime);
+        }
+        avgFloorClearTime = (totalFloorClearTime / floorClearTimes.Length);
+        //Debug.Log("FloorClearTime score: " + avgFloorClearTime);
+        if (floorClearTimes.Length > 0) { skillScore -= (avgFloorClearTime / 10f); }
+        //Debug.Log("skillScore: " + skillScore);
+
+
+        //add floors cleared
+        //Debug.Log("floorsCleared score: " + floorsCleared);
+        skillScore += ((float)floorsCleared * 10f);
         //Debug.Log("skillScore: " + skillScore);
 
 
@@ -275,7 +333,8 @@ public class AdaptiveDifficultyManager : MonoBehaviour
         }
 
         if (ADDM != null) { ADDM.playerSkillScore = skillScore; }
-        if(SVM != null) { SVM.AddSkillScoreDataPoint(skillScore); }
+        if (SVM != null) { SVM.AddSkillScoreDataPoint(skillScore); }
+        FillDataFileRoom();
 
         if (statTracking)
         {
@@ -283,4 +342,67 @@ public class AdaptiveDifficultyManager : MonoBehaviour
         }
     }
     //~~~~~~difficulty change~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+    //~~~~~~data export~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    private string filePath = "";
+    private string statsData = "";
+    private void StartDataFile()
+    {
+        //create a new file
+        Debug.Log("Creating new data file, " + System.DateTime.Now.ToString());
+
+        //if file already exists, add to it
+        if (System.IO.File.Exists(filePath))
+        {
+            statsData = System.IO.File.ReadAllText(filePath);
+
+            //player stats string to be added to file
+            statsData += "\n--- New Report File ---";
+            statsData += "\n\n\nPlayer Stats Report - " + System.DateTime.Now.ToString();
+            statsData += "\n===================\n\n";
+            FillDataFileRoom();
+        }
+        else 
+        {
+            //if no file exists, create new file at path location
+            System.IO.File.Create(filePath);
+
+            //player stats string to be added to file
+            statsData = "Player Stats Report - " + System.DateTime.Now.ToString();
+            statsData += "\n===================\n\n";
+            FillDataFileRoom();
+        }
+    }
+    private void FillDataFileRoom()
+    {
+        statsData += "Rooms Cleared: " + roomsCleared + "\n" +
+                    "Average Room Clear Time: " + avgRoomClearTime + "\n\n" +
+                    "Attacks: " + numOfAttacks + ", Hits: " + numOfHits + "\n" +
+                    "Accuracy: " + accuracy + "\n" +
+                    "Dodges: " + numOfDodges + ", Hits Dodged: " + numOfHitsDodged + "\n" +
+                    "Dodge Effectiveness: " + dodgeEffectiveness + "\n" +
+                    "Combos Performed: " + combosPerformed + "\n\n" +
+                    "Times Damage Taken: " + timeIndexsOfDamageLastTaken.Length + "\n" +
+                    "Average Time Between Damage Taken: " + avgTimeBetweenDamageTaken + "\n\n" +
+
+                    "Skill Score: " + skillScore + "\n\n" +
+                    "\n~~~~~~~~~~~~~~~~~~~\n";
+    }
+    private void FillDataFileFloor()
+    {
+        statsData += "Floor: " + floorsCleared + "\n" +
+                    "Average Floor Clear Time: " + avgFloorClearTime + "\n" +
+                    "\n===================\n";
+    }
+    private void EndDataFile()
+    {
+        statsData += "\n\n\nEnd of Run Stats Report - " + System.DateTime.Now.ToString();
+        statsData += "\n===================\n\n";
+
+        //add statsData to file
+        System.IO.File.WriteAllText(filePath, statsData);
+    }
+    //~~~~~~data export~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 }

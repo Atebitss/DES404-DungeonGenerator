@@ -10,7 +10,7 @@ public class BossHealthDisplayManager : MonoBehaviour
     [SerializeField] private TMP_Text bossHealthText;
     [SerializeField] private RectTransform bossHealthBarRect;
     [SerializeField] private Image bossHealthBarImage;
-    private float maxBossHealthBarWidth;
+    private float maxBossHealthBarWidth = 0f;
     private int bossHealthPointsCurrent = 0, bossHealthPointsMax = 0;
     AbstractEnemy bossController;
 
@@ -29,7 +29,8 @@ public class BossHealthDisplayManager : MonoBehaviour
     public void Wake(AbstractEnemy bossController)
     {
         this.bossController = bossController;
-        maxBossHealthBarWidth = bossHealthBarRect.sizeDelta.x;
+        if (maxBossHealthBarWidth == 0f) { maxBossHealthBarWidth = bossHealthBarRect.sizeDelta.x; }
+        else { bossHealthBarRect.sizeDelta = new Vector2(maxBossHealthBarWidth, bossHealthBarRect.sizeDelta.y); }
         bossHealthPointsCurrent = bossController.GetHealth();
         bossHealthPointsMax = bossController.GetHealth();
         UpdateBossHealthBar();

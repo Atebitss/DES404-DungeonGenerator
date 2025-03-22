@@ -16,4 +16,16 @@ public class DungeonRealmManager : AbstractSceneManager
         SM.GetComponent<PathGeneration>().ResetHallways();
         MG.RegenerateDungeon();
     }
+
+
+    private float startTime = 0f, endTime = 0f, floorClearTime = 0f;
+    public float GetFloorClearTime() { return floorClearTime; }
+    public void StartFloorCounter() { startTime = Time.time; }
+    public void StopFloorCounter()
+    {
+        endTime = Time.time;
+        floorClearTime = endTime - startTime;
+
+        GetADM().FloorCleared(floorClearTime);
+    }
 }

@@ -10,6 +10,8 @@ public class DungeonGeneration : MonoBehaviour
     private MapGeneration MG;
     private PathGeneration PG;
     private AbstractSceneManager ASM;
+    private DungeonRealmManager DRM;
+    public DungeonRealmManager GetDRM() { return DRM; }
 
     //player
     private GameObject currentPlayer;
@@ -83,6 +85,7 @@ public class DungeonGeneration : MonoBehaviour
         MG = this.gameObject.GetComponent<MapGeneration>();
         PG = this.gameObject.GetComponent<PathGeneration>();
         ASM = this.gameObject.GetComponent<AbstractSceneManager>();
+        DRM = this.gameObject.GetComponent<DungeonRealmManager>();
 
         if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Awake"); }
         dungeonType = "Bandit";//dungeonTypes[Random.Range(0, 2)];
@@ -327,9 +330,20 @@ public class DungeonGeneration : MonoBehaviour
 
         yield return StartCoroutine(PG.CreateHallways()); //create hallways
 
-        //spawn player
-        ASM.SpawnPlayer(new Vector3(entryRoomCenter.x, 0.1f, entryRoomCenter.y));
-        currentPlayer = ASM.GetPlayerObject();
+        //spawn player in entry room
+        if (ASM.GetPlayerObject() == null)
+        {
+            ASM.SpawnPlayer(new Vector3(entryRoomCenter.x, 0.1f, entryRoomCenter.y));
+            currentPlayer = ASM.GetPlayerObject();
+        }
+        //else move player to entry room
+        else
+        {
+            currentPlayer.transform.position = new Vector3(entryRoomCenter.x, 1.5f, entryRoomCenter.y);
+            currentPlayer = ASM.GetPlayerObject();
+        }
+
+        DRM.StartFloorCounter(); //start floor timer
 
         // yield return new WaitForSeconds(5f);
         //ASM.RestartScene();

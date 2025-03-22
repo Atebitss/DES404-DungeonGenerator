@@ -39,7 +39,13 @@ public class AdaptiveDifficultyDisplayManager : MonoBehaviour
     public float avgRoomClearTime = 0f;
 
 
-    public void ResetStats()
+    //floor stats
+    public int floorsCleared = 0;
+    public float[] floorClearTimes = new float[0];
+    public float avgFloorClearTime = 0f;
+
+
+    public void ResetRoomStats()
     {
         numOfAttacks = 0;
         numOfHits = 0;

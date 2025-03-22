@@ -42,7 +42,7 @@ public class AbstractSceneManager : MonoBehaviour
     //player controller
     public GameObject player;
     public void SetPlayerObject(GameObject newPlayer) { Debug.Log("newPlayer: " + newPlayer); player = newPlayer; }
-    public GameObject GetPlayerObject() { return player.transform.GetChild(0).gameObject; }
+    public GameObject GetPlayerObject() { if (player != null) { return player.transform.GetChild(0).gameObject; } return null; }
 
     public PlayerController PC;
     public void SetPlayerController (PlayerController newPC) {  PC = newPC; SetPlayerObject(newPC.gameObject); }
@@ -59,8 +59,12 @@ public class AbstractSceneManager : MonoBehaviour
     }
     public void DestroyPlayer()
     {
-        if (MG.IsDbugEnabled()) { MG.UpdateHUDDbugText("Scene Manager: Destroying Player"); }
-        if (player != null) { Destroy(player); }
+        if (player != null)
+        {
+            if (MG.IsDbugEnabled()) { MG.UpdateHUDDbugText("Scene Manager: Destroying Player"); }
+            if (ADM != null) { ADM.End(); }
+            Destroy(player); 
+        }
     }
     public Vector3 GetPlayerPosition() { if(PC != null) { return PC.transform.position; } else { return Vector3.zero; } }
 
@@ -179,7 +183,16 @@ public class AbstractSceneManager : MonoBehaviour
         //Debug.Log("Floor complete");
         //would contain scene change to post level
         //and update dungeon stats
-        RestartScene();
+        NewFloor();
+    }
+    private void NewFloor()
+    {
+        if (MG.IsDbugEnabled()) { MG.UpdateHUDDbugText("Scene Manager: Starting New Floor"); }
+        //Debug.Log("Starting new floor");
+        if (MG != null) { MG.ResetMap(); }
+        if (DG != null) { DG.ResetDungeon(); }
+        if (PG != null) { PG.ResetHallways(); }
+        if (MG != null) { MG.RegenerateDungeon(); }
     }
     virtual public void RestartScene(){}
 }

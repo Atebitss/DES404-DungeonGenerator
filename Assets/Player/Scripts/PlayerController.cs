@@ -51,6 +51,11 @@ public class PlayerController : MonoBehaviour
         BHDM.DisableBossHealthDisplay();
     }
 
+    private void OnDestroy()
+    {
+        ASM.RestartScene();
+    }
+
 
     private void FixedUpdate()
     {

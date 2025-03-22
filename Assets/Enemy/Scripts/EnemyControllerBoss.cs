@@ -36,6 +36,6 @@ public class EnemyControllerBoss : AbstractEnemy
 
     private void OnDestroy()
     {
-        GetBHDM().DisableBossHealthDisplay();
+        if (GetPC() != null) { GetBHDM().DisableBossHealthDisplay(); }
     }
 }
