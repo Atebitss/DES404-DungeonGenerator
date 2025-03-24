@@ -414,7 +414,8 @@ MonoBehaviour:
   interactionPromptText: {fileID: 408251515721017303}
   a: {fileID: 1875127274234875169}
   hitSplashPrefab: {fileID: 2683464079042679606, guid: 03b0fd0cb7bf08349877fd7a75a3598b, type: 3}
-  movementSpeed: 5
+  active: 0
+  movementSpeed: 10
   dodgeMask:
     serializedVersion: 2
     m_Bits: 0
@@ -423,14 +424,14 @@ MonoBehaviour:
   dodgeDistance: 5
   dodgeCDMax: 0.5
   jumpForce: 10
-  lookSensitivity: 7.5
+  lookSensitivity: 5
   lightAttackCooldownMax: 0.5
   heavyAttackCooldownMax: 1
   lightAttackComboTimerMax: 2.5
   weaponParent: {fileID: 4954393113427719825}
   weaponAttackCollider: {fileID: 8225045803689722017}
   PWCM: {fileID: 8198623938989953886}
-  attackDamage: 1
+  attackDamage: 100
   attackSpeed: 1
   PPS: {fileID: 2532494437381932349}
   interactionMask:
@@ -450,7 +451,7 @@ MonoBehaviour:
   IntelligencePoints: 1
   WisdomPoints: 1
   invincible: 0
-  permaInvincible: 0
+  permaInvincible: 1
   invincibilityTimer: 0
 --- !u!82 &631621802871244450
 AudioSource:

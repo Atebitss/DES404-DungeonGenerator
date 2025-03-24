@@ -27,6 +27,19 @@ public class PlayerController : MonoBehaviour
     public SkillVisualizationManager GetSVM() { return SVM; }
     private BossHealthDisplayManager BHDM; //boss health display manager
 
+    [SerializeField] private bool active = false; //allows player input
+    public void SetActive(bool newActive) 
+    {
+        Debug.Log("PlayerController.SetActive: " + newActive);
+        active = newActive;
+
+        if (!active)
+        {
+            playerRigid.velocity = Vector3.zero;
+            playerRigid.angularVelocity = Vector3.zero;
+        }
+    }
+
 
 
     private void Awake()
@@ -53,63 +66,73 @@ public class PlayerController : MonoBehaviour
 
     private void OnDestroy()
     {
-        ASM.RestartScene();
+        if (active)
+        {
+            active = false;
+            ASM.RestartScene();
+        }
     }
 
 
     private void FixedUpdate()
     {
-        if (ASM.GetDevMode()) { UpdateDDM(); }
-        UpdatePlayerMovement();
-        UpdatePlayerLooking();
-        UpdatePlayerStates();
-        UpdateInteractionPrompt();
+        if (active)
+        {
+            if (ASM.GetDevMode()) { UpdateDDM(); }
+            UpdatePlayerMovement();
+            UpdatePlayerLooking();
+            UpdatePlayerStates();
+            UpdateInteractionPrompt();
+        }
     }
 
 
     private void UpdateDDM()
     {
-        //world space
-        DDM.playerJumping = jumping;
-        DDM.playerGrounded = grounded;
-        DDM.playerPosition = playerRigid.position;
-        DDM.playerVelocity = playerVelocity;
-        DDM.playerMovement = movement;
+        if (active)
+        {
+            //world space
+            DDM.playerJumping = jumping;
+            DDM.playerGrounded = grounded;
+            DDM.playerPosition = playerRigid.position;
+            DDM.playerVelocity = playerVelocity;
+            DDM.playerMovement = movement;
 
-        //stats
-        DDM.playerHealthCurrent = healthPointsCurrent;
-        DDM.playerHealthMax = healthPointsMax;
-        DDM.playerHealthPerSecond = 0f;
-        DDM.playerStaminaCurrent = staminaPointsCurrent;
-        DDM.playerStaminaMax = staminaPointsMax;
-        DDM.playerStaminaPerSecond = 0f;
-        DDM.playerMagicCurrent = magicPointsCurrent;
-        DDM.playerMagicMax = magicPointsMax;
-        DDM.playerMagicPerSecond = 0f;
-        DDM.playerAttackDamage = attackDamage;
-        DDM.playerAttackSpeed = attackSpeed;
+            //stats
+            DDM.playerHealthCurrent = healthPointsCurrent;
+            DDM.playerHealthMax = healthPointsMax;
+            DDM.playerHealthPerSecond = 0f;
+            DDM.playerStaminaCurrent = staminaPointsCurrent;
+            DDM.playerStaminaMax = staminaPointsMax;
+            DDM.playerStaminaPerSecond = 0f;
+            DDM.playerMagicCurrent = magicPointsCurrent;
+            DDM.playerMagicMax = magicPointsMax;
+            DDM.playerMagicPerSecond = 0f;
+            DDM.playerAttackDamage = attackDamage;
+            DDM.playerAttackSpeed = attackSpeed;
 
-        //dodge
-        DDM.playerDodging = dodging;
-        DDM.playerDodgeCooldownTimer = dodgeCooldownTimer;
-        DDM.playerDodgeStartTime = dodgeStartTime;
-        DDM.playerDodgeVelocity = dodgeVelocity;
+            //dodge
+            DDM.playerDodging = dodging;
+            DDM.playerDodgeCooldownTimer = dodgeCooldownTimer;
+            DDM.playerDodgeStartTime = dodgeStartTime;
+            DDM.playerDodgeVelocity = dodgeVelocity;
 
-        //attack
-        DDM.playerAttacking = attacking;
-        DDM.playerAttackCooldownTimer = attackCooldownTimer;
-        DDM.playerAttackStartTime = attackStartTime;
+            //attack
+            DDM.playerAttacking = attacking;
+            DDM.playerAttackCooldownTimer = attackCooldownTimer;
+            DDM.playerAttackStartTime = attackStartTime;
 
-        //attack combo
-        DDM.playerComboing = comboing;
-        DDM.lightAttackComboCounter = lightAttackComboCounter;
-        DDM.playerLightAttackComboTimer = lightAttackComboTimer;
-        DDM.playerLightAttackComboStartTime = lightAttackComboStartTime;
+            //attack combo
+            DDM.playerComboing = comboing;
+            DDM.lightAttackComboCounter = lightAttackComboCounter;
+            DDM.playerLightAttackComboTimer = lightAttackComboTimer;
+            DDM.playerLightAttackComboStartTime = lightAttackComboStartTime;
 
-        //invincibility
-        DDM.playerInvincible = invincible;
-        DDM.playerInvincibilityTimer = invincibilityTimer;
-        DDM.playerInvincibilityStartTime = invincibilityStartTime;
+            //invincibility
+            DDM.playerInvincible = invincible;
+            DDM.playerInvincibilityTimer = invincibilityTimer;
+            DDM.playerInvincibilityStartTime = invincibilityStartTime;
+        }
     }
     //~~~~~misc~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -151,89 +174,107 @@ public class PlayerController : MonoBehaviour
 
     public void OnMove(InputAction.CallbackContext ctx)
     {
-        //WASD / Left Thumbstick
-        Vector2 input = ctx.ReadValue<Vector2>(); //get input from input system
-        movement = new Vector3(input.x, 0, input.y); //translate input to impact
+        if (active)
+        {
+            //WASD / Left Thumbstick
+            Vector2 input = ctx.ReadValue<Vector2>(); //get input from input system
+            movement = new Vector3(input.x, 0, input.y); //translate input to impact
+        }
     }
     
     public void OnJump(InputAction.CallbackContext ctx)
     {
-        //Space / Button South
-        if (ctx.performed && grounded && !jumping) //if player is on the ground and not currently jumping
+        if (active)
         {
-            Debug.Log("jump");
+            //Space / Button South
+            if (ctx.performed && grounded && !jumping) //if player is on the ground and not currently jumping
+            {
+                Debug.Log("jump");
 
 
+            }
         }
     }
    
     public void OnDodge(InputAction.CallbackContext ctx)
     {
-        //(Space / Button South) + (WASD/ Left Thumbstick)
-        if (ctx.performed && dodgeCooldownTimer <= 0 && !dodging) //if dodge cooldown is not active and the player is not currently dodging
+        if (active)
         {
-            //Debug.Log("dodge");
-            StartCoroutine(Dodge());
+            //(Space / Button South) + (WASD/ Left Thumbstick)
+            if (ctx.performed && dodgeCooldownTimer <= 0 && !dodging) //if dodge cooldown is not active and the player is not currently dodging
+            {
+                //Debug.Log("dodge");
+                StartCoroutine(Dodge());
+            }
         }
     }
     public IEnumerator Dodge()
     {
-        yield return new WaitForFixedUpdate(); // Wait until the next physics frame
-
-        dodgeStartTime = Time.time; //remember time when dodge started
-        dodgeCooldownTimer = dodgeCDMax; //set cooldown timer
-        dodging = true; //set tracker to true
-        //Debug.Log("Dodge start");
-
-        if (ADM != null) { ADM.DodgeRan(); } //update adaptive difficulty
-
-        MakePlayerInvincible(dodgeDuration);
-
-        AM.Play("Player_Dodge" + Random.Range(1, 4));
-
-        if (movement.x != 0 && movement.z != 0) //if the player is moving horizontally
+        if (active)
         {
-            //calc velocity in direction moving
-            dodgeVelocity = ((playerRigid.transform.TransformDirection(movement.normalized) * dodgeForce).normalized * (dodgeDistance / dodgeDuration));
+            yield return new WaitForFixedUpdate(); // Wait until the next physics frame
 
-        }
-        else //if player is not moving horizontally
-        {
-            //calc velocity in direction faced
-            dodgeVelocity = ((playerRigid.transform.forward * dodgeForce).normalized * (dodgeDistance / dodgeDuration));
+            dodgeStartTime = Time.time; //remember time when dodge started
+            dodgeCooldownTimer = dodgeCDMax; //set cooldown timer
+            dodging = true; //set tracker to true
+                            //Debug.Log("Dodge start");
+
+            if (ADM != null) { ADM.DodgeRan(); } //update adaptive difficulty
+
+            MakePlayerInvincible(dodgeDuration);
+
+            AM.Play("Player_Dodge" + Random.Range(1, 4));
+
+            if (movement.x != 0 && movement.z != 0) //if the player is moving horizontally
+            {
+                //calc velocity in direction moving
+                dodgeVelocity = ((playerRigid.transform.TransformDirection(movement.normalized) * dodgeForce).normalized * (dodgeDistance / dodgeDuration));
+
+            }
+            else //if player is not moving horizontally
+            {
+                //calc velocity in direction faced
+                dodgeVelocity = ((playerRigid.transform.forward * dodgeForce).normalized * (dodgeDistance / dodgeDuration));
+            }
         }
     }
     
     private void UpdatePlayerMovement()
     {
-        if (!dodging) //if player is moving as normal
+        if (active)
         {
-            //add velocity force in direction moving
-            playerVelocity = (((playerRigid.transform.right * movement.x) * movementSpeed) + ((playerRigid.transform.forward * movement.z) * movementSpeed));
-            playerRigid.AddForce(playerVelocity - playerRigid.velocity, ForceMode.VelocityChange);
-        }
-        else if (dodging) //if player is dodging
-        {
-            playerRigid.AddForce(dodgeVelocity - playerRigid.velocity, ForceMode.VelocityChange); //set immediate velocity to calced velocity
-
-            if ((Time.time - dodgeStartTime) >= dodgeDuration) //if the player has been dodging for 1 second
+            if (!dodging) //if player is moving as normal
             {
-                playerRigid.velocity = Vector3.zero; //reset velocity
-                //for (int i = 0; i < dodgeLayerIDs.Length; i++) { Physics.IgnoreLayerCollision(gameObject.layer, dodgeLayerIDs[i], false); } //allow dodging through enemies
-                //Debug.Log("Dodge end");
-                dodging = false; //set tracker to false
+                //add velocity force in direction moving
+                playerVelocity = (((playerRigid.transform.right * movement.x) * movementSpeed) + ((playerRigid.transform.forward * movement.z) * movementSpeed));
+                playerRigid.AddForce(playerVelocity - playerRigid.velocity, ForceMode.VelocityChange);
             }
-        }
+            else if (dodging) //if player is dodging
+            {
+                playerRigid.AddForce(dodgeVelocity - playerRigid.velocity, ForceMode.VelocityChange); //set immediate velocity to calced velocity
 
-        if (dodgeCooldownTimer > 0) { dodgeCooldownTimer -= Time.deltaTime; } //count down cooldown
+                if ((Time.time - dodgeStartTime) >= dodgeDuration) //if the player has been dodging for 1 second
+                {
+                    playerRigid.velocity = Vector3.zero; //reset velocity
+                                                         //for (int i = 0; i < dodgeLayerIDs.Length; i++) { Physics.IgnoreLayerCollision(gameObject.layer, dodgeLayerIDs[i], false); } //allow dodging through enemies
+                                                         //Debug.Log("Dodge end");
+                    dodging = false; //set tracker to false
+                }
+            }
+
+            if (dodgeCooldownTimer > 0) { dodgeCooldownTimer -= Time.deltaTime; } //count down cooldown
+        }
     }
     private void OnTriggerEnter(Collider col)
     {
-        if (dodging)
+        if (active)
         {
-            if (col.gameObject.tag == "EnemyWeapon")
+            if (dodging)
             {
-                if (ADM != null) { ADM.DodgeSuccess(); } //update adaptive difficulty
+                if (col.gameObject.tag == "EnemyWeapon")
+                {
+                    if (ADM != null) { ADM.DodgeSuccess(); } //update adaptive difficulty
+                }
             }
         }
     }
@@ -241,29 +282,53 @@ public class PlayerController : MonoBehaviour
 
     public void OnLook(InputAction.CallbackContext ctx)
     {
-        //Mouse / Right Thumbstick
-        //Debug.Log(ctx.ReadValue<Vector2>());
-        lookment = ctx.ReadValue<Vector2>();
+        if (active)
+        {
+            //Mouse / Right Thumbstick
+            Debug.Log(ctx.ReadValue<Vector2>());
+            lookment = ctx.ReadValue<Vector2>();
+        }
     }
     private void UpdatePlayerLooking()
     {
-        xRot -= (lookment.y * lookSensitivity); //increase rotation by sensitivity
-        xRot = Mathf.Clamp(xRot, -70f, 70f); //lock rotation between 70 up & down
-
-        targetCameraRot = Quaternion.Euler(xRot, 0f, 0f); //new camera rotation
-        playerCamera.transform.localRotation = Quaternion.Lerp(playerCamera.transform.localRotation, targetCameraRot, (Time.deltaTime / 0.1f));
-
-
-        if (!attacking)
+        if (active)
         {
-            Vector3 weaponOffset = (playerCamera.transform.right * 0.25f) + (playerCamera.transform.up * -0.5f) + (playerCamera.transform.forward * -0.5f);
-            weaponParent.transform.position = ((playerRigid.transform.position + weaponOffset) + playerCamera.transform.forward);
-            weaponParent.transform.rotation = playerCamera.transform.rotation;
+            xRot -= (lookment.y * lookSensitivity); //increase rotation by sensitivity
+            xRot = Mathf.Clamp(xRot, -70f, 70f); //lock rotation between 70 up & down
+
+            targetCameraRot = Quaternion.Euler(xRot, 0f, 0f); //new camera rotation
+            playerCamera.transform.localRotation = Quaternion.Lerp(playerCamera.transform.localRotation, targetCameraRot, (Time.deltaTime / 0.1f));
+
+
+            if (!attacking)
+            {
+                Vector3 weaponOffset = (playerCamera.transform.right * 0.25f) + (playerCamera.transform.up * -0.5f) + (playerCamera.transform.forward * -0.5f);
+                weaponParent.transform.position = ((playerRigid.transform.position + weaponOffset) + playerCamera.transform.forward);
+                weaponParent.transform.rotation = playerCamera.transform.rotation;
+            }
+
+            targetPlayerRot *= Quaternion.Euler(0f, (lookment.x * lookSensitivity), 0f); //new player turn rotation
+            //Debug.Log("targetPlayerRot: " + targetPlayerRot);
+            playerRigid.transform.rotation = Quaternion.Lerp(playerRigid.transform.localRotation, targetPlayerRot, (Time.deltaTime / 0.1f));
         }
+    }
+    public void SetPlayerLookAt(Vector3 newLookPos)
+    {
+        //Debug.Log("look at: " + newLookPos);
+        //make player look at a position
+        Vector3 lookPos = newLookPos - playerRigid.transform.position; //calculate direction to look
+        Quaternion targetRot = Quaternion.LookRotation(lookPos); //calculate new rotation
 
+        Quaternion lookTargetCameraRot = Quaternion.Euler(targetRot.x, targetRot.y, targetRot.z); //new camera rotation
+        playerCamera.transform.localRotation = lookTargetCameraRot;
+        targetCameraRot = lookTargetCameraRot;
 
-        targetPlayerRot *= Quaternion.Euler(0f, (lookment.x * lookSensitivity), 0f); //new player turn rotation
-        playerRigid.transform.rotation = Quaternion.Lerp(playerRigid.transform.localRotation, targetPlayerRot, (Time.deltaTime / 0.1f));
+        Vector3 weaponOffset = (playerCamera.transform.right * 0.25f) + (playerCamera.transform.up * -0.5f) + (playerCamera.transform.forward * -0.5f);
+        weaponParent.transform.position = ((playerRigid.transform.position + weaponOffset) + playerCamera.transform.forward);
+        weaponParent.transform.rotation = playerCamera.transform.rotation;
+
+        playerRigid.transform.rotation = targetRot;
+        targetPlayerRot = targetRot;
     }
     //~~~~~movement~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -291,87 +356,96 @@ public class PlayerController : MonoBehaviour
 
     public void OnLightAttack(InputAction.CallbackContext ctx)
     {
-        //lightAttackAnimLength = FindAnimationLength("swordLightAttack30degrees");
-        //Debug.Log("lightAttackAnimLength: " + lightAttackAnimLength);
-
-        if (ctx.performed && attackCooldownTimer <= 0 && !attacking)
+        if (active)
         {
-            //Debug.Log("light attack");
-            //Debug.Log("combo: " + lightAttackComboCounter);
-            
-            if (lightAttackComboCounter == 0) 
+            //lightAttackAnimLength = FindAnimationLength("swordLightAttack30degrees");
+            //Debug.Log("lightAttackAnimLength: " + lightAttackAnimLength);
+
+            if (ctx.performed && attackCooldownTimer <= 0 && !attacking)
             {
-                attackComboDamage = 0; //reset any temp combo damage
-            }
+                //Debug.Log("light attack");
+                //Debug.Log("combo: " + lightAttackComboCounter);
+
+                if (lightAttackComboCounter == 0)
+                {
+                    attackComboDamage = 0; //reset any temp combo damage
+                }
 
 
-            //track light attack
-            attackCooldownTimer = lightAttackCooldownMax;
-            lightAttackComboTimer = lightAttackComboTimerMax;
-            lightAttackComboStartTime = Time.time; //track when last combo hit started
+                //track light attack
+                attackCooldownTimer = lightAttackCooldownMax;
+                lightAttackComboTimer = lightAttackComboTimerMax;
+                lightAttackComboStartTime = Time.time; //track when last combo hit started
 
 
-            if (ADM != null) { ADM.AttackRan(); } //update adaptive difficulty
+                if (ADM != null) { ADM.AttackRan(); } //update adaptive difficulty
 
 
-            //switch depending on combo
-            if (lightAttackComboCounter == 0) { AM.Play("Sword_Swing1"); }
-            else if (lightAttackComboCounter == 1) { AM.Play("Sword_Swing2"); }
-            else if (lightAttackComboCounter == 2)
-            {
-                AM.Play("Sword_SwingFinal");
-                attackComboDamage = attackDamage * 2; //double damage added on to regular damage
-            }
+                //switch depending on combo
+                if (lightAttackComboCounter == 0) { AM.Play("Sword_Swing1"); }
+                else if (lightAttackComboCounter == 1) { AM.Play("Sword_Swing2"); }
+                else if (lightAttackComboCounter == 2)
+                {
+                    AM.Play("Sword_SwingFinal");
+                    attackComboDamage = attackDamage * 2; //double damage added on to regular damage
+                }
 
-            lightAttackComboCounter++; //increase combo
+                lightAttackComboCounter++; //increase combo
 
-            //update sword swing animation
-            a.SetInteger("lightSwingCombo", lightAttackComboCounter);
-            PWCM.EnableAttackCheck((lightAttackAnimLength - 0.1f));
+                //update sword swing animation
+                a.SetInteger("lightSwingCombo", lightAttackComboCounter);
+                PWCM.EnableAttackCheck((lightAttackAnimLength - 0.1f));
 
-            if (lightAttackComboCounter == 3) 
-            {
-                Invoke("ResetLightAttackAnimInt", (lightAttackAnimLength - 0.1f));
-                ADM.ComboPerformed();
+                if (lightAttackComboCounter == 3)
+                {
+                    Invoke("ResetLightAttackAnimInt", (lightAttackAnimLength - 0.1f));
+                    ADM.ComboPerformed();
+                }
             }
         }
     }
     private void ResetLightAttackAnimInt()
     {
-        lightAttackComboCounter = 0; //reset counters
-        lightAttackComboTimer = 0;
-        a.SetInteger("lightSwingCombo", lightAttackComboCounter); 
+        if (active)
+        {
+            lightAttackComboCounter = 0; //reset counters
+            lightAttackComboTimer = 0;
+            a.SetInteger("lightSwingCombo", lightAttackComboCounter);
+        }
     }
 
     public void OnHeavyAttack(InputAction.CallbackContext ctx)
     {
-        //heavyAttackAnimLength = FindAnimationLength("swordHeavyAttackCleave");
-        //Debug.Log("heavyAttackAnimLength: " + heavyAttackAnimLength);
-
-        if (ctx.performed && attackCooldownTimer <= 0 && !attacking)
+        if (active)
         {
-            //Debug.Log("heavy attack");
-            attackCooldownTimer = heavyAttackCooldownMax;
+            //heavyAttackAnimLength = FindAnimationLength("swordHeavyAttackCleave");
+            //Debug.Log("heavyAttackAnimLength: " + heavyAttackAnimLength);
 
-            if (lightAttackComboCounter != 0)  //reset light attack
+            if (ctx.performed && attackCooldownTimer <= 0 && !attacking)
             {
-                //Debug.Log("reset light attack");
-                lightAttackComboCounter = 0;
-                lightAttackComboTimer = 0;
-                a.SetInteger("lightSwingCombo", lightAttackComboCounter);
+                //Debug.Log("heavy attack");
+                attackCooldownTimer = heavyAttackCooldownMax;
+
+                if (lightAttackComboCounter != 0)  //reset light attack
+                {
+                    //Debug.Log("reset light attack");
+                    lightAttackComboCounter = 0;
+                    lightAttackComboTimer = 0;
+                    a.SetInteger("lightSwingCombo", lightAttackComboCounter);
+                }
+
+                if (ADM != null) { ADM.AttackRan(); } //update adaptive difficulty
+
+                //Debug.Log("play heavy attack");
+                AM.Play("Sword_SwingCleave");
+                a.SetBool("attackingHeavy", true);
+
+                //Debug.Log("enable attack check");
+                PWCM.EnableAttackCheck((FindAnimationLength("swordHeavyAttackCleave") - 0.1f));
+
+                //Debug.Log("invoke reset heavy attack, " + (heavyAttackAnimLength - 0.1f));
+                Invoke("ResetHeavyAttackAnimBool", FindAnimationLength("swordHeavyAttackCleave"));
             }
-
-            if (ADM != null) { ADM.AttackRan(); } //update adaptive difficulty
-
-            //Debug.Log("play heavy attack");
-            AM.Play("Sword_SwingCleave");
-            a.SetBool("attackingHeavy", true);
-
-            //Debug.Log("enable attack check");
-            PWCM.EnableAttackCheck((FindAnimationLength("swordHeavyAttackCleave") - 0.1f));
-
-            //Debug.Log("invoke reset heavy attack, " + (heavyAttackAnimLength - 0.1f));
-            Invoke("ResetHeavyAttackAnimBool", FindAnimationLength("swordHeavyAttackCleave"));
         }
     }
     private void ResetHeavyAttackAnimBool() { /*Debug.Log("reset heavy attack");*/ a.SetBool("attackingHeavy", false); }
@@ -403,33 +477,36 @@ public class PlayerController : MonoBehaviour
 
     public void OnInteract(InputAction.CallbackContext ctx)
     {
-        //E / Right Bumper
-        if (ctx.performed && !interacting)
+        if (active)
         {
-            //Debug.Log("interact");
-
-            interacting = true;
-            RaycastHit hit;
-
-            if (Physics.Raycast(playerCamera.transform.position, (playerCamera.transform.forward * interactDistance), out hit, interactDistance, interactionMask))
+            //E / Right Bumper
+            if (ctx.performed && !interacting)
             {
-                //Debug.Log("interact hit " + hit.collider.name);
-                //Debug.Log("tag " + hit.collider.tag);
-                switch (hit.collider.tag)
+                //Debug.Log("interact");
+
+                interacting = true;
+                RaycastHit hit;
+
+                if (Physics.Raycast(playerCamera.transform.position, (playerCamera.transform.forward * interactDistance), out hit, interactDistance, interactionMask))
                 {
-                    case "Door":
-                        //Debug.Log("door, " + hit.collider.GetComponent<AbstractDoorScript>());
-                        hit.collider.GetComponent<AbstractDoorScript>().InteractWithDoor();
-                        break;
-                    case "Portal":
-                        //Debug.Log("portal, " + hit.collider.GetComponent<PortalManager>());
-                        hit.collider.GetComponent<PortalManager>().InteractWithPortal();
-                        break;
+                    //Debug.Log("interact hit " + hit.collider.name);
+                    //Debug.Log("tag " + hit.collider.tag);
+                    switch (hit.collider.tag)
+                    {
+                        case "Door":
+                            //Debug.Log("door, " + hit.collider.GetComponent<AbstractDoorScript>());
+                            hit.collider.GetComponent<AbstractDoorScript>().InteractWithDoor();
+                            break;
+                        case "Portal":
+                            //Debug.Log("portal, " + hit.collider.GetComponent<PortalManager>());
+                            hit.collider.GetComponent<PortalManager>().InteractWithPortal();
+                            break;
 
+                    }
                 }
-            }
 
-            StartCoroutine(ResetInteraction());
+                StartCoroutine(ResetInteraction());
+            }
         }
     }
     IEnumerator ResetInteraction()
@@ -453,27 +530,30 @@ public class PlayerController : MonoBehaviour
 
     private void UpdatePlayerHealthBar()
     {
-        //Debug.Log("invincible: " + invincible);
-        //update health bar
-        float hpPercentage = (float)healthPointsCurrent / (float)healthPointsMax;
-        playerHealthBarRect.sizeDelta = new Vector2(maxPlayerHealthBarWidth * hpPercentage, playerHealthBarRect.sizeDelta.y);
-        playerHealthText.text = healthPointsCurrent + " / " + healthPointsMax;
+        if (active)
+        {
+            //Debug.Log("invincible: " + invincible);
+            //update health bar
+            float hpPercentage = (float)healthPointsCurrent / (float)healthPointsMax;
+            playerHealthBarRect.sizeDelta = new Vector2(maxPlayerHealthBarWidth * hpPercentage, playerHealthBarRect.sizeDelta.y);
+            playerHealthText.text = healthPointsCurrent + " / " + healthPointsMax;
 
-        if(invincible)
-        {
-            playerHealthBarImage.color = Color.magenta;
-        }
-        else if (hpPercentage > 0.5f && hpPercentage <= 1f && !invincible)
-        {
-            playerHealthBarImage.color = Color.green; // Healthy
-        }
-        else if (hpPercentage > 0.2f && hpPercentage <= 0.5f && !invincible)
-        {
-            playerHealthBarImage.color = Color.yellow; // Warning
-        }
-        else if (hpPercentage <= 0.2f && !invincible)
-        {
-            playerHealthBarImage.color = Color.red; // Critical
+            if (invincible)
+            {
+                playerHealthBarImage.color = Color.magenta;
+            }
+            else if (hpPercentage > 0.5f && hpPercentage <= 1f && !invincible)
+            {
+                playerHealthBarImage.color = Color.green; // Healthy
+            }
+            else if (hpPercentage > 0.2f && hpPercentage <= 0.5f && !invincible)
+            {
+                playerHealthBarImage.color = Color.yellow; // Warning
+            }
+            else if (hpPercentage <= 0.2f && !invincible)
+            {
+                playerHealthBarImage.color = Color.red; // Critical
+            }
         }
     }
 
@@ -481,14 +561,17 @@ public class PlayerController : MonoBehaviour
 
     private void UpdateInteractionPrompt()
     {
-        //update interaction prompt
-        RaycastHit hit;
-        Debug.DrawRay(playerCamera.transform.position, (playerCamera.transform.forward * interactDistance), Color.red, 1f);
-        if (Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward, out hit, interactDistance, interactionMask))
+        if (active)
         {
-            interactionPromptText.text = "'RB' to interact with " + hit.collider.tag;
+            //update interaction prompt
+            RaycastHit hit;
+            Debug.DrawRay(playerCamera.transform.position, (playerCamera.transform.forward * interactDistance), Color.red, 1f);
+            if (Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward, out hit, interactDistance, interactionMask))
+            {
+                interactionPromptText.text = "'RB' to interact with " + hit.collider.tag;
+            }
+            else { interactionPromptText.text = ""; }
         }
-        else { interactionPromptText.text = ""; }
     }
 
     //~~~~~HUD~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -514,14 +597,17 @@ public class PlayerController : MonoBehaviour
     public void SetCurrentHealthPoints(int newHealth) { if (!invincible) { /*Debug.Log("setting health: " + newHealth);*/ healthPointsCurrent = newHealth; HealthCheck(); } }
     public void AlterCurrentHealthPoints(int alter) { if(!invincible) { /*Debug.Log("altering health: " + alter);*/ healthPointsCurrent += alter; HealthCheck(); ADM.DamageTaken(); } }
     public int GetCurrentHealthPoints() { return healthPointsCurrent; }
-    private void HealthCheck() 
-    { 
-        if (healthPointsCurrent <= 0) 
-        { 
-            /*Debug.Log("health check: " + healthPointsCurrent);*/ 
-            UpdatePlayerHealthBar(); 
-            ASM.DestroyPlayer(); 
-        } 
+    private void HealthCheck()
+    {
+        if (active)
+        {
+            if (healthPointsCurrent <= 0)
+            {
+                /*Debug.Log("health check: " + healthPointsCurrent);*/
+                UpdatePlayerHealthBar();
+                ASM.DestroyPlayer();
+            }
+        }
     }
 
     public void AlterMaxHealthPoints(int alter) { healthPointsMax += alter; }
@@ -563,56 +649,59 @@ public class PlayerController : MonoBehaviour
     public void MakePlayerInvincible(float iTime) { invincibilityTimer = iTime; }
     public void UpdatePlayerStates()
     {
-        if (invincibilityTimer > 0 && !invincible)
+        if (active)
         {
-            invincible = true; //set tracker true
-            invincibilityStartTime = Time.time; //track when invisibility started
-            UpdatePlayerHealthBar();
-            
-        }
-        else if (permaInvincible && !invincible) 
-        {
-            invincible = true; 
-            invincibilityTimer = 1f;
-            UpdatePlayerHealthBar();
-        } 
+            if (invincibilityTimer > 0 && !invincible)
+            {
+                invincible = true; //set tracker true
+                invincibilityStartTime = Time.time; //track when invisibility started
+                UpdatePlayerHealthBar();
 
-        if (invincibilityTimer > 0 && !permaInvincible) { invincibilityTimer -= Time.deltaTime; } //count down timer
-        if (invincibilityTimer <= 0 && !permaInvincible) 
-        { 
-            //when timer runs out, set tracker false
-            invincibilityTimer = 0; 
-            invincibilityStartTime = 0; 
-            invincible = false; 
-            UpdatePlayerHealthBar();
-        } 
+            }
+            else if (permaInvincible && !invincible)
+            {
+                invincible = true;
+                invincibilityTimer = 1f;
+                UpdatePlayerHealthBar();
+            }
 
-
-
-        if (attackCooldownTimer > 0 && !attacking)
-        {
-            attacking = true; //set tracker
-            attackStartTime = Time.time; //track when attack started
-        }
-
-        if (attackCooldownTimer > 0) { attackCooldownTimer -= Time.deltaTime; } //count down timer
-        if (attackCooldownTimer <= 0) //when timer runs out, set tracker false
-        {
-            attackCooldownTimer = 0;
-            attackStartTime = 0;  
-            attacking = false; 
-        }
+            if (invincibilityTimer > 0 && !permaInvincible) { invincibilityTimer -= Time.deltaTime; } //count down timer
+            if (invincibilityTimer <= 0 && !permaInvincible)
+            {
+                //when timer runs out, set tracker false
+                invincibilityTimer = 0;
+                invincibilityStartTime = 0;
+                invincible = false;
+                UpdatePlayerHealthBar();
+            }
 
 
 
-        if (lightAttackComboTimer > 0 && !comboing) { comboing = true; }
-        if (lightAttackComboTimer > 0) { lightAttackComboTimer -= Time.deltaTime; } //count down timer
-        if (lightAttackComboTimer <= 0 && comboing)  //when timer runs out
-        {
-            lightAttackComboTimer = 0;
-            lightAttackComboCounter = 0; //set tracker to start
-            comboing = false; //set tracker false
-            a.SetInteger("lightSwingCombo", lightAttackComboCounter);
+            if (attackCooldownTimer > 0 && !attacking)
+            {
+                attacking = true; //set tracker
+                attackStartTime = Time.time; //track when attack started
+            }
+
+            if (attackCooldownTimer > 0) { attackCooldownTimer -= Time.deltaTime; } //count down timer
+            if (attackCooldownTimer <= 0) //when timer runs out, set tracker false
+            {
+                attackCooldownTimer = 0;
+                attackStartTime = 0;
+                attacking = false;
+            }
+
+
+
+            if (lightAttackComboTimer > 0 && !comboing) { comboing = true; }
+            if (lightAttackComboTimer > 0) { lightAttackComboTimer -= Time.deltaTime; } //count down timer
+            if (lightAttackComboTimer <= 0 && comboing)  //when timer runs out
+            {
+                lightAttackComboTimer = 0;
+                lightAttackComboCounter = 0; //set tracker to start
+                comboing = false; //set tracker false
+                a.SetInteger("lightSwingCombo", lightAttackComboCounter);
+            }
         }
     }
     //~~~~~stats~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

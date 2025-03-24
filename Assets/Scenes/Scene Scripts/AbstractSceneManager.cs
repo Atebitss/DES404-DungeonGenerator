@@ -49,18 +49,28 @@ public class AbstractSceneManager : MonoBehaviour
     public PlayerController GetPlayerController() { return PC; }
     public void SpawnPlayer(Vector3 pos)
     {
-        if (MG != null) { if (MG.IsDbugEnabled()) { MG.UpdateHUDDbugText("Scene Manager: Spawning Player"); } }
-        player = Instantiate(playerPrefab, pos, Quaternion.identity);
-        //Debug.Log(player.name);
-        PC = player.transform.GetChild(0).gameObject.GetComponent<PlayerController>();
-        SetADDM(PC.GetADDM());
+        if (player == null)
+        {
 
-        ADM.Wake(this);
+            Debug.Log("Spawning player at: " + pos);
+            if (MG != null) { if (MG.IsDbugEnabled()) { MG.UpdateHUDDbugText("Scene Manager: Spawning Player"); } }
+            player = Instantiate(playerPrefab, pos, Quaternion.identity);
+            //Debug.Log(player.name);
+            PC = player.transform.GetChild(0).gameObject.GetComponent<PlayerController>();
+            SetADDM(PC.GetADDM());
+
+            ADM.Wake(this);
+        }
+        else
+        {
+            Debug.Log("Player already exists");
+        }
     }
     public void DestroyPlayer()
     {
         if (player != null)
         {
+            Debug.Log("Destroying player");
             if (MG.IsDbugEnabled()) { MG.UpdateHUDDbugText("Scene Manager: Destroying Player"); }
             if (ADM != null) { ADM.End(); }
             Destroy(player); 
@@ -183,7 +193,8 @@ public class AbstractSceneManager : MonoBehaviour
         //Debug.Log("Floor complete");
         //would contain scene change to post level
         //and update dungeon stats
-        NewFloor();
+        player.transform.GetChild(0).GetComponent<PlayerController>().SetActive(false); //disable player input
+        NewFloor(); //generate new floor
     }
     private void NewFloor()
     {

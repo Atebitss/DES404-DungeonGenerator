@@ -27,7 +27,7 @@ public class SkillVisualizationManager : MonoBehaviour
             Vector3[] corners = new Vector3[4];
             graphContainer.GetWorldCorners(corners);
             containerCornerOffset = corners[0];
-            Debug.Log("containerCornerOffset: " + containerCornerOffset);
+            //Debug.Log("containerCornerOffset: " + containerCornerOffset);
         }
     }
 
@@ -54,25 +54,25 @@ public class SkillVisualizationManager : MonoBehaviour
 
 
         if (numDataPoints > 5) { numDataPoints = 5; } //only display last 5 data points
-        Debug.Log("numDataPoints: " + numDataPoints);
+        //Debug.Log("numDataPoints: " + numDataPoints);
 
         //calculate new point position
         float xPos = containerCornerOffset.x;
         float yPos = containerCornerOffset.y;
-        Debug.Log("xPos: " + xPos + ", yPos: " + yPos);
+        //Debug.Log("xPos: " + xPos + ", yPos: " + yPos);
 
 
         //if less than 5 data points have been created
         if (points.Length < 5)
         {
-            Debug.Log("numDataPoint   " + numDataPoints + " < 5");
+            //Debug.Log("numDataPoint   " + numDataPoints + " < 5");
 
             //increment xPos by number of data points
             xPos += (numDataPoints * (graphWidth / 25)); //number of data points times 1/25th of graph width
 
             //set yPos based on skill score
             yPos += ((skillScores[(numDataPoints - 1)] / maxSkill) * (graphHeight / 5)); //skill score divided by max skill times 1/10th of graph height
-            Debug.Log("new xPos: " + xPos + ", new yPos: " + yPos);
+            //Debug.Log("new xPos: " + xPos + ", new yPos: " + yPos);
 
 
             //increase point array size and add new point to point array
@@ -80,7 +80,7 @@ public class SkillVisualizationManager : MonoBehaviour
             for (int i = 0; i < (numDataPoints - 1); i++) { newPoints[i] = points[i]; }
             newPoints[(numDataPoints - 1)] = new Vector3(xPos, yPos, 0);
             points = newPoints;
-            Debug.Log("new point: " + points[(numDataPoints - 1)]);
+            //Debug.Log("new point: " + points[(numDataPoints - 1)]);
 
 
             //increase graph point array size and add new graph point to graph point array
@@ -94,18 +94,18 @@ public class SkillVisualizationManager : MonoBehaviour
 
             //update graph point array
             graphPoints = newGraphPoints;
-            Debug.Log("new graph point: " + graphPoints[(numDataPoints - 1)]);
+            //Debug.Log("new graph point: " + graphPoints[(numDataPoints - 1)]);
         }
         //otherwise, if there are 5 data points
         else
         {
-            Debug.Log("numDataPoint " + numDataPoints + "  == 5");
+            //Debug.Log("numDataPoint " + numDataPoints + "  == 5");
 
             //move all points to the left, overwriting the first point and leaving the last point empty
             for (int i = 0; i < 4; i++)
             {
-                Debug.Log("old point " + i + ": " + points[i]);
-                Debug.Log("old point " + (i + 1) + ": " + points[(i + 1)]);
+                //Debug.Log("old point " + i + ": " + points[i]);
+                //Debug.Log("old point " + (i + 1) + ": " + points[(i + 1)]);
 
                 float pointXPos = points[i].x; //store x position of current point
                 points[i] = points[(i + 1)]; //set current point to next point
@@ -120,17 +120,17 @@ public class SkillVisualizationManager : MonoBehaviour
 
             //set yPos based on skill score
             yPos += ((skillScores[(numDataPoints - 1)] / maxSkill) * (graphHeight / 5)); //skill score divided by max skill times 1/10th of graph height
-            Debug.Log("new xPos: " + xPos + ", new yPos: " + yPos);
+            //Debug.Log("new xPos: " + xPos + ", new yPos: " + yPos);
 
             //update last point
             points[4] = new Vector3(xPos, yPos, 0);
-            Debug.Log("new point: " + points[(numDataPoints - 1)]);
+            //Debug.Log("new point: " + points[(numDataPoints - 1)]);
 
 
             //update graph point objects with updated positions
             for (int i = 0; i < (numDataPoints - 1); i++) 
             {
-                Debug.Log("updating graph point: " + graphPoints[i]);
+                //Debug.Log("updating graph point: " + graphPoints[i]);
                 graphPoints[i].transform.position = points[i]; 
             }
         }

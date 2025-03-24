@@ -76,7 +76,9 @@ public class RoomGeneration : MonoBehaviour
 
     //doors
     [SerializeField] private GameObject doorwaySectionPrefab, doorPrefab;
-    private Vector2[] doorPositions;
+    private Vector3[] doorPositions = new Vector3[0];
+    public Vector3[] GetDoorPositions() { return doorPositions; }
+    public Vector3 GetDoorPosition(int index) { return doorPositions[index]; }
     private GameObject[] doorObjects = new GameObject[0];
     public GameObject[] GetDoorObjects() { return doorObjects; }
     private GameObject doorClosedPreCombat;
@@ -231,6 +233,12 @@ public class RoomGeneration : MonoBehaviour
                 //create door at position
                 GameObject doorway = Instantiate(doorwaySectionPrefab, roomGridPositions[pos], Quaternion.identity);
                 doorway.transform.parent = this.transform.GetChild(3); //parent it to the doorway parent
+                //increase door positions array by 1 and add new position
+                Vector3[] newDoorPositions = new Vector3[doorPositions.Length + 1];
+                for (int i = 0; i < doorPositions.Length; i++) { newDoorPositions[i] = doorPositions[i]; }
+                newDoorPositions[doorPositions.Length] = roomGridPositions[pos];
+                doorPositions = newDoorPositions;
+                //Debug.Log("doorPos: " + doorPositions[doorPositions.Length - 1]);
 
                 //Vector3 doorPosition = roomGridPositions[pos] + new Vector3(0.5f, 0, 0.5f); // Offset by 0.5 to get center
                 GameObject door = Instantiate(doorPrefab, roomGridPositions[pos], Quaternion.identity);

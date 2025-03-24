@@ -9,8 +9,7 @@ public class DungeonRealmManager : AbstractSceneManager
         MapGeneration MG = this.gameObject.GetComponent<MapGeneration>();
         if (MG.IsDbugEnabled()) { MG.UpdateHUDDbugText("Dungeon Scene Manager: Restarting Scene"); }
         GameObject SM = this.gameObject;
-        DestroyEnemyObjects();
-        DestroyPlayer();
+        if (GetEnemyObjects().Length > 0) { DestroyEnemyObjects(); }
         MG.ResetMap();
         SM.GetComponent<DungeonGeneration>().ResetDungeon();
         SM.GetComponent<PathGeneration>().ResetHallways();

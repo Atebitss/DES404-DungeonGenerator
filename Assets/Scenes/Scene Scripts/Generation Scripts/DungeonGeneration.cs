@@ -283,6 +283,8 @@ public class DungeonGeneration : MonoBehaviour
             scale = 2;
             mapBoundsMin = new Vector2();
             mapBoundsMax = new Vector2();
+
+            if(currentPlayer != null) { currentPlayer.transform.position = Vector3.zero; }
         }
     }
 
@@ -335,12 +337,21 @@ public class DungeonGeneration : MonoBehaviour
         {
             ASM.SpawnPlayer(new Vector3(entryRoomCenter.x, 0.1f, entryRoomCenter.y));
             currentPlayer = ASM.GetPlayerObject();
+            //set player rotation to face door
+            Vector3 doorPosition = roomObjects[entryRoomID].GetComponent<RoomGeneration>().GetDoorPosition(0);
+            doorPosition.y = currentPlayer.transform.position.y;
+            currentPlayer.GetComponent<PlayerController>().SetPlayerLookAt(doorPosition);
+            currentPlayer.GetComponent<PlayerController>().SetActive(true);
         }
         //else move player to entry room
         else
         {
             currentPlayer.transform.position = new Vector3(entryRoomCenter.x, 1.5f, entryRoomCenter.y);
             currentPlayer = ASM.GetPlayerObject();
+            Vector3 doorPosition = roomObjects[entryRoomID].GetComponent<RoomGeneration>().GetDoorPosition(0);
+            doorPosition.y = currentPlayer.transform.position.y;
+            currentPlayer.GetComponent<PlayerController>().SetPlayerLookAt(doorPosition);
+            currentPlayer.GetComponent<PlayerController>().SetActive(true);
         }
 
         DRM.StartFloorCounter(); //start floor timer

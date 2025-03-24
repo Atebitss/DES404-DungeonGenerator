@@ -21,6 +21,9 @@ public class AdaptiveDifficultyManager : MonoBehaviour
     }
     public void Wake(AbstractSceneManager newASM)
     {
+        //Debug.Log("Waking up Adaptive Difficulty Manager");
+
+        //set references
         ASM = newASM;
         PC = ASM.GetPlayerController();
         ADDM = PC.GetADDM();
@@ -28,15 +31,17 @@ public class AdaptiveDifficultyManager : MonoBehaviour
         SVM = PC.GetSVM();
         SVM.SetADM(this);
 
-        StartDataFile();
+        StartDataFile(); //start data file
     }
     public void End()
     {
+        //Debug.Log("Ending Adaptive Difficulty Manager");
+
         //update data with final stats
         statsData += "\n~~~PLAYER DEATH~~~\n\n";
-        FillDataFileRoom();
-        FillDataFileFloor();
-        EndDataFile();
+        FillDataFileRoom(); //fill room data
+        FillDataFileFloor(); //fill floor data
+        EndDataFile(); //end data file
     }
     //~~~~~~misc~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -142,8 +147,10 @@ public class AdaptiveDifficultyManager : MonoBehaviour
         timeIndexsOfDamageLastTaken = new float[0];
         numOfAttacks = 0;
         numOfHits = 0;
+        accuracy = 0f;
         numOfDodges = 0;
         numOfHitsDodged = 0;
+        dodgeEffectiveness = 0f;
         combosPerformed = 0;
         startTime = 0f;
         endTime = 0f;
@@ -267,7 +274,7 @@ public class AdaptiveDifficultyManager : MonoBehaviour
             totalRoomClearTime += roomClearTimes[i];
             //Debug.Log("totalRoomClearTime: " + totalRoomClearTime);
         }
-        avgRoomClearTime = (totalRoomClearTime / roomClearTimes.Length);
+        avgRoomClearTime = (totalRoomClearTime / (float)roomClearTimes.Length);
         //Debug.Log("RoomClearTime score: " + avgRoomClearTime);
         if (roomClearTimes.Length > 0) { skillScore -= (avgRoomClearTime / 10f); }
         //Debug.Log("skillScore: " + skillScore);
@@ -350,33 +357,42 @@ public class AdaptiveDifficultyManager : MonoBehaviour
     private string statsData = "";
     private void StartDataFile()
     {
-        //create a new file
-        Debug.Log("Creating new data file, " + System.DateTime.Now.ToString());
+        //Debug.Log("Starting data file");
 
+        //start data file header
         //if file already exists, add to it
         if (System.IO.File.Exists(filePath))
         {
+            //Debug.Log("File found. Adding to existing data file, " + System.DateTime.Now.ToString());
+
             statsData = System.IO.File.ReadAllText(filePath);
 
             //player stats string to be added to file
-            statsData += "\n--- New Report File ---";
-            statsData += "\n\n\nPlayer Stats Report - " + System.DateTime.Now.ToString();
-            statsData += "\n===================\n\n";
+            statsData += "======================================\n\n";
+            statsData += "\n\n\n--- New Report ---\n\n";
+            statsData += "Player Stats Report - " + System.DateTime.Now.ToString() + "\n\n";
+            statsData += "===================\n\n";
             FillDataFileRoom();
         }
-        else 
+        else
         {
+            //Debug.Log("File not found. Creating new data file, " + System.DateTime.Now.ToString());
+
             //if no file exists, create new file at path location
             System.IO.File.Create(filePath);
 
             //player stats string to be added to file
-            statsData = "Player Stats Report - " + System.DateTime.Now.ToString();
-            statsData += "\n===================\n\n";
+            statsData = "\n\n--- Starting New Data File ---\n\n";
+            statsData += "Player Stats Report - " + System.DateTime.Now.ToString() + "\n\n";
+            statsData += "===================\n\n";
             FillDataFileRoom();
         }
     }
     private void FillDataFileRoom()
     {
+        //Debug.Log("Filling data file with room " + roomsCleared + " data");
+
+        //update statsData with room data
         statsData += "Rooms Cleared: " + roomsCleared + "\n" +
                     "Average Room Clear Time: " + avgRoomClearTime + "\n\n" +
                     "Attacks: " + numOfAttacks + ", Hits: " + numOfHits + "\n" +
@@ -386,20 +402,26 @@ public class AdaptiveDifficultyManager : MonoBehaviour
                     "Combos Performed: " + combosPerformed + "\n\n" +
                     "Times Damage Taken: " + timeIndexsOfDamageLastTaken.Length + "\n" +
                     "Average Time Between Damage Taken: " + avgTimeBetweenDamageTaken + "\n\n" +
-
+                    "Score Gained This Room: " + ((avgTimeBetweenDamageTaken / 15) + accuracy + dodgeEffectiveness + combosPerformed - (avgRoomClearTime / 10f) + ((float)roomsCleared / 10f) - (avgFloorClearTime / 10f) + ((float)floorsCleared * 10f)) + "\n" +
                     "Skill Score: " + skillScore + "\n\n" +
-                    "\n~~~~~~~~~~~~~~~~~~~\n";
+                    "~~~~~~~~~~~~~~~~~~~\n";
     }
     private void FillDataFileFloor()
     {
+        //Debug.Log("Filling data file with floor " + floorsCleared + " data");
+
+        //update statsData with floor data
         statsData += "Floor: " + floorsCleared + "\n" +
                     "Average Floor Clear Time: " + avgFloorClearTime + "\n" +
-                    "\n===================\n";
+                    "===================\n";
     }
     private void EndDataFile()
     {
-        statsData += "\n\n\nEnd of Run Stats Report - " + System.DateTime.Now.ToString();
-        statsData += "\n===================\n\n";
+        //Debug.Log("Ending data file");
+
+        //update statsData with footer
+        statsData += "\n\n\nEnd of Run Stats Report - " + System.DateTime.Now.ToString() + "\n";
+        statsData += "======================================\n\n";
 
         //add statsData to file
         System.IO.File.WriteAllText(filePath, statsData);

@@ -214,7 +214,7 @@
                 {
                     "name": "",
                     "id": "44f35e69-0ffb-4e60-990e-21470ff3ca55",
-                    "path": "<Gamepad>/buttonWest",
+                    "path": "<Gamepad>/rightTrigger",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -236,7 +236,7 @@
                 {
                     "name": "",
                     "id": "8624081c-a4e0-4681-b974-ddb14dfd1a42",
-                    "path": "<Gamepad>/buttonWest",
+                    "path": "<Gamepad>/rightTrigger",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
