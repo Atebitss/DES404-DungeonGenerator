@@ -52,6 +52,7 @@ public class MapGeneration : MonoBehaviour
 
     //map grid
     private Vector2[,] gridPositions; //literal positions
+    public Vector2 GetGridPosition(int posX, int posZ) { return gridPositions[posX, posZ]; }
     private string[,] gridStates; //what fills the grid square, if anything
     public void UpdateGridState(int posX, int posZ, string gridState) //update tile state
     {
@@ -188,7 +189,7 @@ public class MapGeneration : MonoBehaviour
             }
         }
     }
-    private int ConvertPosToPosID(Vector2 pos) //convert 2D position to grid position
+    public int ConvertPosToPosID(Vector2 pos) //convert 2D position to grid position
     {
         //Debug.Log("vector2int: " + pos);
         //Debug.Log("ID: " + (pos.x * boundsZ + pos.y + 1));

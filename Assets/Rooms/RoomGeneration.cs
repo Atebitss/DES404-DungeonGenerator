@@ -213,6 +213,7 @@ public class RoomGeneration : MonoBehaviour
     }
     private void GenerateDoorways()
     {
+        //Debug.Log("generating doorways for room: " + roomID);
         if (dbugEnabled) { MG.UpdateHUDDbugText("Room Generation: Generating Doorways"); }
         int doorCount = 0;
 
@@ -230,69 +231,179 @@ public class RoomGeneration : MonoBehaviour
             //if position is edge and state is doorway
             if (edgeID != new Vector2(0, 0) && roomGridStates[pos] == "Doorway")
             {
+                //Debug.Log("doorway at position: " + pos);
                 //create door at position
                 GameObject doorway = Instantiate(doorwaySectionPrefab, roomGridPositions[pos], Quaternion.identity);
                 doorway.transform.parent = this.transform.GetChild(3); //parent it to the doorway parent
-                //increase door positions array by 1 and add new position
-                Vector3[] newDoorPositions = new Vector3[doorPositions.Length + 1];
-                for (int i = 0; i < doorPositions.Length; i++) { newDoorPositions[i] = doorPositions[i]; }
-                newDoorPositions[doorPositions.Length] = roomGridPositions[pos];
-                doorPositions = newDoorPositions;
-                //Debug.Log("doorPos: " + doorPositions[doorPositions.Length - 1]);
 
-                //Vector3 doorPosition = roomGridPositions[pos] + new Vector3(0.5f, 0, 0.5f); // Offset by 0.5 to get center
-                GameObject door = Instantiate(doorPrefab, roomGridPositions[pos], Quaternion.identity);
-                door.transform.parent = doorway.transform; //parent it to the door parent
-
-                //name door based on room number and direction
+                //varaiables for door creation
+                GameObject curDoor = null;
+                Vector3 curPos = Vector3.zero;
                 string direction = "";
-                switch(edgeID.x)
+
+                
+                //check grid position ahead
+                int gridPosX = pos % roomBoundsX; //get current grid position x
+                int gridPosZ = pos / roomBoundsX; //get current grid position z
+                //Debug.Log("gridPosX: " + gridPosX + ", gridPosZ: " + gridPosZ);
+
+                int adjPosX = (roomPosX + (gridPosX + (int)edgeID.y)); //calculate adjacent grid position x
+                int adjPosZ = (roomPosZ + (gridPosZ + (int)edgeID.x)); //calculate adjacent grid position z
+                //Debug.Log("adjPosX: " + adjPosX + ", adjPosZ: " + adjPosZ);
+
+                if (MG.GetGridState(adjPosX, adjPosZ) == "Doorway")
                 {
-                    case -1:
-                        direction = "South";
-                        doorway.transform.Rotate(0, -90, 0, Space.Self);
-                        door.transform.Rotate(0, 90, 0, Space.Self);
-                        doorway.transform.position += new Vector3(0, 1, -0.75f);
-                        door.transform.position += new Vector3(0.75f, -1, 0.35f);
-                        break;
-                    case 1:
-                        direction = "North"; 
-                        doorway.transform.Rotate(0, 90, 0, Space.Self);
-                        door.transform.Rotate(0, 90, 0, Space.Self);
-                        doorway.transform.position += new Vector3(0, 1, 0.75f);
-                        door.transform.position += new Vector3(-0.75f, -1, -0.35f);
-                        break;
+                    //Debug.Log("door in adjacent position: " + adjPosX + ", " + adjPosZ);
+                    //if there is a door ahead
+                    //check if there is already a door there
+                    Vector2 adjLiteralPosition = MG.GetGridPosition(adjPosX, adjPosZ); //get literal position of adjacent grid position
+                    Vector2 gridLiteralPosition = MG.GetGridPosition(roomPosX + gridPosX, roomPosZ + gridPosZ); //get literal position of current grid position
+                    //Debug.Log("adjLiteralPosition: " + adjLiteralPosition);
+                    //Debug.Log("gridLiteralPosition: " + gridLiteralPosition);
+
+                    //find the position inbetween each doorway literal position
+                    Vector3 doorLiteralPosition = new Vector3((gridLiteralPosition.x + adjLiteralPosition.x) / 2, 0, (gridLiteralPosition.y + adjLiteralPosition.y) / 2);
+                    //Debug.Log("doorLiteralPosition: " + doorLiteralPosition);
+                    curPos = doorLiteralPosition;
+
+                    //run a physics sphere check to see if there is already a door at the position
+                    Collider[] hitColliders = Physics.OverlapSphere(doorLiteralPosition, 0.1f);
+                    bool doorFound = false;
+                    for (int i = 0; i < hitColliders.Length; i++)
+                    {
+                        //Debug.Log("hitCollider" + i + ": " + hitColliders[i].gameObject.name);
+                        if (hitColliders[i].gameObject.tag == "Door")
+                        {
+                            //Debug.Log("door found: " +  hitColliders[i].gameObject.name + ", " + hitColliders[i].gameObject.tag);
+                            //if there is a door, update curDoor with it
+                            curDoor = hitColliders[0].gameObject.transform.parent.gameObject.transform.GetChild(0).gameObject;
+                            curDoor.transform.parent = doorway.transform; //parent it to the door parent
+                            //Debug.Log("curDoor: " + curDoor.name);
+                            doorFound = true;
+                            break;
+                        }
+                    }
+
+
+                    //if there is no door, create a door at the position
+                    if (!doorFound)
+                    {
+                        //Debug.Log("no door found, creating new");
+                        //if there's not a door, create a door there
+                        curDoor = Instantiate(doorPrefab, doorLiteralPosition, Quaternion.identity);
+                        curDoor.transform.parent = doorway.transform; //parent it to the new door parent
+                        //Debug.Log("curDoor: " + curDoor.name);
+                    }
+
+
+                    //name door based on room number and direction
+                    switch (edgeID.x)
+                    {
+                        case -1:
+                            direction = "South";
+                            doorway.transform.Rotate(0, -90, 0, Space.Self);
+                            curDoor.transform.Rotate(0, 90, 0, Space.Self);
+                            doorway.transform.position += new Vector3(0f, 1f, -0.75f);
+                            curDoor.transform.position += new Vector3(-1f, -2f, -0.25f);
+                            break;
+                        case 1:
+                            direction = "North";
+                            doorway.transform.Rotate(0, 90, 0, Space.Self);
+                            curDoor.transform.Rotate(0, 90, 0, Space.Self);
+                            doorway.transform.position += new Vector3(0f, 1f, 0.75f);
+                            //curDoor.transform.position += new Vector3(0.25f, -1f, -1.25f);
+                            break;
+                    }
+                    switch (edgeID.y)
+                    {
+                        case -1:
+                            direction = "West";
+                            doorway.transform.Rotate(0, 0, 0, Space.Self);
+                            curDoor.transform.Rotate(0, 90, 0, Space.Self);
+                            doorway.transform.position += new Vector3(-0.75f, 1f, 0f);
+                            //curDoor.transform.position += new Vector3(-0.25f, -1f, -0.75f);
+                            break;
+                        case 1:
+                            direction = "East";
+                            doorway.transform.Rotate(0, 180, 0, Space.Self);
+                            curDoor.transform.Rotate(0, 90, 0, Space.Self);
+                            doorway.transform.position += new Vector3(0.75f, 1f, 0f);
+                            //curDoor.transform.position += new Vector3(-0.75f, -1f, -0.75f);
+                            break;
+                    }
                 }
-                switch(edgeID.y) 
+                else
                 {
-                    case -1:
-                        direction = "West";
-                        doorway.transform.Rotate(0, 0, 0, Space.Self);
-                        door.transform.Rotate(0, 90, 0, Space.Self);
-                        doorway.transform.position += new Vector3(-0.75f, 1, 0);
-                        door.transform.position += new Vector3(0.35f, -1, -0.75f);
-                        break;
-                    case 1:
-                        direction = "East";
-                        doorway.transform.Rotate(0, 180, 0, Space.Self);
-                        door.transform.Rotate(0, 90, 0, Space.Self);
-                        doorway.transform.position += new Vector3(0.75f, 1, 0);
-                        door.transform.position += new Vector3(-0.35f, -1, 0.75f);
-                        break;
+                    //otherwise, create a door at the current grid position
+                    //Vector3 doorPosition = roomGridPositions[pos] + new Vector3(0.5f, 0, 0.5f); // Offset by 0.5 to get center
+                    curDoor = Instantiate(doorPrefab, roomGridPositions[pos], Quaternion.identity);
+                    curDoor.transform.parent = doorway.transform; //parent it to the door parent
+                    curPos = roomGridPositions[pos];
+
+                    //name door based on room number and direction
+                    switch (edgeID.x)
+                    {
+                        case -1:
+                            direction = "South";
+                            doorway.transform.Rotate(0, -90, 0, Space.Self);
+                            curDoor.transform.Rotate(0, 90, 0, Space.Self);
+                            doorway.transform.position += new Vector3(0, 1, -0.75f);
+                            curDoor.transform.position += new Vector3(0.75f, -1, 0.35f);
+                            break;
+                        case 1:
+                            direction = "North";
+                            doorway.transform.Rotate(0, 90, 0, Space.Self);
+                            curDoor.transform.Rotate(0, 90, 0, Space.Self);
+                            doorway.transform.position += new Vector3(0, 1, 0.75f);
+                            curDoor.transform.position += new Vector3(-0.75f, -1, -0.35f);
+                            break;
+                    }
+                    switch (edgeID.y)
+                    {
+                        case -1:
+                            direction = "West";
+                            doorway.transform.Rotate(0, 0, 0, Space.Self);
+                            curDoor.transform.Rotate(0, 90, 0, Space.Self);
+                            doorway.transform.position += new Vector3(-0.75f, 1, 0);
+                            curDoor.transform.position += new Vector3(0.35f, -1, -0.75f);
+                            break;
+                        case 1:
+                            direction = "East";
+                            doorway.transform.Rotate(0, 180, 0, Space.Self);
+                            curDoor.transform.Rotate(0, 90, 0, Space.Self);
+                            doorway.transform.position += new Vector3(0.75f, 1, 0);
+                            curDoor.transform.position += new Vector3(-0.35f, -1, 0.75f);
+                            break;
+                    }
                 }
 
+
+                //Debug.Log("curDoor: " + curDoor.name);
+                //Debug.Log("curDoor.Child: " + curDoor.transform.GetChild(0).name);
+                //Debug.Log("curDoor.Child.Child: " + curDoor.transform.GetChild(0).GetChild(0).name);
                 doorway.name = "Room" + roomID + direction + "Doorway";
-                door.transform.GetChild(0).GetChild(0).name = "Room" + roomID + direction + "Door" + doorCount;
+                curDoor.transform.GetChild(0).GetChild(0).name = "Room" + roomID + direction + "Door" + doorCount;
+                //Debug.Log("cur door: " + curDoor.transform.GetChild(0).GetChild(0).name);
+                //Debug.Log("cur door parent: " + curDoor.transform.parent.name);
                 doorCount++;
 
                 //increase array size by 1 and add door
                 GameObject[] newDoorObjects = new GameObject[doorObjects.Length + 1];
-                for(int i = 0; i < doorObjects.Length; i++)
+                for (int i = 0; i < doorObjects.Length; i++)
                 {
                     newDoorObjects[i] = doorObjects[i];
                 }
-                newDoorObjects[doorObjects.Length] = door;
+                newDoorObjects[doorObjects.Length] = curDoor;
                 doorObjects = newDoorObjects;
+
+                //increase array size by 1 and add door position
+                Vector3[] newDoorPositions = new Vector3[doorPositions.Length + 1];
+                for (int i = 0; i < doorPositions.Length; i++)
+                {
+                    newDoorPositions[i] = doorPositions[i];
+                }
+                newDoorPositions[doorPositions.Length] = curPos;
+                doorPositions = newDoorPositions;
             }
         }
     }

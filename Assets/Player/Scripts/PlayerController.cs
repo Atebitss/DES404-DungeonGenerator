@@ -30,7 +30,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private bool active = false; //allows player input
     public void SetActive(bool newActive) 
     {
-        Debug.Log("PlayerController.SetActive: " + newActive);
+        //Debug.Log("PlayerController.SetActive: " + newActive);
         active = newActive;
 
         if (!active)
@@ -285,7 +285,7 @@ public class PlayerController : MonoBehaviour
         if (active)
         {
             //Mouse / Right Thumbstick
-            Debug.Log(ctx.ReadValue<Vector2>());
+            //Debug.Log(ctx.ReadValue<Vector2>());
             lookment = ctx.ReadValue<Vector2>();
         }
     }

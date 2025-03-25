@@ -52,7 +52,7 @@ public class AbstractSceneManager : MonoBehaviour
         if (player == null)
         {
 
-            Debug.Log("Spawning player at: " + pos);
+            //Debug.Log("Spawning player at: " + pos);
             if (MG != null) { if (MG.IsDbugEnabled()) { MG.UpdateHUDDbugText("Scene Manager: Spawning Player"); } }
             player = Instantiate(playerPrefab, pos, Quaternion.identity);
             //Debug.Log(player.name);
