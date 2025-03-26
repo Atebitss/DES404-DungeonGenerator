@@ -85,9 +85,13 @@ public class RoomGeneration : MonoBehaviour
     public void LockDoors()
     {
         if (dbugEnabled) { MG.UpdateHUDDbugText("Room Generation: Locking Doors"); }
-        for (int i = 0; i < doorObjects.Length; i++)
+        Debug.Log("locking doors");
+        for (int doorIndex = 0; doorIndex < doorObjects.Length; doorIndex++)
         {
-            doorObjects[i].transform.GetChild(0).transform.GetChild(0).GetComponent<AbstractDoorScript>().LockDoor();
+            AbstractDoorScript curADS = doorObjects[doorIndex].transform.GetChild(0).transform.GetChild(0).GetComponent<AbstractDoorScript>();
+
+            if (curADS.GetIsOpen()) { doorClosedPreCombat = doorObjects[doorIndex]; }
+            curADS.LockDoor();
         }
     }
     public void UnlockDoors()
@@ -231,17 +235,48 @@ public class RoomGeneration : MonoBehaviour
             //if position is edge and state is doorway
             if (edgeID != new Vector2(0, 0) && roomGridStates[pos] == "Doorway")
             {
+                string direction = "";
+
                 //Debug.Log("doorway at position: " + pos);
                 //create door at position
                 GameObject doorway = Instantiate(doorwaySectionPrefab, roomGridPositions[pos], Quaternion.identity);
                 doorway.transform.parent = this.transform.GetChild(3); //parent it to the doorway parent
 
+                switch (edgeID.x)
+                {
+                    case -1:
+                        direction = "South";
+                        doorway.transform.Rotate(0, -90, 0, Space.Self);
+                        doorway.transform.position += new Vector3(0, 1, -0.75f);
+                        break;
+                    case 1:
+                        direction = "North";
+                        doorway.transform.Rotate(0, 90, 0, Space.Self);
+                        doorway.transform.position += new Vector3(0, 1, 0.75f);
+                        break;
+                }
+                switch (edgeID.y)
+                {
+                    case -1:
+                        direction = "West";
+                        doorway.transform.Rotate(0, 0, 0, Space.Self);
+                        doorway.transform.position += new Vector3(-0.75f, 1, 0);
+                        break;
+                    case 1:
+                        direction = "East";
+                        doorway.transform.Rotate(0, 180, 0, Space.Self);
+                        doorway.transform.position += new Vector3(0.75f, 1, 0);
+                        break;
+                }
+
+                doorway.name = "Room" + roomID + direction + "Doorway";
+
+
+
                 //varaiables for door creation
                 GameObject curDoor = null;
                 Vector3 curPos = Vector3.zero;
-                string direction = "";
 
-                
                 //check grid position ahead
                 int gridPosX = pos % roomBoundsX; //get current grid position x
                 int gridPosZ = pos / roomBoundsX; //get current grid position z
@@ -250,6 +285,7 @@ public class RoomGeneration : MonoBehaviour
                 int adjPosX = (roomPosX + (gridPosX + (int)edgeID.y)); //calculate adjacent grid position x
                 int adjPosZ = (roomPosZ + (gridPosZ + (int)edgeID.x)); //calculate adjacent grid position z
                 //Debug.Log("adjPosX: " + adjPosX + ", adjPosZ: " + adjPosZ);
+
 
                 if (MG.GetGridState(adjPosX, adjPosZ) == "Doorway")
                 {
@@ -265,6 +301,7 @@ public class RoomGeneration : MonoBehaviour
                     Vector3 doorLiteralPosition = new Vector3((gridLiteralPosition.x + adjLiteralPosition.x) / 2, 0, (gridLiteralPosition.y + adjLiteralPosition.y) / 2);
                     //Debug.Log("doorLiteralPosition: " + doorLiteralPosition);
                     curPos = doorLiteralPosition;
+
 
                     //run a physics sphere check to see if there is already a door at the position
                     Collider[] hitColliders = Physics.OverlapSphere(doorLiteralPosition, 0.1f);
@@ -293,43 +330,35 @@ public class RoomGeneration : MonoBehaviour
                         curDoor = Instantiate(doorPrefab, doorLiteralPosition, Quaternion.identity);
                         curDoor.transform.parent = doorway.transform; //parent it to the new door parent
                         //Debug.Log("curDoor: " + curDoor.name);
-                    }
 
 
-                    //name door based on room number and direction
-                    switch (edgeID.x)
-                    {
-                        case -1:
-                            direction = "South";
-                            doorway.transform.Rotate(0, -90, 0, Space.Self);
-                            curDoor.transform.Rotate(0, 90, 0, Space.Self);
-                            doorway.transform.position += new Vector3(0f, 1f, -0.75f);
-                            curDoor.transform.position += new Vector3(-1f, -2f, -0.25f);
-                            break;
-                        case 1:
-                            direction = "North";
-                            doorway.transform.Rotate(0, 90, 0, Space.Self);
-                            curDoor.transform.Rotate(0, 90, 0, Space.Self);
-                            doorway.transform.position += new Vector3(0f, 1f, 0.75f);
-                            //curDoor.transform.position += new Vector3(0.25f, -1f, -1.25f);
-                            break;
-                    }
-                    switch (edgeID.y)
-                    {
-                        case -1:
-                            direction = "West";
-                            doorway.transform.Rotate(0, 0, 0, Space.Self);
-                            curDoor.transform.Rotate(0, 90, 0, Space.Self);
-                            doorway.transform.position += new Vector3(-0.75f, 1f, 0f);
-                            //curDoor.transform.position += new Vector3(-0.25f, -1f, -0.75f);
-                            break;
-                        case 1:
-                            direction = "East";
-                            doorway.transform.Rotate(0, 180, 0, Space.Self);
-                            curDoor.transform.Rotate(0, 90, 0, Space.Self);
-                            doorway.transform.position += new Vector3(0.75f, 1f, 0f);
-                            //curDoor.transform.position += new Vector3(-0.75f, -1f, -0.75f);
-                            break;
+                        //name door based on room number and direction
+                        switch (edgeID.x)
+                        {
+                            case -1: //south
+                                //curDoor.transform.Rotate(0, 90, 0, Space.Self);
+                                curDoor.transform.position += new Vector3(0.75f, 0f, 0f);
+                                break;
+                            case 1: //north
+                                curDoor.transform.Rotate(0, 180, 0, Space.Self);
+                                curDoor.transform.position += new Vector3(-0.75f, 0f, 0f);
+                                break;
+                        }
+                        switch (edgeID.y)
+                        {
+                            case -1: //west
+                                curDoor.transform.Rotate(0, 90, 0, Space.Self);
+                                curDoor.transform.position += new Vector3(0f, 0f, -0.75f);
+                                break;
+                            case 1: //east
+                                curDoor.transform.Rotate(0, -90, 0, Space.Self);
+                                curDoor.transform.position += new Vector3(0, 0f, 0.75f);
+                                break;
+                        }
+
+                        curDoor.transform.GetChild(0).GetChild(0).name = "Room" + roomID + direction + "Door" + doorCount;
+                        //Debug.Log("cur door: " + curDoor.transform.GetChild(0).GetChild(0).name);
+                        //Debug.Log("cur door parent: " + curDoor.transform.parent.name);
                     }
                 }
                 else
@@ -343,48 +372,32 @@ public class RoomGeneration : MonoBehaviour
                     //name door based on room number and direction
                     switch (edgeID.x)
                     {
-                        case -1:
-                            direction = "South";
-                            doorway.transform.Rotate(0, -90, 0, Space.Self);
-                            curDoor.transform.Rotate(0, 90, 0, Space.Self);
-                            doorway.transform.position += new Vector3(0, 1, -0.75f);
-                            curDoor.transform.position += new Vector3(0.75f, -1, 0.35f);
+                        case -1: //south
+                            //curDoor.transform.Rotate(0, 90, 0, Space.Self);
+                            curDoor.transform.position += new Vector3(0.75f, 0f, -0.35f);
                             break;
-                        case 1:
-                            direction = "North";
-                            doorway.transform.Rotate(0, 90, 0, Space.Self);
-                            curDoor.transform.Rotate(0, 90, 0, Space.Self);
-                            doorway.transform.position += new Vector3(0, 1, 0.75f);
-                            curDoor.transform.position += new Vector3(-0.75f, -1, -0.35f);
+                        case 1: //north
+                            curDoor.transform.Rotate(0, 180, 0, Space.Self);
+                            curDoor.transform.position += new Vector3(-0.75f, 0f, 0.35f);
                             break;
                     }
                     switch (edgeID.y)
                     {
-                        case -1:
-                            direction = "West";
-                            doorway.transform.Rotate(0, 0, 0, Space.Self);
+                        case -1: //west
                             curDoor.transform.Rotate(0, 90, 0, Space.Self);
-                            doorway.transform.position += new Vector3(-0.75f, 1, 0);
-                            curDoor.transform.position += new Vector3(0.35f, -1, -0.75f);
+                            curDoor.transform.position += new Vector3(-0.35f, 0f, -0.75f);
                             break;
-                        case 1:
-                            direction = "East";
-                            doorway.transform.Rotate(0, 180, 0, Space.Self);
-                            curDoor.transform.Rotate(0, 90, 0, Space.Self);
-                            doorway.transform.position += new Vector3(0.75f, 1, 0);
-                            curDoor.transform.position += new Vector3(-0.35f, -1, 0.75f);
+                        case 1: //east
+                            curDoor.transform.Rotate(0, -90, 0, Space.Self);
+                            curDoor.transform.position += new Vector3(0.35f, 0f, 0.75f);
                             break;
                     }
+
+                    curDoor.transform.GetChild(0).GetChild(0).name = "Room" + roomID + direction + "Door" + doorCount;
+                    //Debug.Log("cur door: " + curDoor.transform.GetChild(0).GetChild(0).name);
+                    //Debug.Log("cur door parent: " + curDoor.transform.parent.name);
                 }
 
-
-                //Debug.Log("curDoor: " + curDoor.name);
-                //Debug.Log("curDoor.Child: " + curDoor.transform.GetChild(0).name);
-                //Debug.Log("curDoor.Child.Child: " + curDoor.transform.GetChild(0).GetChild(0).name);
-                doorway.name = "Room" + roomID + direction + "Doorway";
-                curDoor.transform.GetChild(0).GetChild(0).name = "Room" + roomID + direction + "Door" + doorCount;
-                //Debug.Log("cur door: " + curDoor.transform.GetChild(0).GetChild(0).name);
-                //Debug.Log("cur door parent: " + curDoor.transform.parent.name);
                 doorCount++;
 
                 //increase array size by 1 and add door
@@ -502,13 +515,7 @@ public class RoomGeneration : MonoBehaviour
         running = true;
 
         //lock doors
-        for(int doorIndex = 0; doorIndex < doorObjects.Length; doorIndex++)
-        {
-            AbstractDoorScript curADS = doorObjects[doorIndex].transform.GetChild(0).transform.GetChild(0).GetComponent<AbstractDoorScript>();
-
-            if (curADS.GetIsOpen()) { doorClosedPreCombat = doorObjects[doorIndex]; }
-            curADS.LockDoor();
-        }
+        LockDoors();
 
         //start adaptive difficulty stat watcher
         if (ADM != null) { ADM.StartStatWatch(this); }
@@ -526,13 +533,7 @@ public class RoomGeneration : MonoBehaviour
         bossRoom = true;
 
         //lock doors
-        for (int doorIndex = 0; doorIndex < doorObjects.Length; doorIndex++)
-        {
-            AbstractDoorScript curADS = doorObjects[doorIndex].transform.GetChild(0).transform.GetChild(0).GetComponent<AbstractDoorScript>();
-
-            if (curADS.GetIsOpen()) { doorClosedPreCombat = doorObjects[doorIndex]; }
-            curADS.LockDoor();
-        }
+        LockDoors();
 
         //start adaptive difficulty stat watcher
         if (ADM != null) { ADM.StartStatWatch(this); }

@@ -8,6 +8,7 @@ public abstract class AbstractDoorScript : MonoBehaviour
     AbstractSceneManager ASM;
     void Start(){ASM = GameObject.Find("SceneManager").GetComponent<AbstractSceneManager>();}
 
+
     //~~~~~health~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     public int health;
     public int GetHealth() { return health; }
@@ -42,7 +43,7 @@ public abstract class AbstractDoorScript : MonoBehaviour
     [SerializeField] private Animator a;
 
 
-        //interaction
+    //interaction
     public void InteractWithDoor()
     {
         if(!isBusy && !isLocked)
@@ -112,7 +113,7 @@ public abstract class AbstractDoorScript : MonoBehaviour
     }
     public void CloseDoor()
     {
-        //Debug.Log("Closing " + gameObject.name);
+        Debug.Log("Closing " + gameObject.name);
         a.SetBool("isOpen", false); //run close animation
         isOpen = false; //update state
         //play(doorClosingSound) //play closing audio
@@ -120,8 +121,9 @@ public abstract class AbstractDoorScript : MonoBehaviour
     }
     public void LockDoor() 
     {
-        //Debug.Log("Locking " + gameObject.name);
-        if(isOpen) { a.SetInteger("openDirection", 2); CloseDoor(); }
+        Debug.Log("Locking " + gameObject.name);
+        a.SetBool("isLocked", false);
+        if (isOpen) { a.SetInteger("openDirection", 2); CloseDoor(); }
         isLocked = true; 
         UpdateDoorMaterial();
     }
