@@ -186,6 +186,11 @@ public class AbstractSceneManager : MonoBehaviour
         PG = this.gameObject.GetComponent<PathGeneration>();
         ADM = this.gameObject.GetComponent<AdaptiveDifficultyManager>();
     }
+    void Start()
+    {
+        Debug.Log("ASM: " + DG);
+        NewFloor();
+    }
 
     public void EndFloor()
     {

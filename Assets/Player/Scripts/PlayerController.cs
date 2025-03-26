@@ -369,6 +369,7 @@ public class PlayerController : MonoBehaviour
                 if (lightAttackComboCounter == 0)
                 {
                     attackComboDamage = 0; //reset any temp combo damage
+                    PWCM.SetWeaponDamage(attackDamage);
                 }
 
 
@@ -388,6 +389,7 @@ public class PlayerController : MonoBehaviour
                 {
                     AM.Play("Sword_SwingFinal");
                     attackComboDamage = attackDamage * 2; //double damage added on to regular damage
+                    PWCM.SetWeaponDamage((attackDamage + attackComboDamage));
                 }
 
                 lightAttackComboCounter++; //increase combo

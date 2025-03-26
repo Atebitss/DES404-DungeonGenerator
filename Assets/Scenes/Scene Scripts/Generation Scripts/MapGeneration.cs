@@ -132,6 +132,7 @@ public class MapGeneration : MonoBehaviour
 
         //begin dungeon generation within bounds
         //if(genAttempts > 1) { ASM.RestartScene(); }
+        Debug.Log("MG: " + DG);
         DG.BeginDungeonGeneration(treasureRoomsMax, treasureRoomsMin, specialRoomsMax, specialRoomsMin, boundsX, boundsZ, totalSpace, gridPositions);
     }
     private void DefineBounds()

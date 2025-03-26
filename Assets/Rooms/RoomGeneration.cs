@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine;
 using TMPro;
-using static UnityEditor.PlayerSettings;
-using UnityEditorInternal.Profiling.Memory.Experimental.FileFormat;
 
 public class RoomGeneration : MonoBehaviour
 {
