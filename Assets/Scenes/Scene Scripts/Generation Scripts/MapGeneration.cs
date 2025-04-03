@@ -24,12 +24,8 @@ public class MapGeneration : MonoBehaviour
 
     //debug info
     [Header("Debug Settings")]
-    [SerializeField] private bool dbugEnabled = false;
-    [SerializeField] private bool showDbugTiles = false;
-    public bool IsDbugEnabled() { return dbugEnabled; }
-
-    [SerializeField] private bool visualDemo = false;
-    public bool IsVisualEnabled() { return visualDemo; }
+    private bool dbugEnabled = false;
+    private bool visualDemo = false;
 
 
     [Header("Debug Materials")]
@@ -56,6 +52,10 @@ public class MapGeneration : MonoBehaviour
     private string[,] gridStates; //what fills the grid square, if anything
     public void UpdateGridState(int posX, int posZ, string gridState) //update tile state
     {
+        //Debug.Log("Map Generation: UpdateGridState");
+        //Debug.Log("pos: " + posX + ", " + posZ);
+        //Debug.Log((posX * posZ) + " / " + gridStates.Length);
+        Debug.Log("gridStates[x,z]: " + gridStates[posX, posZ]);
         gridStates[posX, posZ] = gridState;
     }
     public string GetGridState(int posX, int posZ) { /*Debug.Log(gridStates[posX, posZ]);*/ return gridStates[posX, posZ]; }
@@ -67,7 +67,7 @@ public class MapGeneration : MonoBehaviour
         //Debug.Log("MG, Reset Map");
         if (dbugEnabled) { UpdateHUDDbugText("Dungeon Generation: Resetting Map"); }
 
-        if (dbugEnabled && showDbugTiles)
+        if (dbugEnabled && visualDemo)
         {
             //clear the debug grid
             for (int x = 0; x < boundsX; x++) { for (int z = 0; z < boundsZ; z++) { if (gridDbug[x, z] != null) { Destroy(gridDbug[x, z]); } } }
@@ -88,7 +88,7 @@ public class MapGeneration : MonoBehaviour
                 if (gridPositions[x, z] != null) { gridPositions[x, z] = new Vector2(((testTile.transform.localScale.x + 0.1f) * x), ((testTile.transform.localScale.z + 0.1f) * z)); }
 
                 //reset debug text
-                if (dbugEnabled && showDbugTiles) { if (gridDbugText[x, z] != null) { gridDbugText[x, z].text = ""; } }
+                if (dbugEnabled && visualDemo) { if (gridDbugText[x, z] != null) { gridDbugText[x, z].text = ""; } }
             }
         }
     }
@@ -104,6 +104,12 @@ public class MapGeneration : MonoBehaviour
         ASM = this.gameObject.GetComponent<AbstractSceneManager>();
         DG = ASM.GetDG();
         PG = ASM.GetPG();
+
+        dbugEnabled = ASM.GetDbugMode();
+        visualDemo = ASM.GetVisualMode();
+
+        if (dbugEnabled) { dbugTextObj.SetActive(true); }
+        else if (!dbugEnabled) { dbugTextObj.SetActive(false); }
     }
     
     public void RegenerateDungeon()
@@ -128,11 +134,11 @@ public class MapGeneration : MonoBehaviour
         DefineGrid();
 
         //update camera position based on map size
-        defaultCamera.transform.position = new Vector3((boundsX / 2), (((boundsX / 2) + (boundsZ / 2)) * 0.8f), (boundsZ / 2));
+        if (dbugEnabled && visualDemo) { defaultCamera.transform.position = new Vector3((boundsX / 2), (((boundsX / 2) + (boundsZ / 2)) * 0.8f), (boundsZ / 2)); }
 
         //begin dungeon generation within bounds
         //if(genAttempts > 1) { ASM.RestartScene(); }
-        Debug.Log("MG: " + DG);
+        //Debug.Log("MG: " + DG);
         DG.BeginDungeonGeneration(treasureRoomsMax, treasureRoomsMin, specialRoomsMax, specialRoomsMin, boundsX, boundsZ, totalSpace, gridPositions);
     }
     private void DefineBounds()
@@ -155,7 +161,7 @@ public class MapGeneration : MonoBehaviour
         //fill dungeon area with grid
         gridStates = new string[boundsX, boundsZ];      //states of grid positions
         gridPositions = new Vector2[boundsX, boundsZ];  //in world grid positions
-        if (dbugEnabled && showDbugTiles)
+        if (dbugEnabled && visualDemo)
         {
             gridDbug = new GameObject[boundsX, boundsZ];    //game object array for debug grid
             gridDbugText = new TMP_Text[boundsX, boundsZ];  //text components attached to debug grid objects
@@ -177,7 +183,7 @@ public class MapGeneration : MonoBehaviour
                 //Debug.Log("grid pos: " + gridPositions[xPos, zPos]);
 
                 //debug
-                if (dbugEnabled && showDbugTiles)
+                if (dbugEnabled && visualDemo)
                 {
                     gridDbug[xPos, zPos] = Instantiate(testTile, new Vector3(gridPositions[xPos, zPos].x, 0, gridPositions[xPos, zPos].y), Quaternion.identity); //spawn new debug grid tile
                     gridDbug[xPos, zPos].name = "DbugTile" + ConvertPosToPosID(new Vector2(xPos, zPos)); //name debug tiles with relevant position ID
@@ -199,19 +205,26 @@ public class MapGeneration : MonoBehaviour
 
 
 
+    //~~~DEBUG~~~
+    [SerializeField] private GameObject dbugTextObj;
     public void UpdateDbugTileTextMoveCost(int posX, int posZ, float moveCost) //update tile debug text with PathGeneration movement cost (for hallway pathfinding)
     {
-        if (dbugEnabled && showDbugTiles) { gridDbugText[posX, posZ].text = Regex.Replace(gridDbugText[posX, posZ].text, @"\d+$", moveCost.ToString()); }
+        if (dbugEnabled && visualDemo) { gridDbugText[posX, posZ].text = Regex.Replace(gridDbugText[posX, posZ].text, @"\d+$", moveCost.ToString()); }
     }
 
     public void UpdateDbugTileTextGridState(int posX, int posZ, string gridState) //update tile debug text with tile state
     {
-        if (dbugEnabled && showDbugTiles) { gridDbugText[posX, posZ].text = gridState; }
+        if (dbugEnabled && visualDemo) 
+        {
+            //Debug.Log("pos: " + posX + ", " + posZ + " - state: " + gridState + ", legnth: " + gridDbugText.Length);
+            //Debug.Log(gridDbugText[posX, posZ]);
+            gridDbugText[posX, posZ].text = gridState; 
+        }
     }
 
     public void UpdateDbugTileMat(int posX, int posZ, string matType) //update tile debug material
     {
-        if (dbugEnabled && showDbugTiles)
+        if (dbugEnabled && visualDemo)
         {
             Material newMat = null;
 
@@ -245,6 +258,6 @@ public class MapGeneration : MonoBehaviour
 
     public void UpdateHUDDbugText(string newText) //update dbug text with DungeonGeneration state updates
     {
-        if (dbugEnabled) { HUDDbugText.GetComponent<TMP_Text>().text = newText; }
+        if (dbugEnabled && ASM.GetPlayerObject() != null) { HUDDbugText.GetComponent<TMP_Text>().text = newText; }
     }
 }

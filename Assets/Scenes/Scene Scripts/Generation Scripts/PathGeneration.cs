@@ -9,10 +9,11 @@ public class PathGeneration : MonoBehaviour
     //relevant scripts
     private MapGeneration MG;
     private DungeonGeneration DG;
+    private AbstractSceneManager ASM;
 
     //debug info
-    [SerializeField] private bool dbugEnabled = false;
-    public bool isDbugEnabled() { return dbugEnabled; }
+    private bool dbugEnabled = false;
+    private bool visualDemo = false;
 
     //map creation
     private int boundsX, boundsZ; //map generation
@@ -33,8 +34,12 @@ public class PathGeneration : MonoBehaviour
     private void Awake()
     {
         //set up references
+        ASM = this.gameObject.GetComponent<AbstractSceneManager>();
         MG = this.gameObject.GetComponent<MapGeneration>();
         DG = this.gameObject.GetComponent<DungeonGeneration>();
+
+        dbugEnabled = ASM.GetDbugMode();
+        visualDemo = ASM.GetVisualMode();
 
         //if (dbugEnabled) { MG.UpdateHUDDbugText("PG, Awake"); }
     }
@@ -43,6 +48,7 @@ public class PathGeneration : MonoBehaviour
 
     public IEnumerator BeginPathGeneration(Vector2 startPos, Vector2 targetPos, int boundsX, int boundsZ, int scale)
     {
+        Debug.Log("PathGeneration: BeginPathGeneration");
         if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Beginning Path Generation"); }
 
         //update data
@@ -85,11 +91,13 @@ public class PathGeneration : MonoBehaviour
         yield return StartCoroutine(GeneratePath(FindPath()));
         
         hallwayParentIndex++; //increase parent Index
+        Debug.Log("PathGeneration: Finished PathGeneration");
     }
 
 
     private Vector2[] FindPath()
     {
+        Debug.Log("PathGeneration: FindPath");
         //find connections between rooms using A*
         if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Finding Path"); }
 
@@ -127,15 +135,20 @@ public class PathGeneration : MonoBehaviour
         pathToEnd[startPosX, startPosZ] = Heuristic(startPos, targetPos); //find optimal path between start and end positions
         openSet[startPosX, startPosZ] = true; //set current tile to open
 
+        int iteration = 0;
         while (true) //loop until path is found
         {
+            iteration++;
+            //Debug.Log("PathGeneration: finding lowest cost position, " + iteration);
             Vector2 curPos = FindLowestCostPosition(openSet, pathToEnd, targetPos); //look through the grid to find the lowest cost position
 
-            if (curPos.x == -1 && curPos.y == -1) { return null; } //if no lower costs found, return no path
-            if (curPos == targetPos) { return ConstructPath(previousPos, curPos); } //if current position is end position, build the path
+            if (curPos.x == -1 && curPos.y == -1) { Debug.Log("PathGeneration: no path"); return null; } //if no lower costs found, return no path
+            if (curPos == targetPos) { Debug.Log("PathGeneration: Finished FindPath"); return ConstructPath(previousPos, curPos); } //if current position is end position, build the path
 
             int curPosX = (int)curPos.x; //cast to int to avoid issues with floats
             int curPosZ = (int)curPos.y;
+            
+            //Debug.Log("PathGeneration: Processing position (" + curPosX + "," + curPosZ + ") - Cost to next: " + costToNext[curPosX, curPosZ] + " - Path to end: " + pathToEnd[curPosX, curPosZ]);
 
             //update positions so its only checked once
             openSet[curPosX, curPosZ] = false; //no longer availible for path finding
@@ -169,7 +182,7 @@ public class PathGeneration : MonoBehaviour
 
                 if (closedSet[neighborPosX, neighborPosZ]) { continue; } //if position closed, skip
 
-                if (MG.IsDbugEnabled()) { MG.UpdateDbugTileTextMoveCost(neighborPosX, neighborPosZ, moveCost); } //update checked tile debug text with new cost
+                if (dbugEnabled) { MG.UpdateDbugTileTextMoveCost(neighborPosX, neighborPosZ, moveCost); } //update checked tile debug text with new cost
 
 
                 int tempCostToNext = costToNext[curPosX, curPosZ] + moveCost; //cost of current position
@@ -180,7 +193,7 @@ public class PathGeneration : MonoBehaviour
 
                     //update overall path with (neighbor cost + distance from target)
                     pathToEnd[neighborPosX, neighborPosZ] = costToNext[neighborPosX, neighborPosZ] + Heuristic(neighborPos, targetPos);
-
+                    
                     //update open set with neighbor position
                     if (!openSet[neighborPosX, neighborPosZ]) { /*if (dbugEnabled) { MG.UpdateHUDDbugText("update open set with " + neighborPos); } */ openSet[neighborPosX, neighborPosZ] = true; }
                 }
@@ -190,6 +203,7 @@ public class PathGeneration : MonoBehaviour
 
     private Vector2 FindLowestCostPosition(bool[,] openSet, int[,] pathToEnd, Vector2 targetPos)
     {
+        Debug.Log("PathGeneration: FindingLowestCostPosition");
         //if (dbugEnabled) { MG.UpdateHUDDbugText("PG, Find Lowest Cost Position"); }
 
         //initialise lowest cost trackers
@@ -219,12 +233,14 @@ public class PathGeneration : MonoBehaviour
             }
         }
 
+        Debug.Log("PathGeneration: Finished FindingLowestCostPosition");
         return lowestCostPos; //return lowest cost position
     }
 
     [SerializeField] private int wallCost = 50, wallCornerCost = 500, hallwayCost = 1, doorwayCost = 1, emptyCost = 15, roomCost = 1;
     private int GetMoveCost(int x, int z)
     {
+        //Debug.Log("PG, GetMoveCost");
         //find movement cost of requested position
         //if (dbugEnabled) { MG.UpdateHUDDbugText("PG, Get Move Cost"); }
         //if (dbugEnabled) { MG.UpdateHUDDbugText("grid state: " + MG.GetGridState(x, z)); }
@@ -246,6 +262,7 @@ public class PathGeneration : MonoBehaviour
         //check if current checked tile is adjacent to a corner to avoid strange hallways
         if(scale == 2 || scale == 1) { if(IsAdjacentToWallCorner(x, z)) { moveCost = wallCornerCost; } }
 
+        //Debug.Log("PG, Finished GetMoveCost");
         return moveCost;
     }
     private bool IsAdjacentToWallCorner(int x, int z)
@@ -278,6 +295,7 @@ public class PathGeneration : MonoBehaviour
 
     private Vector2[] ConstructPath(Vector2[,] previousPos, Vector2 curPos)
     {
+        Debug.Log("PathGeneration: ConstructPath");
         //puts together an array of the path findings previous steps
         //if (dbugEnabled) { MG.UpdateHUDDbugText("PG, Construct Path"); }
 
@@ -315,11 +333,13 @@ public class PathGeneration : MonoBehaviour
             tempPosZ = (int)tempPos.y;
         }
 
+        Debug.Log("PathGeneration: Finished ConstructPath");
         return path;
     }
 
     private IEnumerator GeneratePath(Vector2[] path)
     {
+        Debug.Log("PathGeneration: GeneratePath");
         //update map manager with new path
         //if (dbugEnabled) { MG.UpdateHUDDbugText("PG, Generate Path between " + startPos + " & " + targetPos); }
 
@@ -327,27 +347,34 @@ public class PathGeneration : MonoBehaviour
 
         Vector2 hallwayStart = path[0]; //set start position
         Vector2 hallwayEnd = path[path.Length - 1]; //set end position
+        Debug.Log("PG. hallwayStart: " +  hallwayStart + ", hallwayEnd: " + hallwayEnd);
 
         int hallwaySectionIndex = 0;
         Vector2[] hallwaySectionPositions = new Vector2[1];
 
         //iterate through path array to create hallway
-        for (int pathSection = 0; pathSection < path.Length - 1; pathSection++)
+        for (int pathSection = 0; pathSection < (path.Length - 1); pathSection++)
         {
+            Debug.Log("PG. path section: " + pathSection + " / " + (path.Length - 1));
             Vector2 start = path[pathSection]; //set start position to current path section
-            Vector2 end = path[pathSection + 1]; //set end position to next path section
+            Vector2 end = path[(pathSection + 1)]; //set end position to next path section
+            Debug.Log("start: " + start + ", end: " + end);
             int startX = (int)start.x; //cast to int to avoid float issues 
             int startZ = (int)start.y;
             int endX = (int)end.x;
             int endZ = (int)end.y;
+            Debug.Log("start pos: " + startX + "." + startZ + ", end pos: " + endX + "." + endZ);
 
 
             for (int x = Mathf.Min(startX, endX); x <= Mathf.Max(startX, endX); x++)
             {
+                Debug.Log("pos x: " + x);
                 for (int z = Mathf.Min(startZ, endZ); z <= Mathf.Max(startZ, endZ); z++)
                 {
-                    if(MG.GetGridState(x, z).Contains("Room"))
+                    Debug.Log("pos z: " + z);
+                    if (MG.GetGridState(x, z).Contains("Room"))
                     {
+                        Debug.Log("PG, path in room @ pos: " + x + ", " + z);
                         continue;
                     }
                     else if (MG.GetGridState(x, z) == "Empty")
@@ -356,6 +383,7 @@ public class PathGeneration : MonoBehaviour
                         //if (dbugEnabled) { MG.UpdateHUDDbugText("setting position x:" + x + ", y:" + z + " as hallway"); }
                         MG.UpdateDbugTileMat(x, z, "Hallway");
                         MG.UpdateDbugTileTextGridState(x, z, "Hallway");
+                        Debug.Log("PG, updating with hallway @ pos: " + x + ", " + z);
                         MG.UpdateGridState(x, z, "Hallway"); //mark the grid position as a hallway
 
                         Vector2[] newHallwaySectionPositions = new Vector2[hallwaySectionPositions.Length + 1]; //new array with increased size
@@ -370,6 +398,7 @@ public class PathGeneration : MonoBehaviour
                         {
                             for (int zOffset = -1; zOffset <= 1; zOffset++)
                             {
+                                Debug.Log("checking offset " + xOffset + ", " + zOffset);
                                 if (xOffset == 0 && zOffset == 0) { continue; } //skip current tile
 
                                 int neighbourX = (x + xOffset);
@@ -377,10 +406,12 @@ public class PathGeneration : MonoBehaviour
 
                                 if (neighbourX >= 0 && neighbourX < boundsX && neighbourZ >= 0 && neighbourZ < boundsZ) //if adjacent position is within bounds
                                 {
+                                    Debug.Log("offset within bounds");
                                     if (MG.GetGridState(neighbourX, neighbourZ) == "Empty") //if adjacent position is a wall
                                     {
                                         MG.UpdateDbugTileMat(neighbourX, neighbourZ, "Hallway"); //update material
                                         MG.UpdateDbugTileTextGridState(neighbourX, neighbourZ, "Hallway"); //update debug text
+                                        Debug.Log("PG, updating with hallway @ pos: " + neighbourX + ", " + neighbourZ);
                                         MG.UpdateGridState(neighbourX, neighbourZ, "Hallway"); //update grid state
 
                                         newHallwaySectionPositions = new Vector2[hallwaySectionPositions.Length + 1]; //new array with increased size
@@ -401,6 +432,7 @@ public class PathGeneration : MonoBehaviour
                         MG.UpdateDbugTileMat(x, z, "Doorway");
                         MG.UpdateDbugTileTextGridState(x, z, "Doorway");
                         MG.UpdateGridState(x, z, "Doorway"); //mark the grid position as a doorway
+                        Debug.Log("PG, updating with doorway @ pos: " + x + ", " + z);
 
                         //assign adjacent positions to doorway as doorway edges
                         int offsetX = 0;
@@ -414,6 +446,7 @@ public class PathGeneration : MonoBehaviour
                         {
                             offsetX = 1; //check left and right
                         }
+                        Debug.Log("checking offset " + offsetX + ", " + offsetZ);
 
                         //mark adjacent walls as doorway edges
                         for (int i = -1; i <= 1; i += 2) //loop for two directions (-1 and 1)
@@ -423,29 +456,35 @@ public class PathGeneration : MonoBehaviour
 
                             if (neighbourX >= 0 && neighbourX < boundsX && neighbourZ >= 0 && neighbourZ < boundsZ) //if adjacent position is within bounds
                             {
+                                Debug.Log("offset within bounds");
                                 if (MG.GetGridState(neighbourX, neighbourZ) == "Wall") //if adjacent position is a wall
                                 {
                                     MG.UpdateDbugTileMat(neighbourX, neighbourZ, "DoorwayEdge"); //update material
                                     MG.UpdateDbugTileTextGridState(neighbourX, neighbourZ, "DoorwayEdge"); //update debug text
+                                    Debug.Log("PG, updating with doorway edge @ pos: " + neighbourX + ", " + neighbourZ);
                                     MG.UpdateGridState(neighbourX, neighbourZ, "DoorwayEdge"); //update grid state
                                 }
                             }
+                            else { Debug.Log("offset out of bounds"); }
                         }
                     }
+                    else { Debug.Log("PG, position is not empty, room or wall: " + MG.GetGridState(x, z)); }
                 }
             }
 
-            if (MG.IsVisualEnabled()) { yield return new WaitForSeconds(.1f); }
+            Debug.Log("PG. Finished path section: " + pathSection + " / " + (path.Length - 1));
+            if (visualDemo) { yield return new WaitForSeconds(.1f); }
             else { yield return null; }
         }
 
-        
+        Debug.Log("PathGeneration: Finished GeneratePath");
         hallwayPaths[hallwayParentIndex] = hallwaySectionPositions;
     }
 
     
     public IEnumerator CreateHallways()
     {
+        Debug.Log("PathGeneration: CreateHallways");
         hallwayParentIndex = 0; //reset hallway parent index
 
         //for each hallway previously identified
@@ -453,14 +492,17 @@ public class PathGeneration : MonoBehaviour
         {
             CreateHallway();
             hallwayParentIndex++;
-            if (MG.IsVisualEnabled()) { yield return new WaitForSeconds(.1f); }
+            if (visualDemo) { yield return new WaitForSeconds(.1f); }
             else { yield return null; }
         }
+
+        Debug.Log("PathGeneration: Finished CreateHallways");
     }
     private void CreateHallway() //called for each hallway section
     {
+        Debug.Log("PathGeneration: CreateHallway");
         //for each section in hallway
-        for(int sectionIndex = 0; sectionIndex < (hallwayPaths[hallwayParentIndex].Length - 1); sectionIndex++)
+        for (int sectionIndex = 0; sectionIndex < (hallwayPaths[hallwayParentIndex].Length - 1); sectionIndex++)
         {
             int xPos = (int)hallwayPaths[hallwayParentIndex][sectionIndex].x;
             int zPos = (int)hallwayPaths[hallwayParentIndex][sectionIndex].y;
@@ -544,6 +586,8 @@ public class PathGeneration : MonoBehaviour
                 }
             }
         }
+
+        Debug.Log("PathGeneration: Finished CreateHallway");
     }
 
 

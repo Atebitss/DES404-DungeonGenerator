@@ -12,6 +12,9 @@ public class RoomGeneration : MonoBehaviour
     private MapGeneration MG;
     private RoomColliderManager RCM;
     private AdaptiveDifficultyManager ADM;
+
+    private bool dbugEnabled = false;
+    private bool visualDemo = false;
     //~~~~~misc~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
@@ -111,6 +114,7 @@ public class RoomGeneration : MonoBehaviour
 
     public void Wake(int roomID, int roomPosX, int roomPosZ, int roomBoundsX, int roomBoundsZ, string roomSize, string roomType, Vector3 literalPosition)
     {
+        Debug.Log("RoomGeneration: Wake");
         //if (dbugEnabled) { Debug.Log("ID: " + roomID + "   size: " + roomSize + "   type: " + roomType + "   x: " + roomBoundsX + ", z: " + roomBoundsZ); }
 
         this.roomID = roomID;
@@ -125,6 +129,9 @@ public class RoomGeneration : MonoBehaviour
         ASM = GameObject.Find("SceneManager").gameObject.GetComponent<AbstractSceneManager>();
         MG = ASM.gameObject.GetComponent<MapGeneration>();
         ADM = ASM.gameObject.GetComponent<AdaptiveDifficultyManager>();
+
+        dbugEnabled = ASM.GetDbugMode();
+        visualDemo = ASM.GetVisualMode();
 
         //set tile x & z offsets
         tileXOffset = dbugFloorTile.transform.localScale.x;
@@ -685,7 +692,6 @@ public class RoomGeneration : MonoBehaviour
 
     //~~~~~debug~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //debug
-    [SerializeField] private bool dbugEnabled = false;
     [SerializeField] private Material baseDbugMat, matDbugEmpty, matDbugWall, matDbugDoor;
     [SerializeField] private GameObject dbugFloorTile, dbugMarker, dbugText;
     private GameObject[] dbugGrid;

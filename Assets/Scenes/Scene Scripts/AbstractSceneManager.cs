@@ -8,6 +8,12 @@ public class AbstractSceneManager : MonoBehaviour
     [SerializeField] private bool devMode = false;
     public bool GetDevMode() { return devMode; }
 
+    [SerializeField] private bool dbugMode = false;
+    public bool GetDbugMode() { return dbugMode; }
+
+    [SerializeField] private bool visualMode = false;
+    public bool GetVisualMode() { return visualMode; }
+
 
 
     //prefabs
@@ -41,7 +47,7 @@ public class AbstractSceneManager : MonoBehaviour
 
     //player controller
     public GameObject player;
-    public void SetPlayerObject(GameObject newPlayer) { Debug.Log("newPlayer: " + newPlayer); player = newPlayer; }
+    public void SetPlayerObject(GameObject newPlayer) { player = newPlayer; }
     public GameObject GetPlayerObject() { if (player != null) { return player.transform.GetChild(0).gameObject; } return null; }
 
     public PlayerController PC;
@@ -53,7 +59,7 @@ public class AbstractSceneManager : MonoBehaviour
         {
 
             //Debug.Log("Spawning player at: " + pos);
-            if (MG != null) { if (MG.IsDbugEnabled()) { MG.UpdateHUDDbugText("Scene Manager: Spawning Player"); } }
+            if (MG != null) { if (dbugMode) { MG.UpdateHUDDbugText("Scene Manager: Spawning Player"); } }
             player = Instantiate(playerPrefab, pos, Quaternion.identity);
             //Debug.Log(player.name);
             PC = player.transform.GetChild(0).gameObject.GetComponent<PlayerController>();
@@ -63,15 +69,15 @@ public class AbstractSceneManager : MonoBehaviour
         }
         else
         {
-            Debug.Log("Player already exists");
+            //Debug.Log("Player already exists");
         }
     }
     public void DestroyPlayer()
     {
         if (player != null)
         {
-            Debug.Log("Destroying player");
-            if (MG.IsDbugEnabled()) { MG.UpdateHUDDbugText("Scene Manager: Destroying Player"); }
+            //Debug.Log("Destroying player");
+            if (dbugMode) { MG.UpdateHUDDbugText("Scene Manager: Destroying Player"); }
             if (ADM != null) { ADM.End(); }
             Destroy(player); 
         }
@@ -87,7 +93,7 @@ public class AbstractSceneManager : MonoBehaviour
 
     public void SpawnEnemy(GameObject enemy, Vector3 position)
     {
-        if (MG != null) { if (MG.IsDbugEnabled()) { MG.UpdateHUDDbugText("Scene Manager: Spawning Enemy " + enemy.name); } }
+        if (MG != null) { if (dbugMode) { MG.UpdateHUDDbugText("Scene Manager: Spawning Enemy " + enemy.name); } }
         int existingCount = enemyObjects.Length; //current number of enemies tracked
         int newCount = (existingCount + 1); //new enemies to add + cur
 
@@ -105,7 +111,7 @@ public class AbstractSceneManager : MonoBehaviour
     }
     public void SpawnEnemies(GameObject[] enemies, Vector3[] positions)
     {
-        if (MG != null) { if (MG.IsDbugEnabled()) { MG.UpdateHUDDbugText("Scene Manager: Spawning Enemies"); } }
+        if (MG != null) { if (dbugMode) { MG.UpdateHUDDbugText("Scene Manager: Spawning Enemies"); } }
         int existingCount = enemyObjects.Length; //current number of enemies tracked
         int newCount = existingCount + enemies.Length; //new enemies to add + cur
 
@@ -115,7 +121,7 @@ public class AbstractSceneManager : MonoBehaviour
         //spawn new enemies and add to new array
         for (int i = 0; i < enemies.Length; i++)
         {
-            if (MG.IsDbugEnabled()) { MG.UpdateHUDDbugText("Scene Manager: Spawning Enemy " + enemies[i].name); }
+            if (dbugMode) { MG.UpdateHUDDbugText("Scene Manager: Spawning Enemy " + enemies[i].name); }
             int index = existingCount + i;
             newEnemyObjects[index] = Instantiate(enemies[i], positions[i], Quaternion.identity);
 
@@ -128,7 +134,7 @@ public class AbstractSceneManager : MonoBehaviour
 
     public void DestroyEnemyObjects()
     {
-        if (MG != null) { if (MG.IsDbugEnabled()) { MG.UpdateHUDDbugText("Scene Manager: Destroying Enemies"); } }
+        if (MG != null) { if (dbugMode) { MG.UpdateHUDDbugText("Scene Manager: Destroying Enemies"); } }
         for (int i = 0; i < enemyObjects.Length; i++)
         {
             if (enemyObjects[i] != null) { Destroy(enemyObjects[i]); }
@@ -138,7 +144,7 @@ public class AbstractSceneManager : MonoBehaviour
     }
     public void DestroyEnemy(GameObject enemy)
     {
-        if (MG != null) { if (MG.IsDbugEnabled()) { MG.UpdateHUDDbugText("Scene Manager: Destroying Enemy " + enemy.name); } }
+        if (MG != null) { if (dbugMode) { MG.UpdateHUDDbugText("Scene Manager: Destroying Enemy " + enemy.name); } }
         //Debug.Log("removing enemy from array: " + enemy);
         // Find index of enemy to remove
         int removeIndex = -1;
@@ -185,16 +191,18 @@ public class AbstractSceneManager : MonoBehaviour
         DG = this.gameObject.GetComponent<DungeonGeneration>();
         PG = this.gameObject.GetComponent<PathGeneration>();
         ADM = this.gameObject.GetComponent<AdaptiveDifficultyManager>();
+
+        dbugMode = GetDbugMode();
+        visualMode = GetVisualMode();
     }
     void Start()
     {
-        Debug.Log("ASM: " + DG);
         NewFloor();
     }
 
     public void EndFloor()
     {
-        if (MG.IsDbugEnabled()) { MG.UpdateHUDDbugText("Scene Manager: Floor Complete"); }
+        if (dbugMode) { MG.UpdateHUDDbugText("Scene Manager: Floor Complete"); }
         //Debug.Log("Floor complete");
         //would contain scene change to post level
         //and update dungeon stats
@@ -203,7 +211,7 @@ public class AbstractSceneManager : MonoBehaviour
     }
     private void NewFloor()
     {
-        if (MG.IsDbugEnabled()) { MG.UpdateHUDDbugText("Scene Manager: Starting New Floor"); }
+        if (dbugMode) { MG.UpdateHUDDbugText("Scene Manager: Starting New Floor"); }
         //Debug.Log("Starting new floor");
         if (MG != null) { MG.ResetMap(); }
         if (DG != null) { DG.ResetDungeon(); }
