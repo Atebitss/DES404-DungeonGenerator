@@ -26,15 +26,22 @@ public class AbstractSceneManager : MonoBehaviour
     //Generation Managers
     private MapGeneration MG;
     public MapGeneration GetMG() { if (MG != null) { return MG; } return null; }
+
     private DungeonGeneration DG;
     public DungeonGeneration GetDG() { if (DG != null) { return DG; } return null; }
+
     private PathGeneration PG;
     public PathGeneration GetPG() { if (PG != null) { return PG; } return null; }
+
     private AdaptiveDifficultyManager ADM;
     public AdaptiveDifficultyManager GetADM() { if (ADM != null) { return ADM; } return null; }
+
     private AdaptiveDifficultyDisplayManager ADDM;
-    public void SetADDM(AdaptiveDifficultyDisplayManager newADDM) { ADDM = newADDM; }
     public AdaptiveDifficultyDisplayManager GetADDM() { if (ADDM != null) { return ADDM; } return null; }
+
+    private ConsumableGenerationManager CGM;
+    public ConsumableGenerationManager GetCGM() { if (CGM != null) { return CGM; } return null; }
+
 
 
 
@@ -63,7 +70,7 @@ public class AbstractSceneManager : MonoBehaviour
             player = Instantiate(playerPrefab, pos, Quaternion.identity);
             //Debug.Log(player.name);
             PC = player.transform.GetChild(0).gameObject.GetComponent<PlayerController>();
-            SetADDM(PC.GetADDM());
+            ADDM = PC.GetADDM();
 
             ADM.Wake(this);
         }
@@ -153,6 +160,7 @@ public class AbstractSceneManager : MonoBehaviour
             //Debug.Log("enemyObjects" + i + " / " + enemyObjects.Length + ": " + enemyObjects[i]);
             if(enemyObjects[i] == enemy)
             {
+                CGM.OnEnemyDeath(enemy.transform.GetChild(0).position);
                 removeIndex = i;
                 break;
             }
@@ -191,6 +199,7 @@ public class AbstractSceneManager : MonoBehaviour
         DG = this.gameObject.GetComponent<DungeonGeneration>();
         PG = this.gameObject.GetComponent<PathGeneration>();
         ADM = this.gameObject.GetComponent<AdaptiveDifficultyManager>();
+        CGM = this.gameObject.GetComponent<ConsumableGenerationManager>();
 
         dbugMode = GetDbugMode();
         visualMode = GetVisualMode();

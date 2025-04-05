@@ -12,6 +12,7 @@ public class RoomGeneration : MonoBehaviour
     private MapGeneration MG;
     private RoomColliderManager RCM;
     private AdaptiveDifficultyManager ADM;
+    private ConsumableGenerationManager CGM;
 
     private bool dbugEnabled = false;
     private bool visualDemo = false;
@@ -39,6 +40,7 @@ public class RoomGeneration : MonoBehaviour
                     portalObject.GetComponent<PortalManager>().SetDRM(ASM.GetDG().GetDRM());
                     portalObject.transform.parent = this.transform.GetChild(1);
                 }
+                CGM.OnRoomClear(literalPosition + roomCenter);
                 UnlockDoors();
                 //open doors locked pre combat
                 if (doorClosedPreCombat != null) { doorClosedPreCombat.transform.GetChild(0).transform.GetChild(0).GetComponent<AbstractDoorScript>().InteractWithDoor(); }
@@ -127,8 +129,9 @@ public class RoomGeneration : MonoBehaviour
         this.literalPosition = literalPosition;
 
         ASM = GameObject.Find("SceneManager").gameObject.GetComponent<AbstractSceneManager>();
-        MG = ASM.gameObject.GetComponent<MapGeneration>();
-        ADM = ASM.gameObject.GetComponent<AdaptiveDifficultyManager>();
+        MG = ASM.GetMG();
+        ADM = ASM.GetADM();
+        CGM = ASM.GetCGM();
 
         dbugEnabled = ASM.GetDbugMode();
         visualDemo = ASM.GetVisualMode();
@@ -498,6 +501,7 @@ public class RoomGeneration : MonoBehaviour
         //Debug.Log("playerInRoom: " + playerInRoom + ", entered: " + entered);
 
         if (ASM.GetADDM() != null) { ASM.GetADDM().currentDifficulty = roomDifficulty; }
+        if (ASM.GetCGM() != null) { CGM.OnRoomEntered(roomDifficulty); }
 
         if (playerInRoom && !entered)
         {
@@ -586,6 +590,7 @@ public class RoomGeneration : MonoBehaviour
     //adaptive difficulty
     [SerializeField] private int roomDifficulty = 0;
     public void SetRoomDifficulty(int newDifficulty) { roomDifficulty = newDifficulty; }
+    public int GetRoomDifficulty() { return roomDifficulty; }
     [SerializeField] private float playerSkillScore = 0f;
     public void SetPlayerSkillScore(float newScore) { playerSkillScore = newScore; }
 

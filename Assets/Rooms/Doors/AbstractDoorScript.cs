@@ -6,7 +6,7 @@ public abstract class AbstractDoorScript : MonoBehaviour
 {
     //scripts
     AbstractSceneManager ASM;
-    void Start(){ASM = GameObject.Find("SceneManager").GetComponent<AbstractSceneManager>();}
+    void Start() { ASM = GameObject.FindWithTag("SceneManager").GetComponent<AbstractSceneManager>(); }
 
 
     //~~~~~health~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -1064,6 +1064,7 @@ GameObject:
   - component: {fileID: 1945132725}
   - component: {fileID: 1945132723}
   - component: {fileID: 1945132727}
+  - component: {fileID: 1945132728}
   m_Layer: 0
   m_Name: SceneManager
   m_TagString: SceneManager
@@ -1194,6 +1195,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dad98337c342fc54289699d4435ffa6a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1945132728
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1945132720}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e5930f80d98f244998049531ffad65a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  consumableTempPrefabs:
+  - {fileID: 492627683840496450, guid: 69a104ff8f2602a4c8b1925b9c1fb81e, type: 3}
+  - {fileID: 475478094218044709, guid: 422d9c32201a1f84383d078493a80f30, type: 3}
+  - {fileID: 2234230539314800452, guid: bb71ec3407ca15a43a5edd1686151e59, type: 3}
+  - {fileID: 7657171414375923042, guid: b228bccc073b6c64a9a62673fcdecc75, type: 3}
+  - {fileID: 6585272412839305312, guid: 585e43d727a37704782f9a780a4d03ba, type: 3}
+  consumableBoostPrefabs:
+  - {fileID: 4166510352759812308, guid: 84356bae1a8ca2c43b5de901cc2a703a, type: 3}
 --- !u!1 &2000653574
 GameObject:
   m_ObjectHideFlags: 0

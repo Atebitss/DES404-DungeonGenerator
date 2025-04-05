@@ -59,6 +59,7 @@ public class AdaptiveDifficultyManager : MonoBehaviour
     }
 
     private float avgRoomClearTime = 0f;
+    public float GetAvgRoomClearTime() { return avgRoomClearTime; }
     private float[] roomClearTimes = new float[0];
 
     //floor clears
@@ -79,6 +80,7 @@ public class AdaptiveDifficultyManager : MonoBehaviour
     }
 
     private float avgFloorClearTime = 0f;
+    public float GetAvgFloorClearTime() { return avgFloorClearTime; }
     private float[] floorClearTimes = new float[0];
 
 
@@ -162,6 +164,7 @@ public class AdaptiveDifficultyManager : MonoBehaviour
 
     private float[] timeIndexsOfDamageLastTaken = new float[0]; //time of when damage last taken
     private float avgTimeBetweenDamageTaken = 0f;
+    public float GetAvgTimeBetweenDamageTaken() { return avgTimeBetweenDamageTaken; }
     public void DamageTaken()
     {
         //increase timeIdexsOfDamageLastTaken array size by 1
@@ -193,6 +196,7 @@ public class AdaptiveDifficultyManager : MonoBehaviour
 
     private int numOfAttacks = 0, numOfHits = 0; //number of swings and hits to detemine accuracy
     private float accuracy = 0f;
+    public float GetAccuracy() { return accuracy; }
     public void AttackRan()
     {
         numOfAttacks++;
@@ -207,6 +211,7 @@ public class AdaptiveDifficultyManager : MonoBehaviour
 
     private int numOfDodges = 0, numOfHitsDodged = 0; //number of dodges and hits dodged to determine dodge percision
     private float dodgeEffectiveness = 0f;
+    public float GetDodgeEffectiveness() { return dodgeEffectiveness; }
     public void DodgeRan()
     {
         numOfDodges++;
@@ -220,6 +225,7 @@ public class AdaptiveDifficultyManager : MonoBehaviour
 
 
     private int combosPerformed = 0; //number of combos performed
+    public int GetCombosPerformed() { return combosPerformed; }
     public void ComboPerformed()
     {
         combosPerformed++;

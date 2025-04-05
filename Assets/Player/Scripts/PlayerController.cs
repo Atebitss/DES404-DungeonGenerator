@@ -142,8 +142,33 @@ public class PlayerController : MonoBehaviour
 
     //~~~~~movement~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     [Header("-Movement")]
+
     //moving
     [SerializeField] private float movementSpeed = 5f; //players movement velocity
+    public float GetMovementSpeed() { return movementSpeed; }
+    public void AlterMovementSpeed(float alter) { movementSpeed += alter; } //increase/decrease movement speed
+    public void SetMovementSpeed(float newSpeed) { movementSpeed = newSpeed; } //set movement speed
+
+    private float tempMovementSpeed = 1f; //players temp movement velocity
+    public float GetTempMovementSpeed() { return tempMovementSpeed; }
+    public void AlterTempMovementSpeed(float alter) { tempMovementSpeed += alter; } //increase/decrease temp movement speed
+    public void SetTempMovementSpeed(float newSpeed) { tempMovementSpeed = newSpeed; } //set temp movement speed
+    public void ResetTempMovementAfter(float resetTimer)
+    {
+        //Debug.Log("starting reset temp speed, timer: " + resetTimer);
+        StartCoroutine(ResetTempMovement(resetTimer)); //reset temp movement speed after x seconds
+    }
+    public IEnumerator ResetTempMovement(float resetTimer) 
+    {
+        yield return new WaitForSeconds(resetTimer);
+        ResetTempMovement();
+    } 
+    public void ResetTempMovement() 
+    {
+        //Debug.Log("resetting temp movement speed"); 
+        tempMovementSpeed = 1f; //reset temp movement speed to 1
+    }
+
     private Quaternion targetPlayerRot = Quaternion.identity; //used to lerp player rotation
     private Vector3 movement = Vector3.zero; //players movement directions
     private Vector3 playerVelocity = Vector3.zero; //used to calc movement
@@ -246,7 +271,7 @@ public class PlayerController : MonoBehaviour
             if (!dodging) //if player is moving as normal
             {
                 //add velocity force in direction moving
-                playerVelocity = (((playerRigid.transform.right * movement.x) * movementSpeed) + ((playerRigid.transform.forward * movement.z) * movementSpeed));
+                playerVelocity = (((playerRigid.transform.right * movement.x) * (movementSpeed + tempMovementSpeed)) + ((playerRigid.transform.forward * movement.z) * (movementSpeed + tempMovementSpeed)));
                 playerRigid.AddForce(playerVelocity - playerRigid.velocity, ForceMode.VelocityChange);
             }
             else if (dodging) //if player is dodging
@@ -339,8 +364,29 @@ public class PlayerController : MonoBehaviour
     //~~~~~attacking~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     [Header("-Attacking")]
     private bool attacking = false; //tracker false to allow for first attack, updated in UpdatePlayerStates when attack cooldown timer is 0
-    private float attackCooldownTimer = 0f, attackStartTime = 0f; //used to reset attack timer in UpdatePlayerStates
+    [SerializeField] private float attackCooldownTimer = 0f, attackStartTime = 0f; //used to reset attack timer in UpdatePlayerStates
+
     [SerializeField] private float lightAttackCooldownMax = 0.5f, heavyAttackCooldownMax = 1f;
+    private float tempAttackCooldownModifier = 1f; //players attack cooldown modifier
+    public float GetTempAttackCooldownModifier() { return tempAttackCooldownModifier; }
+    public void AlterTempAttackCooldownModifier(float alter) { tempAttackCooldownModifier += alter; } //increase/decrease temp movement speed
+    public void SetTempAttackCooldownModifier(float newModifer) { tempAttackCooldownModifier = newModifer; } //set temp movement speed
+    public void ResetTempAttackCooldownModifierAfter(float resetTimer)
+    {
+        //Debug.Log("starting reset temp attack cooldown, timer: " + resetTimer);
+        StartCoroutine(ResetTempAttackCooldownModifier(resetTimer)); //reset temp movement speed after x seconds
+    }
+    public IEnumerator ResetTempAttackCooldownModifier(float resetTimer)
+    {
+        yield return new WaitForSeconds(resetTimer);
+        ResetTempAttackCooldownModifier();
+    }
+    public void ResetTempAttackCooldownModifier() 
+    {
+        //Debug.Log("resetting temp attack cooldown modifier");
+        tempAttackCooldownModifier = 1f; //reset temp movement speed to 1
+    } 
+
     private float lightAttackAnimLength = 0.5f, heavyAttackAnimLength = 1f;
     private int attackComboDamage = 0; //additional damage
     private int lightAttackComboCounter = 0; //combo tracker set to one to skip first rotation
@@ -349,7 +395,28 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private GameObject weaponParent; //weapon parent
     [SerializeField] private GameObject weaponAttackCollider; //weapon collider
     [SerializeField] private PlayerWeaponColliderManager PWCM; //weapon collider script
+
     [SerializeField] private int attackDamage = 5; //dafault damage
+    public int GetAttackDamage() { return attackDamage; }
+    private int attackDamageModifier = 0; //players attack damage modifier
+    public int GetAttackDamageModifier() { return attackDamageModifier; }
+    public void AlterAttackDamageModifier(int alter) { attackDamageModifier += alter; } //increase/decrease damage modifier
+    public void SetAttackDamageModifier(int newModifer) { attackDamageModifier = newModifer; } //set damage modifier
+    public void ResetAttackDamageModifierAfter(float resetTimer)
+    {
+        StartCoroutine(ResetAttackDamageModifier(resetTimer)); //reset damage modifier after x seconds
+    }
+    public IEnumerator ResetAttackDamageModifier(float resetTimer)
+    {
+        yield return new WaitForSeconds(resetTimer);
+        ResetAttackDamageModifier();
+    }
+    public void ResetAttackDamageModifier() 
+    {
+        //Debug.Log("resetting attack damage modifier");
+        attackDamageModifier = 0; //reset damage modifier to 0
+    }
+
     [SerializeField] private float attackSpeed = 1f; //default speed
     private bool comboing = false;
     [SerializeField] private ParticleSystem PPS;
@@ -374,7 +441,8 @@ public class PlayerController : MonoBehaviour
 
 
                 //track light attack
-                attackCooldownTimer = lightAttackCooldownMax;
+                attackCooldownTimer = (lightAttackCooldownMax / tempAttackCooldownModifier);
+                if(attackCooldownTimer == Mathf.Infinity && tempAttackCooldownModifier != 0) { attackCooldownTimer = 0.1f; } //stops timer setting to infinite if not intended
                 lightAttackComboTimer = lightAttackComboTimerMax;
                 lightAttackComboStartTime = Time.time; //track when last combo hit started
 
@@ -396,7 +464,7 @@ public class PlayerController : MonoBehaviour
 
                 //update sword swing animation
                 a.SetInteger("lightSwingCombo", lightAttackComboCounter);
-                PWCM.EnableAttackCheck((lightAttackAnimLength - 0.1f));
+                PWCM.EnableAttackCheck(((lightAttackAnimLength) - 0.1f));
 
                 if (lightAttackComboCounter == 3)
                 {
@@ -426,7 +494,7 @@ public class PlayerController : MonoBehaviour
             if (ctx.performed && attackCooldownTimer <= 0 && !attacking)
             {
                 //Debug.Log("heavy attack");
-                attackCooldownTimer = heavyAttackCooldownMax;
+                attackCooldownTimer = (heavyAttackCooldownMax / tempAttackCooldownModifier);
 
                 if (lightAttackComboCounter != 0)  //reset light attack
                 {
@@ -503,7 +571,10 @@ public class PlayerController : MonoBehaviour
                             //Debug.Log("portal, " + hit.collider.GetComponent<PortalManager>());
                             hit.collider.GetComponent<PortalManager>().InteractWithPortal();
                             break;
-
+                        case "Consumable":
+                            //Debug.Log("consumable, " + hit.collider.GetComponent<AbstractConsumable>());
+                            hit.collider.GetComponent<AbstractConsumable>().Interact();
+                            break;
                     }
                 }
 
@@ -597,7 +668,23 @@ public class PlayerController : MonoBehaviour
 
     //health points
     public void SetCurrentHealthPoints(int newHealth) { if (!invincible) { /*Debug.Log("setting health: " + newHealth);*/ healthPointsCurrent = newHealth; HealthCheck(); } }
-    public void AlterCurrentHealthPoints(int alter) { if(!invincible) { /*Debug.Log("altering health: " + alter);*/ healthPointsCurrent += alter; HealthCheck(); ADM.DamageTaken(); } }
+    public void AlterCurrentHealthPoints(int alter) { /*Debug.Log("altering health: " + alter);*/ healthPointsCurrent += alter; HealthCheck(); }
+    public void DamagePlayer(int alter) 
+    {
+        if (!invincible) 
+        {
+            Debug.Log("damaging health: " + alter);
+            Debug.Log("resistance: " + resistanceModifier);
+            alter += resistanceModifier; //apply resistance modifier
+            Debug.Log("damaging health after resistance: " + alter);
+            if (alter < 0)
+            {
+                healthPointsCurrent += alter;
+                HealthCheck();
+                ADM.DamageTaken();
+            }
+        }
+    }
     public int GetCurrentHealthPoints() { return healthPointsCurrent; }
     private void HealthCheck()
     {
@@ -614,6 +701,18 @@ public class PlayerController : MonoBehaviour
 
     public void AlterMaxHealthPoints(int alter) { healthPointsMax += alter; }
     public int GetMaxHealthPoints() { return healthPointsMax; }
+
+    //resistance
+    private int resistanceModifier = 0; //players resistance modifier
+    public int GetResistanceModifier() { return resistanceModifier; }
+    public void AlterResistanceModifier(int alter) { resistanceModifier += alter; } //increase/decrease resistance modifier
+    public void SetResistanceModifier(int newModifer) { resistanceModifier = newModifer; } //set resistance modifier
+    public IEnumerator ResetResistanceModifierAfter(float resetTimer)
+    {
+        yield return new WaitForSeconds(resetTimer);
+        ResetResistanceModifier();
+    }
+    public void ResetResistanceModifier() { resistanceModifier = 0; } //reset resistance modifier to 0
 
     //stamina points
     public void AlterCurrentStaminaPoints(int alter) { staminaPointsCurrent += alter; }

@@ -87,6 +87,8 @@ public class PlayerWeaponColliderManager : MonoBehaviour
     private void DamageEnemy(GameObject enemy)
     {
         //Debug.Log("enemy damaged");
+        attackDamage = (PC.GetAttackDamage() + PC.GetAttackDamageModifier()); //get attack damage from player controller
+
         //if enemy isnt already in array
         for (int enemyIndex = 0; enemyIndex < foundEnemies.Length; enemyIndex++)
         {

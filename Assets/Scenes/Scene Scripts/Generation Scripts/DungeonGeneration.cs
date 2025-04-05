@@ -367,10 +367,8 @@ public class DungeonGeneration : MonoBehaviour
 
         //DRM.StartFloorCounter(); //start floor timer
 
-        yield return new WaitForSeconds(1f);
-        ASM.RestartScene();
-
-        //if (currentPlayer == null) { currentPlayer = Instantiate(playerPrefab, new Vector3(entryRoomCenter.x, 0, entryRoomCenter.y), Quaternion.identity); }
+        //yield return new WaitForSeconds(1f);
+        //ASM.RestartScene();
 
         if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Generation Complete"); }
     }
