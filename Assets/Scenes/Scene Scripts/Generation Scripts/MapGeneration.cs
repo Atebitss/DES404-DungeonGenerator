@@ -40,6 +40,8 @@ public class MapGeneration : MonoBehaviour
     private TMP_Text[,] gridDbugText;
     private GameObject dbugParent;
     private Renderer[,] gridDbugRenderer;
+    private float singleGridSize; //size of a single grid square (x or z) + 0.1f (for spacing)
+    public float GetSingleGridSize() { return singleGridSize; } //get size of a single grid square (x or z) + 0.1f (for spacing)
 
     //map creation
     private int boundsX, boundsZ; //map width & length
@@ -52,9 +54,9 @@ public class MapGeneration : MonoBehaviour
     private string[,] gridStates; //what fills the grid square, if anything
     public void UpdateGridState(int posX, int posZ, string gridState) //update tile state
     {
-        //Debug.Log("Map Generation: UpdateGridState");
-        //Debug.Log("pos: " + posX + ", " + posZ);
-        //Debug.Log((posX * posZ) + " / " + gridStates.Length);
+        Debug.Log("Map Generation: UpdateGridState");
+        Debug.Log("pos: " + posX + ", " + posZ);
+        Debug.Log((posX * posZ) + " / " + gridStates.Length);
         Debug.Log("gridStates[x,z]: " + gridStates[posX, posZ]);
         gridStates[posX, posZ] = gridState;
     }
@@ -95,7 +97,7 @@ public class MapGeneration : MonoBehaviour
 
 
 
-    private void Start()
+    private void Awake()
     {
         if (dbugEnabled) { UpdateHUDDbugText("Map Generation: Starting"); }
         //Debug.Log("MG Awake");
@@ -107,6 +109,8 @@ public class MapGeneration : MonoBehaviour
 
         dbugEnabled = ASM.GetDbugMode();
         visualDemo = ASM.GetVisualMode();
+
+        singleGridSize = testTile.transform.localScale.x + 0.1f;
 
         if (dbugEnabled) { dbugTextObj.SetActive(true); }
         else if (!dbugEnabled) { dbugTextObj.SetActive(false); }

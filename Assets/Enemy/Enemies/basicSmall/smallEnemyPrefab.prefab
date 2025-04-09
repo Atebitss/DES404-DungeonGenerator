@@ -1,5 +1,123 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &528239289287037847
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2057492892579661320}
+  - component: {fileID: 6672695382096058999}
+  - component: {fileID: 5274499308307524676}
+  - component: {fileID: 7658845363462699611}
+  - component: {fileID: 4716318860976188386}
+  m_Layer: 7
+  m_Name: EnemyWeaponColliderR
+  m_TagString: EnemyWeapon
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2057492892579661320
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 528239289287037847}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.2588191, y: 0, z: 0, w: 0.9659258}
+  m_LocalPosition: {x: 1, y: 0.5, z: 0.25}
+  m_LocalScale: {x: 0.1, y: 1, z: 0.1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3987276604464211926}
+  m_LocalEulerAnglesHint: {x: 30, y: 0, z: 0}
+--- !u!33 &6672695382096058999
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 528239289287037847}
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!23 &5274499308307524676
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 528239289287037847}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!65 &7658845363462699611
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 528239289287037847}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 1
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 5, y: 1.5, z: 5}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &4716318860976188386
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 528239289287037847}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e53b6146385a5e84a9c4b9ca3a2147c4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &543986797196486423
 GameObject:
   m_ObjectHideFlags: 0
@@ -80,7 +198,7 @@ GameObject:
   - component: {fileID: 5652514220819604225}
   - component: {fileID: 6178674796021915901}
   m_Layer: 7
-  m_Name: EnemyWeaponCollider
+  m_Name: EnemyWeaponColliderL
   m_TagString: EnemyWeapon
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -302,8 +420,10 @@ MonoBehaviour:
   weaponParent: {fileID: 7034578543878992195}
   weaponAttackColliders:
   - {fileID: 1701483941685567264}
+  - {fileID: 528239289287037847}
   EWCMs:
   - {fileID: 6178674796021915901}
+  - {fileID: 4716318860976188386}
   EDCNear: {fileID: 1847250764447816529}
   EDCFar: {fileID: 8692641826929463634}
   movementSpeed: 2.5
@@ -5386,6 +5506,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8942219558084417182}
+  - {fileID: 2057492892579661320}
   m_Father: {fileID: 1017267259805658404}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!95 &1935557783522769971

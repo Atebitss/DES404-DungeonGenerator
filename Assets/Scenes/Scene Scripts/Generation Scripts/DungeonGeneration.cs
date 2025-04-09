@@ -367,8 +367,8 @@ public class DungeonGeneration : MonoBehaviour
 
         //DRM.StartFloorCounter(); //start floor timer
 
-        //yield return new WaitForSeconds(1f);
-        //ASM.RestartScene();
+        yield return new WaitForSeconds(1f);
+        ASM.RestartScene();
 
         if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Generation Complete"); }
     }
@@ -635,7 +635,7 @@ public class DungeonGeneration : MonoBehaviour
 
                         //~~~ ERROR HERE ~~~//
                         //~~~ possibly checking for an extra x or z ~~~//
-                        Debug.Log("cur pos: (" + x + ") . (" + z + "), max pos: (" + boundsX + ") . (" + boundsZ + ")");
+                        //Debug.Log("cur pos: (" + x + ") . (" + z + "), max pos: (" + boundsX + ") . (" + boundsZ + ")");
                         if (x >= 0 && x < boundsX && z >= 0 && z < boundsZ)
                         {
                             MG.UpdateGridState(x, z, ("Room" + curRoomsSpawned));

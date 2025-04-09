@@ -391,7 +391,7 @@ public class PlayerController : MonoBehaviour
     private int attackComboDamage = 0; //additional damage
     private int lightAttackComboCounter = 0; //combo tracker set to one to skip first rotation
     private float lightAttackComboTimer = 0f, lightAttackComboStartTime = 0f; //used to reset combo timer
-    [SerializeField] private float lightAttackComboTimerMax = 1f;
+    [SerializeField] private float lightAttackComboTimerMax = 2.5f;
     [SerializeField] private GameObject weaponParent; //weapon parent
     [SerializeField] private GameObject weaponAttackCollider; //weapon collider
     [SerializeField] private PlayerWeaponColliderManager PWCM; //weapon collider script

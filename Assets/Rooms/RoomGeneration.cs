@@ -637,7 +637,7 @@ public class RoomGeneration : MonoBehaviour
                 //find random position within room
                 Vector3 spawnPos = new Vector3((Random.Range(0, roomBoundsX) + literalPosition.x), 0.5f, (Random.Range(0, roomBoundsZ) + literalPosition.z));
 
-                float checkDistance = tileXOffset;
+                float checkDistance = (tileXOffset * 5);
 
                 //find if distance between generated position and player is less than checkDistance
                 Vector3 playerPos = ASM.GetPlayerPosition(); //get current player position from abstract scene manager (run every attempt incase player moves)
@@ -674,8 +674,36 @@ public class RoomGeneration : MonoBehaviour
                     //expand enemy types array and add new type
                     GameObject[] tempEnemyTypes = new GameObject[enemyTypes.Length + 1]; //new increased array
                     for (int enemyIndex = 0; enemyIndex < enemyTypes.Length; enemyIndex++) { tempEnemyTypes[enemyIndex] = enemyTypes[enemyIndex]; } //copy old content
+
+                    //alter chance to spawn large enemy appropriate to difficulty
+                    int largeEnemyChance = 25;
+                    switch(roomDifficulty)
+                    {
+                        case -1:
+                            largeEnemyChance = -1;
+                            break;
+                        case 0:
+                            largeEnemyChance = 25;
+                            break;
+                        case 1:
+                            largeEnemyChance = 50;
+                            break;
+                        case 2:
+                            largeEnemyChance = 75;
+                            break;
+                        case 3:
+                            largeEnemyChance = 101;
+                            break;
+                        case 4:
+                            largeEnemyChance = 101;
+                            break;
+                        case 5:
+                            largeEnemyChance = 101;
+                            break;
+                    }
+
                     GameObject randType;
-                    if (Random.Range(0, 10) >= 8) { randType = validEnemyTypes[1]; }
+                    if (Random.Range(0, 100) <= largeEnemyChance) { randType = validEnemyTypes[1]; }
                     else { randType = validEnemyTypes[0]; }
                     tempEnemyTypes[(tempEnemyTypes.Length - 1)] = randType;
                     enemyTypes = tempEnemyTypes; //update old array with new array

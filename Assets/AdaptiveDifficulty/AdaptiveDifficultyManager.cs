@@ -238,6 +238,9 @@ public class AdaptiveDifficultyManager : MonoBehaviour
     //~~~~~~difficulty change~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     private float skillScore = 100f; //used to determine player skill level
     public float GetSkillScore() { return skillScore; }
+    private int difficulty = 5; //difficulty level
+    public int GetDifficulty() { return difficulty; }
+
     public void RunDifficultyAdapter()
     {
         //Debug.Log("Running difficulty adapter");
@@ -317,33 +320,31 @@ public class AdaptiveDifficultyManager : MonoBehaviour
         if (skillScore <= 25f)
         {
             //Debug.Log("difficulty: beginner");
-            RG.SetRoomDifficulty(-1);
-            RG.SetPlayerSkillScore(skillScore);
+            difficulty = -1;
         }
         else if (skillScore > 25f && skillScore <= 75f)
         {
             //Debug.Log("difficulty: easy");
-            RG.SetRoomDifficulty(0);
-            RG.SetPlayerSkillScore(skillScore);
+            difficulty = 0;
         }
         else if (skillScore > 75f && skillScore <= 125f)
         {
             //Debug.Log("difficulty: normal");
-            RG.SetRoomDifficulty(1);
-            RG.SetPlayerSkillScore(skillScore);
+            difficulty = 1;
         }
         else if (skillScore > 125f && skillScore <= 175f)
         {
             //Debug.Log("difficulty: hard");
-            RG.SetRoomDifficulty(2);
-            RG.SetPlayerSkillScore(skillScore);
+            difficulty = 2;
         }
         else if (skillScore > 175f)
         {
             //Debug.Log("difficulty: dire");
-            RG.SetRoomDifficulty(3);
-            RG.SetPlayerSkillScore(skillScore);
+            difficulty = 3;
         }
+
+        RG.SetPlayerSkillScore(skillScore);
+        RG.SetRoomDifficulty(difficulty);
 
         if (ADDM != null) { ADDM.playerSkillScore = skillScore; }
         if (SVM != null) { SVM.AddSkillScoreDataPoint(skillScore); }

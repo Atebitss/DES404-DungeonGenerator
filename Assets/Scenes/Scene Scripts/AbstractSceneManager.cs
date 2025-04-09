@@ -110,6 +110,7 @@ public class AbstractSceneManager : MonoBehaviour
         //spawn new enemies and add to new array
         int index = existingCount;
         newEnemyObjects[index] = Instantiate(enemy, position, Quaternion.identity);
+        GenerateEnemy(newEnemyObjects[index]);
 
         if (!newEnemyObjects[index].name.Contains("boss")) { newEnemyObjects[index].name = "Enemy" + index; }
         else { newEnemyObjects[index].name = "Boss" + enemy.transform.GetChild(0).GetComponent<AbstractEnemy>().type; }
@@ -131,12 +132,113 @@ public class AbstractSceneManager : MonoBehaviour
             if (dbugMode) { MG.UpdateHUDDbugText("Scene Manager: Spawning Enemy " + enemies[i].name); }
             int index = existingCount + i;
             newEnemyObjects[index] = Instantiate(enemies[i], positions[i], Quaternion.identity);
+            GenerateEnemy(newEnemyObjects[index]);
+            
 
             if (!newEnemyObjects[index].name.Contains("boss")) { newEnemyObjects[index].name = "Enemy" + index; }
             else { newEnemyObjects[index].name = "Boss" + newEnemyObjects[index].GetComponent<AbstractEnemy>().type; }
         }
 
         enemyObjects = newEnemyObjects; //replace old array with new array
+    }
+    private void GenerateEnemy(GameObject curEnemy)
+    {
+        if (MG != null) { MG.UpdateHUDDbugText("Scene Manager: Generating Enemy"); }
+        Debug.Log("Generating enemy: " + curEnemy.name);
+
+        AbstractEnemy curEnemyScript = curEnemy.transform.GetChild(0).GetComponent<AbstractEnemy>();
+        Debug.Log("curEnemyScript: " + curEnemyScript.name);
+        float healthModifier = 1.0f;
+        float damageModifier = 1.0f;
+        float speedModifier = 1.0f;
+        float attackSpeedModifier = 1.0f;
+        int dualChance = 10;
+
+        //set modifiers accoring to ADDM difficulty
+        switch (ADM.GetDifficulty())
+        {
+            case -1:
+                healthModifier = 0.5f; //alter how much health an enemy has
+                damageModifier = 0.5f; //alter how much damage an enemy does
+                speedModifier = 0.5f; //alter how fast an enemy moves
+                attackSpeedModifier = 0.5f; //alter how fast an enemy attacks
+                dualChance = -1; //alter how likely an enemy is to be dual
+                break;
+            case 0:
+                healthModifier = 0.75f;
+                damageModifier = 0.75f;
+                speedModifier = 0.75f;
+                attackSpeedModifier = 0.75f;
+                dualChance = 5;
+                break;
+            case 1:
+                healthModifier = 1.0f;
+                damageModifier = 1.0f;
+                speedModifier = 1.0f;
+                attackSpeedModifier = 1.0f;
+                dualChance = 10;
+                break;
+            case 2:
+                healthModifier = 1.25f;
+                damageModifier = 1.25f;
+                speedModifier = 1.25f;
+                attackSpeedModifier = 1.25f;
+                dualChance = 20;
+                break;
+            case 3:
+                healthModifier = 1.5f;
+                damageModifier = 1.5f;
+                speedModifier = 1.5f;
+                attackSpeedModifier = 1.5f;
+                dualChance = 30;
+                break;
+            case 4:
+                healthModifier = 1.75f;
+                damageModifier = 1.75f;
+                speedModifier = 1.75f;
+                attackSpeedModifier = 1.75f;
+                dualChance = 40;
+                break;
+            case 5:
+                healthModifier = 2f;
+                damageModifier = 2f;
+                speedModifier = 2f;
+                attackSpeedModifier = 2f;
+                dualChance = 50;
+                break;
+        }
+
+        //set enemy stats
+        //health
+        int newHealth = Mathf.RoundToInt(curEnemyScript.GetMaxHealth() * healthModifier);
+        curEnemyScript.SetMaxHealth(newHealth);
+
+        //damamge
+        int newAttackDamage = Mathf.RoundToInt(curEnemyScript.GetAttackDamage() * damageModifier);
+        curEnemyScript.SetAttackDamage(newAttackDamage);
+
+        //movement speed
+        curEnemyScript.SetMovementSpeed((curEnemyScript.GetMovementSpeed() * speedModifier));
+
+        //attack speed
+        curEnemyScript.SetAttackSpeed((curEnemyScript.GetAttackSpeed() * attackSpeedModifier));
+
+        //dual chance
+        if(Random.Range(0, 100) <= dualChance)
+        {
+            curEnemyScript.SetDual(true);
+        }
+
+
+        //wake enemy
+        curEnemyScript.Wake();
+        Debug.Log("Enemy awake: " + curEnemyScript.name);
+        Debug.Log("MG: " + MG);
+        if (MG != null)
+        {
+            Debug.Log("MG.GetSingleGridSize(): " + MG.GetSingleGridSize());
+            curEnemyScript.SetSeperationDistance(MG.GetSingleGridSize());
+        }
     }
 
     public void DestroyEnemyObjects()

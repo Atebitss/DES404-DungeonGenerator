@@ -203,7 +203,7 @@ public class PathGeneration : MonoBehaviour
 
     private Vector2 FindLowestCostPosition(bool[,] openSet, int[,] pathToEnd, Vector2 targetPos)
     {
-        Debug.Log("PathGeneration: FindingLowestCostPosition");
+        //Debug.Log("PathGeneration: FindingLowestCostPosition");
         //if (dbugEnabled) { MG.UpdateHUDDbugText("PG, Find Lowest Cost Position"); }
 
         //initialise lowest cost trackers
@@ -233,7 +233,7 @@ public class PathGeneration : MonoBehaviour
             }
         }
 
-        Debug.Log("PathGeneration: Finished FindingLowestCostPosition");
+        //Debug.Log("PathGeneration: Finished FindingLowestCostPosition");
         return lowestCostPos; //return lowest cost position
     }
 
@@ -267,8 +267,9 @@ public class PathGeneration : MonoBehaviour
     }
     private bool IsAdjacentToWallCorner(int x, int z)
     {
+        //Debug.Log("PG, IsAdjacentToWallCorner");
         //check 8 adjacent neighbour positions
-        for(int xOffset = -1; xOffset <= 1; xOffset++)
+        for (int xOffset = -1; xOffset <= 1; xOffset++)
         {
             for (int zOffset = -1; zOffset <= 1; zOffset++)
             {
@@ -280,12 +281,15 @@ public class PathGeneration : MonoBehaviour
                 //if neighbour is wihtin bounds and is not a hallway
                 if (neighbourX >= 0 && neighbourX < boundsX && neighbourZ >= 0 && neighbourZ < boundsZ)
                 {
+                    //Debug.Log("offset within bounds");
                     //if neighbour is a wall corner, return true
-                    if(MG.GetGridState(neighbourX, neighbourZ) == "WallCorner") { return true; }
+                    if (MG.GetGridState(neighbourX, neighbourZ) == "WallCorner") { /*Debug.Log("PG, wall corner found");*/ return true; }
                 }
+                else { Debug.Log("offset out of bounds"); } //if neighbour is out of bounds, skip
             }
         }
 
+        //Debug.Log("PG, no wall corner found");
         //if no wall corner adjacent, return false
         return false;
     }
@@ -358,23 +362,23 @@ public class PathGeneration : MonoBehaviour
             Debug.Log("PG. path section: " + pathSection + " / " + (path.Length - 1));
             Vector2 start = path[pathSection]; //set start position to current path section
             Vector2 end = path[(pathSection + 1)]; //set end position to next path section
-            Debug.Log("start: " + start + ", end: " + end);
+            //Debug.Log("start: " + start + ", end: " + end);
             int startX = (int)start.x; //cast to int to avoid float issues 
             int startZ = (int)start.y;
             int endX = (int)end.x;
             int endZ = (int)end.y;
-            Debug.Log("start pos: " + startX + "." + startZ + ", end pos: " + endX + "." + endZ);
+            //Debug.Log("start pos: " + startX + "." + startZ + ", end pos: " + endX + "." + endZ);
 
 
             for (int x = Mathf.Min(startX, endX); x <= Mathf.Max(startX, endX); x++)
             {
-                Debug.Log("pos x: " + x);
+                //Debug.Log("pos x: " + x);
                 for (int z = Mathf.Min(startZ, endZ); z <= Mathf.Max(startZ, endZ); z++)
                 {
-                    Debug.Log("pos z: " + z);
+                    //Debug.Log("pos z: " + z);
                     if (MG.GetGridState(x, z).Contains("Room"))
                     {
-                        Debug.Log("PG, path in room @ pos: " + x + ", " + z);
+                        //Debug.Log("PG, path in room @ pos: " + x + ", " + z);
                         continue;
                     }
                     else if (MG.GetGridState(x, z) == "Empty")
@@ -383,7 +387,7 @@ public class PathGeneration : MonoBehaviour
                         //if (dbugEnabled) { MG.UpdateHUDDbugText("setting position x:" + x + ", y:" + z + " as hallway"); }
                         MG.UpdateDbugTileMat(x, z, "Hallway");
                         MG.UpdateDbugTileTextGridState(x, z, "Hallway");
-                        Debug.Log("PG, updating with hallway @ pos: " + x + ", " + z);
+                        //Debug.Log("PG, updating with hallway @ pos: " + x + ", " + z);
                         MG.UpdateGridState(x, z, "Hallway"); //mark the grid position as a hallway
 
                         Vector2[] newHallwaySectionPositions = new Vector2[hallwaySectionPositions.Length + 1]; //new array with increased size
@@ -398,7 +402,7 @@ public class PathGeneration : MonoBehaviour
                         {
                             for (int zOffset = -1; zOffset <= 1; zOffset++)
                             {
-                                Debug.Log("checking offset " + xOffset + ", " + zOffset);
+                                //Debug.Log("checking offset " + xOffset + ", " + zOffset);
                                 if (xOffset == 0 && zOffset == 0) { continue; } //skip current tile
 
                                 int neighbourX = (x + xOffset);
@@ -406,12 +410,12 @@ public class PathGeneration : MonoBehaviour
 
                                 if (neighbourX >= 0 && neighbourX < boundsX && neighbourZ >= 0 && neighbourZ < boundsZ) //if adjacent position is within bounds
                                 {
-                                    Debug.Log("offset within bounds");
+                                    //Debug.Log("offset within bounds");
                                     if (MG.GetGridState(neighbourX, neighbourZ) == "Empty") //if adjacent position is a wall
                                     {
                                         MG.UpdateDbugTileMat(neighbourX, neighbourZ, "Hallway"); //update material
                                         MG.UpdateDbugTileTextGridState(neighbourX, neighbourZ, "Hallway"); //update debug text
-                                        Debug.Log("PG, updating with hallway @ pos: " + neighbourX + ", " + neighbourZ);
+                                        //Debug.Log("PG, updating with hallway @ pos: " + neighbourX + ", " + neighbourZ);
                                         MG.UpdateGridState(neighbourX, neighbourZ, "Hallway"); //update grid state
 
                                         newHallwaySectionPositions = new Vector2[hallwaySectionPositions.Length + 1]; //new array with increased size
@@ -432,7 +436,7 @@ public class PathGeneration : MonoBehaviour
                         MG.UpdateDbugTileMat(x, z, "Doorway");
                         MG.UpdateDbugTileTextGridState(x, z, "Doorway");
                         MG.UpdateGridState(x, z, "Doorway"); //mark the grid position as a doorway
-                        Debug.Log("PG, updating with doorway @ pos: " + x + ", " + z);
+                        //Debug.Log("PG, updating with doorway @ pos: " + x + ", " + z);
 
                         //assign adjacent positions to doorway as doorway edges
                         int offsetX = 0;
@@ -446,7 +450,7 @@ public class PathGeneration : MonoBehaviour
                         {
                             offsetX = 1; //check left and right
                         }
-                        Debug.Log("checking offset " + offsetX + ", " + offsetZ);
+                        //Debug.Log("checking offset " + offsetX + ", " + offsetZ);
 
                         //mark adjacent walls as doorway edges
                         for (int i = -1; i <= 1; i += 2) //loop for two directions (-1 and 1)
@@ -456,12 +460,12 @@ public class PathGeneration : MonoBehaviour
 
                             if (neighbourX >= 0 && neighbourX < boundsX && neighbourZ >= 0 && neighbourZ < boundsZ) //if adjacent position is within bounds
                             {
-                                Debug.Log("offset within bounds");
+                                //Debug.Log("offset within bounds");
                                 if (MG.GetGridState(neighbourX, neighbourZ) == "Wall") //if adjacent position is a wall
                                 {
                                     MG.UpdateDbugTileMat(neighbourX, neighbourZ, "DoorwayEdge"); //update material
                                     MG.UpdateDbugTileTextGridState(neighbourX, neighbourZ, "DoorwayEdge"); //update debug text
-                                    Debug.Log("PG, updating with doorway edge @ pos: " + neighbourX + ", " + neighbourZ);
+                                    //Debug.Log("PG, updating with doorway edge @ pos: " + neighbourX + ", " + neighbourZ);
                                     MG.UpdateGridState(neighbourX, neighbourZ, "DoorwayEdge"); //update grid state
                                 }
                             }

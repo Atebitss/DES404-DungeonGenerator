@@ -40,6 +40,47 @@ public abstract class AbstractEnemy : MonoBehaviour
     public string type = "";
     public bool boss = false;
     public bool dual = false;
+    public void SetDual(bool newDual) 
+    {
+        dual = newDual; 
+        if (dual) 
+        {
+
+            a.SetBool("dual", dual); 
+        }
+    }
+    public void Wake()
+    {
+        health = maxHealth; //set health to max health
+
+        //swap main weapon hand
+        if (Random.Range(0, 2) == 1) //if random number = 1, swap weapon colliders and scripts positions in array
+        {
+            GameObject tempWeapon = weaponAttackColliders[0]; //get first weapon collider
+            weaponAttackColliders[0] = weaponAttackColliders[1]; //set first position to second weapon
+            weaponAttackColliders[1] = tempWeapon; //set second position to first weapon
+
+            EnemyWeaponColliderManager tempEWCM = EWCMs[0]; //get first EWCM
+            EWCMs[0] = EWCMs[1]; //set first position to second EWCM
+            EWCMs[1] = tempEWCM; //set second position to first EWCM
+        }
+
+        //Debug.Log("dual: " + dual);
+        a.SetBool("dual", dual);
+
+        //if not dual, disable offhand weapon
+        if (!dual)
+        {
+            weaponAttackColliders[1].SetActive(false);
+            EWCMs[1].gameObject.SetActive(false);
+        }
+
+        if (boss)
+        {
+            UpdateBossStates();
+            BHDM.Wake(this);
+        }
+    }
     private void Start()
     {
         //Debug.Log("enemy start: " + this.gameObject.name);
@@ -53,14 +94,6 @@ public abstract class AbstractEnemy : MonoBehaviour
             EWCMs[i].SetWeaponDamage(attackDamage);
             if (ADM != null) { EWCMs[i].SetADM(ADM); }
         }
-
-        if (boss) 
-        {
-            UpdateBossStates();
-            BHDM.Wake(this);
-        }
-        //Debug.Log("dual: " + dual);
-        a.SetBool("dual", dual); 
     }
     private void FixedUpdate()
     {
@@ -88,6 +121,10 @@ public abstract class AbstractEnemy : MonoBehaviour
 
 
     //~~~~~health~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    public int maxHealth;
+    public int GetMaxHealth() { return maxHealth; }
+    public void SetMaxHealth(int newMaxHealth) { maxHealth = newMaxHealth; HealthCheck(); }
+
     public int health;
     public int GetHealth() { return health; }
     public void SetHealth(int newHealth) { health = newHealth; HealthCheck(); }
@@ -98,7 +135,7 @@ public abstract class AbstractEnemy : MonoBehaviour
         if (boss) { BHDM.UpdateCurrentBossHealth(health); }
 
         if (health <= 0) 
-        {
+        { 
             ASM.DestroyEnemy(this.transform.parent.gameObject); 
             Destroy(this.transform.parent.gameObject); 
         } 
@@ -114,7 +151,13 @@ public abstract class AbstractEnemy : MonoBehaviour
     [SerializeField] public float attackCooldownTimer = 0f, attackStartTime = 0f; //used to reset attack timer
     [SerializeField] public float attackCooldownMax = 2.5f;
     [SerializeField] public int attackDamage = 1; //dafault damage
+    public int GetAttackDamage() { return attackDamage; }
+    public void SetAttackDamage(int newDamage) { attackDamage = newDamage; }
+
     [SerializeField] public float attackSpeed = 1f; //default speed
+    public float GetAttackSpeed() { return attackSpeed; }
+    public void SetAttackSpeed(float newSpeed) { attackSpeed = newSpeed; }
+
     [SerializeField] public float attackDistance = 1.5f; //default attack distance
     [SerializeField] private int attackStage = 0; //used to track attack stage
 
@@ -191,15 +234,14 @@ public abstract class AbstractEnemy : MonoBehaviour
     [Header("-Movement")]
     //moving
     [SerializeField] private float movementSpeed = 2.5f; //players movement velocity
-    public void SetMovementSpeed(int newSpeed) { movementSpeed = newSpeed; }
-    private Vector3 movement = Vector3.zero; //enemy movement directions
-    private Vector3 enemyVelocity = Vector3.zero; //used to calc movement
+    public float GetMovementSpeed() { return movementSpeed; }
+    public void SetMovementSpeed(float newSpeed) { movementSpeed = newSpeed; }
 
     //boid movement
-    [SerializeField] private float seperationDistance = 2.5f; //seperation distance
-    public void SetSeperationDistance(int newDistance) { seperationDistance = newDistance; }
-    [SerializeField] private float seperationWeight = 2.5f; //seperation weight
-    public void SetSeperationWeight(int newWeight) { seperationWeight = newWeight; }
+    [SerializeField] private float seperationDistance = 50f; //seperation distance
+    public void SetSeperationDistance(float newDistance) { seperationDistance = newDistance; }
+    [SerializeField] private float seperationWeight = 100f; //seperation weight
+    public void SetSeperationWeight(float newWeight) { seperationWeight = newWeight; }
 
     //retreating
     [SerializeField] private bool dodging = false; //dodge tracker
