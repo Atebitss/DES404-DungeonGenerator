@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-public class AdaptiveDifficultyDisplayManager : MonoBehaviour
+public class AdaptiveDifficultyDbugManager : MonoBehaviour
 {
     //misc
     private AdaptiveDifficultyManager ADM;

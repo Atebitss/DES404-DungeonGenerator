@@ -6,6 +6,8 @@ public abstract class AbstractEnemy : MonoBehaviour
     //~~~~~misc~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     [Header("-Misc")]
     [SerializeField] private bool isActive = true;
+    public void SetIsActive(bool newActive) { isActive = newActive; }
+
     [SerializeField] private Rigidbody enemyRigid; //enemy rigidbody used for physics interactions
     [SerializeField] private Animator a; //player animator used for running animations
 
@@ -22,12 +24,12 @@ public abstract class AbstractEnemy : MonoBehaviour
     private float GetCurAnimLength()
     {
         //find legnth of current animation
-        foreach (AnimationClip clip in a.runtimeAnimatorController.animationClips) 
+        foreach (AnimationClip clip in a.runtimeAnimatorController.animationClips)
         {
-            if (a.GetCurrentAnimatorStateInfo(0).IsName(clip.name)) 
+            if (a.GetCurrentAnimatorStateInfo(0).IsName(clip.name))
             {
                 //Debug.Log("clip name: " + clip.name + ", clip length: " + clip.length);
-                return clip.length; 
+                return clip.length;
             }
         }
         return -1;
@@ -40,13 +42,13 @@ public abstract class AbstractEnemy : MonoBehaviour
     public string type = "";
     public bool boss = false;
     public bool dual = false;
-    public void SetDual(bool newDual) 
+    public void SetDual(bool newDual)
     {
-        dual = newDual; 
-        if (dual) 
+        dual = newDual;
+        if (dual)
         {
 
-            a.SetBool("dual", dual); 
+            a.SetBool("dual", dual);
         }
     }
     public void Wake()
@@ -105,7 +107,7 @@ public abstract class AbstractEnemy : MonoBehaviour
             UpdateEnemyMovement();
         }
     }
-    virtual public void UpdateBossStates() {}
+    virtual public void UpdateBossStates() { }
     private void UpdateEnemyStates()
     {
         HealthCheck();
@@ -129,16 +131,16 @@ public abstract class AbstractEnemy : MonoBehaviour
     public int GetHealth() { return health; }
     public void SetHealth(int newHealth) { health = newHealth; HealthCheck(); }
     public void AlterHealth(int change) { /*Debug.Log("altering health: " + change);*/ health += change; HealthCheck(); }
-    private void HealthCheck() 
+    private void HealthCheck()
     {
         /*Debug.Log("health check: " + health);*/
         if (boss) { BHDM.UpdateCurrentBossHealth(health); }
 
-        if (health <= 0) 
-        { 
-            ASM.DestroyEnemy(this.transform.parent.gameObject); 
-            Destroy(this.transform.parent.gameObject); 
-        } 
+        if (health <= 0)
+        {
+            ASM.DestroyEnemy(this.transform.parent.gameObject);
+            Destroy(this.transform.parent.gameObject);
+        }
     }
     //~~~~~health~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -258,14 +260,14 @@ public abstract class AbstractEnemy : MonoBehaviour
 
     private void UpdateEnemyMovement()
     {
-        if(!attacking && !dodging && isActive)
+        if (!attacking && !dodging && isActive)
         {
             //check if player is within close range
-            if(EDCNear.IsPlayerNear())
+            if (EDCNear.IsPlayerNear())
             {
                 //if the player is near the enemy
                 //stop movement and update tracker
-                if(!playerNear) { playerNear = true; }
+                if (!playerNear) { playerNear = true; }
 
                 //begin attack movement
                 //calc distance between enemy and player
@@ -273,7 +275,7 @@ public abstract class AbstractEnemy : MonoBehaviour
                 //Debug.Log(attackDistance + " / " + distToPlayer);
 
                 //if distance greater than melee distance, move into melee range
-                if (distToPlayer > attackDistance) 
+                if (distToPlayer > attackDistance)
                 {
                     Vector3 directionToPlayer = (PC.transform.position - transform.position).normalized;
                     Vector3 seperationForce = CalculateSeperationForce();
@@ -281,7 +283,7 @@ public abstract class AbstractEnemy : MonoBehaviour
 
                     enemyRigid.velocity = new Vector3(newMovement.x, enemyRigid.velocity.y, newMovement.z);
                 }
-                else if(distToPlayer <= attackDistance)
+                else if (distToPlayer <= attackDistance)
                 {
                     Vector3 seperationForce = CalculateSeperationForce();
                     Vector3 newMovement = new Vector3((seperationForce.x * movementSpeed), enemyRigid.velocity.y, (seperationForce.z * movementSpeed));
@@ -335,7 +337,7 @@ public abstract class AbstractEnemy : MonoBehaviour
 
         return seperationForce;
     }
-    
+
     private void Retreat()
     {
         dodging = true;
@@ -348,23 +350,27 @@ public abstract class AbstractEnemy : MonoBehaviour
 
     private void UpdateEnemyLooking()
     {
-        if (!attacking)
+        if (isActive)
         {
-            Vector3 weaponOffset = (enemyRigid.transform.right * -0.5f) + (enemyRigid.transform.up) + (enemyRigid.transform.forward * -0.5f);
-            weaponParent.transform.position = ((enemyRigid.transform.position + weaponOffset) + enemyRigid.transform.forward);
-            weaponParent.transform.rotation = enemyRigid.transform.rotation;
+            if (!attacking)
+            {
+                Vector3 weaponOffset = (enemyRigid.transform.right * -0.5f) + (enemyRigid.transform.up) + (enemyRigid.transform.forward * -0.5f);
+                weaponParent.transform.position = ((enemyRigid.transform.position + weaponOffset) + enemyRigid.transform.forward);
+                weaponParent.transform.rotation = enemyRigid.transform.rotation;
+            }
+
+
+            Vector3 playerLookPosition = new Vector3(PC.transform.position.x, (PC.transform.position.y - 0.5f), PC.transform.position.z);
+            targetEnemyRot = Quaternion.LookRotation(playerLookPosition - enemyRigid.position);
+            enemyRigid.transform.rotation = Quaternion.Lerp(enemyRigid.transform.rotation, targetEnemyRot, Time.deltaTime * lookSensitivity);
         }
-
-
-        Vector3 playerLookPosition = new Vector3(PC.transform.position.x, (PC.transform.position.y - 0.5f), PC.transform.position.z);
-        targetEnemyRot = Quaternion.LookRotation(playerLookPosition - enemyRigid.position);
-        enemyRigid.transform.rotation = Quaternion.Lerp(enemyRigid.transform.rotation, targetEnemyRot, Time.deltaTime * lookSensitivity);
     }
     //~~~~~movement~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 
     //~~~~~visual feedback~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //VFX
     [SerializeField] private ParticleSystem EPS;
     public void MoveEPS(Vector3 hitPos)
     {
@@ -373,5 +379,11 @@ public abstract class AbstractEnemy : MonoBehaviour
         Invoke("StopPS", 0.5f);
     }
     private void StopPS() { EPS.Stop(); }
+
+    //materials
+    [SerializeField] private Renderer enemyRenderer;
+    [SerializeField] private Material baseMaterial;
+    public void ResetMaterial() { enemyRenderer.material = baseMaterial; }
+    public void SetMaterial(Material newMaterial) { enemyRenderer.material = newMaterial; }
     //~~~~~visual feedback~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 }

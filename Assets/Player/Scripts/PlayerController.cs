@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.HID;
+using UnityEngine.EventSystems;
 
 public class PlayerController : MonoBehaviour
 {
@@ -16,16 +17,18 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private TMP_Text interactionPromptText; //object interaction display
     [SerializeField] private Animator a; //player animator used for running animations
     [SerializeField] private GameObject hitSplashPrefab; //hit splash prefab
+    [SerializeField] private GameObject leftHand, rightHand;
 
     private AbstractSceneManager ASM; //scene manager
     private AudioManager AM; //audio manager
     private DbugDisplayManager DDM; //debug manager
     private AdaptiveDifficultyManager ADM; //adaptive difficulty manager
-    private AdaptiveDifficultyDisplayManager ADDM; //adaptive difficulty display manager
-    public AdaptiveDifficultyDisplayManager GetADDM() { return ADDM; }
+    private AdaptiveDifficultyDbugManager ADDM; //adaptive difficulty display manager
+    public AdaptiveDifficultyDbugManager GetADDM() { return ADDM; }
     private SkillVisualizationManager SVM; //skill visualization manager
     public SkillVisualizationManager GetSVM() { return SVM; }
     private BossHealthDisplayManager BHDM; //boss health display manager
+    private SpellDbugManager SDM; //spell debug display
 
     [SerializeField] private bool active = false; //allows player input
     public void SetActive(bool newActive) 
@@ -48,8 +51,9 @@ public class PlayerController : MonoBehaviour
         AM = ASM.GetAudioManager();
         ADM = ASM.GetComponent<AdaptiveDifficultyManager>();
         DDM = this.gameObject.transform.parent.GetChild(1).GetComponent<DbugDisplayManager>();
-        ADDM = this.gameObject.transform.parent.GetChild(1).GetComponent<AdaptiveDifficultyDisplayManager>();
+        ADDM = this.gameObject.transform.parent.GetChild(1).GetComponent<AdaptiveDifficultyDbugManager>();
         SVM = this.gameObject.transform.parent.GetChild(1).GetComponent<SkillVisualizationManager>();
+        SDM = this.gameObject.transform.parent.GetChild(1).GetComponent<SpellDbugManager>();
 
         PWCM.SetWeaponDamage(attackDamage);
         if (ADM != null) { PWCM.SetADM(ADM); }
@@ -58,10 +62,14 @@ public class PlayerController : MonoBehaviour
         PWCM.SetHitSplash(hitSplashPrefab);
         PWCM.SetPC(this);
 
+        if (mainCamera == null) { mainCamera = Camera.main; }
+
         maxPlayerHealthBarWidth = playerHealthBarRect.sizeDelta.x;
         UpdatePlayerHealthBar();
         BHDM = this.gameObject.transform.parent.GetChild(1).GetComponent<BossHealthDisplayManager>();
         BHDM.DisableBossHealthDisplay();
+
+        AssignSpell();
     }
 
     private void OnDestroy()
@@ -78,7 +86,12 @@ public class PlayerController : MonoBehaviour
     {
         if (active)
         {
-            if (ASM.GetDevMode()) { UpdateDDM(); }
+            if (ASM.GetDevMode()) 
+            {
+                UpdateDDM();
+                UpdateSDM();
+            }
+
             UpdatePlayerMovement();
             UpdatePlayerLooking();
             UpdatePlayerStates();
@@ -132,6 +145,34 @@ public class PlayerController : MonoBehaviour
             DDM.playerInvincible = invincible;
             DDM.playerInvincibilityTimer = invincibilityTimer;
             DDM.playerInvincibilityStartTime = invincibilityStartTime;
+        }
+    }
+    private void UpdateSDM()
+    {
+        if (active)
+        {
+            //spell
+            SDM.spellShape = shapeName;
+            SDM.spellEffect = effectName;
+            SDM.spellElement = elementName;
+            SDM.spellCooldown = spellCooldownTimer;
+            SDM.spellCooldownMax = spellCooldownMax;
+            SDM.radius = curSpell.GetRadius();
+            SDM.speed = curSpell.GetSpeed();
+            SDM.damage = curSpell.GetDamage();
+            SDM.spellPower = curSpell.GetSpellPower();
+            SDM.valid = curSpell.GetSpellValid();
+            SDM.casted = curSpell.GetCasted();
+            SDM.persistent = curSpell.GetSpellPersist();
+            SDM.targetPoints = curSpell.GetTargetPoints().Length;
+            SDM.triggerPoints = curSpell.GetTriggerPoints().Length;
+            SDM.targets = curSpell.GetSpellTargets().Length;
+            SDM.aimingTargets = curSpell.GetAimingTargets().Length;
+            SDM.ignoredTargets = curSpell.GetIgnoredTargets().Length;
+            SDM.startPos = curSpell.GetStartPos();
+            SDM.endPos = curSpell.GetEndPos();
+            SDM.direction = curSpell.GetDir();
+            SDM.distance = curSpell.GetJourneyLength();
         }
     }
     //~~~~~misc~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -325,13 +366,6 @@ public class PlayerController : MonoBehaviour
             playerCamera.transform.localRotation = Quaternion.Lerp(playerCamera.transform.localRotation, targetCameraRot, (Time.deltaTime / 0.1f));
 
 
-            if (!attacking)
-            {
-                Vector3 weaponOffset = (playerCamera.transform.right * 0.25f) + (playerCamera.transform.up * -0.5f) + (playerCamera.transform.forward * -0.5f);
-                weaponParent.transform.position = ((playerRigid.transform.position + weaponOffset) + playerCamera.transform.forward);
-                weaponParent.transform.rotation = playerCamera.transform.rotation;
-            }
-
             targetPlayerRot *= Quaternion.Euler(0f, (lookment.x * lookSensitivity), 0f); //new player turn rotation
             //Debug.Log("targetPlayerRot: " + targetPlayerRot);
             playerRigid.transform.rotation = Quaternion.Lerp(playerRigid.transform.localRotation, targetPlayerRot, (Time.deltaTime / 0.1f));
@@ -347,10 +381,6 @@ public class PlayerController : MonoBehaviour
         Quaternion lookTargetCameraRot = Quaternion.Euler(targetRot.x, targetRot.y, targetRot.z); //new camera rotation
         playerCamera.transform.localRotation = lookTargetCameraRot;
         targetCameraRot = lookTargetCameraRot;
-
-        Vector3 weaponOffset = (playerCamera.transform.right * 0.25f) + (playerCamera.transform.up * -0.5f) + (playerCamera.transform.forward * -0.5f);
-        weaponParent.transform.position = ((playerRigid.transform.position + weaponOffset) + playerCamera.transform.forward);
-        weaponParent.transform.rotation = playerCamera.transform.rotation;
 
         playerRigid.transform.rotation = targetRot;
         targetPlayerRot = targetRot;
@@ -630,8 +660,6 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-
-
     private void UpdateInteractionPrompt()
     {
         if (active)
@@ -646,8 +674,121 @@ public class PlayerController : MonoBehaviour
             else { interactionPromptText.text = ""; }
         }
     }
-
     //~~~~~HUD~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+
+
+    //~~~~~magic~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //components
+    private string effectName, elementName, shapeName;
+
+    //cooldown
+    private float spellCooldownTimer = 0f, spellCooldownMax = 1f, spellStartTime = 0f;
+    public void SetSpellCooldownTimer(float newCooldown) { spellCooldownTimer = newCooldown; }
+    private bool castable = true;
+
+    //spell
+    [SerializeField] private GameObject spellPrefab;
+    private SpellScript curSpell;
+    public SpellScript GetCurSpell() { return curSpell; }
+
+    //spell aiming
+    private Camera mainCamera;
+    private Ray cameraToWorldRay;
+    public Ray GetCameraWorldRay() { return cameraToWorldRay; }
+
+
+    //random spell assigned on awake
+    private void AssignSpell()
+    {
+        Debug.Log("PlayerController, AssignSpell");
+
+        if (castable && curSpell == null)
+        {
+            //Debug.Log("init spell");
+            //instantiate new spell game object & reference it's script while updating it with spell components
+            GameObject spellInstance = Instantiate(spellPrefab, this.transform.position, Quaternion.identity);
+            spellInstance.transform.SetParent(leftHand.transform);
+            spellInstance.transform.localPosition = Vector3.zero;
+            curSpell = spellInstance.transform.GetChild(0).GetComponent<SpellScript>().StartSpellScript(ASM);
+            Debug.Log(curSpell);
+        }
+
+
+        if (curSpell != null)
+        {
+            //determine random spell shape, effect, and element
+            switch (Random.Range(0, 2))
+            {
+                case 0:
+                    shapeName = "Ball";
+                    break;
+                case 1:
+                    shapeName = "Line";
+                    break;
+            }
+
+            switch (Random.Range(0, 3))
+            {
+                case 0:
+                    effectName = "Arc";
+                    break;
+                case 1:
+                    effectName = "Chain";
+                    break;
+                case 2:
+                    effectName = "Explode";
+                    break;
+            }
+
+            switch (Random.Range(0, 4))
+            {
+                case 0:
+                    elementName = "Electric";
+                    break;
+                case 1:
+                    elementName = "Fire";
+                    break;
+                case 2:
+                    elementName = "Force";
+                    break;
+                case 3:
+                    elementName = "Water";
+                    break;
+            }
+
+            //testing
+            shapeName = "Ball";
+            effectName = "Explode";
+            elementName = "Fire";
+            curSpell.UpdateSpellScriptShape(shapeName);
+            curSpell.UpdateSpellScriptEffect(effectName);
+            curSpell.UpdateSpellScriptElement(elementName);
+        }
+    }
+
+
+    public void OnCast(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            Debug.Log("PlayerController, CastSpell");
+
+            if (castable) //if spell is castable
+            {
+                Debug.Log("PlayerController, spell casted");
+                curSpell.CastSpell();
+                spellCooldownTimer = spellCooldownMax;
+            }
+            else
+            {
+                Debug.Log("PlayerController, spell not casted");
+            }
+        }
+    }
+    //~~~~~magic~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 
@@ -673,10 +814,10 @@ public class PlayerController : MonoBehaviour
     {
         if (!invincible) 
         {
-            Debug.Log("damaging health: " + alter);
-            Debug.Log("resistance: " + resistanceModifier);
+            //Debug.Log("damaging health: " + alter);
+            //Debug.Log("resistance: " + resistanceModifier);
             alter += resistanceModifier; //apply resistance modifier
-            Debug.Log("damaging health after resistance: " + alter);
+            //Debug.Log("damaging health after resistance: " + alter);
             if (alter < 0)
             {
                 healthPointsCurrent += alter;
@@ -752,6 +893,7 @@ public class PlayerController : MonoBehaviour
     {
         if (active)
         {
+            //invincibility
             if (invincibilityTimer > 0 && !invincible)
             {
                 invincible = true; //set tracker true
@@ -778,7 +920,8 @@ public class PlayerController : MonoBehaviour
 
 
 
-            if (attackCooldownTimer > 0 && !attacking)
+            //melee attack
+            if (attackCooldownTimer > 0 && !attacking) //on attack
             {
                 attacking = true; //set tracker
                 attackStartTime = Time.time; //track when attack started
@@ -794,7 +937,8 @@ public class PlayerController : MonoBehaviour
 
 
 
-            if (lightAttackComboTimer > 0 && !comboing) { comboing = true; }
+            //melee combo
+            if (lightAttackComboTimer > 0 && !comboing) { comboing = true; } //when combo starts
             if (lightAttackComboTimer > 0) { lightAttackComboTimer -= Time.deltaTime; } //count down timer
             if (lightAttackComboTimer <= 0 && comboing)  //when timer runs out
             {
@@ -802,6 +946,23 @@ public class PlayerController : MonoBehaviour
                 lightAttackComboCounter = 0; //set tracker to start
                 comboing = false; //set tracker false
                 a.SetInteger("lightSwingCombo", lightAttackComboCounter);
+            }
+
+
+
+            //spell attack
+            if(spellCooldownTimer > 0 && castable) //on cast
+            {
+                castable = false; //set tracker
+                spellStartTime = Time.time; //track when attack started
+            }
+
+            if(spellCooldownTimer > 0) { spellCooldownTimer -= Time.deltaTime; } //count down timer
+            if(spellCooldownTimer <= 0) //when timer runs out, set tracker false
+            {
+                spellCooldownTimer = 0;
+                spellStartTime = 0;
+                castable = true;
             }
         }
     }

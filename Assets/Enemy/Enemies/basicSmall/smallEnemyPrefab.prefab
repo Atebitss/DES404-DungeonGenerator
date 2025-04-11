@@ -389,7 +389,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 116
-  m_CollisionDetection: 1
+  m_CollisionDetection: 2
 --- !u!114 &8922853273334535014
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -408,6 +408,7 @@ MonoBehaviour:
   type: 
   boss: 0
   dual: 0
+  maxHealth: 0
   health: 1
   attacking: 0
   attackCooldownTimer: 0
@@ -434,6 +435,8 @@ MonoBehaviour:
   dodgeTime: 1
   lookSensitivity: 2.5
   EPS: {fileID: 8600202053329603697}
+  enemyRenderer: {fileID: 3869931894462583156}
+  baseMaterial: {fileID: 2100000, guid: e8a11bef448ed1b4382b0b5eebb590ca, type: 2}
 --- !u!82 &5414379114799386796
 AudioSource:
   m_ObjectHideFlags: 0

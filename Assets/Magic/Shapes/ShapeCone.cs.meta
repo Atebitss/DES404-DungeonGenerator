@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 82d3990fb868747478213e56d694a4b8
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - shapeMesh: {instanceID: 0}
+  - spellMeshFilter: {instanceID: 0}
+  - aimMeshFilter: {instanceID: 0}
+  - aimingLine: {instanceID: 0}
+  - spellAim: {fileID: 1297948113784627377, guid: 4c7ca1f2b68d9e0419c3cd9ce357cbe1, type: 3}
+  - mainCamera: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

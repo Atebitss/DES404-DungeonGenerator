@@ -220,6 +220,8 @@ Transform:
   - {fileID: 3987276604464211926}
   - {fileID: 7544219055295210380}
   - {fileID: 6115117420659367760}
+  - {fileID: 8278499942651991317}
+  - {fileID: 780337779102028233}
   m_Father: {fileID: 2262343023242419389}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &5613823005629515241
@@ -269,7 +271,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 116
-  m_CollisionDetection: 1
+  m_CollisionDetection: 2
 --- !u!114 &7067119043692281086
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -315,6 +317,8 @@ MonoBehaviour:
   dodgeTime: 1
   lookSensitivity: 2
   EPS: {fileID: 1802212081214071756}
+  enemyRenderer: {fileID: 3869931894462583156}
+  baseMaterial: {fileID: 2100000, guid: e8a11bef448ed1b4382b0b5eebb590ca, type: 2}
 --- !u!82 &5414379114799386796
 AudioSource:
   m_ObjectHideFlags: 0
@@ -559,8 +563,6 @@ Transform:
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 1017267259805658404}
-  - {fileID: 8278499942651991317}
-  - {fileID: 780337779102028233}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6198617683156864463
@@ -590,11 +592,11 @@ Transform:
   m_GameObject: {fileID: 6198617683156864463}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: 0.10000038}
-  m_LocalScale: {x: 0.25, y: 0.25, z: 0.25}
+  m_LocalPosition: {x: 0, y: 0, z: 0.06666692}
+  m_LocalScale: {x: 0.16666667, y: 0.16666667, z: 0.16666667}
   m_ConstrainProportionsScale: 1
   m_Children: []
-  m_Father: {fileID: 2262343023242419389}
+  m_Father: {fileID: 1017267259805658404}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!198 &1802212081214071756
 ParticleSystem:
@@ -5558,11 +5560,11 @@ Transform:
   m_GameObject: {fileID: 7147033514649252026}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.6666667, y: 0.6666667, z: 0.6666667}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 2262343023242419389}
+  m_Father: {fileID: 1017267259805658404}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!135 &4288381109726980876
 SphereCollider:

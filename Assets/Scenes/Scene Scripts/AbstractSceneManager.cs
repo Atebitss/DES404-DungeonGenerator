@@ -36,8 +36,8 @@ public class AbstractSceneManager : MonoBehaviour
     private AdaptiveDifficultyManager ADM;
     public AdaptiveDifficultyManager GetADM() { if (ADM != null) { return ADM; } return null; }
 
-    private AdaptiveDifficultyDisplayManager ADDM;
-    public AdaptiveDifficultyDisplayManager GetADDM() { if (ADDM != null) { return ADDM; } return null; }
+    private AdaptiveDifficultyDbugManager ADDM;
+    public AdaptiveDifficultyDbugManager GetADDM() { if (ADDM != null) { return ADDM; } return null; }
 
     private ConsumableGenerationManager CGM;
     public ConsumableGenerationManager GetCGM() { if (CGM != null) { return CGM; } return null; }

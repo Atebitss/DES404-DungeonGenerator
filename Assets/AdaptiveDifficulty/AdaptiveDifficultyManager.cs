@@ -8,7 +8,7 @@ public class AdaptiveDifficultyManager : MonoBehaviour
     //~~~~~~misc~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     private PlayerController PC;
     private AbstractSceneManager ASM;
-    private AdaptiveDifficultyDisplayManager ADDM;
+    private AdaptiveDifficultyDbugManager ADDM;
     private SkillVisualizationManager SVM;
     private RoomGeneration RG;
 
@@ -238,7 +238,7 @@ public class AdaptiveDifficultyManager : MonoBehaviour
     //~~~~~~difficulty change~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     private float skillScore = 100f; //used to determine player skill level
     public float GetSkillScore() { return skillScore; }
-    private int difficulty = 5; //difficulty level
+    private int difficulty = 1; //difficulty level
     public int GetDifficulty() { return difficulty; }
 
     public void RunDifficultyAdapter()

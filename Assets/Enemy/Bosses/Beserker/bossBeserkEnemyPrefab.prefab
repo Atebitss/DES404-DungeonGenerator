@@ -220,6 +220,8 @@ Transform:
   - {fileID: 3987276604464211926}
   - {fileID: 7544219055295210380}
   - {fileID: 6115117420659367760}
+  - {fileID: 8278499942651991317}
+  - {fileID: 5248293774272799640}
   m_Father: {fileID: 2262343023242419389}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &5613823005629515241
@@ -269,7 +271,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 116
-  m_CollisionDetection: 1
+  m_CollisionDetection: 2
 --- !u!114 &7318853923346722591
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -288,6 +290,7 @@ MonoBehaviour:
   type: 
   boss: 0
   dual: 0
+  maxHealth: 0
   health: 20
   attacking: 0
   attackCooldownTimer: 0
@@ -314,6 +317,8 @@ MonoBehaviour:
   dodgeTime: 1
   lookSensitivity: 5
   EPS: {fileID: 8026072965031143694}
+  enemyRenderer: {fileID: 3869931894462583156}
+  baseMaterial: {fileID: 2100000, guid: e8a11bef448ed1b4382b0b5eebb590ca, type: 2}
 --- !u!82 &5414379114799386796
 AudioSource:
   m_ObjectHideFlags: 0
@@ -440,8 +445,6 @@ Transform:
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 1017267259805658404}
-  - {fileID: 8278499942651991317}
-  - {fileID: 5248293774272799640}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4576898883615846317
@@ -672,11 +675,11 @@ Transform:
   m_GameObject: {fileID: 6748601479782374817}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: 0.10000038}
-  m_LocalScale: {x: 0.25, y: 0.25, z: 0.25}
+  m_LocalPosition: {x: 0, y: 0, z: 0.05000019}
+  m_LocalScale: {x: 0.125, y: 0.125, z: 0.125}
   m_ConstrainProportionsScale: 1
   m_Children: []
-  m_Father: {fileID: 2262343023242419389}
+  m_Father: {fileID: 1017267259805658404}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!198 &8026072965031143694
 ParticleSystem:
@@ -5557,11 +5560,11 @@ Transform:
   m_GameObject: {fileID: 7147033514649252026}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 2262343023242419389}
+  m_Father: {fileID: 1017267259805658404}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!135 &4288381109726980876
 SphereCollider:
