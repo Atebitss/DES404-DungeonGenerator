@@ -24,7 +24,7 @@ public class ShapeBall : AbstractShape
 
             aimingLine = spellAim[0].GetComponent<LineRenderer>();
             aimingLine.positionCount = pathPoints.Length;
-            aimingLine.SetPosition(0, this.transform.position); //~~~~~   update position with player position constantly   ~~~~~//
+            aimingLine.SetPosition(0, this.transform.position);
 
             aimMeshFilter = spellAim[0].GetComponent<MeshFilter>();
             aimMeshFilter.mesh = shapeMesh;
@@ -62,8 +62,9 @@ public class ShapeBall : AbstractShape
         {
             //raycasts from center of view to world position, if hit then update, then return
             Ray cameraToWorld = mainCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
-            if (Physics.Raycast(cameraToWorld, out RaycastHit hit))
+            if (Physics.Raycast(cameraToWorld, out RaycastHit hit, SS.GetMaxLength()))
             {
+                Debug.Log("hit: " + hit.collider.gameObject);
                 aimPos = hit.point;
                 pathPoints[pathPoints.Length - 1] = aimPos;
             }

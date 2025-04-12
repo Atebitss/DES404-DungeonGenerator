@@ -7,12 +7,12 @@ public class EnemyControllerBoss : AbstractEnemy
     {
         //update basic stats
         boss = true;
+        SetBHDM(GetPC().gameObject.transform.parent.GetChild(1).GetComponent<BossHealthDisplayManager>());
     }
 
     override public void UpdateBossStates() 
     {
         //Debug.Log("UpdateBossStates");
-        SetBHDM(GetPC().gameObject.transform.parent.GetChild(1).GetComponent<BossHealthDisplayManager>());
         GetBHDM().EnableBossHealthDisplay();
 
         int randBossTypeID = Random.Range(0, 0);

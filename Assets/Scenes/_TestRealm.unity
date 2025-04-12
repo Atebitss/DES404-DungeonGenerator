@@ -259,7 +259,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2140f40bfe1ca442b4de2afdafb43d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  devMode: 1
+  devMode: 0
   dbugMode: 0
   visualMode: 0
   amPrefab: {fileID: 4065216700189244488, guid: 924cc0721c1d6e841a3aff4bc23543af, type: 3}
@@ -275,7 +275,7 @@ MonoBehaviour:
   validEnemyTypes:
   - {fileID: 3375864117963020452, guid: 46bfd7227e5fe13448287a98bbe35f7b, type: 3}
   - {fileID: 3375864117963020452, guid: 73e0bdc0c73c3084d9f86851aacbc54b, type: 3}
-  maxEnemies: 10
+  maxEnemies: 0
 --- !u!4 &357799855
 Transform:
   m_ObjectHideFlags: 0

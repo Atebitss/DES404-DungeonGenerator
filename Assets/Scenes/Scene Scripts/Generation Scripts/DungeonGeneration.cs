@@ -365,10 +365,10 @@ public class DungeonGeneration : MonoBehaviour
             currentPlayer.GetComponent<PlayerController>().SetActive(true);
         }
 
-        //DRM.StartFloorCounter(); //start floor timer
+        DRM.StartFloorCounter(); //start floor timer
 
-        yield return new WaitForSeconds(1f);
-        ASM.RestartScene();
+        //yield return new WaitForSeconds(1f);
+        //ASM.RestartScene();
 
         if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Generation Complete"); }
     }

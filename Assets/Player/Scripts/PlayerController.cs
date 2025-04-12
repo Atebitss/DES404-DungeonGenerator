@@ -71,7 +71,7 @@ public class PlayerController : MonoBehaviour
         BHDM = this.gameObject.transform.parent.GetChild(1).GetComponent<BossHealthDisplayManager>();
         BHDM.DisableBossHealthDisplay();
 
-        //AssignSpell();
+        AssignSpell();
     }
 
     private void OnDestroy()
@@ -659,6 +659,8 @@ public class PlayerController : MonoBehaviour
             {
                 playerHealthBarImage.color = Color.red; // Critical
             }
+
+            vignetteOverlayAnimator.SetFloat("healthPercentage", hpPercentage);
         }
     }
 
@@ -757,8 +759,9 @@ public class PlayerController : MonoBehaviour
 
             //testing
             shapeName = "Ball";
-            effectName = "Chain";
+            effectName = "Explode";
             elementName = "Fire";
+
             curSpell.UpdateSpellScriptShape(shapeName);
             curSpell.UpdateSpellScriptEffect(effectName);
             curSpell.UpdateSpellScriptElement(elementName);
@@ -802,6 +805,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private bool invincible = false, permaInvincible = false;
     [SerializeField] private float invincibilityTimer = 0f;
     private float invincibilityStartTime = 0f;
+    [SerializeField] Animator vignetteOverlayAnimator;
 
     //health points
     public void SetCurrentHealthPoints(int newHealth) { if (!invincible) { /*Debug.Log("setting health: " + newHealth);*/ healthPointsCurrent = newHealth; HealthCheck(); } }
@@ -817,6 +821,7 @@ public class PlayerController : MonoBehaviour
             if (alter < 0)
             {
                 healthPointsCurrent += alter;
+                VignetteHit();
                 HealthCheck();
                 ADM.DamageTaken();
             }
@@ -834,6 +839,15 @@ public class PlayerController : MonoBehaviour
                 ASM.DestroyPlayer();
             }
         }
+    }
+    private void VignetteHit()
+    {
+        vignetteOverlayAnimator.SetBool("hit", true);
+        Invoke("ResetVignetteHit", 0.5f);
+    }
+    private void ResetVignetteHit()
+    {
+        vignetteOverlayAnimator.SetBool("hit", false);
     }
 
     public void AlterMaxHealthPoints(int alter) { healthPointsMax += alter; }
@@ -954,11 +968,13 @@ public class PlayerController : MonoBehaviour
             }
 
             if(spellCooldownTimer > 0) { spellCooldownTimer -= Time.deltaTime; } //count down timer
-            if(spellCooldownTimer <= 0) //when timer runs out, set tracker false
+            if(spellCooldownTimer <= 0 && !castable) //when timer runs out, set tracker false
             {
                 spellCooldownTimer = 0;
                 spellStartTime = 0;
                 castable = true;
+                curSpell = null;
+                AssignSpell(); //assign new spell
             }
         }
     }

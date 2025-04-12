@@ -297,6 +297,7 @@ public class AbstractSceneManager : MonoBehaviour
         AM = Instantiate(amPrefab, new Vector3(0, 0, 0), Quaternion.identity).GetComponent<AudioManager>();
         MG = this.gameObject.GetComponent<MapGeneration>();
         DG = this.gameObject.GetComponent<DungeonGeneration>();
+        Debug.Log("DG: " + DG);
         PG = this.gameObject.GetComponent<PathGeneration>();
         ADM = this.gameObject.GetComponent<AdaptiveDifficultyManager>();
         CGM = this.gameObject.GetComponent<ConsumableGenerationManager>();

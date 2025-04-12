@@ -97,7 +97,7 @@ public class MapGeneration : MonoBehaviour
 
 
 
-    private void Awake()
+    private void Start()
     {
         if (dbugEnabled) { UpdateHUDDbugText("Map Generation: Starting"); }
         //Debug.Log("MG Awake");
@@ -142,7 +142,7 @@ public class MapGeneration : MonoBehaviour
 
         //begin dungeon generation within bounds
         //if(genAttempts > 1) { ASM.RestartScene(); }
-        //Debug.Log("MG: " + DG);
+        Debug.Log("DG: " + DG);
         DG.BeginDungeonGeneration(treasureRoomsMax, treasureRoomsMin, specialRoomsMax, specialRoomsMin, boundsX, boundsZ, totalSpace, gridPositions);
     }
     private void DefineBounds()

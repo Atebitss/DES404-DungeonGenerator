@@ -636,8 +636,6 @@ public class SpellScript : MonoBehaviour
         //Debug.Log(this.transform.position);
         //Debug.Log("Spell Script destroy spell");
 
-        //if (PC.GetCurSpell() == this) { PC.SetSpellCooldownTimer(0f); }
-
         if (triggerObjects != null) { for (int point = 0; point < triggerObjects.Length; point++) { Destroy(triggerObjects[point]); } }
 
         Destroy(this.gameObject);

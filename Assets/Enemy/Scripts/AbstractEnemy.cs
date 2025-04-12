@@ -134,7 +134,7 @@ public abstract class AbstractEnemy : MonoBehaviour
     private void HealthCheck()
     {
         /*Debug.Log("health check: " + health);*/
-        if (boss) { BHDM.UpdateCurrentBossHealth(health); }
+        if (boss) { BHDM.UpdateCurrentBossHealth(health); } //~~~~~~   BHDM NOT FOUND   ~~~~~~//
 
         if (health <= 0)
         {
