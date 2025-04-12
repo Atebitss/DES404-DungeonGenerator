@@ -426,7 +426,7 @@ GameObject:
   - component: {fileID: 2262343023242419389}
   m_Layer: 7
   m_Name: bossBeserkEnemyPrefab
-  m_TagString: Enemy
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -578,7 +578,7 @@ GameObject:
   - component: {fileID: 3869931894462583156}
   m_Layer: 7
   m_Name: EnemyRenderer
-  m_TagString: Enemy
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

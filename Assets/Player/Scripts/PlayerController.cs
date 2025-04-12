@@ -30,6 +30,8 @@ public class PlayerController : MonoBehaviour
     private BossHealthDisplayManager BHDM; //boss health display manager
     private SpellDbugManager SDM; //spell debug display
 
+    private Camera mainCamera;
+
     [SerializeField] private bool active = false; //allows player input
     public void SetActive(bool newActive) 
     {
@@ -69,7 +71,7 @@ public class PlayerController : MonoBehaviour
         BHDM = this.gameObject.transform.parent.GetChild(1).GetComponent<BossHealthDisplayManager>();
         BHDM.DisableBossHealthDisplay();
 
-        AssignSpell();
+        //AssignSpell();
     }
 
     private void OnDestroy()
@@ -494,7 +496,7 @@ public class PlayerController : MonoBehaviour
 
                 //update sword swing animation
                 a.SetInteger("lightSwingCombo", lightAttackComboCounter);
-                PWCM.EnableAttackCheck(((lightAttackAnimLength) - 0.1f));
+                PWCM.EnableAttackCheck(((lightAttackAnimLength) - 0.1f), "light");
 
                 if (lightAttackComboCounter == 3)
                 {
@@ -541,7 +543,7 @@ public class PlayerController : MonoBehaviour
                 a.SetBool("attackingHeavy", true);
 
                 //Debug.Log("enable attack check");
-                PWCM.EnableAttackCheck((FindAnimationLength("swordHeavyAttackCleave") - 0.1f));
+                PWCM.EnableAttackCheck((FindAnimationLength("swordHeavyAttackCleave") - 0.1f), "heavy");
 
                 //Debug.Log("invoke reset heavy attack, " + (heavyAttackAnimLength - 0.1f));
                 Invoke("ResetHeavyAttackAnimBool", FindAnimationLength("swordHeavyAttackCleave"));
@@ -694,12 +696,6 @@ public class PlayerController : MonoBehaviour
     private SpellScript curSpell;
     public SpellScript GetCurSpell() { return curSpell; }
 
-    //spell aiming
-    private Camera mainCamera;
-    private Ray cameraToWorldRay;
-    public Ray GetCameraWorldRay() { return cameraToWorldRay; }
-
-
     //random spell assigned on awake
     private void AssignSpell()
     {
@@ -761,7 +757,7 @@ public class PlayerController : MonoBehaviour
 
             //testing
             shapeName = "Ball";
-            effectName = "Explode";
+            effectName = "Chain";
             elementName = "Fire";
             curSpell.UpdateSpellScriptShape(shapeName);
             curSpell.UpdateSpellScriptEffect(effectName);

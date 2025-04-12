@@ -64,7 +64,6 @@ public class AbstractSceneManager : MonoBehaviour
     {
         if (player == null)
         {
-
             //Debug.Log("Spawning player at: " + pos);
             if (MG != null) { if (dbugMode) { MG.UpdateHUDDbugText("Scene Manager: Spawning Player"); } }
             player = Instantiate(playerPrefab, pos, Quaternion.identity);
@@ -144,10 +143,10 @@ public class AbstractSceneManager : MonoBehaviour
     private void GenerateEnemy(GameObject curEnemy)
     {
         if (MG != null) { MG.UpdateHUDDbugText("Scene Manager: Generating Enemy"); }
-        Debug.Log("Generating enemy: " + curEnemy.name);
+        //Debug.Log("Generating enemy: " + curEnemy.name);
 
         AbstractEnemy curEnemyScript = curEnemy.transform.GetChild(0).GetComponent<AbstractEnemy>();
-        Debug.Log("curEnemyScript: " + curEnemyScript.name);
+        //Debug.Log("curEnemyScript: " + curEnemyScript.name);
         float healthModifier = 1.0f;
         float damageModifier = 1.0f;
         float speedModifier = 1.0f;
@@ -232,11 +231,10 @@ public class AbstractSceneManager : MonoBehaviour
 
         //wake enemy
         curEnemyScript.Wake();
-        Debug.Log("Enemy awake: " + curEnemyScript.name);
-        Debug.Log("MG: " + MG);
+        //Debug.Log("Enemy awake: " + curEnemyScript.name);
         if (MG != null)
         {
-            Debug.Log("MG.GetSingleGridSize(): " + MG.GetSingleGridSize());
+            //Debug.Log("MG.GetSingleGridSize(): " + MG.GetSingleGridSize());
             curEnemyScript.SetSeperationDistance(MG.GetSingleGridSize());
         }
     }
