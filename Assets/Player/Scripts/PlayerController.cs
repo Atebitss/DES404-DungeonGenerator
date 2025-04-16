@@ -30,7 +30,17 @@ public class PlayerController : MonoBehaviour
     private BossHealthDisplayManager BHDM; //boss health display manager
     private SpellDbugManager SDM; //spell debug display
 
+    [Header("-Minimap")]
+    [SerializeField] private GameObject MV;
+    private MinimapManager MM; //minimap manager
+
     private Camera mainCamera;
+
+    [Header("-Debug Displays")]
+    [SerializeField] private GameObject DbugDisplay;
+    [SerializeField] private GameObject ADDbugDisplay;
+    [SerializeField] private GameObject SpellDbugDisplay;
+    [SerializeField] private GameObject SVDisplay;
 
     [SerializeField] private bool active = false; //allows player input
     public void SetActive(bool newActive) 
@@ -40,7 +50,7 @@ public class PlayerController : MonoBehaviour
 
         if (!active)
         {
-            playerRigid.velocity = Vector3.zero;
+            playerRigid.linearVelocity = Vector3.zero;
             playerRigid.angularVelocity = Vector3.zero;
         }
     }
@@ -49,6 +59,7 @@ public class PlayerController : MonoBehaviour
 
     private void Awake()
     {
+        //set refrences
         ASM = GameObject.FindWithTag("SceneManager").GetComponent<AbstractSceneManager>();
         AM = ASM.GetAudioManager();
         ADM = ASM.GetComponent<AdaptiveDifficultyManager>();
@@ -56,21 +67,52 @@ public class PlayerController : MonoBehaviour
         ADDM = this.gameObject.transform.parent.GetChild(1).GetComponent<AdaptiveDifficultyDbugManager>();
         SVM = this.gameObject.transform.parent.GetChild(1).GetComponent<SkillVisualizationManager>();
         SDM = this.gameObject.transform.parent.GetChild(1).GetComponent<SpellDbugManager>();
+        MM = this.gameObject.transform.parent.GetChild(1).GetComponent<MinimapManager>();
 
-        PWCM.SetWeaponDamage(attackDamage);
-        if (ADM != null) { PWCM.SetADM(ADM); }
-        PWCM.SetAM(AM);
-        PWCM.SetHitParticle(PPS);
-        PWCM.SetHitSplash(hitSplashPrefab);
-        PWCM.SetPC(this);
-
+        //update camera reference
         if (mainCamera == null) { mainCamera = Camera.main; }
 
+        //update weapon collider references
+        PWCM.SetWeaponDamage(attackDamage); //update weapon collider base damage
+        if (ADM != null) { PWCM.SetADM(ADM); }
+        if (AM != null) { PWCM.SetAM(AM); }
+        if (PPS != null) { PWCM.SetHitParticle(PPS); }
+        if (hitSplashPrefab != null) { PWCM.SetHitSplash(hitSplashPrefab); }
+        PWCM.SetPC(this);
+
+        //display debug infos
+        if (ASM.GetDevMode())
+        {
+            DbugDisplay.SetActive(true);
+            ADDbugDisplay.SetActive(true);
+            SVDisplay.SetActive(true);
+            SpellDbugDisplay.SetActive(true);
+        }
+        else
+        {
+            DbugDisplay.SetActive(false);
+            ADDbugDisplay.SetActive(false);
+            SVDisplay.SetActive(false);
+            SpellDbugDisplay.SetActive(false);
+        }
+
+
+        //update health displays
         maxPlayerHealthBarWidth = playerHealthBarRect.sizeDelta.x;
         UpdatePlayerHealthBar();
         BHDM = this.gameObject.transform.parent.GetChild(1).GetComponent<BossHealthDisplayManager>();
         BHDM.DisableBossHealthDisplay();
 
+        //wake minimap
+        if (GameObject.Find("MinimapCamera") == null) 
+        {
+            //if there is no minimap camera, disable the minimap
+            MM.enabled = false;
+            MV.SetActive(false);
+        }
+        else { MM.Wake(ASM.GetMG().GetBoundsX(), ASM.GetMG().GetBoundsZ()); }
+
+        //begin spell
         AssignSpell();
     }
 
@@ -178,8 +220,6 @@ public class PlayerController : MonoBehaviour
         }
     }
     //~~~~~misc~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
 
 
 
@@ -315,15 +355,15 @@ public class PlayerController : MonoBehaviour
             {
                 //add velocity force in direction moving
                 playerVelocity = (((playerRigid.transform.right * movement.x) * (movementSpeed + tempMovementSpeed)) + ((playerRigid.transform.forward * movement.z) * (movementSpeed + tempMovementSpeed)));
-                playerRigid.AddForce(playerVelocity - playerRigid.velocity, ForceMode.VelocityChange);
+                playerRigid.AddForce(playerVelocity - playerRigid.linearVelocity, ForceMode.VelocityChange);
             }
             else if (dodging) //if player is dodging
             {
-                playerRigid.AddForce(dodgeVelocity - playerRigid.velocity, ForceMode.VelocityChange); //set immediate velocity to calced velocity
+                playerRigid.AddForce(dodgeVelocity - playerRigid.linearVelocity, ForceMode.VelocityChange); //set immediate velocity to calced velocity
 
                 if ((Time.time - dodgeStartTime) >= dodgeDuration) //if the player has been dodging for 1 second
                 {
-                    playerRigid.velocity = Vector3.zero; //reset velocity
+                    playerRigid.linearVelocity = Vector3.zero; //reset velocity
                                                          //for (int i = 0; i < dodgeLayerIDs.Length; i++) { Physics.IgnoreLayerCollision(gameObject.layer, dodgeLayerIDs[i], false); } //allow dodging through enemies
                                                          //Debug.Log("Dodge end");
                     dodging = false; //set tracker to false
@@ -394,7 +434,7 @@ public class PlayerController : MonoBehaviour
 
 
     //~~~~~attacking~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    [Header("-Attacking")]
+    [Header("-Melee")]
     private bool attacking = false; //tracker false to allow for first attack, updated in UpdatePlayerStates when attack cooldown timer is 0
     [SerializeField] private float attackCooldownTimer = 0f, attackStartTime = 0f; //used to reset attack timer in UpdatePlayerStates
 
@@ -460,7 +500,7 @@ public class PlayerController : MonoBehaviour
             //lightAttackAnimLength = FindAnimationLength("swordLightAttack30degrees");
             //Debug.Log("lightAttackAnimLength: " + lightAttackAnimLength);
 
-            if (ctx.performed && attackCooldownTimer <= 0 && !attacking)
+            if (ctx.performed && attackCooldownTimer <= 0 && !attacking && !interacting)
             {
                 //Debug.Log("light attack");
                 //Debug.Log("combo: " + lightAttackComboCounter);
@@ -523,7 +563,7 @@ public class PlayerController : MonoBehaviour
             //heavyAttackAnimLength = FindAnimationLength("swordHeavyAttackCleave");
             //Debug.Log("heavyAttackAnimLength: " + heavyAttackAnimLength);
 
-            if (ctx.performed && attackCooldownTimer <= 0 && !attacking)
+            if (ctx.performed && attackCooldownTimer <= 0 && !attacking && !interacting)
             {
                 //Debug.Log("heavy attack");
                 attackCooldownTimer = (heavyAttackCooldownMax / tempAttackCooldownModifier);
@@ -550,7 +590,11 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
-    private void ResetHeavyAttackAnimBool() { /*Debug.Log("reset heavy attack");*/ a.SetBool("attackingHeavy", false); }
+    private void ResetHeavyAttackAnimBool() 
+    {
+        /*Debug.Log("reset heavy attack");*/ 
+        a.SetBool("attackingHeavy", false); 
+    }
 
 
     private float FindAnimationLength(string clipName)
@@ -586,13 +630,13 @@ public class PlayerController : MonoBehaviour
             {
                 //Debug.Log("interact");
 
-                interacting = true;
                 RaycastHit hit;
-
                 if (Physics.Raycast(playerCamera.transform.position, (playerCamera.transform.forward * interactDistance), out hit, interactDistance, interactionMask))
                 {
                     //Debug.Log("interact hit " + hit.collider.name);
                     //Debug.Log("tag " + hit.collider.tag);
+                    interacting = true;
+
                     switch (hit.collider.tag)
                     {
                         case "Door":
@@ -673,7 +717,27 @@ public class PlayerController : MonoBehaviour
             Debug.DrawRay(playerCamera.transform.position, (playerCamera.transform.forward * interactDistance), Color.red, 1f);
             if (Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward, out hit, interactDistance, interactionMask))
             {
-                interactionPromptText.text = "'RB' to interact with " + hit.collider.tag;
+                string promptText = hit.collider.tag;
+                switch (hit.collider.tag)
+                {
+                    case "Door":
+                        promptText = "door";
+                        break;
+                    case "Portal":
+                        promptText = "exit portal";
+                        break;
+                    case "Consumable":
+                        //remove 'prefab' from name string
+                        string consumableName = hit.collider.name;
+                        consumableName = consumableName.Replace("Prefab", "");
+                        promptText = consumableName;
+                        break;
+                    default:
+                        promptText = "???";
+                        break;
+                }
+
+                interactionPromptText.text = "'RB' to interact with " + promptText;
             }
             else { interactionPromptText.text = ""; }
         }
@@ -685,23 +749,28 @@ public class PlayerController : MonoBehaviour
 
 
     //~~~~~magic~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    [Header("-Magic")]
     //components
-    private string effectName, elementName, shapeName;
+    [SerializeField] private string effectName;
+    [SerializeField] private string elementName;
+    [SerializeField] private string shapeName;
 
     //cooldown
-    private float spellCooldownTimer = 0f, spellCooldownMax = 1f, spellStartTime = 0f;
+    [SerializeField] private float spellCooldownTimer = 0f;
+    [SerializeField] private float spellCooldownMax = 5f;
+    private float spellStartTime = 0f;
     public void SetSpellCooldownTimer(float newCooldown) { spellCooldownTimer = newCooldown; }
-    private bool castable = true;
+    [SerializeField] private bool castable = true;
 
     //spell
     [SerializeField] private GameObject spellPrefab;
-    private SpellScript curSpell;
+    [SerializeField] private SpellScript curSpell;
     public SpellScript GetCurSpell() { return curSpell; }
 
     //random spell assigned on awake
     private void AssignSpell()
     {
-        Debug.Log("PlayerController, AssignSpell");
+        //Debug.Log("PlayerController, AssignSpell");
 
         if (castable && curSpell == null)
         {
@@ -718,7 +787,7 @@ public class PlayerController : MonoBehaviour
         if (curSpell != null)
         {
             //determine random spell shape, effect, and element
-            switch (Random.Range(0, 2))
+            switch (Random.Range(0, 1))
             {
                 case 0:
                     shapeName = "Ball";
@@ -758,9 +827,9 @@ public class PlayerController : MonoBehaviour
             }
 
             //testing
-            shapeName = "Ball";
-            effectName = "Explode";
-            elementName = "Fire";
+            //shapeName = "Ball";
+            //effectName = "Explode";
+            //elementName = "Fire";
 
             curSpell.UpdateSpellScriptShape(shapeName);
             curSpell.UpdateSpellScriptEffect(effectName);
@@ -773,23 +842,21 @@ public class PlayerController : MonoBehaviour
     {
         if (context.performed)
         {
-            Debug.Log("PlayerController, CastSpell");
+            //Debug.Log("PlayerController, CastSpell");
 
             if (castable) //if spell is castable
             {
-                Debug.Log("PlayerController, spell casted");
+                //Debug.Log("PlayerController, spell casted");
                 curSpell.CastSpell();
                 spellCooldownTimer = spellCooldownMax;
             }
             else
             {
-                Debug.Log("PlayerController, spell not casted");
+                //Debug.Log("PlayerController, spell not casted");
             }
         }
     }
     //~~~~~magic~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
 
 
 

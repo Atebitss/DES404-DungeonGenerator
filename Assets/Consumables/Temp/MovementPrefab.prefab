@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 6500805318716674800}
   - component: {fileID: 1463795913539119752}
   - component: {fileID: 8280954348900980324}
-  m_Layer: 3
+  m_Layer: 8
   m_Name: MovementPrefab
   m_TagString: Consumable
   m_Icon: {fileID: 0}
@@ -60,10 +60,13 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: ae54b6d16e6a0b845a9f969d682bfc67, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

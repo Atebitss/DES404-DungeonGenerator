@@ -7,7 +7,7 @@ public class EnemyControllerBoss : AbstractEnemy
     {
         //update basic stats
         boss = true;
-        SetBHDM(GetPC().gameObject.transform.parent.GetChild(1).GetComponent<BossHealthDisplayManager>());
+        SetBHDM(GetASM().GetPlayerObject().transform.GetChild(1).GetComponent<BossHealthDisplayManager>());
     }
 
     override public void UpdateBossStates() 

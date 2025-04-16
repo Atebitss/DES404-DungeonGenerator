@@ -47,7 +47,7 @@ public class ShapeBall : AbstractShape
     }
     public override void ApplyShape()
     {
-        Debug.Log("Ball shape applied");
+        //Debug.Log("Ball shape applied");
     }
 
     //runs when shape is added to spell
@@ -64,7 +64,7 @@ public class ShapeBall : AbstractShape
             Ray cameraToWorld = mainCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
             if (Physics.Raycast(cameraToWorld, out RaycastHit hit, SS.GetMaxLength()))
             {
-                Debug.Log("hit: " + hit.collider.gameObject);
+                //Debug.Log("hit: " + hit.collider.gameObject);
                 aimPos = hit.point;
                 pathPoints[pathPoints.Length - 1] = aimPos;
             }

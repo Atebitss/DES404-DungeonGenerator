@@ -57,31 +57,39 @@ public class PlayerWeaponColliderManager : MonoBehaviour
 
     private IEnumerator OverlapCheck()
     {
-        yield return new WaitForSeconds(0.1f); //wait for 0.1 seconds
-
-        //check for already overlapping enemy colliders
-        BoxCollider weaponAttackCollider = GetComponent<BoxCollider>();
-        //Debug.Log("weaponAttackCollider: " + weaponAttackCollider);
-        Collider[] hitColliders = Physics.OverlapBox
-        (
-            weaponAttackCollider.transform.position,
-            weaponAttackCollider.transform.localScale / 2,
-            weaponAttackCollider.transform.rotation,
-            LayerMask.GetMask("Enemy")
-        );
-
-        for (int hitIndex = 0; hitIndex < hitColliders.Length; hitIndex++)
+        if (attacking)
         {
-            //Debug.Log(hitIndex + ": " + hitColliders[hitIndex].gameObject.name);
-            if (hitColliders[hitIndex].gameObject.tag == "Enemy")
-            {
-                Debug.Log("enemy found in overlap: " + hitColliders[hitIndex].gameObject.transform.parent.name);
-                //process enemies found in overlap
-                ProcessEnemy(hitColliders[hitIndex].gameObject);
-            }
-        }
+            yield return new WaitForSeconds(0.1f); //wait for 0.1 seconds
 
-        StartCoroutine(OverlapCheck()); //start overlap check coroutine
+            //check for already overlapping enemy colliders
+            BoxCollider weaponAttackCollider = GetComponent<BoxCollider>();
+            //Debug.Log("weaponAttackCollider: " + weaponAttackCollider);
+            Collider[] hitColliders = Physics.OverlapBox
+            (
+                weaponAttackCollider.transform.position,
+                weaponAttackCollider.transform.localScale / 2,
+                weaponAttackCollider.transform.rotation,
+                LayerMask.GetMask("Enemy")
+            );
+
+            for (int hitIndex = 0; hitIndex < hitColliders.Length; hitIndex++)
+            {
+                //Debug.Log(hitIndex + ": " + hitColliders[hitIndex].gameObject.name);
+                if (hitColliders[hitIndex].gameObject.tag == "Enemy")
+                {
+                    Debug.Log("enemy found in overlap: " + hitColliders[hitIndex].gameObject.transform.parent.name);
+                    //process enemies found in overlap
+                    ProcessEnemy(hitColliders[hitIndex].gameObject);
+                }
+            }
+
+            StartCoroutine(OverlapCheck()); //start overlap check coroutine
+        }
+        else
+        {
+            //Debug.Log("overlap check stopped");
+            yield break; //stop coroutine
+        }
     }
     private void OnTriggerEnter(Collider col)
     {
@@ -94,28 +102,31 @@ public class PlayerWeaponColliderManager : MonoBehaviour
     }
     private void OnTriggerExit(Collider exitCol)
     {
-        //remove enemy from array
-        for (int enemyIndex = 0; enemyIndex < foundEnemies.Length; enemyIndex++)
+        if (attacking && exitCol.gameObject.tag == "Enemy")
         {
-            if (foundEnemies[enemyIndex] == exitCol.gameObject)
+            //remove enemy from array
+            for (int enemyIndex = 0; enemyIndex < foundEnemies.Length; enemyIndex++)
             {
-                //remove enemy from tracked enemies array
-                GameObject[] newFoundEnemies = new GameObject[foundEnemies.Length - 1];
-                for (int newIndex = 0; newIndex < enemyIndex; newIndex++) { newFoundEnemies[newIndex] = foundEnemies[newIndex]; }
-                for (int newIndex = enemyIndex; newIndex < newFoundEnemies.Length; newIndex++) { newFoundEnemies[newIndex] = foundEnemies[newIndex + 1]; }
-                foundEnemies = newFoundEnemies;
+                if (foundEnemies[enemyIndex] == exitCol.gameObject)
+                {
+                    //remove enemy from tracked enemies array
+                    GameObject[] newFoundEnemies = new GameObject[foundEnemies.Length - 1];
+                    for (int newIndex = 0; newIndex < enemyIndex; newIndex++) { newFoundEnemies[newIndex] = foundEnemies[newIndex]; }
+                    for (int newIndex = enemyIndex; newIndex < newFoundEnemies.Length; newIndex++) { newFoundEnemies[newIndex] = foundEnemies[newIndex + 1]; }
+                    foundEnemies = newFoundEnemies;
+                }
             }
-        }
 
-        for(int enemyIndex = 0; enemyIndex < ignoredTrackedEnemies.Length; enemyIndex++)
-        {
-            if (ignoredTrackedEnemies[enemyIndex] == exitCol.gameObject)
+            for (int enemyIndex = 0; enemyIndex < ignoredTrackedEnemies.Length; enemyIndex++)
             {
-                //remove enemy from ignored tracked enemies array
-                GameObject[] newIgnoredTrackedEnemies = new GameObject[ignoredTrackedEnemies.Length - 1];
-                for (int newIndex = 0; newIndex < enemyIndex; newIndex++) { newIgnoredTrackedEnemies[newIndex] = ignoredTrackedEnemies[newIndex]; }
-                for (int newIndex = enemyIndex; newIndex < newIgnoredTrackedEnemies.Length; newIndex++) { newIgnoredTrackedEnemies[newIndex] = ignoredTrackedEnemies[newIndex + 1]; }
-                ignoredTrackedEnemies = newIgnoredTrackedEnemies;
+                if (ignoredTrackedEnemies[enemyIndex] == exitCol.gameObject)
+                {
+                    //remove enemy from ignored tracked enemies array
+                    GameObject[] newIgnoredTrackedEnemies = new GameObject[ignoredTrackedEnemies.Length - 1];
+                    for (int newIndex = 0; newIndex < enemyIndex; newIndex++) { newIgnoredTrackedEnemies[newIndex] = ignoredTrackedEnemies[newIndex]; }
+                    for (int newIndex = enemyIndex; newIndex < newIgnoredTrackedEnemies.Length; newIndex++) { newIgnoredTrackedEnemies[newIndex] = ignoredTrackedEnemies[newIndex + 1]; }
+                    ignoredTrackedEnemies = newIgnoredTrackedEnemies;
+                }
             }
         }
     }
@@ -132,7 +143,7 @@ public class PlayerWeaponColliderManager : MonoBehaviour
 
     private void ProcessEnemy(GameObject curEnemy)
     {
-        Debug.Log("processing enemy: " + curEnemy.transform.parent.name);
+        //Debug.Log("processing enemy: " + curEnemy.transform.parent.name);
 
         //add enemy to array
         GameObject[] newFoundEnemies = new GameObject[foundEnemies.Length + 1];
@@ -163,7 +174,7 @@ public class PlayerWeaponColliderManager : MonoBehaviour
                 }
             }
 
-            Debug.Log("closest enemy: " + foundEnemies[closestEnemyID].transform.parent.name);
+            //Debug.Log("closest enemy: " + foundEnemies[closestEnemyID].transform.parent.name);
             //if closest enemy is not null
             if (closestEnemyID != -1)
             {
@@ -190,14 +201,14 @@ public class PlayerWeaponColliderManager : MonoBehaviour
                     //if enemy is not the closest enemy
                     if (hitColliders[hitIndex].gameObject != foundEnemies[closestEnemyID] && hitColliders[hitIndex].gameObject.tag == "Enemy")
                     {
-                        Debug.Log("enemy found behind closest enemy: " + hitColliders[hitIndex].transform.parent.gameObject.name);
+                        //Debug.Log("enemy found behind closest enemy: " + hitColliders[hitIndex].transform.parent.gameObject.name);
                         //if the enemy is already in the ignore array, skip
                         for (int enemyIndex = 0; enemyIndex < ignoredTrackedEnemies.Length; enemyIndex++)
                         {
                             if (hitColliders[hitIndex].gameObject == ignoredTrackedEnemies[enemyIndex]) { Debug.Log("enemy already ignored"); return; }
                         }
 
-                        Debug.Log("enemy added to ignored tracked enemies");
+                        //Debug.Log("enemy added to ignored tracked enemies");
                         //add enemy to ignored tracked enemies
                         GameObject[] newIgnoredTrackedEnemies = new GameObject[ignoredTrackedEnemies.Length + 1];
                         for (int enemyIndex = 0; enemyIndex < ignoredTrackedEnemies.Length; enemyIndex++) { newIgnoredTrackedEnemies[enemyIndex] = ignoredTrackedEnemies[enemyIndex]; }
@@ -238,16 +249,16 @@ public class PlayerWeaponColliderManager : MonoBehaviour
     //damage found enemies
     private void DamageEnemy(GameObject enemy)
     {
-        Debug.Log("attempting to damage " + enemy.transform.parent.name);
+        //Debug.Log("attempting to damage " + enemy.transform.parent.name);
         attackDamage = (PC.GetAttackDamage() + PC.GetAttackDamageModifier()); //get attack damage from player controller
 
         //if enemy is ignored array, skip
         for (int enemyIndex = 0; enemyIndex < ignoredTrackedEnemies.Length; enemyIndex++)
         {
-            if (ignoredTrackedEnemies[enemyIndex] == enemy) { Debug.Log("enemy is ignored"); return; }
+            if (ignoredTrackedEnemies[enemyIndex] == enemy) { /*Debug.Log("enemy is ignored");*/ return; }
         }
 
-        Debug.Log("adding enemy to ignore list");
+        //Debug.Log("adding enemy to ignore list");
         //add enemy to ignored tracked enemies so they cant be hit again
         GameObject[] newIgnoredTrackedEnemies = new GameObject[ignoredTrackedEnemies.Length + 1];
         for (int enemyIndex = 0; enemyIndex < ignoredTrackedEnemies.Length; enemyIndex++) { newIgnoredTrackedEnemies[enemyIndex] = ignoredTrackedEnemies[enemyIndex]; }
@@ -255,7 +266,7 @@ public class PlayerWeaponColliderManager : MonoBehaviour
         ignoredTrackedEnemies = newIgnoredTrackedEnemies;
 
 
-        Debug.Log("damaging enemy");
+        //Debug.Log("damaging enemy");
         //damage enemy
         Vector3 collisionPoint = enemy.GetComponent<Collider>().ClosestPoint(transform.position); //find collision point
         enemy.GetComponent<AbstractEnemy>().MoveEPS(collisionPoint); //move hit particle system to collision point

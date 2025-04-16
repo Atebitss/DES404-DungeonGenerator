@@ -54,16 +54,17 @@ public class ConsumableGenerationManager : MonoBehaviour
     private GameObject[] curConsumables = new GameObject[0];
     public void OnEnemyDeath(Vector3 pos)
     {
-        Debug.Log("Consumable Generation, OnEnemyDeath");
+        //Debug.Log("Consumable Generation, OnEnemyDeath");
         int randomChance = Random.Range(0, 100); //roll generation chance
         if (randomChance < spawnChance) //if consumable should spawn
         {
             //determine which consumable to spawn
             int randomIndex = Random.Range(0, consumableTempPrefabs.Length);
+            Vector3 spawnPos = new Vector3(pos.x, 0.5f, pos.z); //spawn at enemy position
             GameObject consumable = Instantiate(consumableTempPrefabs[randomIndex], pos, Quaternion.identity);
             consumable.transform.SetParent(parentObject.transform);
             consumable.name = consumable.name.Replace("Prefab", "");
-            Debug.Log("spawning consumable: " + consumable.name);
+            //Debug.Log("spawning consumable: " + consumable.name);
 
             //increase curConsumables array size
             GameObject[] tempConsumables = new GameObject[curConsumables.Length + 1];

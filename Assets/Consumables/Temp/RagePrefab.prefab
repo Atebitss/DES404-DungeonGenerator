@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 2652563337540986321}
   - component: {fileID: 1438713611534274144}
   - component: {fileID: 2813156410381122134}
-  m_Layer: 3
+  m_Layer: 8
   m_Name: RagePrefab
   m_TagString: Consumable
   m_Icon: {fileID: 0}
@@ -60,10 +60,13 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: ac548c1b5a6154e4b9523f9898b650bd, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

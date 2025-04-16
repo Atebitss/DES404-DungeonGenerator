@@ -164,6 +164,7 @@ public class RoomGeneration : MonoBehaviour
         GenerateFloor();
         GenerateDoorways();
         GenerateWalls();
+        SetMinimapIcon();
 
         if (dbugEnabled)
         {
@@ -596,7 +597,7 @@ public class RoomGeneration : MonoBehaviour
 
     //enemy info
     [SerializeField] private bool bossRoom = false;
-    [SerializeField] private int enemyMin = 4, enemyMax = 7;
+    [SerializeField] private int enemyMin = 5, enemyMax = 10;
     public void SetEnemyMin(int min) { enemyMin = min; }
     public void SetEnemyMax(int max) { enemyMax = max; }
 
@@ -620,14 +621,48 @@ public class RoomGeneration : MonoBehaviour
     private void GenerateEnemies()
     {
         //start combat
+        switch (roomDifficulty)
+        {
+            case -1:
+                enemyMin = 2;
+                enemyMax = 6;
+                break;
+            case 0:
+                enemyMin = 3;
+                enemyMax = 8;
+                break;
+            case 1:
+                enemyMin = 5;
+                enemyMax = 10;
+                break;
+            case 2:
+                enemyMin = 10;
+                enemyMax = 15;
+                break;
+            case 3:
+                enemyMin = 15;
+                enemyMax = 20;
+                break;
+            case 4:
+                enemyMin = 20;
+                enemyMax = 25;
+                break;
+            case 5:
+                enemyMin = 25;
+                enemyMax = 30;
+                break;
+        }
         int enemyCount = Random.Range(enemyMin, enemyMax);
         if (dbugEnabled) { MG.UpdateHUDDbugText("Room Generation: Generating " + enemyCount + " Enemies"); }
+
         Vector3[] enemyPositions = new Vector3[0];
         GameObject[] enemyTypes = new GameObject[0];
+        float checkDistance = (tileXOffset * 2.5f);
+        //Debug.Log("checkDistance: " + tileXOffset);
         //Debug.Log("enemyCount: " + enemyCount);
 
         //for each enemy to be spawned
-        for(int currentEnemyIndex = 0; currentEnemyIndex < enemyCount; currentEnemyIndex++)
+        for (int currentEnemyIndex = 0; currentEnemyIndex < enemyCount; currentEnemyIndex++)
         {
             //Debug.Log("curEnemyIndex: " + currentEnemyIndex);
             int attempts = 0, maxAttempts = 3;
@@ -637,11 +672,11 @@ public class RoomGeneration : MonoBehaviour
                 //find random position within room
                 Vector3 spawnPos = new Vector3((Random.Range(0, roomBoundsX) + literalPosition.x), 0.5f, (Random.Range(0, roomBoundsZ) + literalPosition.z));
 
-                float checkDistance = (tileXOffset * 5);
 
                 //find if distance between generated position and player is less than checkDistance
                 Vector3 playerPos = ASM.GetPlayerPosition(); //get current player position from abstract scene manager (run every attempt incase player moves)
                 bool playerNearBy = Vector3.Distance(spawnPos, playerPos) < checkDistance; //check if distance between spawn pos & player pos is less than check distance (if false, no player near; if true, player near)
+                //Debug.Log("spawnPos: " + spawnPos + ", playerPos: " + playerPos + ", distance: " + Vector3.Distance(spawnPos, playerPos) + ", checkDistance: " + checkDistance);
 
                 //check radius around position for walls & other enemies
                 bool wallInRadius = false, enemyInRadius = false;
@@ -652,24 +687,27 @@ public class RoomGeneration : MonoBehaviour
                     {
                         //if its a wall, set bool to true
                         wallInRadius = true;
+                        //Debug.Log("spawnPos: " + spawnPos + ", wallPos: " + hitColliders[colliderIndex].gameObject.transform.position + ", distance: " + Vector3.Distance(spawnPos, hitColliders[colliderIndex].gameObject.transform.position) + ", checkDistance: " + checkDistance);
                         break;
                     }
                     else if(hitColliders[colliderIndex].gameObject.CompareTag("Enemy"))
                     {
                         //if its an enemy, set bool to true
                         enemyInRadius = true;
+                        //Debug.Log("spawnPos: " + spawnPos + ", enemyPos: " + hitColliders[colliderIndex].gameObject.transform.position + ", distance: " + Vector3.Distance(spawnPos, hitColliders[colliderIndex].gameObject.transform.position) + ", checkDistance: " + checkDistance);
                         break;
                     }
                 }
 
                 //if player is not near by, enemy is not in radius, and there are no walls in radius, spawn enemy
-                if(!playerNearBy && !enemyInRadius && !wallInRadius)
+                if (!playerNearBy && !enemyInRadius && !wallInRadius)
                 {
                     //expand enemy positions array and add new pos
                     Vector3[] tempEnemyPositions = new Vector3[enemyPositions.Length + 1]; //new increased array
                     for (int enemyIndex = 0; enemyIndex < enemyPositions.Length; enemyIndex++) { tempEnemyPositions[enemyIndex] = enemyPositions[enemyIndex]; } //copy old content
                     tempEnemyPositions[(tempEnemyPositions.Length - 1)] = spawnPos; //add new data to last position
                     enemyPositions = tempEnemyPositions; //update old array with new array
+                    //Debug.Log("valid spawnPos: " + spawnPos);
 
                     //expand enemy types array and add new type
                     GameObject[] tempEnemyTypes = new GameObject[enemyTypes.Length + 1]; //new increased array
@@ -720,6 +758,33 @@ public class RoomGeneration : MonoBehaviour
         if (enemyPositions.Length > 0){ ASM.SpawnEnemies(enemyTypes, enemyPositions); }
     }
     //~~~~~enemies~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+    //~~~~~minimap~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    [SerializeField] private GameObject roomIconPrefab;
+    private GameObject roomMinimapIcon;
+
+    private void SetMinimapIcon()
+    {
+        Debug.Log("roomType: " + roomType);
+        if (roomType.Contains("Entry") || roomType.Contains("Treasure") || roomType.Contains("Special") || roomType.Contains("Boss"))
+        {
+            Debug.Log("creating minimap icon");
+
+            string iconType = "";
+            if (roomType.Contains("Treasure")) { iconType = "Treasure"; }
+            else if (roomType.Contains("Special")) { iconType = "Special"; }
+            else if (roomType.Contains("Entry")) { iconType = "Entry"; }
+            else if (roomType.Contains("Boss")) { iconType = "Boss"; }
+
+            roomMinimapIcon = Instantiate(roomIconPrefab, new Vector3((literalPosition.x + (roomBoundsX / 2)), (literalPosition.y + 5f), (literalPosition.z + (roomBoundsZ / 2))), Quaternion.identity);
+            roomMinimapIcon.name = iconType + "MinimapIcon";
+            roomMinimapIcon.transform.parent = this.transform;
+            roomMinimapIcon.GetComponent<MinimapIconManager>().Wake(iconType);
+        }
+    }
+    //~~~~~minimap~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 

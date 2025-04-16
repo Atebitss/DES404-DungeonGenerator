@@ -602,7 +602,7 @@ public class SpellScript : MonoBehaviour
             {
                 if (targets[targetNum] != null)
                 {
-                    int randDamage = Random.Range(0, (5 * spellPower));
+                    int randDamage = Random.Range(0, 2);
 
                     damageDealt = Mathf.RoundToInt(damageCalc);
                     damageDealt += randDamage;

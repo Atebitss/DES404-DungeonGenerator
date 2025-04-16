@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 7363599180066778996}
   - component: {fileID: 1488355408845076540}
   - component: {fileID: 5331935476695607819}
-  m_Layer: 3
+  m_Layer: 8
   m_Name: ToughnessPrefab
   m_TagString: Consumable
   m_Icon: {fileID: 0}
@@ -60,10 +60,13 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: f3986009d33a5ca41893a77b185c2cd3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

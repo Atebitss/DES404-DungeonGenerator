@@ -12,6 +12,7 @@ public abstract class AbstractEnemy : MonoBehaviour
     [SerializeField] private Animator a; //player animator used for running animations
 
     private AbstractSceneManager ASM;
+    public AbstractSceneManager GetASM() { return ASM; }
     private AdaptiveDifficultyManager ADM;
     private AudioManager AM;
     private PlayerController PC;
@@ -134,7 +135,7 @@ public abstract class AbstractEnemy : MonoBehaviour
     private void HealthCheck()
     {
         /*Debug.Log("health check: " + health);*/
-        if (boss) { BHDM.UpdateCurrentBossHealth(health); } //~~~~~~   BHDM NOT FOUND   ~~~~~~//
+        if (boss) { BHDM.UpdateCurrentBossHealth(health); }
 
         if (health <= 0)
         {
@@ -281,13 +282,13 @@ public abstract class AbstractEnemy : MonoBehaviour
                     Vector3 seperationForce = CalculateSeperationForce();
                     Vector3 newMovement = (directionToPlayer + seperationForce).normalized * movementSpeed;
 
-                    enemyRigid.velocity = new Vector3(newMovement.x, enemyRigid.velocity.y, newMovement.z);
+                    enemyRigid.linearVelocity = new Vector3(newMovement.x, enemyRigid.linearVelocity.y, newMovement.z);
                 }
                 else if (distToPlayer <= attackDistance)
                 {
                     Vector3 seperationForce = CalculateSeperationForce();
-                    Vector3 newMovement = new Vector3((seperationForce.x * movementSpeed), enemyRigid.velocity.y, (seperationForce.z * movementSpeed));
-                    enemyRigid.velocity = newMovement;
+                    Vector3 newMovement = new Vector3((seperationForce.x * movementSpeed), enemyRigid.linearVelocity.y, (seperationForce.z * movementSpeed));
+                    enemyRigid.linearVelocity = newMovement;
                     BeginAttack();
                 }
             }
@@ -301,7 +302,7 @@ public abstract class AbstractEnemy : MonoBehaviour
                 Vector3 seperationForce = CalculateSeperationForce();
                 Vector3 newMovement = (transform.forward + seperationForce).normalized * movementSpeed;
 
-                enemyRigid.velocity = new Vector3(newMovement.x, enemyRigid.velocity.y, newMovement.z);
+                enemyRigid.linearVelocity = new Vector3(newMovement.x, enemyRigid.linearVelocity.y, newMovement.z);
             }
         }
     }
@@ -342,7 +343,7 @@ public abstract class AbstractEnemy : MonoBehaviour
     {
         dodging = true;
         Vector3 dodgeVelocity = ((-enemyRigid.transform.forward * dodgeForce).normalized * (dodgeForce / dodgeTime));
-        enemyRigid.AddForce(dodgeVelocity - enemyRigid.velocity, ForceMode.VelocityChange); //set immediate velocity to calced velocity
+        enemyRigid.AddForce(dodgeVelocity - enemyRigid.linearVelocity, ForceMode.VelocityChange); //set immediate velocity to calced velocity
         Invoke("StopDodge", dodgeTime);
     }
     private void StopDodge() { dodging = false; }
@@ -386,4 +387,18 @@ public abstract class AbstractEnemy : MonoBehaviour
     public void ResetMaterial() { enemyRenderer.material = baseMaterial; }
     public void SetMaterial(Material newMaterial) { enemyRenderer.material = newMaterial; }
     //~~~~~visual feedback~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+    //~~~~~debug~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireSphere(transform.position, seperationDistance);
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, attackDistance);
+        Gizmos.color = Color.blue;
+        Gizmos.DrawWireSphere(transform.position, 2.5f);
+    }
+    //~~~~~debug~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 }

@@ -232,11 +232,6 @@ public class AbstractSceneManager : MonoBehaviour
         //wake enemy
         curEnemyScript.Wake();
         //Debug.Log("Enemy awake: " + curEnemyScript.name);
-        if (MG != null)
-        {
-            //Debug.Log("MG.GetSingleGridSize(): " + MG.GetSingleGridSize());
-            curEnemyScript.SetSeperationDistance(MG.GetSingleGridSize());
-        }
     }
 
     public void DestroyEnemyObjects()
@@ -297,7 +292,6 @@ public class AbstractSceneManager : MonoBehaviour
         AM = Instantiate(amPrefab, new Vector3(0, 0, 0), Quaternion.identity).GetComponent<AudioManager>();
         MG = this.gameObject.GetComponent<MapGeneration>();
         DG = this.gameObject.GetComponent<DungeonGeneration>();
-        Debug.Log("DG: " + DG);
         PG = this.gameObject.GetComponent<PathGeneration>();
         ADM = this.gameObject.GetComponent<AdaptiveDifficultyManager>();
         CGM = this.gameObject.GetComponent<ConsumableGenerationManager>();
@@ -316,7 +310,7 @@ public class AbstractSceneManager : MonoBehaviour
         //Debug.Log("Floor complete");
         //would contain scene change to post level
         //and update dungeon stats
-        player.transform.GetChild(0).GetComponent<PlayerController>().SetActive(false); //disable player input
+        PC.SetActive(false); //disable player input
         NewFloor(); //generate new floor
     }
     private void NewFloor()

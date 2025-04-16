@@ -36,10 +36,17 @@ public class DungeonGeneration : MonoBehaviour
 
     //room identification
     private int bossRoomID, entryRoomID; //important room ids
+    public int GetBossRoomID() { return bossRoomID; }
+    public int GetEntryRoomID() { return entryRoomID; }
+
     private int[] treasureRoomIDs, specialRoomIDs; //unique room ids
+    public int[] GetTreasureRoomIDs() { return treasureRoomIDs; }
+    public int[] GetSpecialRoomIDs() { return specialRoomIDs; }
+
     private int numOfTreasureRooms, numOfSpecialRooms; //number of unique rooms
     Vector2 boundsCenter, bossRoomCenter, entryRoomCenter, mapCenter; //unique centers
     Vector2[] roomCenters, treasureRoomCenters, specialRoomCenters; //common centers
+    public Vector2 GetRoomCenter(int index) { return roomCenters[index]; } //get room center position
     private Vector2[] roomPositions; //bottom left corners of rooms literal positions
 
     //room info
@@ -858,7 +865,7 @@ public class DungeonGeneration : MonoBehaviour
                 if (x == roomPosX[roomID] || x == roomPosX[roomID] + roomBoundsX[roomID] - 1)
                 {
                     //if x is on far end of room x, set to corner
-                    MG.UpdateGridState(newX, newZ, "WallCorner");
+                    MG.UpdateGridState(newX, newZ, "WallCorner"); //~~~~~   BUG HERE OUT OF BOUNDS   ~~~~~//
                     if (dbugEnabled)
                     {
                         MG.UpdateDbugTileTextGridState(newX, newZ, "WallCorner");
@@ -970,29 +977,26 @@ public class DungeonGeneration : MonoBehaviour
         if (scale == 2)
         {
             //for each large room, connect it to each other large room to create primary hallways
-            for (int roomID = 0; roomID < curRoomsSpawned - 1; roomID++)
+            for (int roomID = 0; roomID < curRoomsSpawned; roomID++)
             {
                 //if (dbugEnabled) { MG.UpdateHUDDbugText("cur:" + roomID); }
-
-                for (int targetRoomID = roomID + 1; targetRoomID < curRoomsSpawned; targetRoomID++) //for each other room
+                //if the current room and next room are different IDs
+                if (roomID != 0)
                 {
-                    //if the current room and next room are different IDs
-                    if (roomID != targetRoomID)
-                    {
-                        //yield return WaitForSeconds(.1f);
-                        if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Connecting Large Room " + roomID + " & Room " + (roomID + 1)); }
-                        Vector2 startPos = roomCenters[roomID];
-                        Vector2 targetPos = roomCenters[targetRoomID];
+                    //yield return WaitForSeconds(.1f);
+                    if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Connecting Large Room " + 0 + " & Room " + (roomID + 1)); }
+                    Vector2 startPos = roomCenters[0];
+                    Vector2 targetPos = roomCenters[roomID];
 
-                        Debug.Log("room " + roomID + " / " + (curRoomsSpawned));
-                        Debug.Log("hallway from room " + roomID + " to room " + targetRoomID);
+                    Debug.Log("room " + roomID + " / " + (curRoomsSpawned));
+                    Debug.Log("hallway from room " + 0 + " to room " + roomID);
 
-                        //start room to room path generation
-                        yield return StartCoroutine(PG.BeginPathGeneration(startPos, targetPos, boundsX, boundsZ, scale));
-                        if (visualDemo) { yield return new WaitForSeconds(.1f); }
-                        else { yield return null; }
-                    }
+                    //start room to room path generation
+                    yield return StartCoroutine(PG.BeginPathGeneration(startPos, targetPos, boundsX, boundsZ, scale));
+                    if (visualDemo) { yield return new WaitForSeconds(.1f); }
+                    else { yield return null; }
                 }
+                
             }
         }
         else if (scale == 1)

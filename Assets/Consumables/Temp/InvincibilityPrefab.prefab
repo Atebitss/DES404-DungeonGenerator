@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 1408805454874064331}
   - component: {fileID: 4086026893487145997}
   - component: {fileID: 1908179825437775582}
-  m_Layer: 3
+  m_Layer: 8
   m_Name: InvincibilityPrefab
   m_TagString: Consumable
   m_Icon: {fileID: 0}
@@ -60,10 +60,13 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 2d35541ff53300b4390f69bf78144f17, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

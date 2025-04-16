@@ -7,14 +7,21 @@ using TMPro;
 
 public class MapGeneration : MonoBehaviour
 {
+    //~~~~~misc~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //relevant scripts
     private AbstractSceneManager ASM;
     private DungeonGeneration DG;
     private PathGeneration PG;
 
+    //camera
+    [SerializeField] private Camera defaultCamera;
+    //~~~~~misc~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+    //~~~~~generation~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //map generation data
     [Header("Generation Data")]
-    private int genAttempts = 0;
     [SerializeField] [Range(10, 250)] private int mapBoundsMax = 50;
     [SerializeField] [Range(10, 250)] private int mapBoundsMin = 50;
     [SerializeField] [Range(0, 5)] private int treasureRoomsMax = 3;
@@ -22,46 +29,31 @@ public class MapGeneration : MonoBehaviour
     [SerializeField] [Range(0, 5)] private int specialRoomsMax = 3;
     [SerializeField] [Range(0, 5)] private int specialRoomsMin = 3;
 
-    //debug info
-    [Header("Debug Settings")]
-    private bool dbugEnabled = false;
-    private bool visualDemo = false;
-
-
-    [Header("Debug Materials")]
-    [SerializeField] private Camera defaultCamera;
-    [SerializeField] private Material baseDbugMat;
-    [SerializeField] private Material matDbugEmpty, matDbugRoom, matDbugWall, matDbugHallway, matDbugDoorway;
-    [SerializeField] private Material matDbugRoomBoss, matDbugRoomEntry, matDbugRoomTreasure, matDbugRoomSpecial;
-
-    [Header("Debug Objects")]
-    [SerializeField] private GameObject testTile, HUDDbugText;
-    private GameObject[,] gridDbug; //grid squares [x bounds, z bounds] (ie. 0,0 = tile 1   25,25 = tile 625)
-    private TMP_Text[,] gridDbugText;
-    private GameObject dbugParent;
-    private Renderer[,] gridDbugRenderer;
-    private float singleGridSize; //size of a single grid square (x or z) + 0.1f (for spacing)
-    public float GetSingleGridSize() { return singleGridSize; } //get size of a single grid square (x or z) + 0.1f (for spacing)
-
     //map creation
+    private int genAttempts = 0;
     private int boundsX, boundsZ; //map width & length
+    public int GetBoundsX() { return boundsX; } //get map width
+    public int GetBoundsZ() { return boundsZ; } //get map length
     private int totalSpace; //map area
     public int GetTotalSpace() { return totalSpace; }
+    //~~~~~generation~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+
+
+    //~~~~~grid~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //map grid
     private Vector2[,] gridPositions; //literal positions
     public Vector2 GetGridPosition(int posX, int posZ) { return gridPositions[posX, posZ]; }
     private string[,] gridStates; //what fills the grid square, if anything
     public void UpdateGridState(int posX, int posZ, string gridState) //update tile state
     {
-        Debug.Log("Map Generation: UpdateGridState");
-        Debug.Log("pos: " + posX + ", " + posZ);
-        Debug.Log((posX * posZ) + " / " + gridStates.Length);
-        Debug.Log("gridStates[x,z]: " + gridStates[posX, posZ]);
+        //Debug.Log("Map Generation: UpdateGridState");
+        //Debug.Log("pos: " + posX + ", " + posZ);
+        //Debug.Log((posX * posZ) + " / " + gridStates.Length);
+        //Debug.Log("gridStates[x,z]: " + gridStates[posX, posZ]);
         gridStates[posX, posZ] = gridState;
     }
     public string GetGridState(int posX, int posZ) { /*Debug.Log(gridStates[posX, posZ]);*/ return gridStates[posX, posZ]; }
-
 
 
     public void ResetMap()
@@ -94,9 +86,11 @@ public class MapGeneration : MonoBehaviour
             }
         }
     }
+    //~~~~~grid~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 
+    //~~~~~start~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     private void Start()
     {
         if (dbugEnabled) { UpdateHUDDbugText("Map Generation: Starting"); }
@@ -115,14 +109,18 @@ public class MapGeneration : MonoBehaviour
         if (dbugEnabled) { dbugTextObj.SetActive(true); }
         else if (!dbugEnabled) { dbugTextObj.SetActive(false); }
     }
-    
+    //~~~~~start~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+    //~~~~~generation~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     public void RegenerateDungeon()
     {
         if (dbugEnabled) { UpdateHUDDbugText("Map Generation: Regenerating"); }
         //Debug.Log("MG, Regenerating Dungeon");
 
         //prime & begin generation
-        BeginMapGeneration(); 
+        BeginMapGeneration();
     }
 
     private void BeginMapGeneration()
@@ -206,11 +204,33 @@ public class MapGeneration : MonoBehaviour
         //Debug.Log("ID: " + (pos.x * boundsZ + pos.y + 1));
         return ((int)pos.x * boundsZ + (int)pos.y) + 1;
     }
+    //~~~~~generation~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 
-    //~~~DEBUG~~~
-    [SerializeField] private GameObject dbugTextObj;
+    //~~~~~debug~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    [Header("Debug Settings")]
+    private bool dbugEnabled = false;
+    private bool visualDemo = false;
+
+    //visual
+    [Header("Debug Visuals")]
+    [SerializeField] private GameObject testTile;
+    [SerializeField] private Material baseDbugMat;
+    [SerializeField] private Material matDbugEmpty, matDbugRoom, matDbugWall, matDbugHallway, matDbugDoorway;
+    [SerializeField] private Material matDbugRoomBoss, matDbugRoomEntry, matDbugRoomTreasure, matDbugRoomSpecial;
+    private GameObject dbugParent;
+    private Renderer[,] gridDbugRenderer;
+    private GameObject[,] gridDbug; //grid squares [x bounds, z bounds] (ie. 0,0 = tile 1   25,25 = tile 625)
+
+    private float singleGridSize; //size of a single grid square (x or z) + 0.1f (for spacing)
+    public float GetSingleGridSize() { return singleGridSize; } //get size of a single grid square (x or z) + 0.1f (for spacing)
+
+
+    //text
+    [Header("Debug Text")]
+    private TMP_Text[,] gridDbugText;
+
     public void UpdateDbugTileTextMoveCost(int posX, int posZ, float moveCost) //update tile debug text with PathGeneration movement cost (for hallway pathfinding)
     {
         if (dbugEnabled && visualDemo) { gridDbugText[posX, posZ].text = Regex.Replace(gridDbugText[posX, posZ].text, @"\d+$", moveCost.ToString()); }
@@ -231,7 +251,7 @@ public class MapGeneration : MonoBehaviour
         if (dbugEnabled && visualDemo)
         {
             Material newMat = null;
-
+            Debug.Log(matType);
             switch (matType)
             {
                 case null: newMat = baseDbugMat; break;
@@ -260,8 +280,11 @@ public class MapGeneration : MonoBehaviour
     }
 
 
+    [SerializeField] private GameObject dbugTextObj;
+    [SerializeField] private TMP_Text HUDDbugText;
     public void UpdateHUDDbugText(string newText) //update dbug text with DungeonGeneration state updates
     {
-        if (dbugEnabled && ASM.GetPlayerObject() != null) { HUDDbugText.GetComponent<TMP_Text>().text = newText; }
+        if (dbugEnabled) { HUDDbugText.GetComponent<TMP_Text>().text = newText; }
     }
+    //~~~~~debug~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 }

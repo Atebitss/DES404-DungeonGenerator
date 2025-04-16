@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 4450629900758687236}
   - component: {fileID: 2171961710025854894}
   - component: {fileID: 1175158933809111161}
-  m_Layer: 3
+  m_Layer: 8
   m_Name: PortalPrefab
   m_TagString: Portal
   m_Icon: {fileID: 0}
@@ -61,6 +61,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
