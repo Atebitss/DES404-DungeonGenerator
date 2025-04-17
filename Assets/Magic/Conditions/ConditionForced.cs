@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class ConditionForced : AbstractCondition
 {
+    private float spellStartTime = float.PositiveInfinity;
     private Vector3 dir;
     public void SetDir(Vector3 dir) { this.dir = dir; }//Debug.Log(dir); }
 
@@ -17,6 +18,7 @@ public class ConditionForced : AbstractCondition
         //set enemy colour
         Material elementMaterial = Resources.Load<Material>("SpellMaterials/ElementForceMaterial");
         targetScript.SetMaterial(elementMaterial);
+        spellStartTime = Time.time;
         StartCoroutine(MoveToTarget());
     }
     IEnumerator MoveToTarget()
@@ -46,7 +48,6 @@ public class ConditionForced : AbstractCondition
         while (remainingDistance >= 0.1f)
         {
             //Debug.Log("CF, remainingDistance: " + remainingDistance + "   time: " + Time.time + "/" + (startTime + 1f));
-            if (Time.time >= (startTime + 1f)) { EndCondition(); break; }
 
             //Debug.Log(this.transform.position);
             float travelInterpolate = (Time.time - startTime) * 5 / journeyLength;
@@ -70,6 +71,15 @@ public class ConditionForced : AbstractCondition
         }
 
         EndCondition();
+    }
+
+    private void FixedUpdate()
+    {
+        if (Time.time >= (spellStartTime + 1f))
+        {
+            StopCoroutine(MoveToTarget());
+            EndCondition(); 
+        }
     }
 
     void OnDestroy()
