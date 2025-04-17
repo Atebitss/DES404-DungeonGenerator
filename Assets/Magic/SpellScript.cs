@@ -58,6 +58,7 @@ public class SpellScript : MonoBehaviour
     public bool GetSpellValid() { return spellValid; }
     private bool casted = false;
     public bool GetCasted() { return casted; }
+    private bool spellActive = false;
     private float castStartTime = 0f;
     private float timeSinceCast = 0f;
     private float maxLength = 50f;
@@ -136,6 +137,11 @@ public class SpellScript : MonoBehaviour
 
         playerObject = ASM.GetPlayerObject();
         PC = ASM.GetPlayerController();
+        //Debug.Log("ASM: " + ASM);
+        //Debug.Log("ASM.GetPlayerController(): " + ASM.GetPlayerController());
+        //Debug.Log("PC: " + PC);
+
+        spellActive = true;
 
         //return reference to this script
         return this;
@@ -147,7 +153,7 @@ public class SpellScript : MonoBehaviour
         //Debug.Log(this.transform.position);
         //Debug.Log();
         //update this pos to aim pos
-        if (shapeScript != null && !casted) { shapeScript.AimSpell(); }
+        if (shapeScript != null && !casted && spellActive) { shapeScript.AimSpell(); }
         if (effectScript != null && effectScript.componentWeight == 1) { effectScript.ApplyEffect(); } //weight 1 assumes the effect impacts aiming
     }
 
@@ -466,7 +472,7 @@ public class SpellScript : MonoBehaviour
 
                 //check if the spell intersects with an object on the Solid layer, shouldnt end if colliding with ignored target
                 Debug.DrawRay(transform.position, dir, Color.red, 10f);
-                if (Physics.Raycast(transform.position, dir, out RaycastHit hit, Vector3.Distance(transform.position, nextPosition) + 0.1f, LayerMask.GetMask("Solid")) && !CheckIgnoredTargets(hit.collider.gameObject)) 
+                if (Physics.Raycast(transform.position, dir, out RaycastHit hit, Vector3.Distance(transform.position, nextPosition) + 0.1f, LayerMask.GetMask("Enemy")) && !CheckIgnoredTargets(hit.collider.gameObject)) 
                 {  
                     EndSpell();
                     yield break; 

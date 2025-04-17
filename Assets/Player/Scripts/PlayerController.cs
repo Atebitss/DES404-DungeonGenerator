@@ -111,9 +111,6 @@ public class PlayerController : MonoBehaviour
             MV.SetActive(false);
         }
         else { MM.Wake(ASM.GetMG().GetBoundsX(), ASM.GetMG().GetBoundsZ()); }
-
-        //begin spell
-        AssignSpell();
     }
 
     private void OnDestroy()
@@ -364,8 +361,8 @@ public class PlayerController : MonoBehaviour
                 if ((Time.time - dodgeStartTime) >= dodgeDuration) //if the player has been dodging for 1 second
                 {
                     playerRigid.linearVelocity = Vector3.zero; //reset velocity
-                                                         //for (int i = 0; i < dodgeLayerIDs.Length; i++) { Physics.IgnoreLayerCollision(gameObject.layer, dodgeLayerIDs[i], false); } //allow dodging through enemies
-                                                         //Debug.Log("Dodge end");
+                    //for (int i = 0; i < dodgeLayerIDs.Length; i++) { Physics.IgnoreLayerCollision(gameObject.layer, dodgeLayerIDs[i], false); } //allow dodging through enemies
+                    //Debug.Log("Dodge end");
                     dodging = false; //set tracker to false
                 }
             }
@@ -468,7 +465,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private GameObject weaponAttackCollider; //weapon collider
     [SerializeField] private PlayerWeaponColliderManager PWCM; //weapon collider script
 
-    [SerializeField] private int attackDamage = 5; //dafault damage
+    [SerializeField] private int attackDamage = 2; //dafault damage
     public int GetAttackDamage() { return attackDamage; }
     private int attackDamageModifier = 0; //players attack damage modifier
     public int GetAttackDamageModifier() { return attackDamageModifier; }
@@ -766,9 +763,11 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private GameObject spellPrefab;
     [SerializeField] private SpellScript curSpell;
     public SpellScript GetCurSpell() { return curSpell; }
+    [SerializeField] private LayerMask aimLayerMask = 0;
+    public LayerMask GetAimLayerMask() { return aimLayerMask; }
 
     //random spell assigned on awake
-    private void AssignSpell()
+    public void AssignSpell()
     {
         //Debug.Log("PlayerController, AssignSpell");
 
@@ -780,7 +779,7 @@ public class PlayerController : MonoBehaviour
             spellInstance.transform.SetParent(leftHand.transform);
             spellInstance.transform.localPosition = Vector3.zero;
             curSpell = spellInstance.transform.GetChild(0).GetComponent<SpellScript>().StartSpellScript(ASM);
-            Debug.Log(curSpell);
+            //Debug.Log(curSpell);
         }
 
 
@@ -827,9 +826,9 @@ public class PlayerController : MonoBehaviour
             }
 
             //testing
-            //shapeName = "Ball";
-            //effectName = "Explode";
-            //elementName = "Fire";
+            shapeName = "Ball";
+            effectName = "Explode";
+            elementName = "Force";
 
             curSpell.UpdateSpellScriptShape(shapeName);
             curSpell.UpdateSpellScriptEffect(effectName);

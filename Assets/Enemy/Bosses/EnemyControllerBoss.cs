@@ -7,13 +7,11 @@ public class EnemyControllerBoss : AbstractEnemy
     {
         //update basic stats
         boss = true;
-        SetBHDM(GetASM().GetPlayerObject().transform.GetChild(1).GetComponent<BossHealthDisplayManager>());
     }
 
     override public void UpdateBossStates() 
     {
         //Debug.Log("UpdateBossStates");
-        GetBHDM().EnableBossHealthDisplay();
 
         int randBossTypeID = Random.Range(0, 0);
         //Debug.Log("randBossTypeID: " + randBossTypeID);
@@ -32,6 +30,8 @@ public class EnemyControllerBoss : AbstractEnemy
                 Debug.Log("attackDamage: " + attackDamage);*/
                 break;
         }
+
+        GetBHDM().EnableBossHealthDisplay();
     }
 
     private void OnDestroy()

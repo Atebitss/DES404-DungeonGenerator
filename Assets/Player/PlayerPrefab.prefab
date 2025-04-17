@@ -407,7 +407,7 @@ MonoBehaviour:
   weaponParent: {fileID: 4954393113427719825}
   weaponAttackCollider: {fileID: 8225045803689722017}
   PWCM: {fileID: 8198623938989953886}
-  attackDamage: 1
+  attackDamage: 2
   attackSpeed: 1
   PPS: {fileID: 2532494437381932349}
   interactionMask:
@@ -424,6 +424,9 @@ MonoBehaviour:
   castable: 1
   spellPrefab: {fileID: 6375034429829408696, guid: 4310df259f825b942b51e3d184c4fe5e, type: 3}
   curSpell: {fileID: 0}
+  aimLayerMask:
+    serializedVersion: 2
+    m_Bits: 392
   healthPointsCurrent: 10
   healthPointsMax: 10
   staminaPointsCurrent: 10

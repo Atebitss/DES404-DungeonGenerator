@@ -25,7 +25,7 @@ public class ConditionForced : AbstractCondition
         //move target away from impact
         Vector3 startPos = this.transform.position;
         //Debug.Log(startPos);
-        Vector3 targetPos = (this.transform.position + (dir * 5));
+        Vector3 targetPos = (this.transform.position + (dir * 2.5f));
         //Debug.Log(targetPos);
 
         Collider collider = this.gameObject.GetComponent<Collider>();
@@ -39,10 +39,15 @@ public class ConditionForced : AbstractCondition
 
         float journeyLength = Vector3.Distance(startPos, targetPos);
         float startTime = Time.time;
+        Debug.Log("CF, startTime: " + startTime);
 
-        //while the target is not at end point 
-        while (this.transform.position != targetPos)
+        //while the target is not at end point within 0.1f
+        float remainingDistance = Vector3.Distance(this.transform.position, targetPos);
+        while (remainingDistance >= 0.1f)
         {
+            Debug.Log("CF, remainingDistance: " + remainingDistance + "   time: " + Time.time + "/" + (startTime + 1f));
+            if (Time.time >= (startTime + 1f)) { break; }
+
             //Debug.Log(this.transform.position);
             float travelInterpolate = (Time.time - startTime) * 5 / journeyLength;
             Vector3 nextPosition = Vector3.Lerp(startPos, targetPos, travelInterpolate);
@@ -54,7 +59,7 @@ public class ConditionForced : AbstractCondition
                 if (Physics.Raycast((collider.bounds.center + cornerOffsets[i]), dir, out RaycastHit hit, 0.1f))
                 {
                     //Debug.Log(this.gameObject.name + " solid collision: " + hit.collider.gameObject.name);
-                    targetScript.AlterHealth(-2);
+                    targetScript.AlterHealth(-1);
                     yield break;
                 }
             }

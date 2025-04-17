@@ -21,7 +21,8 @@ public class ElementForce : AbstractElement
     {
         startPos = SS.GetStartPos();
         endPos = SS.GetEndPos();
-        dir = (endPos - startPos).normalized;
+        dir = (endPos - startPos).normalized; //calculate direction enemy will move
+        dir = new Vector3(dir.x, 0, dir.z); //remove y component
         //Debug.Log(dir);
     }
     public override void ApplyCondition()

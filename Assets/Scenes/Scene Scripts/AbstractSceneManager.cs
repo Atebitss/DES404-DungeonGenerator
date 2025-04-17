@@ -56,9 +56,10 @@ public class AbstractSceneManager : MonoBehaviour
     public GameObject player;
     public void SetPlayerObject(GameObject newPlayer) { player = newPlayer; }
     public GameObject GetPlayerObject() { if (player != null) { return player.transform.GetChild(0).gameObject; } return null; }
+    public GameObject GetPlayerParent() { if (player != null) { return player; } return null; }
 
     public PlayerController PC;
-    public void SetPlayerController (PlayerController newPC) {  PC = newPC; SetPlayerObject(newPC.gameObject); }
+    public void SetPlayerController (PlayerController newPC) {  PC = newPC; }
     public PlayerController GetPlayerController() { return PC; }
     public void SpawnPlayer(Vector3 pos)
     {
@@ -70,6 +71,7 @@ public class AbstractSceneManager : MonoBehaviour
             //Debug.Log(player.name);
             PC = player.transform.GetChild(0).gameObject.GetComponent<PlayerController>();
             ADDM = PC.GetADDM();
+            PC.AssignSpell();
 
             ADM.Wake(this);
         }
@@ -207,6 +209,11 @@ public class AbstractSceneManager : MonoBehaviour
                 break;
         }
 
+
+        //wake enemy
+        curEnemyScript.Wake(this);
+        //Debug.Log("Enemy awake: " + curEnemyScript.name);
+
         //set enemy stats
         //health
         int newHealth = Mathf.RoundToInt(curEnemyScript.GetMaxHealth() * healthModifier);
@@ -227,11 +234,6 @@ public class AbstractSceneManager : MonoBehaviour
         {
             curEnemyScript.SetDual(true);
         }
-
-
-        //wake enemy
-        curEnemyScript.Wake();
-        //Debug.Log("Enemy awake: " + curEnemyScript.name);
     }
 
     public void DestroyEnemyObjects()

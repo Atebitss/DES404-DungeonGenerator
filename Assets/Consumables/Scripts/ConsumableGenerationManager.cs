@@ -64,6 +64,7 @@ public class ConsumableGenerationManager : MonoBehaviour
             GameObject consumable = Instantiate(consumableTempPrefabs[randomIndex], pos, Quaternion.identity);
             consumable.transform.SetParent(parentObject.transform);
             consumable.name = consumable.name.Replace("Prefab", "");
+            consumable.name = consumable.name.Replace("(Clone)", "");
             //Debug.Log("spawning consumable: " + consumable.name);
 
             //increase curConsumables array size
@@ -85,6 +86,8 @@ public class ConsumableGenerationManager : MonoBehaviour
             int randomIndex = Random.Range(0, consumableBoostPrefabs.Length);
             GameObject consumable = Instantiate(consumableBoostPrefabs[randomIndex], pos, Quaternion.identity);
             consumable.transform.SetParent(parentObject.transform);
+            consumable.name = consumable.name.Replace("Prefab", "");
+            consumable.name = consumable.name.Replace("(Clone)", "");
 
             //increase curConsumables array size
             GameObject[] tempConsumables = new GameObject[curConsumables.Length + 1];

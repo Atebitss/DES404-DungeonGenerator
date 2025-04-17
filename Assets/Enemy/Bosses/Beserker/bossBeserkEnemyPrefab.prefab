@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 6115117420659367760}
   - component: {fileID: 4613551058788062843}
   - component: {fileID: 1847250764447816529}
-  m_Layer: 7
+  m_Layer: 0
   m_Name: DetectionColliderNear
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -79,7 +79,7 @@ GameObject:
   - component: {fileID: 8452932137980635183}
   - component: {fileID: 5652514220819604225}
   - component: {fileID: 6178674796021915901}
-  m_Layer: 7
+  m_Layer: 0
   m_Name: EnemyWeaponColliderL
   m_TagString: EnemyWeapon
   m_Icon: {fileID: 0}
@@ -126,6 +126,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -330,6 +333,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
@@ -460,7 +464,7 @@ GameObject:
   - component: {fileID: 5250686181841666061}
   - component: {fileID: 4866023153341456928}
   - component: {fileID: 7684243928832391058}
-  m_Layer: 7
+  m_Layer: 0
   m_Name: EnemyWeaponColliderR
   m_TagString: EnemyWeapon
   m_Icon: {fileID: 0}
@@ -507,6 +511,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -576,7 +583,7 @@ GameObject:
   - component: {fileID: 7544219055295210380}
   - component: {fileID: 4272633439467311216}
   - component: {fileID: 3869931894462583156}
-  m_Layer: 7
+  m_Layer: 0
   m_Name: EnemyRenderer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -623,6 +630,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -659,7 +669,7 @@ GameObject:
   - component: {fileID: 5248293774272799640}
   - component: {fileID: 8026072965031143694}
   - component: {fileID: 1389129628318052250}
-  m_Layer: 7
+  m_Layer: 0
   m_Name: HitParticle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5422,6 +5432,9 @@ ParticleSystemRenderer:
   m_ReflectionProbeUsage: 0
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -5488,7 +5501,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3987276604464211926}
   - component: {fileID: 1935557783522769971}
-  m_Layer: 7
+  m_Layer: 0
   m_Name: EnemyWeaponParent
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5514,7 +5527,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!95 &1935557783522769971
 Animator:
-  serializedVersion: 5
+  serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -5528,6 +5541,7 @@ Animator:
   m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
@@ -5544,7 +5558,7 @@ GameObject:
   - component: {fileID: 8278499942651991317}
   - component: {fileID: 4288381109726980876}
   - component: {fileID: 8692641826929463634}
-  m_Layer: 7
+  m_Layer: 0
   m_Name: DetectionColliderFar
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -22,6 +22,7 @@ public abstract class AbstractEnemy : MonoBehaviour
     public BossHealthDisplayManager GetBHDM() { return BHDM; }
 
 
+
     private float GetCurAnimLength()
     {
         //find legnth of current animation
@@ -52,9 +53,9 @@ public abstract class AbstractEnemy : MonoBehaviour
             a.SetBool("dual", dual);
         }
     }
-    public void Wake()
+    public void Wake(AbstractSceneManager ASM)
     {
-        health = maxHealth; //set health to max health
+        this.ASM = ASM;
 
         //swap main weapon hand
         if (Random.Range(0, 2) == 1) //if random number = 1, swap weapon colliders and scripts positions in array
@@ -80,9 +81,12 @@ public abstract class AbstractEnemy : MonoBehaviour
 
         if (boss)
         {
+            SetBHDM(ASM.GetPlayerParent().transform.GetChild(1).GetComponent<BossHealthDisplayManager>());
             UpdateBossStates();
             BHDM.Wake(this);
         }
+
+        health = maxHealth;
     }
     private void Start()
     {
@@ -126,7 +130,7 @@ public abstract class AbstractEnemy : MonoBehaviour
     //~~~~~health~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     public int maxHealth;
     public int GetMaxHealth() { return maxHealth; }
-    public void SetMaxHealth(int newMaxHealth) { maxHealth = newMaxHealth; HealthCheck(); }
+    public void SetMaxHealth(int newMaxHealth) { maxHealth = newMaxHealth; }
 
     public int health;
     public int GetHealth() { return health; }
