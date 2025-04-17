@@ -39,14 +39,14 @@ public class ConditionForced : AbstractCondition
 
         float journeyLength = Vector3.Distance(startPos, targetPos);
         float startTime = Time.time;
-        Debug.Log("CF, startTime: " + startTime);
+        //Debug.Log("CF, startTime: " + startTime);
 
         //while the target is not at end point within 0.1f
         float remainingDistance = Vector3.Distance(this.transform.position, targetPos);
         while (remainingDistance >= 0.1f)
         {
-            Debug.Log("CF, remainingDistance: " + remainingDistance + "   time: " + Time.time + "/" + (startTime + 1f));
-            if (Time.time >= (startTime + 1f)) { break; }
+            //Debug.Log("CF, remainingDistance: " + remainingDistance + "   time: " + Time.time + "/" + (startTime + 1f));
+            if (Time.time >= (startTime + 1f)) { EndCondition(); break; }
 
             //Debug.Log(this.transform.position);
             float travelInterpolate = (Time.time - startTime) * 5 / journeyLength;
