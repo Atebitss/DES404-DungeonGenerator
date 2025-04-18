@@ -6,7 +6,7 @@ public class ConsumableControllerHealing : AbstractConsumable
 {
     public override void ApplyEffect(PlayerController PC)
     {
-        Debug.Log("ConsumableControllerHealing, applying effect to player");
+        //Debug.Log("ConsumableControllerHealing, applying effect to player");
         int maxPlayerHealth = PC.GetMaxHealthPoints(); //get max player health
         int currentPlayerHealth = PC.GetCurrentHealthPoints(); //get current player health
 

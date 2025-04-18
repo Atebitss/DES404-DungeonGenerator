@@ -21,7 +21,7 @@ public class ConsumableGenerationManager : MonoBehaviour
     private int spawnChance = 50;
     public void OnRoomEntered(int roomDifficulty)
     {
-        Debug.Log("Consumable Generation, OnRoomEntered");
+        //Debug.Log("Consumable Generation, OnRoomEntered");
         switch (roomDifficulty)
         {
             case -1:
@@ -78,7 +78,7 @@ public class ConsumableGenerationManager : MonoBehaviour
 
     public void OnRoomClear(Vector3 pos)
     {
-        Debug.Log("Consumable Generation, OnRoomClear");
+        //Debug.Log("Consumable Generation, OnRoomClear");
         int randomChance = Random.Range(0, 100); //roll generation chance
         if (randomChance < spawnChance) //if consumable should spawn
         {

@@ -23,7 +23,7 @@ public class PlayerWeaponColliderManager : MonoBehaviour
 
     public void EnableAttackCheck(float attackAnimDur, string attackType)
     {
-        Debug.Log("attack enabled");
+        //Debug.Log("attack enabled");
         attacking = true;
         this.attackType = attackType; //set attack type
         StartCoroutine(OverlapCheck()); //start overlap check coroutine
@@ -31,7 +31,7 @@ public class PlayerWeaponColliderManager : MonoBehaviour
     }
     private void DisableAttackCheck()
     {
-        Debug.Log("attack disabled");
+        //Debug.Log("attack disabled");
         StopCoroutine(OverlapCheck()); //start overlap check coroutine
         ResetAttack(); //reset attack state
         attacking = false;
@@ -77,7 +77,7 @@ public class PlayerWeaponColliderManager : MonoBehaviour
                 //Debug.Log(hitIndex + ": " + hitColliders[hitIndex].gameObject.name);
                 if (hitColliders[hitIndex].gameObject.tag == "Enemy")
                 {
-                    Debug.Log("enemy found in overlap: " + hitColliders[hitIndex].gameObject.transform.parent.name);
+                    //Debug.Log("enemy found in overlap: " + hitColliders[hitIndex].gameObject.transform.parent.name);
                     //process enemies found in overlap
                     ProcessEnemy(hitColliders[hitIndex].gameObject);
                 }
@@ -96,7 +96,7 @@ public class PlayerWeaponColliderManager : MonoBehaviour
         //Debug.Log(col.gameObject.name);
         if (attacking && col.gameObject.tag == "Enemy")
         {
-            Debug.Log("enemy found in swing: " + col.gameObject.transform.parent.name);
+            //Debug.Log("enemy found in swing: " + col.gameObject.transform.parent.name);
             ProcessEnemy(col.gameObject); //check if enemy is the closest enemy
         }
     }
@@ -136,7 +136,6 @@ public class PlayerWeaponColliderManager : MonoBehaviour
 
     //~~~~~enemy processing~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     private GameObject[] ignoredTrackedEnemies = new GameObject[0]; //track enemies that are ignored by the collider
-    //temp
     private Vector3 closestEnemyPos = Vector3.zero;
     private Quaternion closestEnemyRot = Quaternion.identity;
     private Vector3 checkSize = Vector3.zero;

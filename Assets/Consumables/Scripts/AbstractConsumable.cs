@@ -20,7 +20,7 @@ public class AbstractConsumable : MonoBehaviour
     private IEnumerator StartConsumable()
     {
         //start consumable
-        Debug.Log("AbstractConsumable, starting consumable: " + this.gameObject.name);
+        //Debug.Log("AbstractConsumable, starting consumable: " + this.gameObject.name);
         yield return new WaitForSeconds(destroyTime);
         StartCoroutine("DestroyConsumable");
     }
@@ -35,9 +35,8 @@ public class AbstractConsumable : MonoBehaviour
         //apply consumable effect to player
         if (!isUsed)
         {
-            Debug.Log("AbstractConsumable, using consumable: " + this.gameObject.name);
+            //Debug.Log("AbstractConsumable, using consumable: " + this.gameObject.name);
             PlayerController PC = ASM.GetPlayerController();
-            Debug.Log(PC);
             if (PC != null)
             {
                 //apply effect to player
@@ -58,7 +57,7 @@ public class AbstractConsumable : MonoBehaviour
     //~~~~~~end~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     private IEnumerator DestroyConsumable()
     {
-        Debug.Log("AbstractConsumable, destroying consumable: " + this.gameObject.name);
+        //Debug.Log("AbstractConsumable, destroying consumable: " + this.gameObject.name);
         if (!isUsed)
         {
             //run flicker animation

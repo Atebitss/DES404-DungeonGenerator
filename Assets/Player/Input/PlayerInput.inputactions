@@ -45,7 +45,7 @@
                     "name": "Jump",
                     "type": "Button",
                     "id": "368e1f21-b5a5-4c04-84e3-b321a10cab9c",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -56,7 +56,7 @@
                     "id": "1e7e23c4-c264-4c42-b38d-8c4c04959852",
                     "expectedControlType": "",
                     "processors": "",
-                    "interactions": "Tap",
+                    "interactions": "",
                     "initialStateCheck": false
                 },
                 {
@@ -72,9 +72,9 @@
                     "name": "Dodge",
                     "type": "Button",
                     "id": "789f902e-8518-4493-a697-876b5a9c154f",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
-                    "interactions": "",
+                    "interactions": "Tap",
                     "initialStateCheck": false
                 },
                 {
@@ -82,6 +82,15 @@
                     "type": "Button",
                     "id": "9b646668-c6c7-4ab1-a4d5-acf9363c2c93",
                     "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "ToggleDevMode",
+                    "type": "Button",
+                    "id": "8eeb5503-b4e1-4354-99f7-52ee5aa66a8d",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -257,7 +266,7 @@
                     "name": "",
                     "id": "f7b7171f-a3a1-4a3f-a5e7-07a38549790b",
                     "path": "<Gamepad>/rightShoulder",
-                    "interactions": "Tap",
+                    "interactions": "",
                     "processors": "",
                     "groups": "",
                     "action": "HeavyAttack",
@@ -307,6 +316,61 @@
                     "action": "Cast",
                     "isComposite": false,
                     "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "69068bba-9525-4e92-a631-5b6496b6f34c",
+                    "path": "<Keyboard>/tab",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ToggleDevMode",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "Two Modifiers",
+                    "id": "da36dbc5-ede6-4e99-98bb-e3205ae341c2",
+                    "path": "TwoModifiers(modifiersOrder=1)",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ToggleDevMode",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "modifier1",
+                    "id": "13ee4da6-06cc-4f76-a5a4-542340d83b07",
+                    "path": "<Gamepad>/leftShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ToggleDevMode",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "modifier2",
+                    "id": "73ededfc-d1a3-42e6-a6c1-c390f7fc67ff",
+                    "path": "<Gamepad>/rightShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ToggleDevMode",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "binding",
+                    "id": "39e7473e-aa07-4c72-8cdf-c7431dc76c92",
+                    "path": "<Gamepad>/buttonWest",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ToggleDevMode",
+                    "isComposite": false,
+                    "isPartOfComposite": true
                 }
             ]
         }

@@ -669,15 +669,20 @@ public class PlayerController : MonoBehaviour
 
     //~~~~~HUD~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     [Header("-HUD")]
+    [SerializeField] private GameObject HUDParent;
     [SerializeField] private TMP_Text playerHealthText;
     [SerializeField] private RectTransform playerHealthBarRect;
     [SerializeField] private Image playerHealthBarImage;
     private float maxPlayerHealthBarWidth;
 
+    public void ToggleHUD(bool newState)
+    {
+        HUDParent.SetActive(newState);
+    }
+
+    //~~~~~   DOESNT UPDATE WHEN LOADING A NEW FLOOR (SETS HP% TO 0)   ~~~~~//
     private void UpdatePlayerHealthBar()
     {
-        if (active)
-        {
             //Debug.Log("invincible: " + invincible);
             //update health bar
             float hpPercentage = (float)healthPointsCurrent / (float)healthPointsMax;
@@ -701,8 +706,8 @@ public class PlayerController : MonoBehaviour
                 playerHealthBarImage.color = Color.red; // Critical
             }
 
+            Debug.Log("hpPercetage: " + hpPercentage);
             vignetteOverlayAnimator.SetFloat("healthPercentage", hpPercentage);
-        }
     }
 
     private void UpdateInteractionPrompt()
@@ -1045,4 +1050,37 @@ public class PlayerController : MonoBehaviour
         }
     }
     //~~~~~stats~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+    //~~~~~~debug~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    public void OnToggleDevMode(InputAction.CallbackContext ctx)
+    {
+        if(ctx.performed)
+        {
+            //update scene manager with dev status
+            if(ASM.GetDevMode())
+            {
+                ASM.SetDevMode(false);
+            }
+            else { ASM.SetDevMode(true); }
+
+            //display debug infos
+            if (ASM.GetDevMode())
+            {
+                DbugDisplay.SetActive(true);
+                ADDbugDisplay.SetActive(true);
+                SVDisplay.SetActive(true);
+                SpellDbugDisplay.SetActive(true);
+            }
+            else
+            {
+                DbugDisplay.SetActive(false);
+                ADDbugDisplay.SetActive(false);
+                SVDisplay.SetActive(false);
+                SpellDbugDisplay.SetActive(false);
+            }
+        }
+    }
+    //~~~~~~debug~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 }

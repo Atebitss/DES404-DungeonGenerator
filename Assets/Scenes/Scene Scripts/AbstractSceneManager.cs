@@ -7,6 +7,7 @@ public class AbstractSceneManager : MonoBehaviour
     //debug info
     [SerializeField] private bool devMode = false;
     public bool GetDevMode() { return devMode; }
+    public void SetDevMode(bool newDevMode) { devMode = newDevMode; }
 
     [SerializeField] private bool dbugMode = false;
     public bool GetDbugMode() { return dbugMode; }
@@ -15,12 +16,15 @@ public class AbstractSceneManager : MonoBehaviour
     public bool GetVisualMode() { return visualMode; }
 
 
-
     //prefabs
     [SerializeField] public GameObject amPrefab;
     [SerializeField] public GameObject playerPrefab;
     [SerializeField] public GameObject doorPrefab;
 
+
+    //camera references
+    [SerializeField] public Camera playerCamera;
+    [SerializeField] public Camera loadingCamera;
 
 
     //Generation Managers
@@ -72,6 +76,7 @@ public class AbstractSceneManager : MonoBehaviour
             PC = player.transform.GetChild(0).gameObject.GetComponent<PlayerController>();
             ADDM = PC.GetADDM();
             PC.AssignSpell();
+            playerCamera = player.transform.GetChild(0).transform.GetChild(0).GetComponent<Camera>();
 
             ADM.Wake(this);
         }
@@ -311,8 +316,15 @@ public class AbstractSceneManager : MonoBehaviour
         if (dbugMode) { MG.UpdateHUDDbugText("Scene Manager: Floor Complete"); }
         //Debug.Log("Floor complete");
         //would contain scene change to post level
+
         //and update dungeon stats
         PC.SetActive(false); //disable player input
+        PC.ToggleHUD(false); //disable player hud
+
+        //swap main camera to loading camera
+        playerCamera.enabled = false;
+        loadingCamera.enabled = true;
+
         NewFloor(); //generate new floor
     }
     private void NewFloor()

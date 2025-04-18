@@ -113,7 +113,7 @@ public abstract class AbstractDoorScript : MonoBehaviour
     }
     public void CloseDoor()
     {
-        Debug.Log("Closing " + gameObject.name);
+        //Debug.Log("Closing " + gameObject.name);
         a.SetBool("isOpen", false); //run close animation
         isOpen = false; //update state
         //play(doorClosingSound) //play closing audio
@@ -121,7 +121,7 @@ public abstract class AbstractDoorScript : MonoBehaviour
     }
     public void LockDoor() 
     {
-        Debug.Log("Locking " + gameObject.name);
+        //Debug.Log("Locking " + gameObject.name);
         a.SetBool("isLocked", false);
         if (isOpen) { a.SetInteger("openDirection", 2); CloseDoor(); }
         isLocked = true; 

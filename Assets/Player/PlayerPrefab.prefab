@@ -359,6 +359,22 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 9b646668-c6c7-4ab1-a4d5-acf9363c2c93
     m_ActionName: 'Normal/Cast[/XInputControllerWindows/leftTrigger]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 7362370709811634931}
+        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
+        m_MethodName: OnToggleDevMode
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 8eeb5503-b4e1-4354-99f7-52ee5aa66a8d
+    m_ActionName: 'Normal/ToggleDevMode[/Keyboard/tab,/XInputControllerWindows/leftShoulder,/XInputControllerWindows/rightShoulder,/XInputControllerWindows/buttonWest]'
   m_NeverAutoSwitchControlSchemes: 1
   m_DefaultControlScheme: 
   m_DefaultActionMap: Normal
@@ -407,12 +423,13 @@ MonoBehaviour:
   weaponParent: {fileID: 4954393113427719825}
   weaponAttackCollider: {fileID: 8225045803689722017}
   PWCM: {fileID: 8198623938989953886}
-  attackDamage: 2
+  attackDamage: 10
   attackSpeed: 1
   PPS: {fileID: 2532494437381932349}
   interactionMask:
     serializedVersion: 2
     m_Bits: 256
+  HUDParent: {fileID: 7062791796487923162}
   playerHealthText: {fileID: 405076100582398847}
   playerHealthBarRect: {fileID: 710692867093648824}
   playerHealthBarImage: {fileID: 3565896714354243369}
@@ -438,7 +455,7 @@ MonoBehaviour:
   IntelligencePoints: 1
   WisdomPoints: 1
   invincible: 0
-  permaInvincible: 0
+  permaInvincible: 1
   invincibilityTimer: 0
   vignetteOverlayAnimator: {fileID: 5627751566675936464}
 --- !u!82 &631621802871244450
@@ -7297,8 +7314,8 @@ MonoBehaviour:
   m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 1920, y: 1000}
-  m_ScreenMatchMode: 0
+  m_ReferenceResolution: {x: 1920, y: 1080}
+  m_ScreenMatchMode: 2
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
@@ -7506,7 +7523,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 750, y: 500}
+  m_AnchoredPosition: {x: 752, y: -15}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7897228404301484587
@@ -7602,7 +7619,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: -1596.7427, y: 0, z: -83.88208, w: -975.63654}
+  m_margin: {x: -1596.7427, y: -48.61798, z: -83.88208, w: -474.5163}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0

@@ -19,11 +19,13 @@ public class EnemyWeaponColliderManager : MonoBehaviour
     {
         //Debug.Log("attack enabled on " + this.gameObject.name);
         attacking = true;
+        StartCoroutine(OverlapCheck()); //start overlap check coroutine
         Invoke("DisableAttackCheck", attackAnimDur);
     }
     private void DisableAttackCheck()
     {
         //Debug.Log("attack disabled on " + this.gameObject.name);
+        StopCoroutine(OverlapCheck()); //start overlap check coroutine
         attacking = false;
         hasHitPlayer = false;
     }
@@ -39,6 +41,43 @@ public class EnemyWeaponColliderManager : MonoBehaviour
             col.gameObject.GetComponent<PlayerController>().DamagePlayer(-attackDamage);
             AM.Play("Sword_Hit" + Random.Range(1, 3));
             hasHitPlayer = true;
+        }
+    }
+    private IEnumerator OverlapCheck()
+    {
+        if (attacking && !hasHitPlayer)
+        {
+            yield return new WaitForSeconds(0.1f); //wait for 0.1 seconds
+
+            //check for already overlapping enemy colliders
+            BoxCollider weaponAttackCollider = GetComponent<BoxCollider>();
+            //Debug.Log("weaponAttackCollider: " + weaponAttackCollider);
+            Collider[] hitColliders = Physics.OverlapBox
+            (
+                weaponAttackCollider.transform.position,
+                weaponAttackCollider.transform.localScale / 2,
+                weaponAttackCollider.transform.rotation,
+                LayerMask.GetMask("Player")
+            );
+
+            for (int hitIndex = 0; hitIndex < hitColliders.Length; hitIndex++)
+            {
+                //Debug.Log(hitIndex + ": " + hitColliders[hitIndex].gameObject.name);
+                if (hitColliders[hitIndex].gameObject.tag == "Player")
+                {
+                    //Debug.Log("player found in overlap: " + hitColliders[hitIndex].gameObject.transform.parent.name);
+                    hitColliders[hitIndex].gameObject.GetComponent<PlayerController>().DamagePlayer(-attackDamage);
+                    AM.Play("Sword_Hit" + Random.Range(1, 3));
+                    hasHitPlayer = true;
+                }
+            }
+
+            StartCoroutine(OverlapCheck()); //start overlap check coroutine
+        }
+        else
+        {
+            //Debug.Log("overlap check stopped");
+            yield break; //stop coroutine
         }
     }
 }

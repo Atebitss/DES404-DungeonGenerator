@@ -209,7 +209,7 @@ public abstract class AbstractEnemy : MonoBehaviour
         for (int i = 0; i < weaponAttackColliders.Length; i++)
         {
             //~~~ CHANGE LATER SO ONLY APPROPRIATE COLLIDER IS ENABLED ~~~//
-            EWCMs[i].EnableAttackCheck((GetCurAnimLength()));
+            if (EWCMs[i].gameObject.activeSelf) { EWCMs[i].EnableAttackCheck((GetCurAnimLength())); }
         }
         AM.Play("Sword_Swing1");
         yield return new WaitForSeconds(GetCurAnimLength()); //exact animation length

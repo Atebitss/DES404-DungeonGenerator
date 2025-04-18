@@ -88,7 +88,7 @@ public class RoomGeneration : MonoBehaviour
     public void LockDoors()
     {
         if (dbugEnabled) { MG.UpdateHUDDbugText("Room Generation: Locking Doors"); }
-        Debug.Log("locking doors");
+        //Debug.Log("locking doors");
         for (int doorIndex = 0; doorIndex < doorObjects.Length; doorIndex++)
         {
             AbstractDoorScript curADS = doorObjects[doorIndex].transform.GetChild(0).transform.GetChild(0).GetComponent<AbstractDoorScript>();
@@ -116,7 +116,7 @@ public class RoomGeneration : MonoBehaviour
 
     public void Wake(int roomID, int roomPosX, int roomPosZ, int roomBoundsX, int roomBoundsZ, string roomSize, string roomType, Vector3 literalPosition)
     {
-        Debug.Log("RoomGeneration: Wake");
+        //Debug.Log("RoomGeneration: Wake");
         //if (dbugEnabled) { Debug.Log("ID: " + roomID + "   size: " + roomSize + "   type: " + roomType + "   x: " + roomBoundsX + ", z: " + roomBoundsZ); }
 
         this.roomID = roomID;
@@ -767,10 +767,10 @@ public class RoomGeneration : MonoBehaviour
 
     private void SetMinimapIcon()
     {
-        Debug.Log("roomType: " + roomType);
+        //Debug.Log("roomType: " + roomType);
         if (roomType.Contains("Entry") || roomType.Contains("Treasure") || roomType.Contains("Special") || roomType.Contains("Boss"))
         {
-            Debug.Log("creating minimap icon");
+            //Debug.Log("creating minimap icon");
 
             string iconType = "";
             if (roomType.Contains("Treasure")) { iconType = "Treasure"; }

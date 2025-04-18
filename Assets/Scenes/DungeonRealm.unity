@@ -1495,7 +1495,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d7e51d4e4c60a8469e73ca687febaff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  defaultCamera: {fileID: 963194227}
+  minimapCamera: {fileID: 690711938}
   mapBoundsMax: 100
   mapBoundsMin: 100
   treasureRoomsMax: 3
@@ -1556,6 +1556,8 @@ MonoBehaviour:
   amPrefab: {fileID: 4065216700189244488, guid: 924cc0721c1d6e841a3aff4bc23543af, type: 3}
   playerPrefab: {fileID: 2783768033875945984, guid: 07888939a1f59d349b73cd0353289295, type: 3}
   doorPrefab: {fileID: 7151845054247194810, guid: ec6fe55e299e1054496342b441da8b59, type: 3}
+  playerCamera: {fileID: 0}
+  loadingCamera: {fileID: 963194227}
   AM: {fileID: 0}
   player: {fileID: 0}
   PC: {fileID: 0}

@@ -360,16 +360,20 @@ public class DungeonGeneration : MonoBehaviour
             doorPosition.y = currentPlayer.transform.position.y;
             currentPlayer.GetComponent<PlayerController>().SetPlayerLookAt(doorPosition);
             currentPlayer.GetComponent<PlayerController>().SetActive(true);
+            currentPlayer.GetComponent<PlayerController>().ToggleHUD(true); //enable player hud
         }
         //else move player to entry room
         else
         {
             currentPlayer.transform.position = new Vector3(entryRoomCenter.x, 1.5f, entryRoomCenter.y);
             currentPlayer = ASM.GetPlayerObject();
+            ASM.playerCamera.enabled = true;
+            ASM.loadingCamera.enabled = false;
             Vector3 doorPosition = roomObjects[entryRoomID].GetComponent<RoomGeneration>().GetDoorPosition(0);
             doorPosition.y = currentPlayer.transform.position.y;
             currentPlayer.GetComponent<PlayerController>().SetPlayerLookAt(doorPosition);
             currentPlayer.GetComponent<PlayerController>().SetActive(true);
+            currentPlayer.GetComponent<PlayerController>().ToggleHUD(true); //enable player hud
         }
 
         DRM.StartFloorCounter(); //start floor timer
@@ -865,6 +869,7 @@ public class DungeonGeneration : MonoBehaviour
                 if (x == roomPosX[roomID] || x == roomPosX[roomID] + roomBoundsX[roomID] - 1)
                 {
                     //if x is on far end of room x, set to corner
+                    Debug.Log("x: " + newX + ", z: " + newZ + "   /   tX: " + MG.GetBoundsX() + ", tZ: " + MG.GetBoundsZ());
                     MG.UpdateGridState(newX, newZ, "WallCorner"); //~~~~~   BUG HERE OUT OF BOUNDS   ~~~~~//
                     if (dbugEnabled)
                     {
