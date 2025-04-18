@@ -10,7 +10,7 @@ public class ConsumableControllerHealing : AbstractConsumable
         int maxPlayerHealth = PC.GetMaxHealthPoints(); //get max player health
         int currentPlayerHealth = PC.GetCurrentHealthPoints(); //get current player health
 
-        float healAmount = (maxPlayerHealth / 10f); //calculate 10% of max player health
+        float healAmount = (maxPlayerHealth * 0.25f); //calculate x% of max player health
 
         //if heal amount is not a whole number
         if (healAmount % 1 != 0)

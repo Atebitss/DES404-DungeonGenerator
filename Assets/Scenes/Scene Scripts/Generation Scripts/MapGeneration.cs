@@ -251,7 +251,7 @@ public class MapGeneration : MonoBehaviour
         if (dbugEnabled && visualDemo)
         {
             Material newMat = null;
-            Debug.Log(matType);
+            //Debug.Log(matType);
             switch (matType)
             {
                 case null: newMat = baseDbugMat; break;

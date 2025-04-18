@@ -323,6 +323,8 @@ public class DungeonGeneration : MonoBehaviour
     {
         if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Generating " + dungeonType + " Dungeon"); }
 
+        if (ASM.GetRegenMode()) { ASM.loadingCamera.transform.position = new Vector3((boundsX / 2), (((boundsX / 2) + (boundsZ / 2)) * 0.8f), (boundsZ / 2)); }
+
         //choose dungeon type (will be influenced elsewhere later)
 
         Debug.Log("GenerateDungeon: DetermineNumOfRooms");
@@ -350,36 +352,42 @@ public class DungeonGeneration : MonoBehaviour
         Debug.Log("GenerateDungeon: CreateHallways");
         yield return StartCoroutine(PG.CreateHallways()); //create hallways
 
-        //spawn player in entry room
-        if (ASM.GetPlayerObject() == null)
+        if (ASM.GetDevMode() && ASM.GetRegenMode())
         {
-            ASM.SpawnPlayer(new Vector3(entryRoomCenter.x, 0.1f, entryRoomCenter.y));
-            currentPlayer = ASM.GetPlayerObject();
-            //set player rotation to face door
-            Vector3 doorPosition = roomObjects[entryRoomID].GetComponent<RoomGeneration>().GetDoorPosition(0);
-            doorPosition.y = currentPlayer.transform.position.y;
-            currentPlayer.GetComponent<PlayerController>().SetPlayerLookAt(doorPosition);
-            currentPlayer.GetComponent<PlayerController>().SetActive(true);
-            currentPlayer.GetComponent<PlayerController>().ToggleHUD(true); //enable player hud
+            //regenerate the dungeon instead of spawning a player
+            yield return new WaitForSeconds(1f);
+            ASM.RestartScene();
         }
-        //else move player to entry room
         else
         {
-            currentPlayer.transform.position = new Vector3(entryRoomCenter.x, 1.5f, entryRoomCenter.y);
-            currentPlayer = ASM.GetPlayerObject();
-            ASM.playerCamera.enabled = true;
-            ASM.loadingCamera.enabled = false;
-            Vector3 doorPosition = roomObjects[entryRoomID].GetComponent<RoomGeneration>().GetDoorPosition(0);
-            doorPosition.y = currentPlayer.transform.position.y;
-            currentPlayer.GetComponent<PlayerController>().SetPlayerLookAt(doorPosition);
-            currentPlayer.GetComponent<PlayerController>().SetActive(true);
-            currentPlayer.GetComponent<PlayerController>().ToggleHUD(true); //enable player hud
+            //spawn player in entry room
+            if (ASM.GetPlayerObject() == null)
+            {
+                ASM.SpawnPlayer(new Vector3(entryRoomCenter.x, 0.1f, entryRoomCenter.y));
+                currentPlayer = ASM.GetPlayerObject();
+                //set player rotation to face door
+                Vector3 doorPosition = roomObjects[entryRoomID].GetComponent<RoomGeneration>().GetDoorPosition(0);
+                doorPosition.y = currentPlayer.transform.position.y;
+                currentPlayer.GetComponent<PlayerController>().SetPlayerLookAt(doorPosition);
+                currentPlayer.GetComponent<PlayerController>().SetActive(true);
+                currentPlayer.GetComponent<PlayerController>().ToggleHUD(true); //enable player hud
+            }
+            //else move player to entry room
+            else
+            {
+                currentPlayer.transform.position = new Vector3(entryRoomCenter.x, 1.5f, entryRoomCenter.y);
+                currentPlayer = ASM.GetPlayerObject();
+                ASM.playerCamera.enabled = true;
+                ASM.loadingCamera.enabled = false;
+                Vector3 doorPosition = roomObjects[entryRoomID].GetComponent<RoomGeneration>().GetDoorPosition(0);
+                doorPosition.y = currentPlayer.transform.position.y;
+                currentPlayer.GetComponent<PlayerController>().SetPlayerLookAt(doorPosition);
+                currentPlayer.GetComponent<PlayerController>().SetActive(true);
+                currentPlayer.GetComponent<PlayerController>().ToggleHUD(true); //enable player hud
+            }
+
+            DRM.StartFloorCounter(); //start floor timer
         }
-
-        DRM.StartFloorCounter(); //start floor timer
-
-        //yield return new WaitForSeconds(1f);
-        //ASM.RestartScene();
 
         if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Generation Complete"); }
     }

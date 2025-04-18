@@ -53,6 +53,10 @@ public class PlayerController : MonoBehaviour
             playerRigid.linearVelocity = Vector3.zero;
             playerRigid.angularVelocity = Vector3.zero;
         }
+        else
+        {
+            UpdatePlayerHealthBar();
+        }
     }
 
 
@@ -612,144 +616,6 @@ public class PlayerController : MonoBehaviour
 
 
 
-    //~~~~~interaction~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    [Header("-Interaction")]
-    [SerializeField] private LayerMask interactionMask;
-    private float interactDistance = 2.5f, interactCooldown = .25f;
-    private bool interacting = false;
-
-    public void OnInteract(InputAction.CallbackContext ctx)
-    {
-        if (active)
-        {
-            //E / Right Bumper
-            if (ctx.performed && !interacting)
-            {
-                //Debug.Log("interact");
-
-                RaycastHit hit;
-                if (Physics.Raycast(playerCamera.transform.position, (playerCamera.transform.forward * interactDistance), out hit, interactDistance, interactionMask))
-                {
-                    //Debug.Log("interact hit " + hit.collider.name);
-                    //Debug.Log("tag " + hit.collider.tag);
-                    interacting = true;
-
-                    switch (hit.collider.tag)
-                    {
-                        case "Door":
-                            //Debug.Log("door, " + hit.collider.GetComponent<AbstractDoorScript>());
-                            hit.collider.GetComponent<AbstractDoorScript>().InteractWithDoor();
-                            break;
-                        case "Portal":
-                            //Debug.Log("portal, " + hit.collider.GetComponent<PortalManager>());
-                            hit.collider.GetComponent<PortalManager>().InteractWithPortal();
-                            break;
-                        case "Consumable":
-                            //Debug.Log("consumable, " + hit.collider.GetComponent<AbstractConsumable>());
-                            hit.collider.GetComponent<AbstractConsumable>().Interact();
-                            break;
-                    }
-                }
-
-                StartCoroutine(ResetInteraction());
-            }
-        }
-    }
-    IEnumerator ResetInteraction()
-    {
-        yield return new WaitForSeconds(interactCooldown);
-        //Debug.Log("interact reset");
-        interacting = false;
-    }
-    //~~~~~interaction~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-
-
-
-    //~~~~~HUD~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    [Header("-HUD")]
-    [SerializeField] private GameObject HUDParent;
-    [SerializeField] private TMP_Text playerHealthText;
-    [SerializeField] private RectTransform playerHealthBarRect;
-    [SerializeField] private Image playerHealthBarImage;
-    private float maxPlayerHealthBarWidth;
-
-    public void ToggleHUD(bool newState)
-    {
-        HUDParent.SetActive(newState);
-    }
-
-    //~~~~~   DOESNT UPDATE WHEN LOADING A NEW FLOOR (SETS HP% TO 0)   ~~~~~//
-    private void UpdatePlayerHealthBar()
-    {
-            //Debug.Log("invincible: " + invincible);
-            //update health bar
-            float hpPercentage = (float)healthPointsCurrent / (float)healthPointsMax;
-            playerHealthBarRect.sizeDelta = new Vector2(maxPlayerHealthBarWidth * hpPercentage, playerHealthBarRect.sizeDelta.y);
-            playerHealthText.text = healthPointsCurrent + " / " + healthPointsMax;
-
-            if (invincible)
-            {
-                playerHealthBarImage.color = Color.magenta;
-            }
-            else if (hpPercentage > 0.5f && hpPercentage <= 1f && !invincible)
-            {
-                playerHealthBarImage.color = Color.green; // Healthy
-            }
-            else if (hpPercentage > 0.2f && hpPercentage <= 0.5f && !invincible)
-            {
-                playerHealthBarImage.color = Color.yellow; // Warning
-            }
-            else if (hpPercentage <= 0.2f && !invincible)
-            {
-                playerHealthBarImage.color = Color.red; // Critical
-            }
-
-            Debug.Log("hpPercetage: " + hpPercentage);
-            vignetteOverlayAnimator.SetFloat("healthPercentage", hpPercentage);
-    }
-
-    private void UpdateInteractionPrompt()
-    {
-        if (active)
-        {
-            //update interaction prompt
-            RaycastHit hit;
-            Debug.DrawRay(playerCamera.transform.position, (playerCamera.transform.forward * interactDistance), Color.red, 1f);
-            if (Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward, out hit, interactDistance, interactionMask))
-            {
-                string promptText = hit.collider.tag;
-                switch (hit.collider.tag)
-                {
-                    case "Door":
-                        promptText = "door";
-                        break;
-                    case "Portal":
-                        promptText = "exit portal";
-                        break;
-                    case "Consumable":
-                        //remove 'prefab' from name string
-                        string consumableName = hit.collider.name;
-                        consumableName = consumableName.Replace("Prefab", "");
-                        promptText = consumableName;
-                        break;
-                    default:
-                        promptText = "???";
-                        break;
-                }
-
-                interactionPromptText.text = "'RB' to interact with " + promptText;
-            }
-            else { interactionPromptText.text = ""; }
-        }
-    }
-    //~~~~~HUD~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-
-
-
     //~~~~~magic~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     [Header("-Magic")]
     //components
@@ -833,7 +699,7 @@ public class PlayerController : MonoBehaviour
             //testing
             shapeName = "Ball";
             effectName = "Explode";
-            elementName = "Force";
+            elementName = "Electric";
 
             curSpell.UpdateSpellScriptShape(shapeName);
             curSpell.UpdateSpellScriptEffect(effectName);
@@ -1050,6 +916,146 @@ public class PlayerController : MonoBehaviour
         }
     }
     //~~~~~stats~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+
+
+    //~~~~~interaction~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    [Header("-Interaction")]
+    [SerializeField] private LayerMask interactionMask;
+    private float interactDistance = 2.5f, interactCooldown = .25f;
+    private bool interacting = false;
+
+    public void OnInteract(InputAction.CallbackContext ctx)
+    {
+        if (active)
+        {
+            //E / Right Bumper
+            if (ctx.performed && !interacting)
+            {
+                //Debug.Log("interact");
+
+                RaycastHit hit;
+                if (Physics.Raycast(playerCamera.transform.position, (playerCamera.transform.forward * interactDistance), out hit, interactDistance, interactionMask))
+                {
+                    //Debug.Log("interact hit " + hit.collider.name);
+                    //Debug.Log("tag " + hit.collider.tag);
+                    interacting = true;
+
+                    switch (hit.collider.tag)
+                    {
+                        case "Door":
+                            //Debug.Log("door, " + hit.collider.GetComponent<AbstractDoorScript>());
+                            hit.collider.GetComponent<AbstractDoorScript>().InteractWithDoor();
+                            break;
+                        case "Portal":
+                            //Debug.Log("portal, " + hit.collider.GetComponent<PortalManager>());
+                            hit.collider.GetComponent<PortalManager>().InteractWithPortal();
+                            break;
+                        case "Consumable":
+                            //Debug.Log("consumable, " + hit.collider.GetComponent<AbstractConsumable>());
+                            hit.collider.GetComponent<AbstractConsumable>().Interact();
+                            break;
+                    }
+                }
+
+                StartCoroutine(ResetInteraction());
+            }
+        }
+    }
+    IEnumerator ResetInteraction()
+    {
+        yield return new WaitForSeconds(interactCooldown);
+        //Debug.Log("interact reset");
+        interacting = false;
+    }
+    //~~~~~interaction~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+
+
+    //~~~~~HUD~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    [Header("-HUD")]
+    [SerializeField] private GameObject HUDParent;
+    [SerializeField] private TMP_Text playerHealthText;
+    [SerializeField] private RectTransform playerHealthBarRect;
+    [SerializeField] private Image playerHealthBarImage;
+    private float maxPlayerHealthBarWidth;
+
+    public void ToggleHUD(bool newState)
+    {
+        HUDParent.SetActive(newState);
+    }
+
+    private void UpdatePlayerHealthBar()
+    {
+        //update health bar
+        float hpPercentage = (float)healthPointsCurrent / (float)healthPointsMax;
+        Debug.Log("hpPercentage: " + hpPercentage);
+        playerHealthBarRect.sizeDelta = new Vector2(maxPlayerHealthBarWidth * hpPercentage, playerHealthBarRect.sizeDelta.y);
+        playerHealthText.text = healthPointsCurrent + " / " + healthPointsMax;
+
+        if (invincible)
+        {
+            playerHealthBarImage.color = Color.magenta;
+        }
+        else if (hpPercentage > 0.5f && hpPercentage <= 1f && !invincible)
+        {
+            playerHealthBarImage.color = Color.green; // Healthy
+        }
+        else if (hpPercentage > 0.2f && hpPercentage <= 0.5f && !invincible)
+        {
+            playerHealthBarImage.color = Color.yellow; // Warning
+        }
+        else if (hpPercentage <= 0.2f && !invincible)
+        {
+            playerHealthBarImage.color = Color.red; // Critical
+        }
+
+        Debug.Log("vignetteOverlayAnimator: " + vignetteOverlayAnimator);
+        vignetteOverlayAnimator.SetFloat("healthPercentage", hpPercentage);
+        Debug.Log("healthPercentage: " + vignetteOverlayAnimator.GetFloat("healthPercentage"));
+    }
+
+    private void UpdateInteractionPrompt()
+    {
+        if (active)
+        {
+            //update interaction prompt
+            RaycastHit hit;
+            Debug.DrawRay(playerCamera.transform.position, (playerCamera.transform.forward * interactDistance), Color.red, 1f);
+            if (Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward, out hit, interactDistance, interactionMask))
+            {
+                string promptText = hit.collider.tag;
+                switch (hit.collider.tag)
+                {
+                    case "Door":
+                        promptText = "door";
+                        break;
+                    case "Portal":
+                        promptText = "exit portal";
+                        break;
+                    case "Consumable":
+                        //remove 'prefab' from name string
+                        string consumableName = hit.collider.name;
+                        consumableName = consumableName.Replace("Prefab", "");
+                        promptText = consumableName;
+                        break;
+                    default:
+                        promptText = "???";
+                        break;
+                }
+
+                interactionPromptText.text = "'RB' to interact with " + promptText;
+            }
+            else { interactionPromptText.text = ""; }
+        }
+    }
+    //~~~~~HUD~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
 
 
 

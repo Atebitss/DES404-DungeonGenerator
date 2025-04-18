@@ -15,6 +15,9 @@ public class AbstractSceneManager : MonoBehaviour
     [SerializeField] private bool visualMode = false;
     public bool GetVisualMode() { return visualMode; }
 
+    [SerializeField] private bool regenMode = false;
+    public bool GetRegenMode() { return regenMode; }
+
 
     //prefabs
     [SerializeField] public GameObject amPrefab;
