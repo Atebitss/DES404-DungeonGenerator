@@ -1495,7 +1495,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d7e51d4e4c60a8469e73ca687febaff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minimapCamera: {fileID: 690711938}
+  loadingCamera: {fileID: 963194227}
   mapBoundsMax: 100
   mapBoundsMin: 100
   treasureRoomsMax: 3

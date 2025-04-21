@@ -482,13 +482,6 @@ public class PathGeneration : MonoBehaviour
                     else if (MG.GetGridState(x, z) == "Hallway" || MG.GetGridState(x, z) == "Doorway")
                     {
                         Debug.Log("PG, path in hallway or doorway space @ pos: " + x + ", " + z);
-                        Vector2[] newHallwaySectionPositions = new Vector2[hallwaySectionPositions.Length + 1]; //new array with increased size
-                        for (int sectionIndex = 0; sectionIndex < hallwaySectionPositions.Length; sectionIndex++) { newHallwaySectionPositions[sectionIndex] = hallwaySectionPositions[sectionIndex]; } //copy old array to new arary
-                        hallwaySectionPositions = newHallwaySectionPositions; //replace old array with new arary
-
-                        hallwaySectionPositions[hallwaySectionIndex] = new Vector2(x, z); //update last new array position
-                        hallwaySectionIndex++; //increase index
-
                         Debug.Log("PG, running neighbour pos check");
                         //check 8 adjacent neighbour positions
                         for (int xOffset = -1; xOffset <= 1; xOffset++)
@@ -512,7 +505,7 @@ public class PathGeneration : MonoBehaviour
                                         Debug.Log("PG, updating with hallway @ neighbour pos: " + neighbourX + ", " + neighbourZ);
                                         MG.UpdateGridState(neighbourX, neighbourZ, "Hallway"); //update grid state
 
-                                        newHallwaySectionPositions = new Vector2[hallwaySectionPositions.Length + 1]; //new array with increased size
+                                        Vector2[] newHallwaySectionPositions = new Vector2[hallwaySectionPositions.Length + 1]; //new array with increased size
                                         for (int sectionIndex = 0; sectionIndex < hallwaySectionPositions.Length; sectionIndex++) { newHallwaySectionPositions[sectionIndex] = hallwaySectionPositions[sectionIndex]; } //copy old array to new arary
                                         hallwaySectionPositions = newHallwaySectionPositions; //replace old array with new arary
 
@@ -568,7 +561,7 @@ public class PathGeneration : MonoBehaviour
 
 
             //create main hallway floor
-            GameObject hallwayFloor = Instantiate(hallwayFloorPrefab, new Vector3(xPos, -1, zPos), Quaternion.identity);
+            GameObject hallwayFloor = Instantiate(hallwayFloorPrefab, new Vector3(xPos, -0.5f, zPos), Quaternion.identity);
             hallwayFloor.transform.parent = hallwayParents[hallwayParentIndex].transform;
             hallwayFloor.name = "Hallway" + hallwayParentIndex + "Floor" + sectionIndex;
 
@@ -624,7 +617,7 @@ public class PathGeneration : MonoBehaviour
                 if(MG.GetGridState(xPos + xOffset, zPos + zOffset) == "Empty")
                 {
                     //create additional hallway floors
-                    hallwayFloor = Instantiate(hallwayFloorPrefab, new Vector3(xPos + xOffset, -1, zPos + zOffset), Quaternion.identity);
+                    hallwayFloor = Instantiate(hallwayFloorPrefab, new Vector3(xPos + xOffset, -0.5f, zPos + zOffset), Quaternion.identity);
                     hallwayFloor.transform.parent = hallwayParents[hallwayParentIndex].transform;
                     hallwayFloor.name = "Hallway" + hallwayParentIndex + "Floor" + sectionIndex + "Adjacent" + wallIndex;
 

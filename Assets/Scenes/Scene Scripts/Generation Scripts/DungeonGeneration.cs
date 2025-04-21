@@ -1641,10 +1641,10 @@ public class DungeonGeneration : MonoBehaviour
                             }
 
                             //update room state with new special room
-                            roomStates[roomID] = specialRoomType[roomTypeID];
+                            roomStates[roomID] = roomStates[roomID] + specialRoomType[roomTypeID];
                             if (specialRoomsFound < usedSpecialRoomIDs.Length) { usedSpecialRoomIDs[specialRoomsFound] = roomTypeID; } //add used room to used special array
                             usedTypeMediumIDs[(roomID - largeRoomNum)] = 20; //set used ID to special ID
-                            if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Defined Common Room " + roomID + " as " + specialRoomType[roomTypeID]); }
+                            if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Defined Special Room " + roomID + " as " + specialRoomType[roomTypeID]); }
                             specialRoomsFound++; //increase number of special rooms spawned
                             if (visualDemo) { yield return new WaitForSeconds(.1f); }
                             continue;

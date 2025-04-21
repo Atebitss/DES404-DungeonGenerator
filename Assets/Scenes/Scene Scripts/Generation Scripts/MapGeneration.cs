@@ -14,7 +14,7 @@ public class MapGeneration : MonoBehaviour
     private PathGeneration PG;
 
     //camera
-    [SerializeField] private Camera minimapCamera;
+    [SerializeField] private Camera loadingCamera;
     //~~~~~misc~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
@@ -136,7 +136,7 @@ public class MapGeneration : MonoBehaviour
         DefineGrid();
 
         //update camera position based on map size
-        if (dbugEnabled && visualDemo) { minimapCamera.transform.position = new Vector3((boundsX / 2), (((boundsX / 2) + (boundsZ / 2)) * 0.8f), (boundsZ / 2)); }
+        if (dbugEnabled && visualDemo) { loadingCamera.transform.position = new Vector3((boundsX / 2), (((boundsX / 2) + (boundsZ / 2)) * 0.8f), (boundsZ / 2)); }
 
         //begin dungeon generation within bounds
         //if(genAttempts > 1) { ASM.RestartScene(); }

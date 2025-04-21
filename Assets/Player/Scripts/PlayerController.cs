@@ -713,7 +713,7 @@ public class PlayerController : MonoBehaviour
 
             //testing
             shapeName = "Ball";
-            effectName = "Chain";
+            effectName = "Explode";
             elementName = "Fire";
             spellStrength = 0.375f;
 

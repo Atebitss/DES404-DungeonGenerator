@@ -657,7 +657,6 @@ public class RoomGeneration : MonoBehaviour
 
         Vector3[] enemyPositions = new Vector3[0];
         GameObject[] enemyTypes = new GameObject[0];
-        float checkDistance = (tileXOffset * 2.5f);
         //Debug.Log("checkDistance: " + tileXOffset);
         //Debug.Log("enemyCount: " + enemyCount);
 
@@ -675,12 +674,12 @@ public class RoomGeneration : MonoBehaviour
 
                 //find if distance between generated position and player is less than checkDistance
                 Vector3 playerPos = ASM.GetPlayerPosition(); //get current player position from abstract scene manager (run every attempt incase player moves)
-                bool playerNearBy = Vector3.Distance(spawnPos, playerPos) < checkDistance; //check if distance between spawn pos & player pos is less than check distance (if false, no player near; if true, player near)
+                bool playerNearBy = Vector3.Distance(spawnPos, playerPos) < (tileXOffset * 2); //check if distance between spawn pos & player pos is less than check distance (if false, no player near; if true, player near)
                 //Debug.Log("spawnPos: " + spawnPos + ", playerPos: " + playerPos + ", distance: " + Vector3.Distance(spawnPos, playerPos) + ", checkDistance: " + checkDistance);
 
                 //check radius around position for walls & other enemies
                 bool wallInRadius = false, enemyInRadius = false;
-                Collider[] hitColliders = Physics.OverlapSphere(spawnPos, checkDistance); //check for colliders within radius of check distance around spawn pos
+                Collider[] hitColliders = Physics.OverlapSphere(spawnPos, tileXOffset); //check for colliders within radius of check distance around spawn pos
                 for(int colliderIndex = 0; colliderIndex < hitColliders.Length; colliderIndex++) //for each collider found
                 {
                     if(hitColliders[colliderIndex].gameObject.CompareTag("Wall"))

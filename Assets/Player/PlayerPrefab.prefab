@@ -449,7 +449,7 @@ MonoBehaviour:
   IntelligencePoints: 1
   WisdomPoints: 1
   invincible: 0
-  permaInvincible: 1
+  permaInvincible: 0
   invincibilityTimer: 0
   vignetteOverlayAnimator: {fileID: 5627751566675936464}
   interactionMask:
@@ -1933,7 +1933,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &17975446201192633
 RectTransform:
   m_ObjectHideFlags: 0
