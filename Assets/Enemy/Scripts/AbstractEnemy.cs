@@ -44,6 +44,7 @@ public abstract class AbstractEnemy : MonoBehaviour
     public string type = "";
     public bool boss = false;
     public bool dual = false;
+    public bool GetDual() { return dual; }
     public void SetDual(bool newDual)
     {
         dual = newDual;
@@ -58,7 +59,7 @@ public abstract class AbstractEnemy : MonoBehaviour
         this.ASM = ASM;
 
         //swap main weapon hand
-        if (Random.Range(0, 2) == 1) //if random number = 1, swap weapon colliders and scripts positions in array
+        if (Random.Range(0, 2) == 1 && !dual) //if random number = 1, swap weapon colliders and scripts positions in array
         {
             GameObject tempWeapon = weaponAttackColliders[0]; //get first weapon collider
             weaponAttackColliders[0] = weaponAttackColliders[1]; //set first position to second weapon
@@ -75,6 +76,7 @@ public abstract class AbstractEnemy : MonoBehaviour
         //if not dual, disable offhand weapon
         if (!dual)
         {
+            //Debug.Log(this.gameObject.transform.parent.gameObject.name + " dual: " + dual);
             weaponAttackColliders[1].SetActive(false);
             EWCMs[1].gameObject.SetActive(false);
         }

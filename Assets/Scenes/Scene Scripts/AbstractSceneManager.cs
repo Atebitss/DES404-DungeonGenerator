@@ -66,7 +66,6 @@ public class AbstractSceneManager : MonoBehaviour
     public GameObject GetPlayerParent() { if (player != null) { return player; } return null; }
 
     public PlayerController PC;
-    public void SetPlayerController (PlayerController newPC) {  PC = newPC; }
     public PlayerController GetPlayerController() { return PC; }
     public void SpawnPlayer(Vector3 pos)
     {
@@ -238,7 +237,7 @@ public class AbstractSceneManager : MonoBehaviour
         curEnemyScript.SetAttackSpeed((curEnemyScript.GetAttackSpeed() * attackSpeedModifier));
 
         //dual chance
-        if(Random.Range(0, 100) <= dualChance)
+        if(Random.Range(0, 100) <= dualChance && !curEnemyScript.GetDual())
         {
             curEnemyScript.SetDual(true);
         }

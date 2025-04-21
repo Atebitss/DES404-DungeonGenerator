@@ -154,6 +154,9 @@ public class AdaptiveDifficultyManager : MonoBehaviour
         numOfHitsDodged = 0;
         dodgeEffectiveness = 0f;
         combosPerformed = 0;
+        numOfSpellsCast = 0;
+        numOfSpellsHit = 0;
+        spellAccuracy = 0f;
         startTime = 0f;
         endTime = 0f;
 
@@ -184,7 +187,9 @@ public class AdaptiveDifficultyManager : MonoBehaviour
             totalTime += timeIndexsOfDamageLastTaken[i];
             //Debug.Log("totalTime: " + totalTime);
         }
+
         avgTimeBetweenDamageTaken = totalTime / timeIndexsOfDamageLastTaken.Length;
+
         //Debug.Log("avgTimeBetweenDamageTaken: " + avgTimeBetweenDamageTaken);
         if (ADDM != null)
         {
@@ -231,6 +236,23 @@ public class AdaptiveDifficultyManager : MonoBehaviour
         combosPerformed++;
         if (ADDM != null) { ADDM.combosPerformed = combosPerformed; }
     }
+
+
+    private int numOfSpellsCast = 0, numOfSpellsHit; //number of casts and hits to determine spell accuracy
+    private float spellAccuracy = 0f, spellStrength = 0f;
+    public float GetSpellAccuracy() { return spellAccuracy; }
+    public void SetSpellStrength(float newSpellStrength) { spellStrength = newSpellStrength; }
+    public void SpellRan()
+    {
+        numOfSpellsCast++;
+        if (ADDM != null) { ADDM.numOfMagicAttacks = numOfSpellsCast; }
+    }
+    public void SpellSuccess()
+    {
+        //Debug.Log("Spell success");
+        numOfSpellsHit++;
+        if (ADDM != null) { ADDM.numOfMagicHits = numOfSpellsHit; }
+    }
     //~~~~~~track stats~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
@@ -248,8 +270,18 @@ public class AdaptiveDifficultyManager : MonoBehaviour
         //difficulty change based on stats
         //calculate average time between damage taken
         float maxExpectedTimeBetweenDamage = 15f;
-        //Debug.Log("TimeBetweenDamageTaken score: " + (avgTimeBetweenDamageTaken / maxExpectedTimeBetweenDamage));
-        skillScore += (avgTimeBetweenDamageTaken / maxExpectedTimeBetweenDamage);
+        if (avgTimeBetweenDamageTaken == 0) 
+        {
+            skillScore += (Time.time - startTime);
+
+            if (ADDM != null)
+            {
+                ADDM.timesDamageTaken = timeIndexsOfDamageLastTaken;
+                ADDM.avgTimeBetweenDamageTaken = (Time.time - startTime);
+            }
+        }
+        else { skillScore += (avgTimeBetweenDamageTaken / maxExpectedTimeBetweenDamage); }
+
         //Debug.Log("skillScore: " + skillScore);
 
 
@@ -272,6 +304,15 @@ public class AdaptiveDifficultyManager : MonoBehaviour
         //add combo useage
         //Debug.Log("combo scored: " + combosPerformed);
         skillScore += combosPerformed;
+        //Debug.Log("skillScore: " + skillScore);
+
+
+        //add spell useage
+        //Debug.Log("spell scored: " + spellsCast);
+        if (numOfSpellsCast > 0) { spellAccuracy = (((float)numOfSpellsHit / (float)numOfSpellsCast)); }
+        //Debug.Log("numOfSpellsHit: " + numOfSpellsHit + " / numOfSpellsCast: " + numOfSpellsCast);
+        //Debug.Log("spellAccuracy score: " + spellAccuracy);
+        skillScore += (spellAccuracy * spellStrength);
         //Debug.Log("skillScore: " + skillScore);
 
 

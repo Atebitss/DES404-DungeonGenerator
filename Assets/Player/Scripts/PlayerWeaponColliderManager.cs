@@ -241,15 +241,15 @@ public class PlayerWeaponColliderManager : MonoBehaviour
     public void SetHitSplash(GameObject newHS) { hitSplashPrefab = newHS; }
 
     //player damage
-    private int attackDamage = 1;
-    public void SetWeaponDamage(int newDamage) { attackDamage = newDamage; }
+    private int attackDamage = -1;
+    //public void SetWeaponDamage(int newDamage) { attackDamage = newDamage; }
 
 
     //damage found enemies
     private void DamageEnemy(GameObject enemy)
     {
         //Debug.Log("attempting to damage " + enemy.transform.parent.name);
-        attackDamage = (PC.GetAttackDamage() + PC.GetAttackDamageModifier()); //get attack damage from player controller
+        attackDamage = ((PC.GetAttackDamage() + PC.GetAttackDamageModifier()) + PC.GetAttackComboDamage()); //get attack damage from player controller
 
         //if enemy is ignored array, skip
         for (int enemyIndex = 0; enemyIndex < ignoredTrackedEnemies.Length; enemyIndex++)

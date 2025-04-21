@@ -5,8 +5,9 @@ using UnityEngine;
 public class AbstractConsumable : MonoBehaviour
 {
     //~~~~~~misc~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    AbstractSceneManager ASM;
-    void Awake() { ASM = GameObject.FindWithTag("SceneManager").GetComponent<AbstractSceneManager>(); }
+    public AbstractSceneManager ASM;
+    public string consumableType = ""; //type of consumable
+    public float consumableTime = -1f; //length of consumable
     //~~~~~~misc~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
@@ -39,8 +40,8 @@ public class AbstractConsumable : MonoBehaviour
             PlayerController PC = ASM.GetPlayerController();
             if (PC != null)
             {
-                //apply effect to player
-                ApplyEffect(PC);
+                PC.GetCVM().ApplyHUDVisual(consumableType, consumableTime); //update HUD visual
+                ApplyEffect(PC); //apply effect to player
                 isUsed = true;
                 StartCoroutine(DestroyConsumable());
             }

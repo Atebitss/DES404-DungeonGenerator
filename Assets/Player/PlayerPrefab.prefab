@@ -400,6 +400,7 @@ MonoBehaviour:
   leftHand: {fileID: 4075520952137028764}
   rightHand: {fileID: 6907946679000108315}
   MV: {fileID: 8332598331872724208}
+  CV: {fileID: 0}
   DbugDisplay: {fileID: 4796008054970737904}
   ADDbugDisplay: {fileID: 7276178659585030838}
   SpellDbugDisplay: {fileID: 2405926329210986906}
@@ -423,16 +424,9 @@ MonoBehaviour:
   weaponParent: {fileID: 4954393113427719825}
   weaponAttackCollider: {fileID: 8225045803689722017}
   PWCM: {fileID: 8198623938989953886}
-  attackDamage: 10
+  attackDamage: 2
   attackSpeed: 1
   PPS: {fileID: 2532494437381932349}
-  interactionMask:
-    serializedVersion: 2
-    m_Bits: 256
-  HUDParent: {fileID: 7062791796487923162}
-  playerHealthText: {fileID: 405076100582398847}
-  playerHealthBarRect: {fileID: 710692867093648824}
-  playerHealthBarImage: {fileID: 3565896714354243369}
   effectName: 
   elementName: 
   shapeName: 
@@ -443,7 +437,7 @@ MonoBehaviour:
   curSpell: {fileID: 0}
   aimLayerMask:
     serializedVersion: 2
-    m_Bits: 392
+    m_Bits: 136
   healthPointsCurrent: 10
   healthPointsMax: 10
   staminaPointsCurrent: 10
@@ -458,6 +452,13 @@ MonoBehaviour:
   permaInvincible: 1
   invincibilityTimer: 0
   vignetteOverlayAnimator: {fileID: 5627751566675936464}
+  interactionMask:
+    serializedVersion: 2
+    m_Bits: 256
+  HUDParent: {fileID: 7062791796487923162}
+  playerHealthText: {fileID: 405076100582398847}
+  playerHealthBarRect: {fileID: 710692867093648824}
+  playerHealthBarImage: {fileID: 3565896714354243369}
 --- !u!82 &631621802871244450
 AudioSource:
   m_ObjectHideFlags: 0
@@ -1399,6 +1400,41 @@ MonoBehaviour:
   m_Spacing: {x: 5, y: 5}
   m_Constraint: 0
   m_ConstraintCount: 2
+--- !u!1 &4322341389425557569
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 481092941108965708}
+  m_Layer: 6
+  m_Name: PlayerConsumableVisual
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &481092941108965708
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4322341389425557569}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3266530071791452112}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -850, y: -350}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &4537674717785410484
 GameObject:
   m_ObjectHideFlags: 0
@@ -1897,7 +1933,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &17975446201192633
 RectTransform:
   m_ObjectHideFlags: 0
@@ -7240,6 +7276,7 @@ GameObject:
   - component: {fileID: 3436191850363739005}
   - component: {fileID: 6344203139748065997}
   - component: {fileID: 6737665910173591734}
+  - component: {fileID: 3523742301590324782}
   m_Layer: 6
   m_Name: PlayerHUD
   m_TagString: Untagged
@@ -7262,6 +7299,7 @@ RectTransform:
   - {fileID: 3817076862400395491}
   - {fileID: 3695976310893028198}
   - {fileID: 220255132329050269}
+  - {fileID: 481092941108965708}
   - {fileID: 277970848915608920}
   - {fileID: 1383597826020622961}
   - {fileID: 4174996067177260875}
@@ -7390,6 +7428,8 @@ MonoBehaviour:
   combosPerformed: 0
   timesDamageTaken: []
   avgTimeBetweenDamageTaken: 0
+  numOfMagicAttacks: 0
+  numOfMagicHits: 0
   currentDifficulty: 0
   startTime: 0
   endTime: 0
@@ -7489,6 +7529,26 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   minimapCamera: {fileID: 0}
+--- !u!114 &3523742301590324782
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7062791796487923162}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 60e4129144f9ed640b1bf34dae4d30ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  consumableVisualsParent: {fileID: 4322341389425557569}
+  cvPrefab: {fileID: 1326170049490198772, guid: 7e504c5111b396b4fa9a035358084ac2, type: 3}
+  consumableImages:
+  - {fileID: 21300000, guid: a81c98c00b8b07e459eb9d7b3ef15596, type: 3}
+  - {fileID: 21300000, guid: 44de790037d3d4546a3be764f3638a1b, type: 3}
+  - {fileID: 21300000, guid: e9b207e391da71945abe5025ae04fc3f, type: 3}
+  - {fileID: 21300000, guid: 3f55ea98e5cf0ab45a1599c10c9538d9, type: 3}
+  - {fileID: 21300000, guid: 9d5358fac54e8ef4089caef2f6dff72f, type: 3}
 --- !u!1 &7276178659585030838
 GameObject:
   m_ObjectHideFlags: 0

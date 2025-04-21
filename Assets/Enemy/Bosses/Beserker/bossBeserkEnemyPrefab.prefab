@@ -291,8 +291,8 @@ MonoBehaviour:
   enemyRigid: {fileID: 5759717008156093597}
   a: {fileID: 1935557783522769971}
   type: 
-  boss: 0
-  dual: 0
+  boss: 1
+  dual: 1
   maxHealth: 0
   health: 20
   attacking: 0

@@ -4,6 +4,12 @@ using UnityEngine;
 
 public class ConsumableControllerHealing : AbstractConsumable
 {
+    private void Awake()
+    {
+        ASM = GameObject.FindWithTag("SceneManager").GetComponent<AbstractSceneManager>();
+        consumableType = "Healing";
+        consumableTime = -1f;
+    }
     public override void ApplyEffect(PlayerController PC)
     {
         //Debug.Log("ConsumableControllerHealing, applying effect to player");

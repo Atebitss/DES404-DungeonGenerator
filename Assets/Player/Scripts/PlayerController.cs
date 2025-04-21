@@ -30,11 +30,16 @@ public class PlayerController : MonoBehaviour
     private BossHealthDisplayManager BHDM; //boss health display manager
     private SpellDbugManager SDM; //spell debug display
 
+
     [Header("-Minimap")]
     [SerializeField] private GameObject MV;
     private MinimapManager MM; //minimap manager
-
     private Camera mainCamera;
+
+    [Header("-HUD")]
+    [SerializeField] private GameObject CV;
+    private ConsumableVisualManager CVM; //consumable visual manager
+    public ConsumableVisualManager GetCVM() { return CVM; }
 
     [Header("-Debug Displays")]
     [SerializeField] private GameObject DbugDisplay;
@@ -72,12 +77,12 @@ public class PlayerController : MonoBehaviour
         SVM = this.gameObject.transform.parent.GetChild(1).GetComponent<SkillVisualizationManager>();
         SDM = this.gameObject.transform.parent.GetChild(1).GetComponent<SpellDbugManager>();
         MM = this.gameObject.transform.parent.GetChild(1).GetComponent<MinimapManager>();
+        CVM = this.gameObject.transform.parent.GetChild(1).GetComponent<ConsumableVisualManager>();
 
         //update camera reference
         if (mainCamera == null) { mainCamera = Camera.main; }
 
         //update weapon collider references
-        PWCM.SetWeaponDamage(attackDamage); //update weapon collider base damage
         if (ADM != null) { PWCM.SetADM(ADM); }
         if (AM != null) { PWCM.SetAM(AM); }
         if (PPS != null) { PWCM.SetHitParticle(PPS); }
@@ -462,6 +467,7 @@ public class PlayerController : MonoBehaviour
 
     private float lightAttackAnimLength = 0.5f, heavyAttackAnimLength = 1f;
     private int attackComboDamage = 0; //additional damage
+    public int GetAttackComboDamage() { return attackComboDamage; } //get additional damage
     private int lightAttackComboCounter = 0; //combo tracker set to one to skip first rotation
     private float lightAttackComboTimer = 0f, lightAttackComboStartTime = 0f; //used to reset combo timer
     [SerializeField] private float lightAttackComboTimerMax = 2.5f;
@@ -509,7 +515,6 @@ public class PlayerController : MonoBehaviour
                 if (lightAttackComboCounter == 0)
                 {
                     attackComboDamage = 0; //reset any temp combo damage
-                    PWCM.SetWeaponDamage(attackDamage);
                 }
 
 
@@ -530,7 +535,6 @@ public class PlayerController : MonoBehaviour
                 {
                     AM.Play("Sword_SwingFinal");
                     attackComboDamage = attackDamage * 2; //double damage added on to regular damage
-                    PWCM.SetWeaponDamage((attackDamage + attackComboDamage));
                 }
 
                 lightAttackComboCounter++; //increase combo
@@ -654,6 +658,8 @@ public class PlayerController : MonoBehaviour
         }
 
 
+        //1f for base difficulty, 0.5f for easy, 1.5f for hard
+        float spellStrength = 1f; //used by adaptive difficulty as a spell skill modifier
         if (curSpell != null)
         {
             //determine random spell shape, effect, and element
@@ -661,9 +667,11 @@ public class PlayerController : MonoBehaviour
             {
                 case 0:
                     shapeName = "Ball";
+                    spellStrength *= 1f;
                     break;
                 case 1:
                     shapeName = "Line";
+                    spellStrength *= 0.5f;
                     break;
             }
 
@@ -671,12 +679,15 @@ public class PlayerController : MonoBehaviour
             {
                 case 0:
                     effectName = "Arc";
+                    spellStrength *= 1f;
                     break;
                 case 1:
                     effectName = "Chain";
+                    spellStrength *= 0.5f;
                     break;
                 case 2:
                     effectName = "Explode";
+                    spellStrength *= 0.5f;
                     break;
             }
 
@@ -684,22 +695,29 @@ public class PlayerController : MonoBehaviour
             {
                 case 0:
                     elementName = "Electric";
+                    spellStrength *= 1f;
                     break;
                 case 1:
                     elementName = "Fire";
+                    spellStrength *= 0.75f;
                     break;
                 case 2:
                     elementName = "Force";
+                    spellStrength *= 0.75f;
                     break;
                 case 3:
                     elementName = "Water";
+                    spellStrength *= 1.5f;
                     break;
             }
 
             //testing
             shapeName = "Ball";
-            effectName = "Explode";
-            elementName = "Electric";
+            effectName = "Chain";
+            elementName = "Fire";
+            spellStrength = 0.375f;
+
+            ADM.SetSpellStrength(spellStrength); //update adaptive difficulty
 
             curSpell.UpdateSpellScriptShape(shapeName);
             curSpell.UpdateSpellScriptEffect(effectName);
@@ -719,6 +737,7 @@ public class PlayerController : MonoBehaviour
                 //Debug.Log("PlayerController, spell casted");
                 curSpell.CastSpell();
                 spellCooldownTimer = spellCooldownMax;
+                ADM.SpellRan(); //update adaptive difficulty
             }
             else
             {
@@ -993,7 +1012,7 @@ public class PlayerController : MonoBehaviour
     {
         //update health bar
         float hpPercentage = (float)healthPointsCurrent / (float)healthPointsMax;
-        Debug.Log("hpPercentage: " + hpPercentage);
+        //Debug.Log("hpPercentage: " + hpPercentage);
         playerHealthBarRect.sizeDelta = new Vector2(maxPlayerHealthBarWidth * hpPercentage, playerHealthBarRect.sizeDelta.y);
         playerHealthText.text = healthPointsCurrent + " / " + healthPointsMax;
 
@@ -1014,9 +1033,9 @@ public class PlayerController : MonoBehaviour
             playerHealthBarImage.color = Color.red; // Critical
         }
 
-        Debug.Log("vignetteOverlayAnimator: " + vignetteOverlayAnimator);
+        //Debug.Log("vignetteOverlayAnimator: " + vignetteOverlayAnimator);
         vignetteOverlayAnimator.SetFloat("healthPercentage", hpPercentage);
-        Debug.Log("healthPercentage: " + vignetteOverlayAnimator.GetFloat("healthPercentage"));
+        //Debug.Log("healthPercentage: " + vignetteOverlayAnimator.GetFloat("healthPercentage"));
     }
 
     private void UpdateInteractionPrompt()

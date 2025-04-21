@@ -30,6 +30,11 @@ public class AdaptiveDifficultyDbugManager : MonoBehaviour
     public float avgTimeBetweenDamageTaken = 0f;
 
 
+    //magic stats
+    public int numOfMagicAttacks = 0;
+    public int numOfMagicHits = 0;
+
+
     //room stats
     public float currentDifficulty = 0f;
     public float startTime = 0f, endTime = 0f;

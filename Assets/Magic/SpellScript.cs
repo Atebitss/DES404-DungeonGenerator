@@ -176,7 +176,7 @@ public class SpellScript : MonoBehaviour
     }
     private void FindEffect()
     {
-        Debug.Log("SpellScript find effect");
+        //Debug.Log("SpellScript find effect");
 
         //if effect name not null
         if (effectName != null)
@@ -186,7 +186,7 @@ public class SpellScript : MonoBehaviour
             System.Type effectType = System.Type.GetType(effectScriptName);
             effectScript = this.gameObject.AddComponent(effectType) as AbstractEffect;
 
-            Debug.Log(effectScript.GetType().ToString() + " found");
+            //Debug.Log(effectScript.GetType().ToString() + " found");
         }
     }
 
@@ -207,7 +207,7 @@ public class SpellScript : MonoBehaviour
     }
     private void FindElement()
     {
-        Debug.Log("SpellScript find element");
+        //Debug.Log("SpellScript find element");
 
         //if element name not null
         if (elementName != null)
@@ -217,7 +217,7 @@ public class SpellScript : MonoBehaviour
             System.Type elementType = System.Type.GetType(elementScriptName);
             elementScript = this.gameObject.AddComponent(elementType) as AbstractElement;
             
-            Debug.Log(elementScript.GetType().ToString() + " found");
+            //Debug.Log(elementScript.GetType().ToString() + " found");
         }
     }
 
@@ -238,7 +238,7 @@ public class SpellScript : MonoBehaviour
     }
     private void FindShape()
     {
-        Debug.Log("SpellScript find shape");
+        //Debug.Log("SpellScript find shape");
 
         //if shape name not null
         if (shapeScript == null)
@@ -248,7 +248,7 @@ public class SpellScript : MonoBehaviour
             System.Type shapeType = System.Type.GetType(shapeScriptName);
             shapeScript = this.gameObject.AddComponent(shapeType) as AbstractShape;
 
-            Debug.Log(shapeScript.GetType().ToString() + " found");
+            //Debug.Log(shapeScript.GetType().ToString() + " found");
         }
     }
 
@@ -257,7 +257,7 @@ public class SpellScript : MonoBehaviour
     //operation center
     public void CastSpell()
     {
-        Debug.Log("SpellScript CastSpell");
+        //Debug.Log("SpellScript CastSpell");
 
         //Debug.Log("shape castable: " + shapeScript.castable);
         //Debug.Log(this.transform.position);
@@ -333,7 +333,7 @@ public class SpellScript : MonoBehaviour
     }
     private void TravelSetup()
     {
-        Debug.Log("Spell Script travel setup");
+        //Debug.Log("Spell Script travel setup");
 
         //start & end positions are set on aim destroy - run at start of CastSpell()
         //the start and end point of the line are constant
@@ -579,13 +579,13 @@ public class SpellScript : MonoBehaviour
                 newTargets = new GameObject[numOfTargets]; //increase array size to number of found targets
                 for(int i = 0; i < tempNewTargets.Length; i++) { newTargets[i] = tempNewTargets[i]; } //fill new array with previously found targets
                 newTargets[numOfTargets - 1] = collisions[check].gameObject; //fill new arrays last position with enemy object
-                Debug.Log("new target " + (numOfTargets - 1) + ": " + newTargets[numOfTargets - 1]);
+                //Debug.Log("new target " + (numOfTargets - 1) + ": " + newTargets[numOfTargets - 1]);
 
                 AbstractEnemy[] tempNewTargetScripts = newTargetScripts; //prep to increase arrays size
                 newTargetScripts = new AbstractEnemy[numOfTargets]; //increase array size to number of found targets
                 for (int i = 0; i < tempNewTargetScripts.Length; i++) { newTargetScripts[i] = tempNewTargetScripts[i]; } //fill new array with previously found targets
                 newTargetScripts[numOfTargets - 1] = collisions[check].gameObject.GetComponent<AbstractEnemy>(); //fill new arrays last position with enemy object
-                Debug.Log("new target script " + (numOfTargets - 1) + ": " + newTargetScripts[numOfTargets - 1]);
+                //Debug.Log("new target script " + (numOfTargets - 1) + ": " + newTargetScripts[numOfTargets - 1]);
             }
         }
 
@@ -616,6 +616,7 @@ public class SpellScript : MonoBehaviour
                     damagesDealt[targetNum] = damageDealt;
 
                     targetScripts[targetNum].AlterHealth(-damageDealt);
+                    ASM.GetADM().SpellSuccess();
 
                     //create hit splash halfway to collision point
                     Vector3 midPoint = ((((targets[targetNum].transform.position + this.transform.position) / 2) + (this.transform.position - targets[targetNum].transform.position).normalized));
