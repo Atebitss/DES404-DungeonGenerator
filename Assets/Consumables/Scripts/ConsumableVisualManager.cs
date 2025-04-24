@@ -94,4 +94,17 @@ public class ConsumableVisualManager : MonoBehaviour
             consumableVisuals[i].transform.localPosition = new Vector3((spawnOffset * i), 0, 0);
         }
     }
+
+
+    public void ResetVisuals()
+    {
+        Debug.Log("ConsumableVisualManager, resetting consumable visuals");
+        //destroy all visuals
+        for (int i = 0; i < consumableVisuals.Length; i++)
+        {
+            Destroy(consumableVisuals[i].gameObject);
+        }
+
+        consumableVisuals = new GameObject[0]; //reset array
+    }
 }

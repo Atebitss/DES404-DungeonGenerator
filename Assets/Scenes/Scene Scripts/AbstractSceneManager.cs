@@ -319,6 +319,9 @@ public class AbstractSceneManager : MonoBehaviour
         //Debug.Log("Floor complete");
         //would contain scene change to post level
 
+        //reset consumable visuals
+        if (PC.GetCVM() != null) { PC.GetCVM().ResetVisuals(); }
+
         //and update dungeon stats
         PC.SetActive(false); //disable player input
         PC.ToggleHUD(false); //disable player hud
