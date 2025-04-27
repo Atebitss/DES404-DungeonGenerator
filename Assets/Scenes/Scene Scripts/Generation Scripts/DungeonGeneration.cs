@@ -255,6 +255,8 @@ public class DungeonGeneration : MonoBehaviour
 
     public void ResetDungeon()
     {
+        DRM.ToggleLoadingVisual(true);
+
         if (roomPositions != null)
         {
             if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Resetting Dungeon"); }
@@ -321,11 +323,15 @@ public class DungeonGeneration : MonoBehaviour
     {
         if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Generating " + dungeonType + " Dungeon"); }
 
-        if (ASM.GetRegenMode()) { ASM.loadingCamera.transform.position = new Vector3((boundsX / 2), (((boundsX / 2) + (boundsZ / 2)) * 0.8f), (boundsZ / 2)); }
+        if (ASM.GetRegenMode()) 
+        {
+            ASM.loadingCamera.transform.position = new Vector3((boundsX / 2), (((boundsX / 2) + (boundsZ / 2)) * 0.8f), (boundsZ / 2));
+            DRM.ToggleLoadingVisual(false);
+        }
 
-        //choose dungeon type (will be influenced elsewhere later)
+            //choose dungeon type (will be influenced elsewhere later)
 
-        Debug.Log("GenerateDungeon: DetermineNumOfRooms");
+            Debug.Log("GenerateDungeon: DetermineNumOfRooms");
         DetermineNumOfRooms(); //calclulate number of possible rooms
 
         Debug.Log("GenerateDungeon: PlotRooms");
@@ -382,6 +388,8 @@ public class DungeonGeneration : MonoBehaviour
                 currentPlayer.GetComponent<PlayerController>().SetPlayerLookAt(doorPosition);
                 currentPlayer.GetComponent<PlayerController>().SetActive(true);
                 currentPlayer.GetComponent<PlayerController>().ToggleHUD(true); //enable player hud
+
+                DRM.ToggleLoadingVisual(false);
             }
 
             DRM.StartFloorCounter(); //start floor timer

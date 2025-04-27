@@ -4,6 +4,15 @@ using UnityEngine;
 
 public class DungeonRealmManager : AbstractSceneManager
 {
+    [SerializeField] private GameObject LoadingVisualParent;
+    public void ToggleLoadingVisual(bool isVisible)
+    {
+        if (LoadingVisualParent != null)
+        {
+            LoadingVisualParent.SetActive(isVisible);
+        }
+    }
+
     override public void RestartScene()
     {
         MapGeneration MG = this.gameObject.GetComponent<MapGeneration>();
