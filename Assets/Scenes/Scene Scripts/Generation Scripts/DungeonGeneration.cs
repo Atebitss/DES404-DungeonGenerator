@@ -27,7 +27,7 @@ public class DungeonGeneration : MonoBehaviour
     private int boundsX, boundsZ; //max dungeon area
     private int totalSpace, numOfRooms, posNumOfRooms, curRoomsSpawned = 0, scale = 2; //room generation
     private int largeRoomNum, mediumRoomNum, smallRoomNum; //number of room sizes
-    [SerializeField] private int largeRoomSizeMin = 15, largeRoomSizeMax = 20, mediumRoomSizeMin = 10, mediumRoomSizeMax = 15, smallRoomSizeMin = 5, smallRoomSizeMax = 10;
+    [SerializeField] private int largeRoomSizeMin = 15, largeRoomSizeMax = 20, mediumRoomSizeMin = 10, mediumRoomSizeMax = 15, smallRoomSizeMin = 5, smallRoomSizeMax = 5;
 
     //map grid
     private Vector2[,] gridPositions; //literal position
@@ -531,8 +531,8 @@ public class DungeonGeneration : MonoBehaviour
                 }
                 else //if making large or medium rooms, find a random position within dungeon area without allowing the new room to pass the area bounds
                 {
-                    roomPosX[curRoomsSpawned] = Random.Range(0, boundsX - roomBoundsX[curRoomsSpawned] + 1);
-                    roomPosZ[curRoomsSpawned] = Random.Range(0, boundsZ - roomBoundsZ[curRoomsSpawned] + 1);
+                    roomPosX[curRoomsSpawned] = Random.Range(0, boundsX - roomBoundsX[curRoomsSpawned]);
+                    roomPosZ[curRoomsSpawned] = Random.Range(0, boundsZ - roomBoundsZ[curRoomsSpawned]);
                 }
 
                 //if the room doesnt over lap another and has distance from other rooms
@@ -635,31 +635,24 @@ public class DungeonGeneration : MonoBehaviour
             if (attempts == maxAttempts) { if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Removing Room " + curRoomsSpawned + "/" + numOfRooms); } }
             if (attempts != maxAttempts)
             {
-                Debug.Log("plotted room " + curRoomsSpawned);
                 //update grid states
                 if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Spawning Room " + curRoomsSpawned + "/" + numOfRooms); }
                 for (int x = roomPosX[curRoomsSpawned]; x < (roomPosX[curRoomsSpawned] + roomBoundsX[curRoomsSpawned]); x++)
                 {
                     for (int z = roomPosZ[curRoomsSpawned]; z < (roomPosZ[curRoomsSpawned] + roomBoundsZ[curRoomsSpawned]); z++)
                     {
-                        //for each tile covered by the room 
-                        if (dbugEnabled)
-                        {
-                            //MG.UpdateHUDDbugText("grid pos @ X: " + x + ", Z: " + z + " is now part of room" + curRoomsSpawned);
-                            MG.UpdateDbugTileTextGridState(x, z, "Room");   //~~~~~   SENDS OUT OF BOUDSN ARRAY   ~~~~~//
-                            MG.UpdateDbugTileMat(x, z, "Room");
-                        }
-
-                        //~~~ ERROR HERE ~~~//
-                        //~~~ possibly checking for an extra x or z ~~~//
                         //Debug.Log("cur pos: (" + x + ") . (" + z + "), max pos: (" + boundsX + ") . (" + boundsZ + ")");
                         if (x >= 0 && x < boundsX && z >= 0 && z < boundsZ)
                         {
                             MG.UpdateGridState(x, z, ("Room" + curRoomsSpawned));
-                        }
-                        else
-                        {
-                            Debug.LogWarning("pos outside bounds");
+
+                            //for each tile covered by the room 
+                            if (dbugEnabled)
+                            {
+                                //MG.UpdateHUDDbugText("grid pos @ X: " + x + ", Z: " + z + " is now part of room" + curRoomsSpawned);
+                                MG.UpdateDbugTileTextGridState(x, z, "Room");   //~~~~~   SENDS OUT OF BOUDSN ARRAY   ~~~~~//
+                                MG.UpdateDbugTileMat(x, z, "Room");
+                            }
                         }
                         roomStates[curRoomsSpawned] = "Empty"; //set room state as empty
                     }
@@ -875,6 +868,7 @@ public class DungeonGeneration : MonoBehaviour
                 if (x == roomPosX[roomID] || x == roomPosX[roomID] + roomBoundsX[roomID] - 1)
                 {
                     //if x is on far end of room x, set to corner
+                    //~~~~~   IS CHECKING MAX BOUNDS HERE   ~~~~~//
                     Debug.Log("x: " + newX + ", z: " + newZ + "   /   tX: " + MG.GetBoundsX() + ", tZ: " + MG.GetBoundsZ());
                     MG.UpdateGridState(newX, newZ, "WallCorner"); //~~~~~   BUG HERE OUT OF BOUNDS   ~~~~~//
                     if (dbugEnabled)
@@ -1217,7 +1211,7 @@ public class DungeonGeneration : MonoBehaviour
                 for (int z = roomPosZ[bossRoomID]; z < (roomPosZ[bossRoomID] + roomBoundsZ[bossRoomID]); z++)
                 {
                     string gridState = MG.GetGridState(x, z);
-                    if (gridState != "Wall" && gridState != "Doorway" && gridState != "WallCorner") //if pos is empty room
+                    if (gridState != "Wall" && gridState != "Doorway" && gridState != "WallCorner" && gridState != "DoorwayEdge") //if pos is empty room
                     {
                         Debug.Log("Dungeon Generation, updating grid positions with boss");
                         Debug.Log("Dungeon Generation, x: " + x + ", z: " + z);
@@ -1372,7 +1366,7 @@ public class DungeonGeneration : MonoBehaviour
                     {
                         string gridState = MG.GetGridState(x, z);
                         //if pos is empty room
-                        if (gridState != "Wall" && gridState != "Doorway" && gridState != "WallCorner")
+                        if (gridState != "Wall" && gridState != "Doorway" && gridState != "WallCorner" && gridState != "DoorwayEdge")
                         {
                             Debug.Log("Dungeon Generation, updating grid position with treasure");
                             Debug.Log("Dungeon Generation, x: " + x + ", z: " + z);
@@ -1488,7 +1482,7 @@ public class DungeonGeneration : MonoBehaviour
                     {
                         string gridState = MG.GetGridState(x, z);
                         //only if pos is empty room
-                        if (gridState != "Wall" && gridState != "Doorway" && gridState != "WallCorner")
+                        if (gridState != "Wall" && gridState != "Doorway" && gridState != "WallCorner" && gridState != "DoorwayEdge")
                         {
                             Debug.Log("Dungeon Generation, updating grid position with special");
                             Debug.Log("Dungeon Generation, x: " + x + ", z: " + z);
