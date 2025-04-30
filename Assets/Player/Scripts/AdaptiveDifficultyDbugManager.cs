@@ -33,6 +33,7 @@ public class AdaptiveDifficultyDbugManager : MonoBehaviour
     //magic stats
     public int numOfMagicAttacks = 0;
     public int numOfMagicHits = 0;
+    private float magicAccuracy = 0f;
 
 
     //room stats
@@ -75,7 +76,8 @@ public class AdaptiveDifficultyDbugManager : MonoBehaviour
     {
         if (ADM.IsStatTracking()) 
         {
-            if(numOfAttacks > 0 && numOfHits > 0) { accuracy = (((float)numOfHits / (float)numOfAttacks)); }
+            if (numOfAttacks > 0 && numOfHits > 0) { accuracy = (((float)numOfHits / (float)numOfAttacks)); }
+            if (numOfMagicAttacks > 0 && numOfMagicHits > 0) { magicAccuracy = (((float)numOfMagicHits / (float)numOfMagicAttacks)); }
             if (numOfDodges > 0 && numOfHitsDodged > 0) { dodgeEffectivness = (((float)numOfHitsDodged / (float)numOfDodges)); }
             UpdateDisplayText(); 
         } 
@@ -93,6 +95,9 @@ public class AdaptiveDifficultyDbugManager : MonoBehaviour
             "   Hits: " + numOfHits +
             "\nAccuracy: " + accuracy +
             "\nCombos: " + combosPerformed +
+            "\nMagic Attacks: " + numOfMagicAttacks +
+            "   Magic Hits: " + numOfMagicHits +
+            "\nMagic Accuracy: " + magicAccuracy +
             "\nDodges: " + numOfDodges +
             "   Hits Dodged: " + numOfHitsDodged +
             "\nDodge Effectiveness: " + dodgeEffectivness +

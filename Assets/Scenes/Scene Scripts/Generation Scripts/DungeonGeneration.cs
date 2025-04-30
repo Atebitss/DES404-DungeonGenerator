@@ -331,29 +331,29 @@ public class DungeonGeneration : MonoBehaviour
 
             //choose dungeon type (will be influenced elsewhere later)
 
-            Debug.Log("GenerateDungeon: DetermineNumOfRooms");
+            //Debug.Log("GenerateDungeon: DetermineNumOfRooms");
         DetermineNumOfRooms(); //calclulate number of possible rooms
 
-        Debug.Log("GenerateDungeon: PlotRooms");
+        //Debug.Log("GenerateDungeon: PlotRooms");
         yield return StartCoroutine(PlotRooms()); //place rooms within dungeon area
 
-        Debug.Log("GenerateDungeon: ReinitialiseWithNewLimit");
+        //Debug.Log("GenerateDungeon: ReinitialiseWithNewLimit");
         ReinitialiseWithNewLimit(); //reset arrays with placed rooms
         if (dbugEnabled) { MG.UpdateHUDDbugText("L: " + largeRoomNum + ", M: " + mediumRoomNum + ", S: " + smallRoomNum + ", TOTAL: " + numOfRooms + "/" + (largeRoomNum + mediumRoomNum + smallRoomNum)); }
         //yield return new WaitForSeconds(50f);
 
-        Debug.Log("GenerateDungeon: DetermineImportantRooms");
+        //Debug.Log("GenerateDungeon: DetermineImportantRooms");
         yield return StartCoroutine(DefineImportantRooms()); //sets room types to unique & reward types
         //yield return new WaitForSeconds(50f);
         
-        Debug.Log("GenerateDungeon: DefineRoomTypes");
+        //Debug.Log("GenerateDungeon: DefineRoomTypes");
         yield return StartCoroutine(DefineRoomTypes()); //sets room types to common types
                                                         //yield return new WaitForSeconds(50f);
 
-        Debug.Log("GenerateDungeon: GenerateRooms");
+        //Debug.Log("GenerateDungeon: GenerateRooms");
         yield return StartCoroutine(GenerateRooms()); //spawn rooms
 
-        Debug.Log("GenerateDungeon: CreateHallways");
+        //Debug.Log("GenerateDungeon: CreateHallways");
         yield return StartCoroutine(PG.CreateHallways()); //create hallways
 
         if (ASM.GetDevMode() && ASM.GetRegenMode())
@@ -402,7 +402,7 @@ public class DungeonGeneration : MonoBehaviour
 
     private void DetermineNumOfRooms()
     {
-        Debug.Log("DetermineNumOfRooms");
+        //Debug.Log("DetermineNumOfRooms");
         if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Calculating Number of Rooms"); }
 
         //determine number of rooms to be spawned
@@ -437,7 +437,7 @@ public class DungeonGeneration : MonoBehaviour
 
     private IEnumerator PlotRooms()
     {
-        Debug.Log("PlotRooms");
+        //Debug.Log("PlotRooms");
         /*
         ~ set room bounds
         ~ select random position within map bounds
@@ -849,7 +849,7 @@ public class DungeonGeneration : MonoBehaviour
 
     private IEnumerator DefineWalls()
     {
-        Debug.Log("DefineWalls");
+        //Debug.Log("DefineWalls");
         if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Defining Walls"); }
 
         /*
@@ -877,7 +877,7 @@ public class DungeonGeneration : MonoBehaviour
                 {
                     //if x is on far end of room x, set to corner
                     //~~~~~   IS CHECKING MAX BOUNDS HERE   ~~~~~//
-                    Debug.Log("x: " + newX + ", z: " + newZ + "   /   tX: " + MG.GetBoundsX() + ", tZ: " + MG.GetBoundsZ());
+                    //Debug.Log("x: " + newX + ", z: " + newZ + "   /   tX: " + MG.GetBoundsX() + ", tZ: " + MG.GetBoundsZ());
                     MG.UpdateGridState(newX, newZ, "WallCorner"); //~~~~~   BUG HERE OUT OF BOUNDS   ~~~~~//
                     if (dbugEnabled)
                     {
@@ -983,7 +983,7 @@ public class DungeonGeneration : MonoBehaviour
 
     private IEnumerator DefineHallways()
     {
-        Debug.Log("DefineHallways");
+        //Debug.Log("DefineHallways");
         if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Defining Hallways"); }
 
         //define rooms to be connected using A* and Prims
@@ -1001,8 +1001,8 @@ public class DungeonGeneration : MonoBehaviour
                     Vector2 startPos = roomCenters[0];
                     Vector2 targetPos = roomCenters[roomID];
 
-                    Debug.Log("room " + roomID + " / " + (curRoomsSpawned));
-                    Debug.Log("hallway from room " + 0 + " to room " + roomID);
+                    //Debug.Log("room " + roomID + " / " + (curRoomsSpawned));
+                    //Debug.Log("hallway from room " + 0 + " to room " + roomID);
 
                     //start room to room path generation
                     yield return StartCoroutine(PG.BeginPathGeneration(startPos, targetPos, boundsX, boundsZ, scale));
@@ -1051,8 +1051,8 @@ public class DungeonGeneration : MonoBehaviour
                     Vector2 startPos = roomCenters[roomID];
                     Vector2 targetPos = roomCenters[nearestRoomID];
 
-                    Debug.Log("room " + roomID + " / " + (curRoomsSpawned));
-                    Debug.Log("hallway from room " + roomID + " to room " + nearestRoomID);
+                    //Debug.Log("room " + roomID + " / " + (curRoomsSpawned));
+                    //Debug.Log("hallway from room " + roomID + " to room " + nearestRoomID);
 
                     //if (dbugEnabled) { MG.UpdateHUDDbugText("joining cur:" + roomID + " & target:" + nearestRoomID); }
 
@@ -1067,27 +1067,27 @@ public class DungeonGeneration : MonoBehaviour
         {
             for (int roomID = (largeRoomNum + mediumRoomNum); roomID < curRoomsSpawned; roomID++)
             {
-                Debug.Log("roomID: " + roomID + ", curRoomsSpawned: " + curRoomsSpawned);
+                //Debug.Log("roomID: " + roomID + ", curRoomsSpawned: " + curRoomsSpawned);
                 //connect each small room to its parent
                 int parentRoomID = roomID - (largeRoomNum + mediumRoomNum);
-                Debug.Log("parentRoomID: " + parentRoomID);
+                //Debug.Log("parentRoomID: " + parentRoomID);
                 if (roomID != parentRoomID)
                 {
-                    Debug.Log("roomID != parentRoomID");
+                    //Debug.Log("roomID != parentRoomID");
                     Vector2 startPos = roomCenters[roomID];
                     Vector2 targetPos = roomCenters[parentRoomID];
                     if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Connecting Small Room " + roomID + " & Room " + parentRoomID); }
 
-                    Debug.Log("room " + roomID + " / " + curRoomsSpawned);
-                    Debug.Log("hallway from room " + roomID + " to room " + parentRoomID);
-                    Debug.Log("hallway from " + startPos + " to " + targetPos);
+                    //Debug.Log("room " + roomID + " / " + curRoomsSpawned);
+                    //Debug.Log("hallway from room " + roomID + " to room " + parentRoomID);
+                    //Debug.Log("hallway from " + startPos + " to " + targetPos);
 
                     //start room to room path generation
                     yield return StartCoroutine(PG.BeginPathGeneration(startPos, targetPos, boundsX, boundsZ, scale));
                     if (visualDemo) { yield return new WaitForSeconds(.1f); }
                     else { yield return null; }
                 }
-                else { Debug.Log("roomID == parentRoomID"); yield return null; }
+                //else { Debug.Log("roomID == parentRoomID"); yield return null; }
             }
         }
         //else { if (dbugEnabled) {MG.UpdateHUDDbugText("scale past hallway gen"); }
@@ -1097,7 +1097,7 @@ public class DungeonGeneration : MonoBehaviour
 
     private void ReinitialiseWithNewLimit()
     {
-        Debug.Log("ReinitialiseWithNewLimit");
+        //Debug.Log("ReinitialiseWithNewLimit");
         if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Recalculating Number of Rooms"); }
 
         numOfRooms = curRoomsSpawned; //set room total to current number of spawned rooms
@@ -1155,7 +1155,7 @@ public class DungeonGeneration : MonoBehaviour
 
     private IEnumerator DefineImportantRooms()
     {
-        Debug.Log("Dungeon Generation, DefineImportantRooms");
+        //Debug.Log("Dungeon Generation, DefineImportantRooms");
         //set room types
         //find large room furthest away from bounds center to define as Boss room
         //find medium or small room furthest away from Boss room to define as Entry room
@@ -1179,7 +1179,7 @@ public class DungeonGeneration : MonoBehaviour
 
     private void FindBossRoom()
     {
-        Debug.Log("Dungeon Generation, FindingBossRoom");
+        //Debug.Log("Dungeon Generation, FindingBossRoom");
         //find large room furthest away from bounds center
         if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Defining Boss Room"); }
 
@@ -1204,7 +1204,7 @@ public class DungeonGeneration : MonoBehaviour
             }
         }
 
-        Debug.Log("Dungeon Generation, boss room id: " + bossRoomID);
+        //Debug.Log("Dungeon Generation, boss room id: " + bossRoomID);
 
         if (bossRoomID != -1) //if boss room found
         {
@@ -1221,8 +1221,8 @@ public class DungeonGeneration : MonoBehaviour
                     string gridState = MG.GetGridState(x, z);
                     if (gridState != "Wall" && gridState != "Doorway" && gridState != "WallCorner" && gridState != "DoorwayEdge") //if pos is empty room
                     {
-                        Debug.Log("Dungeon Generation, updating grid positions with boss");
-                        Debug.Log("Dungeon Generation, x: " + x + ", z: " + z);
+                        //Debug.Log("Dungeon Generation, updating grid positions with boss");
+                        //Debug.Log("Dungeon Generation, x: " + x + ", z: " + z);
                         //update grid state, debug text, and debug material
                         //if (dbugEnabled) { MG.UpdateHUDDbugText("grid pos @ X: " + x + ", Z: " + z + " is now part of room" + curRoomsSpawned); }
                         MG.UpdateGridState(x, z, "BossRoom");
@@ -1239,7 +1239,7 @@ public class DungeonGeneration : MonoBehaviour
 
     private void FindEntryRoom()
     {
-        Debug.Log("Dungeon Generation, FindEntryRoom");
+        //Debug.Log("Dungeon Generation, FindEntryRoom");
         //find medium or small room furthest away from Boss room
         if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Defining Entry Room"); }
 
@@ -1265,7 +1265,7 @@ public class DungeonGeneration : MonoBehaviour
             }
         }
 
-        Debug.Log("Dungeon Generation, entry room id: " + entryRoomID);
+        //Debug.Log("Dungeon Generation, entry room id: " + entryRoomID);
 
         if (entryRoomID != -1) //if entry room found
         {
@@ -1283,8 +1283,8 @@ public class DungeonGeneration : MonoBehaviour
                     //if pos is empty room
                     if (gridState != "Wall" && gridState != "Doorway" && gridState != "WallCorner" && gridState != "DoorwayEdge")
                     {
-                        Debug.Log("Dungeon Generation, updating grid position with entry");
-                        Debug.Log("Dungeon Generation, x: " + x + ", z: " + z);
+                        //Debug.Log("Dungeon Generation, updating grid position with entry");
+                        //Debug.Log("Dungeon Generation, x: " + x + ", z: " + z);
                         //update grid state, debug text, and debug material
                         //if (dbugEnabled) { MG.UpdateHUDDbugText("grid pos @ X: " + x + ", Z: " + z + " is now part of room" + curRoomsSpawned); }
                         MG.UpdateGridState(x, z, "EntryRoom");
@@ -1301,7 +1301,7 @@ public class DungeonGeneration : MonoBehaviour
 
     private void FindTreasureRooms()
     {
-        Debug.Log("Dungeon Generation, FindingTreasureRooms");
+        //Debug.Log("Dungeon Generation, FindingTreasureRooms");
         //find small rooms furthest from Boss & Entry & other Treasure Rooms
         if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Defining Treasure Rooms"); }
 
@@ -1315,7 +1315,7 @@ public class DungeonGeneration : MonoBehaviour
 
         for (int tR = 0; tR < numOfTreasureRooms; tR++) //for each treasure room, find a room
         {
-            Debug.Log("Dungeon Generation, treasure room: " + tR + "/" + numOfTreasureRooms);
+            //Debug.Log("Dungeon Generation, treasure room: " + tR + "/" + numOfTreasureRooms);
             //Debug.Log("tR: " + tR + "/" + numOfTreasureRooms);
 
             for (int roomID = (largeRoomNum + mediumRoomNum); roomID < (largeRoomNum + mediumRoomNum + smallRoomNum); roomID++) //for each small room
@@ -1352,16 +1352,16 @@ public class DungeonGeneration : MonoBehaviour
                     distFromEntryAndBoss = distFromRoomToEntryAndBoss;
                     treasureRoomIDs[tR] = roomID;
                     //if (dbugEnabled) { MG.UpdateHUDDbugText("new treasure room id: " + treasureRoomIDs[tR]); }
-                    //if (dbugEnabled) { Debug.Log("new treasure room id: " + treasureRoomIDs[tR]); }
+                    //if (dbugEnabled) { //Debug.Log("new treasure room id: " + treasureRoomIDs[tR]); }
                 }
             }
 
-            Debug.Log("Dungeon Generation, treasure room " + tR + " id: " + treasureRoomIDs[tR]);
+            //Debug.Log("Dungeon Generation, treasure room " + tR + " id: " + treasureRoomIDs[tR]);
 
             if (treasureRoomIDs[tR] != -1) //if treasure room found
             {
                 if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Defined Treasure Room " + treasureRoomIDs[tR]); }
-                //if (dbugEnabled) { Debug.Log("treasure room id: " + treasureRoomIDs[tR]); }
+                //if (dbugEnabled) { //Debug.Log("treasure room id: " + treasureRoomIDs[tR]); }
 
                 //update room state tracker
                 roomStates[treasureRoomIDs[tR]] = "Treasure"; 
@@ -1376,8 +1376,8 @@ public class DungeonGeneration : MonoBehaviour
                         //if pos is empty room
                         if (gridState != "Wall" && gridState != "Doorway" && gridState != "WallCorner" && gridState != "DoorwayEdge")
                         {
-                            Debug.Log("Dungeon Generation, updating grid position with treasure");
-                            Debug.Log("Dungeon Generation, x: " + x + ", z: " + z);
+                            //Debug.Log("Dungeon Generation, updating grid position with treasure");
+                            //Debug.Log("Dungeon Generation, x: " + x + ", z: " + z);
                             //update grid state, debug text, and debug material
                             //if (dbugEnabled) { MG.UpdateHUDDbugText("grid pos @ X: " + x + ", Z: " + z + " is now part of room" + curRoomsSpawned); }
                             MG.UpdateGridState(x, z, "TreasureRoom");
@@ -1396,7 +1396,7 @@ public class DungeonGeneration : MonoBehaviour
             else 
             {
                 //if (dbugEnabled) { MG.UpdateHUDDbugText("No treasure room found"); }
-                //if (dbugEnabled) { Debug.Log("No treasure room found"); }
+                //if (dbugEnabled) { //Debug.Log("No treasure room found"); }
             }
 
             if(numOfTreasureRoomsFound == numOfTreasureRooms) { break; }
@@ -1405,7 +1405,7 @@ public class DungeonGeneration : MonoBehaviour
 
     private void FindSpecialRooms()
     {
-        Debug.Log("Dungeon Generation, FindSpecialRooms");
+        //Debug.Log("Dungeon Generation, FindSpecialRooms");
         //find medium or small rooms furthest from Boss & Entry & Treasure Rooms & other Special Rooms
         if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Defining Special Rooms"); }
 
@@ -1418,7 +1418,7 @@ public class DungeonGeneration : MonoBehaviour
 
         for (int sR = 0; sR < numOfSpecialRooms; sR++) //for each special room, find a room
         {
-            //if (dbugEnabled) { Debug.Log(sR + "/" + numOfSpecialRooms); }
+            //if (dbugEnabled) { //Debug.Log(sR + "/" + numOfSpecialRooms); }
 
             for (int roomID = largeRoomNum; roomID < (largeRoomNum + mediumRoomNum + smallRoomNum); roomID++) //for each medium and small room
             {
@@ -1471,13 +1471,13 @@ public class DungeonGeneration : MonoBehaviour
                 }
             }
 
-            Debug.Log("Dungeon Generation, special room " + sR + " id: " + specialRoomIDs[sR]);
+            //Debug.Log("Dungeon Generation, special room " + sR + " id: " + specialRoomIDs[sR]);
 
 
             if (specialRoomIDs[sR] != -1) //if special room found
             {
                 if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Defined Special Room " + specialRoomIDs[sR]); }
-                //if (dbugEnabled) { Debug.Log("special room id: " + specialRoomIDs[sR]); }
+                //if (dbugEnabled) { //Debug.Log("special room id: " + specialRoomIDs[sR]); }
 
                 //update room state tracker
                 roomStates[specialRoomIDs[sR]] = "Special";
@@ -1492,8 +1492,8 @@ public class DungeonGeneration : MonoBehaviour
                         //only if pos is empty room
                         if (gridState != "Wall" && gridState != "Doorway" && gridState != "WallCorner" && gridState != "DoorwayEdge")
                         {
-                            Debug.Log("Dungeon Generation, updating grid position with special");
-                            Debug.Log("Dungeon Generation, x: " + x + ", z: " + z);
+                            //Debug.Log("Dungeon Generation, updating grid position with special");
+                            //Debug.Log("Dungeon Generation, x: " + x + ", z: " + z);
                             //update grid state, debug text, and debug material
                             //if (dbugEnabled) { MG.UpdateHUDDbugText("grid pos @ X: " + x + ", Z: " + z + " is now part of room" + curRoomsSpawned); }
                             MG.UpdateGridState(x, z, "SpecialRoom");
@@ -1512,7 +1512,7 @@ public class DungeonGeneration : MonoBehaviour
             else 
             {
                 //if (dbugEnabled) { MG.UpdateHUDDbugText("No special room found"); }
-                //if (dbugEnabled) { Debug.Log("No special room found"); }
+                //if (dbugEnabled) { //Debug.Log("No special room found"); }
             }
 
             //Debug.Log(numOfSpecialRoomsFound + "/" + numOfSpecialRooms);
@@ -1524,13 +1524,13 @@ public class DungeonGeneration : MonoBehaviour
 
     private IEnumerator DefineRoomTypes()
     {
-        Debug.Log("Dungeon Generation, DefineRoomTypes");
+        //Debug.Log("Dungeon Generation, DefineRoomTypes");
         if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Defining Common Room Types"); }
 
         //if specific dungeon type, layout specific
         //otherwise, assign appropriate rooms
 
-        Debug.Log("Dungeon Generation, dunegon type: " + dungeonType);
+        //Debug.Log("Dungeon Generation, dunegon type: " + dungeonType);
          
         if (dungeonType == "Crypt")
         {
@@ -1540,7 +1540,7 @@ public class DungeonGeneration : MonoBehaviour
                 //select random room
                 string roomStateTemp = roomStates[roomID];
                 roomStates[roomID] = "Crypt" + roomStateTemp;
-                Debug.Log("Dungeon Generation, room state: " + roomStates[roomID]);
+                //Debug.Log("Dungeon Generation, room state: " + roomStates[roomID]);
                 if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Defined Common Room " + roomID + " as " + roomStates[roomID]); }
                 if (visualDemo) { yield return new WaitForSeconds(.1f); }
             }
@@ -1554,7 +1554,7 @@ public class DungeonGeneration : MonoBehaviour
                 //if (dbugEnabled) { MG.UpdateHUDDbugText("scale: " + scale); }
                 if (scale == 2)
                 {
-                    Debug.Log("Dungeon Generation, assigning large rooms");
+                    //Debug.Log("Dungeon Generation, assigning large rooms");
                     //if (dbugEnabled) { MG.UpdateHUDDbugText("DG, Assigning " + largeRoomNum + " large rooms"); }
                     //assign large room types
                     string[] largeRoomTypeStrings = new string[largeRoomTypes.Count];
@@ -1562,28 +1562,28 @@ public class DungeonGeneration : MonoBehaviour
 
                     for (int roomID = 0; roomID < largeRoomNum; roomID++)
                     {
-                        Debug.Log("Dungeon Generation, assigning large room: " + roomID);
+                        //Debug.Log("Dungeon Generation, assigning large room: " + roomID);
                         bool valid = false;
                         int inc = 0;
                         int[] curValidRoomIDs = FindThresholdRooms(scale, roomID); //find valid room types
                         int index = Random.Range(0, curValidRoomIDs.Length); //random ID between 0 and max valid types
                         int roomTypeID = curValidRoomIDs[index]; //find random room type
                         int tryCount = 0; //track number of tries
-                        Debug.Log("Dungeon Generation, large roomTypeID: " + curValidRoomIDs[index]);
+                        //Debug.Log("Dungeon Generation, large roomTypeID: " + curValidRoomIDs[index]);
 
                         while (inc == 0) { inc = Random.Range(-1, 1); } //choose to check up or down first
 
                         while (!valid && tryCount < 3) //while room invalid
                         {
                             //if (dbugEnabled) { MG.UpdateHUDDbugText("room type id: " + roomTypeID + ", " + largeRoomTypeStrings[roomTypeID]); }
-                            Debug.Log("Dungeon Generation, is room " + roomID + " valid: " + IsRoomValid(scale, roomTypeID, roomID, curValidRoomIDs.Length)); 
+                            //Debug.Log("Dungeon Generation, is room " + roomID + " valid: " + IsRoomValid(scale, roomTypeID, roomID, curValidRoomIDs.Length)); 
                             valid = IsRoomValid(scale, roomTypeID, roomID, curValidRoomIDs.Length); //set valid to room check
                             //if (dbugEnabled) { MG.UpdateHUDDbugText("valid: " + valid); }
                             
-                            if (valid) { Debug.Log("Dungeon Generation, large room valid"); break; }
+                            if (valid) { /*Debug.Log("Dungeon Generation, large room valid");*/ break; }
                             else if (!valid) //find unused room type, then loop
                             {
-                                Debug.Log("Dungeon Generation, large room not valid");
+                                //Debug.Log("Dungeon Generation, large room not valid");
                                 if (inc == 1 && index >= curValidRoomIDs.Length) //wrap around if exceeding array length
                                 {
                                     index = 0;
@@ -1597,8 +1597,8 @@ public class DungeonGeneration : MonoBehaviour
                                     index += inc;
                                 }
 
-                                Debug.Log("Dungeon Generation, large roomType: " + index + " / " + curValidRoomIDs.Length);
-                                Debug.Log("Dungeon Generation, large roomTypeID: " + curValidRoomIDs[index]);
+                                //Debug.Log("Dungeon Generation, large roomType: " + index + " / " + curValidRoomIDs.Length);
+                                //Debug.Log("Dungeon Generation, large roomTypeID: " + curValidRoomIDs[index]);
                                 roomTypeID = curValidRoomIDs[index];
                                 tryCount++;
                             }
@@ -1606,7 +1606,7 @@ public class DungeonGeneration : MonoBehaviour
 
                         if(tryCount == 3) //if no valid room found after 3 tries, assign a random room type
                         {
-                            Debug.Log("Dungeon Generation, large roomTypeID: " + curValidRoomIDs[index]);
+                            //Debug.Log("Dungeon Generation, large roomTypeID: " + curValidRoomIDs[index]);
                             roomTypeID = Random.Range(0, curValidRoomIDs.Length);
                         }
 
@@ -1619,7 +1619,7 @@ public class DungeonGeneration : MonoBehaviour
                         }*/
                         usedTypeLargeIDs[roomID] = roomTypeID;
                         //if (dbugEnabled) { MG.UpdateHUDDbugText("post usedTypeLargeIDs[roomID]: " + usedTypeLargeIDs[roomID]); }
-                        Debug.Log("Dungeon Generation, room " + roomID + ", large, assigned " + largeRoomTypeStrings[roomTypeID]); 
+                        //Debug.Log("Dungeon Generation, room " + roomID + ", large, assigned " + largeRoomTypeStrings[roomTypeID]); 
                         if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Defined Common Room " + roomID + " as " + largeRoomTypeStrings[roomTypeID]); }
                         //if (dbugEnabled) { MG.UpdateHUDDbugText("room " + roomID + ": large room " + roomID + "/" + largeRoomNum + " set as " + largeRoomTypeStrings[roomTypeID]); }
 
@@ -1633,14 +1633,14 @@ public class DungeonGeneration : MonoBehaviour
                 }
                 else if (scale == 1)
                 {
-                    Debug.Log("Dungeon Generation, assigning medium rooms");
+                    //Debug.Log("Dungeon Generation, assigning medium rooms");
                     //if (dbugEnabled) { MG.UpdateHUDDbugText("DG, Assigning " + mediumRoomNum + " medium rooms"); }
                     //assign medium room types
                     string[] mediumRoomTypeStrings = new string[mediumRoomTypes.Count];
                     mediumRoomTypes.Keys.CopyTo(mediumRoomTypeStrings, 0);
                     for (int roomID = largeRoomNum; roomID < (largeRoomNum + mediumRoomNum); roomID++)
                     {
-                        Debug.Log("Dungeon Generation, assigning medium room: " + roomID);
+                        //Debug.Log("Dungeon Generation, assigning medium room: " + roomID);
                         //Debug.Log((roomID - largeRoomNum) + "/" + usedTypeMediumIDs.Length);
                         //select random room
                         bool valid = false;
@@ -1649,20 +1649,20 @@ public class DungeonGeneration : MonoBehaviour
                         int index = Random.Range(0, curValidRoomIDs.Length); //random number between 0 and max valid rooms
                         int roomTypeID = curValidRoomIDs[index]; //find random room type
                         int tryCount = 0; //track number of tries
-                        Debug.Log("Dungeon Generation, medium roomTypeID: " + curValidRoomIDs[index]);
+                        //Debug.Log("Dungeon Generation, medium roomTypeID: " + curValidRoomIDs[index]);
 
                         while (inc == 0) { inc = Random.Range(-1, 1); } //decide whether to look up or down
 
                         if (roomStates[roomID] == "Special")
                         {
-                            Debug.Log("Dungeon Generation, assigning medium special room");
+                            //Debug.Log("Dungeon Generation, assigning medium special room");
                             //assign special room types
                             //if (dbugEnabled) { MG.UpdateHUDDbugText("special medium room"); }
                             roomTypeID = Random.Range(0, specialRoomType.Length); //find random special room type
-                            Debug.Log("Dungeon Generation, medium special roomTypeID: " + index + " / " + curValidRoomIDs.Length);
+                            //Debug.Log("Dungeon Generation, medium special roomTypeID: " + index + " / " + curValidRoomIDs.Length);
                             while (!valid && tryCount < 3) //while room invalid
                             {
-                                Debug.Log("Dungeon Generation, is room " + roomID + " valid: " + IsRoomValid(scale, roomTypeID, roomID, curValidRoomIDs.Length));
+                                //Debug.Log("Dungeon Generation, is room " + roomID + " valid: " + IsRoomValid(scale, roomTypeID, roomID, curValidRoomIDs.Length));
                                 //if (dbugEnabled) { MG.UpdateHUDDbugText("room type id: " + roomTypeID); }
                                 valid = IsRoomValid(scale, roomTypeID, roomID, curValidRoomIDs.Length); //set valid to room check
                                 //if (dbugEnabled) { MG.UpdateHUDDbugText("valid: " + valid); }
@@ -1680,13 +1680,13 @@ public class DungeonGeneration : MonoBehaviour
                                         roomTypeID = (specialRoomType.Length - 1);
                                     }
                                     tryCount++;
-                                    Debug.Log("Dungeon Generation, medium special roomType: " + index + " / " + curValidRoomIDs.Length);
+                                    //Debug.Log("Dungeon Generation, medium special roomType: " + index + " / " + curValidRoomIDs.Length);
                                 }
                             }
 
                             if (tryCount == 3) //if no valid room found after 3 tries, assign a random room type
                             {
-                                Debug.Log("Dungeon Generation, medium special roomTypeID: " + curValidRoomIDs[index]);
+                                //Debug.Log("Dungeon Generation, medium special roomTypeID: " + curValidRoomIDs[index]);
                                 roomTypeID = Random.Range(0, curValidRoomIDs.Length);
                             }
 
@@ -1694,7 +1694,7 @@ public class DungeonGeneration : MonoBehaviour
                             roomStates[roomID] = roomStates[roomID] + specialRoomType[roomTypeID];
                             if (specialRoomsFound < usedSpecialRoomIDs.Length) { usedSpecialRoomIDs[specialRoomsFound] = roomTypeID; } //add used room to used special array
                             usedTypeMediumIDs[(roomID - largeRoomNum)] = 20; //set used ID to special ID
-                            Debug.Log("Dungeon Generation, room " + roomID + ", medium special, assigned " + specialRoomType[roomTypeID]);
+                            //Debug.Log("Dungeon Generation, room " + roomID + ", medium special, assigned " + specialRoomType[roomTypeID]);
                             if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Defined Special Room " + roomID + " as " + specialRoomType[roomTypeID]); }
                             specialRoomsFound++; //increase number of special rooms spawned
                             if (visualDemo) { yield return new WaitForSeconds(.1f); }
@@ -1702,23 +1702,23 @@ public class DungeonGeneration : MonoBehaviour
                         }
                         else if (roomStates[roomID] == "Entry")
                         {
-                            Debug.Log("Dungeon Generation, assigning medium entry room");
+                            //Debug.Log("Dungeon Generation, assigning medium entry room");
                             //if room state is entry, make room antechamber
                             //if (dbugEnabled) { MG.UpdateHUDDbugText("room " + roomID + ": medium room is already " + roomStates[roomID]); }
                             roomStates[roomID] = "EntryAntechamber";
                             usedTypeMediumIDs[(roomID - largeRoomNum)] = 21; //set used ID tp antechamber ID
-                            Debug.Log("Dungeon Generation, room " + roomID + ", medium entry, assigned " + roomStates[roomID]);
+                            //Debug.Log("Dungeon Generation, room " + roomID + ", medium entry, assigned " + roomStates[roomID]);
                             if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Defined Common Room " + roomID + " as " + roomStates[roomID]); }
                             if (visualDemo) { yield return new WaitForSeconds(.1f); }
                             continue;
                         }
                         else
                         {
-                            Debug.Log("Dungeon Generation, assigning medium room");
+                            //Debug.Log("Dungeon Generation, assigning medium room");
                             while (!valid && tryCount < 3) //while room invalid
                             { 
                                 //if (dbugEnabled) { MG.UpdateHUDDbugText("room type id: " + roomTypeID + ", " + mediumRoomTypeStrings[roomTypeID]); }
-                                Debug.Log("Dungeon Generation, is room " + roomID + " valid: " + IsRoomValid(scale, roomTypeID, roomID, curValidRoomIDs.Length));
+                                //Debug.Log("Dungeon Generation, is room " + roomID + " valid: " + IsRoomValid(scale, roomTypeID, roomID, curValidRoomIDs.Length));
                                 valid = IsRoomValid(scale, roomTypeID, roomID, curValidRoomIDs.Length); //set valid to room check
                                 //if (dbugEnabled) { MG.UpdateHUDDbugText("valid: " + valid); }
 
@@ -1739,8 +1739,8 @@ public class DungeonGeneration : MonoBehaviour
                                         index += inc;
                                     }
 
-                                    Debug.Log("Dungeon Generation, medium roomType: " + index + " / " + curValidRoomIDs.Length);
-                                    Debug.Log("Dungeon Generation, medium roomTypeID: " + curValidRoomIDs[index]);
+                                    //Debug.Log("Dungeon Generation, medium roomType: " + index + " / " + curValidRoomIDs.Length);
+                                    //Debug.Log("Dungeon Generation, medium roomTypeID: " + curValidRoomIDs[index]);
                                     roomTypeID = curValidRoomIDs[index];
                                     tryCount++;
                                 }
@@ -1748,7 +1748,7 @@ public class DungeonGeneration : MonoBehaviour
 
                             if (tryCount == 3) //if no valid room found after 3 tries, assign a random room type
                             {
-                                Debug.Log("Dungeon Generation, medium roomTypeID: " + curValidRoomIDs[index]);
+                                //Debug.Log("Dungeon Generation, medium roomTypeID: " + curValidRoomIDs[index]);
                                 roomTypeID = Random.Range(0, curValidRoomIDs.Length);
                             }
                         }
@@ -1764,19 +1764,19 @@ public class DungeonGeneration : MonoBehaviour
                             MG.UpdateHUDDbugText("largeRoomNum+mediumRoomNum" + (largeRoomNum + mediumRoomNum));
                         }*/
                         usedTypeMediumIDs[(roomID - largeRoomNum)] = roomTypeID; //set used ID to room type ID
-                        Debug.Log("Dungeon Generation, room " + roomID + ", medium, assigned " + mediumRoomTypeStrings[roomTypeID]);
+                        //Debug.Log("Dungeon Generation, room " + roomID + ", medium, assigned " + mediumRoomTypeStrings[roomTypeID]);
                         if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Defined Common Room " + roomID + " as " + mediumRoomTypeStrings[roomTypeID]); }
                         if (visualDemo) { yield return new WaitForSeconds(.1f); }
                     }
                 }
                 else if (scale == 0)
                 {
-                    Debug.Log("Dungeon Generation, assigning small rooms");
+                    //Debug.Log("Dungeon Generation, assigning small rooms");
                     //if (dbugEnabled) { MG.UpdateHUDDbugText("DG, Assigning " + smallRoomNum + " small rooms"); }
                     //assign small room types
                     for (int roomID = (largeRoomNum + mediumRoomNum); roomID < (largeRoomNum + mediumRoomNum + smallRoomNum); roomID++)
                     {
-                        Debug.Log("Dungeon Generation, assigning small room: " + roomID);
+                        //Debug.Log("Dungeon Generation, assigning small room: " + roomID);
                         //Debug.Log((roomID - largeRoomNum - mediumRoomNum) + "/" + smallRoomNum);
                         bool valid = false;
                         int inc = 0;
@@ -1787,13 +1787,13 @@ public class DungeonGeneration : MonoBehaviour
 
                         if (roomStates[roomID] == "Special")
                         {
-                            Debug.Log("Dungeon Generation, assigning small special room");
+                            //Debug.Log("Dungeon Generation, assigning small special room");
                             //Debug.Log("special small room");
                             roomTypeID = Random.Range(0, specialRoomType.Length); //find random special room type ID
                             while (!valid && tryCount < 3) //while room invalid
                             {
                                 //Debug.Log("room type id: " + roomTypeID);
-                                Debug.Log("Dungeon Generation, is room " + roomID + " valid: " + IsRoomValid(scale, roomTypeID, roomID, 0));
+                                //Debug.Log("Dungeon Generation, is room " + roomID + " valid: " + IsRoomValid(scale, roomTypeID, roomID, 0));
                                 valid = IsRoomValid(scale, roomTypeID, roomID, 0); //set valid to room check
                                 //Debug.Log("valid: " + valid);
 
@@ -1812,20 +1812,20 @@ public class DungeonGeneration : MonoBehaviour
                                         roomTypeID = (specialRoomType.Length - 1);
                                     }
                                     tryCount++;
-                                    Debug.Log("Dungeon Generation, small special roomType: " + roomTypeID + " / " + specialRoomType.Length);
+                                    //Debug.Log("Dungeon Generation, small special roomType: " + roomTypeID + " / " + specialRoomType.Length);
                                 }
                             }
 
                             if (tryCount == 3) //if no valid room found after 3 tries, assign a random room type
                             {
-                                Debug.Log("Dungeon Generation, small special roomTypeID: " + specialRoomType[roomTypeID]);
+                                //Debug.Log("Dungeon Generation, small special roomTypeID: " + specialRoomType[roomTypeID]);
                                 roomTypeID = Random.Range(0, specialRoomType.Length);
                             }
 
                             //Debug.Log("adding room state: " + roomTypeID);
                             roomStates[roomID] = roomStates[roomID] + specialRoomType[roomTypeID]; //update room state with special room type
                             if (specialRoomsFound < usedSpecialRoomIDs.Length) { usedSpecialRoomIDs[specialRoomsFound] = roomTypeID; } //add room type ID to special rooms found
-                            Debug.Log("Dungeon Generation, room " + roomID + ", small special, assigned " + specialRoomType[roomTypeID]);
+                            //Debug.Log("Dungeon Generation, room " + roomID + ", small special, assigned " + specialRoomType[roomTypeID]);
                             if (dbugEnabled) { MG.UpdateHUDDbugText("room " + roomID + ": small special room " + (roomID - largeRoomNum - mediumRoomNum) + "/" + smallRoomNum + " set as " + specialRoomType[roomTypeID]); }
                             specialRoomsFound++; //increment special rooms spawned
                             if (visualDemo) { yield return new WaitForSeconds(.1f); }
@@ -1833,12 +1833,12 @@ public class DungeonGeneration : MonoBehaviour
                         }
                         else if (roomStates[roomID] == "Treasure")
                         {
-                            Debug.Log("Dungeon Generation, assigning small treasure room");
+                            //Debug.Log("Dungeon Generation, assigning small treasure room");
                             //Debug.Log("treasure small room");
                             roomTypeID = Random.Range(0, treasureRoomType.Length); //find random treasure room type
                             while (!valid && tryCount < 3) //while room invalid
                             {
-                                Debug.Log("Dungeon Generation, is room " + roomID + " valid: " + IsRoomValid(scale, roomTypeID, roomID, 0));
+                                //Debug.Log("Dungeon Generation, is room " + roomID + " valid: " + IsRoomValid(scale, roomTypeID, roomID, 0));
                                 valid = IsRoomValid(scale, roomTypeID, roomID, 0); //set valid to room check
                                 //Debug.Log("valid: " + valid);
 
@@ -1859,17 +1859,17 @@ public class DungeonGeneration : MonoBehaviour
 
                                     if (tryCount == 3) //if no valid room found after 3 tries, assign a random room type
                                     {
-                                        Debug.Log("Dungeon Generation, small treasure roomTypeID: " + treasureRoomType[roomTypeID]);
+                                        //Debug.Log("Dungeon Generation, small treasure roomTypeID: " + treasureRoomType[roomTypeID]);
                                         roomTypeID = Random.Range(0, treasureRoomType.Length);
                                     }
-                                    Debug.Log("Dungeon Generation, small treasure roomType: " + roomTypeID + " / " + treasureRoomType.Length);
+                                    //Debug.Log("Dungeon Generation, small treasure roomType: " + roomTypeID + " / " + treasureRoomType.Length);
                                 }
                             }
 
                             //Debug.Log("adding room state: " + roomTypeID);
                             roomStates[roomID] = roomStates[roomID] + treasureRoomType[roomTypeID]; //update room state with treasure room type
                             if (treasureRoomsFound < usedTreasureRoomIDs.Length) { usedTreasureRoomIDs[treasureRoomsFound] = roomTypeID; } //add treasure room ID to treasure rooms found
-                            Debug.Log("Dungeon Generation, room " + roomID + ", small treasure, assigned: " + treasureRoomType[roomTypeID]);
+                            //Debug.Log("Dungeon Generation, room " + roomID + ", small treasure, assigned: " + treasureRoomType[roomTypeID]);
                             if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Defined Common Room " + roomID + " as " + treasureRoomType[roomTypeID]); }
                             treasureRoomsFound++; //increment treasure rooms found
                             if (visualDemo) { yield return new WaitForSeconds(.1f); }
@@ -1877,9 +1877,9 @@ public class DungeonGeneration : MonoBehaviour
                         }
                         else if (roomStates[roomID] == "Entry")
                         {
-                            Debug.Log("Dungeon Generation, assigning small entry room");
+                            //Debug.Log("Dungeon Generation, assigning small entry room");
                             //if room has been assigned type entry, skip
-                            Debug.Log("Dungeon Generation, room " + roomID + ", small entry, assigned " + roomStates[roomID]);
+                            //Debug.Log("Dungeon Generation, room " + roomID + ", small entry, assigned " + roomStates[roomID]);
                             if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Defined Common Room " + roomID + " as " + roomStates[roomID]); }
                             roomStates[roomID] = "Entry";
                             if (visualDemo) { yield return new WaitForSeconds(.1f); }
@@ -1887,7 +1887,7 @@ public class DungeonGeneration : MonoBehaviour
                         }
                         else
                         {
-                            Debug.Log("Dungeon Generation, assigning small room");
+                            //Debug.Log("Dungeon Generation, assigning small room");
                             string parentRoomType = roomStates[(roomID - (largeRoomNum + mediumRoomNum))]; //find related room types
                             string roomStateTemp = "";
                             //Debug.Log("room" + roomID + " parent room type: " + parentRoomType);
@@ -1964,7 +1964,7 @@ public class DungeonGeneration : MonoBehaviour
                                         //if found ID is storage and parent room is boss
                                         if(validSmallRoomTypes[roomTypeID] == "Storage" && roomStates[(roomID - (largeRoomNum + mediumRoomNum))] == "Boss")
                                         {
-                                            Debug.Log("Dungeon Generation, assigning small boss storage room");
+                                            //Debug.Log("Dungeon Generation, assigning small boss storage room");
                                             //concatonate storage and boss strings & update room state
                                             roomStateTemp = futureBossRoomType;
                                             roomStates[roomID] = roomStateTemp + validSmallRoomTypes[roomTypeID];
@@ -1972,7 +1972,7 @@ public class DungeonGeneration : MonoBehaviour
                                         //otherwise if found ID is storage
                                         else if (validSmallRoomTypes[roomTypeID] == "Storage")
                                         {
-                                            Debug.Log("Dungeon Generation, assigning small storage room");
+                                            //Debug.Log("Dungeon Generation, assigning small storage room");
                                             //concatonate storage and parent strings & update room state
                                             roomStateTemp = parentRoomType;
                                             roomStates[roomID] = roomStateTemp + validSmallRoomTypes[roomTypeID];
@@ -1980,19 +1980,19 @@ public class DungeonGeneration : MonoBehaviour
                                         //otherwise update room state with found ID
                                         else { roomStates[roomID] = validSmallRoomTypes[roomTypeID]; }
 
-                                        Debug.Log("Dungeon Generation, room " + roomID + ", small, assigned " + validSmallRoomTypes[roomTypeID]);
+                                        //Debug.Log("Dungeon Generation, room " + roomID + ", small, assigned " + validSmallRoomTypes[roomTypeID]);
                                         if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Defined Common Room " + roomID + " as " + validSmallRoomTypes[roomTypeID]); }
                                     }
                                     if (visualDemo) { yield return new WaitForSeconds(.1f); }
                                     break;
                                 default: //shouldnt occur, added due to old issue i think its fixed now
-                                    Debug.Log("Dungeon Generation, assigning small secret room");
+                                    //Debug.Log("Dungeon Generation, assigning small secret room");
                                     //Debug.Log("creating secret room");
                                     roomStateTemp = roomStates[(roomID - (largeRoomNum + mediumRoomNum))];
                                     roomStates[(roomID - (largeRoomNum + mediumRoomNum))] = roomStateTemp + "IllusionRoom";
                                     roomStates[roomID] = "SecretRoom"; //set room state to secret
                                     //Debug.Log("room " + (roomID - (largeRoomNum + mediumRoomNum)) + ": room set as " + roomStates[(roomID - (largeRoomNum + mediumRoomNum))]);
-                                    Debug.Log("Dungeon Generation, room " + roomID + ", small secret, assigned " + roomStates[roomID]);
+                                    //Debug.Log("Dungeon Generation, room " + roomID + ", small secret, assigned " + roomStates[roomID]);
                                     if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Defined Common Room " + roomID + " as " + roomStates[roomID]); }
                                     if (visualDemo) { yield return new WaitForSeconds(.1f); }
                                     break;
@@ -2150,13 +2150,13 @@ public class DungeonGeneration : MonoBehaviour
 
     private IEnumerator GenerateRooms()
     {
-        Debug.Log("Generating Rooms");
+        //Debug.Log("Generating Rooms");
         //generate rooms
         if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Generating Rooms"); }
 
         for (int roomID = 0; roomID < numOfRooms; roomID++)
         {
-            Debug.Log("roomID: " + roomID);
+            //Debug.Log("roomID: " + roomID);
             //for total number of rooms
             //if (dbugEnabled)
             //{

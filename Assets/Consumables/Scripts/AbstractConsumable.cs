@@ -13,7 +13,7 @@ public class AbstractConsumable : MonoBehaviour
 
 
     //~~~~~~start~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    private float destroyTime = 100f; //time before consumable is destroyed
+    private float destroyTime = 10f; //time before consumable is destroyed
     private void Start()
     {
         StartCoroutine(StartConsumable());
