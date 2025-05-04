@@ -42,6 +42,8 @@ public class AdaptiveDifficultyManager : MonoBehaviour
         FillDataFileRoom(); //fill room data
         FillDataFileFloor(); //fill floor data
         EndDataFile(); //end data file
+        HardResetStats();
+        SVM.ResetSVM();
     }
     //~~~~~~misc~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -92,7 +94,7 @@ public class AdaptiveDifficultyManager : MonoBehaviour
     {
         //Debug.Log("Starting stat watch");
         RG = newRG;
-        ResetTrackers();
+        ResetRoomStats();
 
         if (!statTracking)
         {
@@ -140,27 +142,65 @@ public class AdaptiveDifficultyManager : MonoBehaviour
         for (int i = 0; i < roomClearTimes.Length; i++) { newRoomClearTimes[i] = roomClearTimes[i]; }
         newRoomClearTimes[roomClearTimes.Length] = (endTime - startTime); //new time
         roomClearTimes = newRoomClearTimes;
+        totalRoomsCleared++;
 
         Invoke("DisableStatWatch", 0.1f);
     }
     private void DisableStatWatch() { statTracking = false; }
-    private void ResetTrackers()
+    public void HardResetStats()
     {
-        timeIndexsOfDamageLastTaken = new float[0];
+        //reset all variables
         numOfAttacks = 0;
         numOfHits = 0;
         accuracy = 0f;
         combosPerformed = 0;
+
         numOfSpellsCast = 0;
         numOfSpellsHit = 0;
         spellAccuracy = 0f;
+
         numOfDodges = 0;
         numOfHitsDodged = 0;
         dodgeEffectiveness = 0f;
+
+        totalDamageDealt = 0;
+        totalDamageTaken = 0;
+        totalSpellDamageDealt = 0;
+
+        consumablesUsed = 0;
+
+        timeIndexsOfDamageLastTaken = new float[0];
+        avgTimeBetweenDamageTaken = 0f;
+
+        roomsCleared = 0;
+        floorsCleared = 0;
+        roomClearTimes = new float[0];
+        floorClearTimes = new float[0];
+        avgRoomClearTime = 0f;
+        avgFloorClearTime = 0f;
+
+        skillScore = 100f;
+        difficulty = 1;
+
+        if (ADDM != null) { ADDM.ResetRoomStats(); }
+    }
+    private void ResetRoomStats()
+    {
         startTime = 0f;
         endTime = 0f;
 
-        if (ADDM != null) { ADDM.ResetRoomStats(); }
+        numOfAttacks = 0;
+        numOfHits = 0;
+        accuracy = 0f;
+        combosPerformed = 0;
+
+        numOfSpellsCast = 0;
+        numOfSpellsHit = 0;
+        spellAccuracy = 0f;
+
+        numOfDodges = 0;
+        numOfHitsDodged = 0;
+        dodgeEffectiveness = 0f;
     }
 
 
@@ -208,11 +248,13 @@ public class AdaptiveDifficultyManager : MonoBehaviour
     public void AttackRan()
     {
         numOfAttacks++;
+        totalMeleeAttacks++;
         if (ADDM != null) { ADDM.numOfAttacks = numOfAttacks; }
     }
     public void AttackSuccess()
     {
         numOfHits++;
+        totalMeleeHits++;
         if (ADDM != null) { ADDM.numOfHits = numOfHits; }
     }
 
@@ -222,6 +264,7 @@ public class AdaptiveDifficultyManager : MonoBehaviour
     public void ComboPerformed()
     {
         combosPerformed++;
+        totalCombosPerformed++;
         if (ADDM != null) { ADDM.combosPerformed = combosPerformed; }
     }
 
@@ -235,40 +278,15 @@ public class AdaptiveDifficultyManager : MonoBehaviour
     public void SpellRan()
     {
         numOfSpellsCast++;
+        totalSpellAttacks++;
         if (ADDM != null) { ADDM.numOfMagicAttacks = numOfSpellsCast; }
     }
     public void SpellSuccess()
     {
         //Debug.Log("Spell success");
         numOfSpellsHit++;
+        totalSpellHits++;
         if (ADDM != null) { ADDM.numOfMagicHits = numOfSpellsHit; }
-    }
-
-
-    public int totalDamageDealt = 0;
-    public int GetTotalDamageDealt() { return totalDamageDealt; }
-    public void AddDamageDealt(int damage)
-    {
-        totalDamageDealt += damage;
-        if (ADDM != null) { ADDM.totalDamageDealt = totalDamageDealt; }
-    }
-
-
-    public int totalSpellDamageDealt = 0;
-    public int GetTotalSpellDamageDealt() { return totalSpellDamageDealt; }
-    public void AddSpellDamageDealt(int damage)
-    {
-        totalSpellDamageDealt += damage;
-        if (ADDM != null) { ADDM.totalSpellDamageDealt = totalSpellDamageDealt; }
-    }
-
-
-    public int totalDamageTaken = 0;
-    public int GetTotalDamageTaken() { return totalDamageTaken; }
-    public void AddDamageTaken(int damage)
-    {
-        totalDamageTaken += damage;
-        if (ADDM != null) { ADDM.totalDamageTaken = totalDamageTaken; }
     }
 
 
@@ -280,11 +298,13 @@ public class AdaptiveDifficultyManager : MonoBehaviour
     public void DodgeRan()
     {
         numOfDodges++;
+        totalDodges++;
         if (ADDM != null) { ADDM.numOfDodges = numOfDodges; }
     }
     public void DodgeSuccess()
     {
         numOfHitsDodged++;
+        totalDodgesSuccessful++;
         if (ADDM != null) { ADDM.numOfHitsDodged = numOfHitsDodged; }
     }
 
@@ -294,7 +314,77 @@ public class AdaptiveDifficultyManager : MonoBehaviour
     public void ConsumableUsed()
     {
         consumablesUsed++;
+        totalConsumablesUsed++;
         if (ADDM != null) { ADDM.consumablesUsed = consumablesUsed; }
+    }
+
+
+    //session stats
+    private int totalMeleeAttacks = 0;
+    private int totalMeleeHits = 0;
+    private int totalCombosPerformed = 0;
+
+    private int totalSpellAttacks = 0;
+    private int totalSpellHits = 0;
+
+    private int totalDodges = 0;
+    private int totalDodgesSuccessful = 0;
+
+    private int totalConsumablesUsed = 0;
+
+    private int totalRoomsCleared = 0;
+    private int totalFloorsCleared = 0;
+
+    private int totalDamageDealt = 0;
+    private int totalDamageTaken = 0;
+
+    private int totalSpellDamageDealt = 0;
+
+    public int GetTotalMeleeAttacks() { return totalMeleeAttacks; }
+    public int GetTotalMeleeHits() { return totalMeleeHits; }
+    public float GetTotalMeleeAccuracy()
+    {
+        if (totalMeleeAttacks > 0) { return ((float)totalMeleeHits / (float)totalMeleeAttacks); }
+        else { return 0f; }
+    }
+    public int GetTotalCombosPerformed() { return totalCombosPerformed; }
+    public int GetTotalSpellAttacks() { return totalSpellAttacks; }
+    public int GetTotalSpellHits() { return totalSpellHits; }
+    public float GetTotalSpellAccuracy()
+    {
+        if (totalSpellAttacks > 0) { return ((float)totalSpellHits / (float)totalSpellAttacks); }
+        else { return 0f; }
+    }
+    public int GetTotalDodges() { return totalDodges; }
+    public int GetTotalDodgesSuccessful() { return totalDodgesSuccessful; }
+    public float GetTotalDodgeEffectiveness()
+    {
+        if (totalDodges > 0) { return ((float)totalDodgesSuccessful / (float)totalDodges); }
+        else { return 0f; }
+    }
+    public int GetTotalConsumablesUsed() { return totalConsumablesUsed; }
+    public int GetTotalRoomsCleared() { return totalRoomsCleared; }
+    public int GetTotalFloorsCleared() { return totalFloorsCleared; }
+
+    public int GetTotalDamageDealt() { return totalDamageDealt; }
+    public void AddDamageDealt(int damage)
+    {
+        totalDamageDealt += damage;
+        if (ADDM != null) { ADDM.totalDamageDealt = totalDamageDealt; }
+    }
+
+    public int GetTotalDamageTaken() { return totalDamageTaken; }
+    public void AddDamageTaken(int damage)
+    {
+        totalDamageTaken += damage;
+        if (ADDM != null) { ADDM.totalDamageTaken = totalDamageTaken; }
+    }
+
+    public int GetTotalSpellDamageDealt() { return totalSpellDamageDealt; }
+    public void AddSpellDamageDealt(int damage)
+    {
+        totalSpellDamageDealt += damage;
+        if (ADDM != null) { ADDM.totalSpellDamageDealt = totalSpellDamageDealt; }
     }
     //~~~~~~track stats~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -308,8 +398,6 @@ public class AdaptiveDifficultyManager : MonoBehaviour
 
     public void RunDifficultyAdapter()
     {
-        //Debug.Log("Running difficulty adapter");
-
         //difficulty change based on stats
         //calculate average time between damage taken
         float maxExpectedTimeBetweenDamage = 15f;
@@ -325,117 +413,55 @@ public class AdaptiveDifficultyManager : MonoBehaviour
         }
         else { skillScore += (avgTimeBetweenDamageTaken / maxExpectedTimeBetweenDamage); }
 
-        //Debug.Log("skillScore: " + skillScore);
-
-
         //calculate attack accuracy
         if (numOfAttacks > 0) { accuracy = (((float)numOfHits / (float)numOfAttacks)); }
-        //Debug.Log("numOfHits: " + numOfHits + " / numOfAttacks: " + numOfAttacks);
-        //Debug.Log("accuracy score: " + accuracy);
         skillScore += accuracy;
-        //Debug.Log("skillScore: " + skillScore);
-
 
         //add combo useage
-        //Debug.Log("combo scored: " + combosPerformed);
         skillScore += combosPerformed;
-        //Debug.Log("skillScore: " + skillScore);
-
 
         //add spell useage
-        //Debug.Log("spell scored: " + spellsCast);
         if (numOfSpellsCast > 0) { spellAccuracy = (((float)numOfSpellsHit / (float)numOfSpellsCast)); }
-        //Debug.Log("numOfSpellsHit: " + numOfSpellsHit + " / numOfSpellsCast: " + numOfSpellsCast);
-        //Debug.Log("spellAccuracy score: " + spellAccuracy);
         skillScore += (spellAccuracy * spellStrength);
-        //Debug.Log("skillScore: " + skillScore);
-
 
         //calculate dodge effectiveness
         if (numOfDodges > 0) { dodgeEffectiveness = (((float)numOfHitsDodged / (float)numOfDodges)); }
-        //Debug.Log("numOfHitsDodged: " + numOfHitsDodged + " / numOfDodges: " + numOfDodges);
-        //Debug.Log("dodge score: " + dodgeEffectiveness);
         skillScore += dodgeEffectiveness;
-        //Debug.Log("skillScore: " + skillScore);
-
 
         //calculate average room clear time
         float totalRoomClearTime = 0f;
         for (int i = 0; i < roomClearTimes.Length; i++)
         {
-            //Debug.Log("roomClearTimes[" + i + "]: " + roomClearTimes[i]);
             totalRoomClearTime += roomClearTimes[i];
-            //Debug.Log("totalRoomClearTime: " + totalRoomClearTime);
         }
-        avgRoomClearTime = (totalRoomClearTime / (float)roomClearTimes.Length);
-        //Debug.Log("RoomClearTime score: " + avgRoomClearTime);
-        if (roomClearTimes.Length > 0) { skillScore -= (avgRoomClearTime / 10f); }
-        //Debug.Log("skillScore: " + skillScore);
 
+        avgRoomClearTime = (totalRoomClearTime / (float)roomClearTimes.Length);
+        if (roomClearTimes.Length > 0) { skillScore -= (avgRoomClearTime / 10f); }
 
         //add rooms cleared
-        //Debug.Log("roomsCleared score: " + roomsCleared);
         skillScore += ((float)roomsCleared / 10f);
-        //Debug.Log("skillScore: " + skillScore);
-
 
         //calculate average floor clear time
         float totalFloorClearTime = 0f;
         for (int i = 0; i < floorClearTimes.Length; i++)
         {
-            //Debug.Log("floorClearTimes[" + i + "]: " + floorClearTimes[i]);
             totalFloorClearTime += floorClearTimes[i];
-            //Debug.Log("totalFloorClearTime: " + totalFloorClearTime);
         }
-        avgFloorClearTime = (totalFloorClearTime / floorClearTimes.Length);
-        //Debug.Log("FloorClearTime score: " + avgFloorClearTime);
-        if (floorClearTimes.Length > 0) { skillScore -= (avgFloorClearTime / 10f); }
-        //Debug.Log("skillScore: " + skillScore);
 
+        avgFloorClearTime = (totalFloorClearTime / floorClearTimes.Length);
+        if (floorClearTimes.Length > 0) { skillScore -= (avgFloorClearTime / 10f); }
 
         //add floors cleared
-        //Debug.Log("floorsCleared score: " + floorsCleared);
         skillScore += ((float)floorsCleared * 10f);
-        //Debug.Log("skillScore: " + skillScore);
-
 
         //difficulty change based on skillScore
-        //Debug.Log("final skillScore: " + skillScore);
-        if (skillScore <= 25f)
-        {
-            //Debug.Log("difficulty: beginner");
-            difficulty = -1;
-        }
-        else if (skillScore > 25f && skillScore <= 75f)
-        {
-            //Debug.Log("difficulty: easy");
-            difficulty = 0;
-        }
-        else if (skillScore > 75f && skillScore <= 125f)
-        {
-            //Debug.Log("difficulty: normal");
-            difficulty = 1;
-        }
-        else if (skillScore > 125f && skillScore <= 175f)
-        {
-            //Debug.Log("difficulty: hard");
-            difficulty = 2;
-        }
-        else if (skillScore > 175f && skillScore <= 225f)
-        {
-            //Debug.Log("difficulty: tough");
-            difficulty = 3;
-        }
-        else if (skillScore > 225f && skillScore <= 275f)
-        {
-            //Debug.Log("difficulty: dire");
-            difficulty = 4;
-        }
-        else if (skillScore > 275f)
-        {
-            //Debug.Log("difficulty: impossible");
-            difficulty = 5;
-        }
+        if (skillScore <= 25f) { difficulty = -1; }
+        else if (skillScore > 25f && skillScore <= 75f) { difficulty = 0; }
+        else if (skillScore > 75f && skillScore <= 125f) { difficulty = 1; }
+        else if (skillScore > 125f && skillScore <= 175f) { difficulty = 2; }
+        else if (skillScore > 175f && skillScore <= 225f) { difficulty = 3; }
+        else if (skillScore > 225f && skillScore <= 275f) { difficulty = 4; }
+        else if (skillScore > 275f) { difficulty = 5; }
 
         RG.SetPlayerSkillScore(skillScore);
         RG.SetRoomDifficulty(difficulty);
@@ -514,6 +540,7 @@ public class AdaptiveDifficultyManager : MonoBehaviour
     {
         //Debug.Log("Filling data file with floor " + floorsCleared + " data");
 
+        totalFloorsCleared++;
         //update statsData with floor data
         statsData += "Floor: " + floorsCleared + "\n" +
                     "Average Floor Clear Time: " + avgFloorClearTime + "\n" +

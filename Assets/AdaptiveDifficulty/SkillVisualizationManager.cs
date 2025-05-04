@@ -20,6 +20,26 @@ public class SkillVisualizationManager : MonoBehaviour
         ADM = newADM;
     }
 
+    public void ResetSVM()
+    {
+        calledCounter = 0;
+        skillScores = new float[0];
+        graphPoints = new GameObject[0];
+        //reset all x axis titles
+        for (int i = 0; i < xAxisTitleTexts.Length; i++)
+        {
+            xAxisTitleTexts[i].text = "";
+        }
+        //reset all graph points
+        for (int i = 0; i < graphPoints.Length; i++)
+        {
+            if (graphPoints[i] != null)
+            {
+                Destroy(graphPoints[i]);
+            }
+        }
+    }
+
     private void Awake()
     {
         if (containerCornerOffset == Vector3.zero)

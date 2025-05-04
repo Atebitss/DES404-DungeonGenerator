@@ -96,13 +96,12 @@ public class AbstractSceneManager : MonoBehaviour
         if (player != null)
         {
             //Debug.Log("Destroying player");
-            if (dbugMode) { MG.UpdateHUDDbugText("Scene Manager: Destroying Player"); }
-            if (ADM != null) { ADM.End(); }
             PLVM.SetVisualHeader("Death!");
             PLVM.UpdateVisualText();
             playerCamera.enabled = false;
             loadingCamera.enabled = false;
             postLevelCamera.enabled = true;
+            if (dbugMode) { MG.UpdateHUDDbugText("Scene Manager: Destroying Player"); }
             Destroy(player); 
         }
     }

@@ -18,29 +18,35 @@ public class ConsumableGenerationManager : MonoBehaviour
 
 
     //~~~~~~chance~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    private int spawnChance = 50;
+    private int consumeSpawnChance = 50;
     public void OnRoomEntered(int roomDifficulty)
     {
         //Debug.Log("Consumable Generation, OnRoomEntered");
         switch (roomDifficulty)
         {
             case -1:
-                spawnChance = 50;
+                consumeSpawnChance = 75;
                 break;
             case 0:
-                spawnChance = 50;
+                consumeSpawnChance = 50;
                 break;
             case 1:
-                spawnChance = 50;
+                consumeSpawnChance = 25;
                 break;
             case 2:
-                spawnChance = 50;
+                consumeSpawnChance = 20;
                 break;
             case 3:
-                spawnChance = 50;
+                consumeSpawnChance = 15;
+                break;
+            case 4:
+                consumeSpawnChance = 10;
+                break;
+            case 5:
+                consumeSpawnChance = 5;
                 break;
             default:
-                spawnChance = 50;
+                consumeSpawnChance = 50;
                 break;
         }
     }
@@ -56,7 +62,7 @@ public class ConsumableGenerationManager : MonoBehaviour
     {
         //Debug.Log("Consumable Generation, OnEnemyDeath");
         int randomChance = Random.Range(0, 100); //roll generation chance
-        if (randomChance < spawnChance) //if consumable should spawn
+        if (randomChance < consumeSpawnChance) //if consumable should spawn
         {
             //determine which consumable to spawn
             int randomIndex = Random.Range(0, consumableTempPrefabs.Length);
@@ -80,7 +86,7 @@ public class ConsumableGenerationManager : MonoBehaviour
     {
         //Debug.Log("Consumable Generation, OnRoomClear");
         int randomChance = Random.Range(0, 100); //roll generation chance
-        if (randomChance < spawnChance) //if consumable should spawn
+        if (randomChance < consumeSpawnChance) //if consumable should spawn
         {
             //determine which boost consumable to spawn
             int randomIndex = Random.Range(0, consumableBoostPrefabs.Length);

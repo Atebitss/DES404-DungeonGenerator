@@ -329,48 +329,15 @@
                     "isPartOfComposite": false
                 },
                 {
-                    "name": "Two Modifiers",
-                    "id": "da36dbc5-ede6-4e99-98bb-e3205ae341c2",
-                    "path": "TwoModifiers(modifiersOrder=1)",
+                    "name": "",
+                    "id": "42ac983d-03eb-417d-93ce-c4d942efc86d",
+                    "path": "<Gamepad>/dpad/up",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
                     "action": "ToggleDevMode",
-                    "isComposite": true,
+                    "isComposite": false,
                     "isPartOfComposite": false
-                },
-                {
-                    "name": "modifier1",
-                    "id": "13ee4da6-06cc-4f76-a5a4-542340d83b07",
-                    "path": "<Gamepad>/leftShoulder",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "ToggleDevMode",
-                    "isComposite": false,
-                    "isPartOfComposite": true
-                },
-                {
-                    "name": "modifier2",
-                    "id": "73ededfc-d1a3-42e6-a6c1-c390f7fc67ff",
-                    "path": "<Gamepad>/rightShoulder",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "ToggleDevMode",
-                    "isComposite": false,
-                    "isPartOfComposite": true
-                },
-                {
-                    "name": "binding",
-                    "id": "39e7473e-aa07-4c72-8cdf-c7431dc76c92",
-                    "path": "<Gamepad>/buttonWest",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "ToggleDevMode",
-                    "isComposite": false,
-                    "isPartOfComposite": true
                 }
             ]
         }

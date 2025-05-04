@@ -126,7 +126,9 @@ public class PlayerController : MonoBehaviour
         if (active)
         {
             active = false;
+            ADM.End();
             ASM.RestartScene();
+            ADM.HardResetStats();
         }
     }
 

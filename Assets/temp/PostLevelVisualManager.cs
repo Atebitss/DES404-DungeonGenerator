@@ -24,23 +24,24 @@ public class PostLevelVisualManager : MonoBehaviour
         visualText.text =
             "Skill Score: " + ADM.GetSkillScore() +
             "   Difficulty: " + ADM.GetDifficulty() +
-            "\n\nRooms Cleared: " + ADM.GetRoomsCleared() +
+            "\n\nRooms Cleared: " + ADM.GetTotalRoomsCleared() +
             "   Avg Clear Time: " + ADM.GetAvgRoomClearTime() +
-            "\n\nAttacks: " + ADM.GetNumOfAttacks() +
-            "   Hits: " + ADM.GetNumOfHits() +
-            "\nAccuracy: " + ADM.GetAccuracy() +
+            "\nFloors Cleared: " + ADM.GetTotalFloorsCleared() +
+            "\n\nAttacks: " + ADM.GetTotalMeleeAttacks() +
+            "   Hits: " + ADM.GetTotalMeleeHits() +
+            "\nAccuracy: " + ADM.GetTotalMeleeAccuracy() +
             "   Damage Dealt: " + ADM.GetTotalDamageDealt() +
-            "\nCombos Performed: " + ADM.GetCombosPerformed() +
-            "\n\nMagic Attacks: " + ADM.GetNumOfSpellAttacks() +
-            "   Magic Hits: " + ADM.GetNumOfSpellHits() +
-            "\nMagic Accuracy: " + ADM.GetSpellAccuracy() +
+            "\nCombos Performed: " + ADM.GetTotalCombosPerformed() +
+            "\n\nMagic Attacks: " + ADM.GetTotalSpellAttacks() +
+            "   Magic Hits: " + ADM.GetTotalSpellHits() +
+            "\nMagic Accuracy: " + ADM.GetTotalSpellAccuracy() +
             "   Spell Damage Dealt: " + ADM.GetTotalSpellDamageDealt() +
-            "\n\nDodges: " + ADM.GetNumOfDodges() +
-            "   Hits Dodged: " + ADM.GetNumOfHitsDodged() +
-            "\nDodge Effectiveness: " + ADM.GetDodgeEffectiveness() +
+            "\n\nDodges: " + ADM.GetTotalDodges() +
+            "   Hits Dodged: " + ADM.GetTotalDodgesSuccessful() +
+            "\nDodge Effectiveness: " + ADM.GetTotalDodgeEffectiveness() +
             "\n\nHits Taken: " + ADM.GetTimesDamageTaken().Length +
             "   Damage Taken: " + ADM.GetTotalDamageTaken() +
             "\nAvg Time Between Damage: " + ADM.GetAvgTimeBetweenDamageTaken() +
-            "\n\nConsumables Used: " + ADM.GetConsumablesUsed();
+            "\n\nConsumables Used: " + ADM.GetTotalConsumablesUsed();
     }
 }
