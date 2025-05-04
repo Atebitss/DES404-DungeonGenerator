@@ -637,19 +637,19 @@ public class RoomGeneration : MonoBehaviour
                 break;
             case 2:
                 enemyMin = 10;
-                enemyMax = 15;
-                break;
-            case 3:
-                enemyMin = 15;
                 enemyMax = 20;
                 break;
-            case 4:
+            case 3:
                 enemyMin = 20;
-                enemyMax = 25;
+                enemyMax = 30;
+                break;
+            case 4:
+                enemyMin = 30;
+                enemyMax = 50;
                 break;
             case 5:
-                enemyMin = 25;
-                enemyMax = 30;
+                enemyMin = 40;
+                enemyMax = 50;
                 break;
         }
         int enemyCount = Random.Range(enemyMin, enemyMax);

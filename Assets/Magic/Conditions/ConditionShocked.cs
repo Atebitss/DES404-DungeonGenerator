@@ -25,8 +25,8 @@ public class ConditionShocked : AbstractCondition
         duration = 2;
         curDuration = 0;
 
-        if (this.gameObject.GetComponent<ConditionSoaked>()) { /*Debug.Log(targetScript.gameObject.name + " already soaked, extra electric damage");*/ targetScript.AlterHealth(-10); }
-        else if (!this.gameObject.GetComponent<ConditionSoaked>()) { targetScript.AlterHealth(-2); }
+        if (this.gameObject.GetComponent<ConditionSoaked>()) { /*Debug.Log(targetScript.gameObject.name + " already soaked, extra electric damage");*/ targetScript.DamageTarget(10, "electric"); }
+        else if (!this.gameObject.GetComponent<ConditionSoaked>()) { targetScript.DamageTarget(2, "electric"); }
     }
 
 

@@ -294,7 +294,8 @@ MonoBehaviour:
   boss: 1
   dual: 1
   maxHealth: 0
-  health: 20
+  hitSplashPrefab: {fileID: 2683464079042679606, guid: 03b0fd0cb7bf08349877fd7a75a3598b, type: 3}
+  health: 25
   attacking: 0
   attackCooldownTimer: 0
   attackStartTime: 0

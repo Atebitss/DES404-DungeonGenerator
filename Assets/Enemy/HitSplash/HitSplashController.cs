@@ -6,12 +6,34 @@ using UnityEngine.UI;
 
 public class HitSplashController : MonoBehaviour
 {
+    [SerializeField] private Material m_default, m_fire, m_water, m_electric, m_force;
     [SerializeField] private TMP_Text text;
+    [SerializeField] private Image bg;
     private PlayerController PC;
-    public void Wake(PlayerController newPC, int newText)
+    public void Wake(PlayerController newPC, int newText, string dmgType)
     {
         this.PC = newPC;
         text.text = newText.ToString();
+
+        //set color
+        switch(dmgType)
+        {
+            case "fire":
+                bg.material = m_fire;
+                break;
+            case "water":
+                bg.material = m_water;
+                break;
+            case "electric":
+                bg.material = m_electric;
+                break;
+            case "force":
+                bg.material = m_force;
+                break;
+            default:
+                bg.material = m_default;
+                break;
+        }
 
         //get animator
         Animator a = this.gameObject.GetComponent<Animator>();

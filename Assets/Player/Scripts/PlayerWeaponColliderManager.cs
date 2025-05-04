@@ -236,10 +236,6 @@ public class PlayerWeaponColliderManager : MonoBehaviour
     private ParticleSystem PS;
     public void SetHitParticle(ParticleSystem newPS) { PS = newPS; }
 
-    //damage number visual feedback
-    private GameObject hitSplashPrefab;
-    public void SetHitSplash(GameObject newHS) { hitSplashPrefab = newHS; }
-
     //player damage
     private int attackDamage = -1;
     //public void SetWeaponDamage(int newDamage) { attackDamage = newDamage; }
@@ -269,15 +265,7 @@ public class PlayerWeaponColliderManager : MonoBehaviour
         //damage enemy
         Vector3 collisionPoint = enemy.GetComponent<Collider>().ClosestPoint(transform.position); //find collision point
         enemy.GetComponent<AbstractEnemy>().MoveEPS(collisionPoint); //move hit particle system to collision point
-        enemy.GetComponent<AbstractEnemy>().AlterHealth(-attackDamage); //deal damage to enemy
-
-
-        //create hit splash halfway to collision point
-        Vector3 midPoint = ((((collisionPoint + this.transform.position) / 2) + (this.transform.position - collisionPoint).normalized));
-        GameObject curHitSplash = Instantiate(hitSplashPrefab, collisionPoint, Quaternion.Euler(0f, 0f, 0f));
-
-        //wake and play hit splash animation
-        curHitSplash.GetComponent<HitSplashController>().Wake(PC, attackDamage);
+        enemy.GetComponent<AbstractEnemy>().DamageTarget(attackDamage, ""); //deal damage to enemy
 
 
         //play hit sound and particle system
@@ -286,6 +274,7 @@ public class PlayerWeaponColliderManager : MonoBehaviour
 
 
         ADM.AttackSuccess(); //increment attack success count in adaptive difficulty manager
+        ADM.AddDamageDealt(attackDamage); //increment damage total in adaptive difficulty manager
         Invoke("StopPS", 0.5f); //stop particle system after 0.5 seconds
     }
     private void StopPS() { PS.Stop(); }

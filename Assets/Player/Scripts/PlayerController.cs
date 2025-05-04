@@ -86,7 +86,6 @@ public class PlayerController : MonoBehaviour
         if (ADM != null) { PWCM.SetADM(ADM); }
         if (AM != null) { PWCM.SetAM(AM); }
         if (PPS != null) { PWCM.SetHitParticle(PPS); }
-        if (hitSplashPrefab != null) { PWCM.SetHitSplash(hitSplashPrefab); }
         PWCM.SetPC(this);
 
         //display debug infos
@@ -94,14 +93,14 @@ public class PlayerController : MonoBehaviour
         {
             DbugDisplay.SetActive(true);
             ADDbugDisplay.SetActive(true);
-            SVDisplay.SetActive(true);
+            //SVDisplay.SetActive(true);
             SpellDbugDisplay.SetActive(true);
         }
         else
         {
             DbugDisplay.SetActive(false);
             ADDbugDisplay.SetActive(false);
-            SVDisplay.SetActive(false);
+            //SVDisplay.SetActive(false);
             SpellDbugDisplay.SetActive(false);
         }
 
@@ -629,7 +628,7 @@ public class PlayerController : MonoBehaviour
 
     //cooldown
     [SerializeField] private float spellCooldownTimer = 0f;
-    [SerializeField] private float spellCooldownMax = 5f;
+    [SerializeField] private float spellCooldownMax = 10f;
     private float spellStartTime = 0f;
     public void SetSpellCooldownTimer(float newCooldown) { spellCooldownTimer = newCooldown; }
     [SerializeField] private bool castable = true;
@@ -766,20 +765,21 @@ public class PlayerController : MonoBehaviour
     //health points
     public void SetCurrentHealthPoints(int newHealth) { if (!invincible) { /*Debug.Log("setting health: " + newHealth);*/ healthPointsCurrent = newHealth; HealthCheck(); } }
     public void AlterCurrentHealthPoints(int alter) { /*Debug.Log("altering health: " + alter);*/ healthPointsCurrent += alter; HealthCheck(); }
-    public void DamagePlayer(int alter) 
+    public void DamageTarget(int alter) 
     {
         if (!invincible) 
         {
-            //Debug.Log("damaging health: " + alter);
-            //Debug.Log("resistance: " + resistanceModifier);
+            Debug.Log("damaging health: " + alter);
+            Debug.Log("resistance: " + resistanceModifier);
             alter += resistanceModifier; //apply resistance modifier
-            //Debug.Log("damaging health after resistance: " + alter);
-            if (alter < 0)
+            Debug.Log("damaging health after resistance: " + alter);
+            if (alter > 0)
             {
-                healthPointsCurrent += alter;
+                healthPointsCurrent -= alter;
                 VignetteHit();
                 HealthCheck();
                 ADM.DamageTaken();
+                ADM.AddDamageTaken(alter);
             }
         }
     }
@@ -1095,14 +1095,14 @@ public class PlayerController : MonoBehaviour
             {
                 DbugDisplay.SetActive(true);
                 ADDbugDisplay.SetActive(true);
-                SVDisplay.SetActive(true);
+                //SVDisplay.SetActive(true);
                 SpellDbugDisplay.SetActive(true);
             }
             else
             {
                 DbugDisplay.SetActive(false);
                 ADDbugDisplay.SetActive(false);
-                SVDisplay.SetActive(false);
+                //SVDisplay.SetActive(false);
                 SpellDbugDisplay.SetActive(false);
             }
         }

@@ -241,7 +241,7 @@ public class SpellScript : MonoBehaviour
         //Debug.Log("SpellScript find shape");
 
         //if shape name not null
-        if (shapeScript == null)
+        if (shapeName != null)
         {
             //get system type (script) by the name of shape name
             //then add relevant script
@@ -608,23 +608,16 @@ public class SpellScript : MonoBehaviour
             {
                 if (targets[targetNum] != null)
                 {
-                    int randDamage = Random.Range(0, 2);
+                    int randDamage = 0; //Random.Range(0, 2);
 
                     damageDealt = Mathf.RoundToInt(damageCalc);
                     damageDealt += randDamage;
 
                     damagesDealt[targetNum] = damageDealt;
 
-                    targetScripts[targetNum].AlterHealth(-damageDealt);
+                    targetScripts[targetNum].DamageTarget(damageDealt, damageType);
                     ASM.GetADM().SpellSuccess();
-
-                    //create hit splash halfway to collision point
-                    Vector3 midPoint = ((((targets[targetNum].transform.position + this.transform.position) / 2) + (this.transform.position - targets[targetNum].transform.position).normalized));
-                    GameObject curHitSplash = Instantiate(hitSplashPrefab, targets[targetNum].transform.position, Quaternion.Euler(0f, 0f, 0f));
-
-                    //wake and play hit splash animation
-                    curHitSplash.GetComponent<HitSplashController>().Wake(PC, damagesDealt[targetNum]);
-
+                    ASM.GetADM().AddSpellDamageDealt(damageDealt);
                     //Debug.Log("dmg calc on " + targets[targetNum].name + ": " + damageDealt);
                 }
             }

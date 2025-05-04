@@ -28,6 +28,7 @@ public class AbstractSceneManager : MonoBehaviour
     //camera references
     [SerializeField] public Camera playerCamera;
     [SerializeField] public Camera loadingCamera;
+    [SerializeField] public Camera postLevelCamera;
 
 
     //Generation Managers
@@ -48,6 +49,9 @@ public class AbstractSceneManager : MonoBehaviour
 
     private ConsumableGenerationManager CGM;
     public ConsumableGenerationManager GetCGM() { if (CGM != null) { return CGM; } return null; }
+
+    private PostLevelVisualManager PLVM;
+    public PostLevelVisualManager GetPLVM() { if (PLVM != null) { return PLVM; } return null; }
 
 
 
@@ -94,6 +98,11 @@ public class AbstractSceneManager : MonoBehaviour
             //Debug.Log("Destroying player");
             if (dbugMode) { MG.UpdateHUDDbugText("Scene Manager: Destroying Player"); }
             if (ADM != null) { ADM.End(); }
+            PLVM.SetVisualHeader("Death!");
+            PLVM.UpdateVisualText();
+            playerCamera.enabled = false;
+            loadingCamera.enabled = false;
+            postLevelCamera.enabled = true;
             Destroy(player); 
         }
     }
@@ -177,42 +186,42 @@ public class AbstractSceneManager : MonoBehaviour
                 damageModifier = 0.75f;
                 speedModifier = 0.75f;
                 attackSpeedModifier = 0.75f;
-                dualChance = 5;
+                dualChance = 10;
                 break;
             case 1:
                 healthModifier = 1.0f;
                 damageModifier = 1.0f;
                 speedModifier = 1.0f;
                 attackSpeedModifier = 1.0f;
-                dualChance = 10;
+                dualChance = 25;
                 break;
             case 2:
                 healthModifier = 1.25f;
                 damageModifier = 1.25f;
                 speedModifier = 1.25f;
                 attackSpeedModifier = 1.25f;
-                dualChance = 20;
+                dualChance = 40;
                 break;
             case 3:
                 healthModifier = 1.5f;
                 damageModifier = 1.5f;
                 speedModifier = 1.5f;
                 attackSpeedModifier = 1.5f;
-                dualChance = 30;
+                dualChance = 55;
                 break;
             case 4:
                 healthModifier = 1.75f;
                 damageModifier = 1.75f;
                 speedModifier = 1.75f;
                 attackSpeedModifier = 1.75f;
-                dualChance = 40;
+                dualChance = 75;
                 break;
             case 5:
                 healthModifier = 2f;
                 damageModifier = 2f;
                 speedModifier = 2f;
                 attackSpeedModifier = 2f;
-                dualChance = 50;
+                dualChance = 100;
                 break;
         }
 
@@ -304,9 +313,14 @@ public class AbstractSceneManager : MonoBehaviour
         PG = this.gameObject.GetComponent<PathGeneration>();
         ADM = this.gameObject.GetComponent<AdaptiveDifficultyManager>();
         CGM = this.gameObject.GetComponent<ConsumableGenerationManager>();
+        PLVM = this.gameObject.GetComponent<PostLevelVisualManager>();
+        PLVM.Wake(this);
 
         dbugMode = GetDbugMode();
         visualMode = GetVisualMode();
+
+        postLevelCamera.enabled = false;
+        loadingCamera.enabled = true;
     }
     void Start()
     {
@@ -328,7 +342,11 @@ public class AbstractSceneManager : MonoBehaviour
 
         //swap main camera to loading camera
         playerCamera.enabled = false;
-        loadingCamera.enabled = true;
+        loadingCamera.enabled = false;
+        postLevelCamera.enabled = true;
+
+        PLVM.SetVisualHeader("Floor Cleared!");
+        PLVM.UpdateVisualText();
 
         NewFloor(); //generate new floor
     }

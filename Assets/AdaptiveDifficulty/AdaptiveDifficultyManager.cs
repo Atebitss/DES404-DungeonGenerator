@@ -150,13 +150,13 @@ public class AdaptiveDifficultyManager : MonoBehaviour
         numOfAttacks = 0;
         numOfHits = 0;
         accuracy = 0f;
-        numOfDodges = 0;
-        numOfHitsDodged = 0;
-        dodgeEffectiveness = 0f;
         combosPerformed = 0;
         numOfSpellsCast = 0;
         numOfSpellsHit = 0;
         spellAccuracy = 0f;
+        numOfDodges = 0;
+        numOfHitsDodged = 0;
+        dodgeEffectiveness = 0f;
         startTime = 0f;
         endTime = 0f;
 
@@ -167,6 +167,7 @@ public class AdaptiveDifficultyManager : MonoBehaviour
 
     private float[] timeIndexsOfDamageLastTaken = new float[0]; //time of when damage last taken
     private float avgTimeBetweenDamageTaken = 0f;
+    public float[] GetTimesDamageTaken() { return timeIndexsOfDamageLastTaken; }
     public float GetAvgTimeBetweenDamageTaken() { return avgTimeBetweenDamageTaken; }
     public void DamageTaken()
     {
@@ -201,6 +202,8 @@ public class AdaptiveDifficultyManager : MonoBehaviour
 
     private int numOfAttacks = 0, numOfHits = 0; //number of swings and hits to detemine accuracy
     private float accuracy = 0f;
+    public int GetNumOfAttacks() { return numOfAttacks; }
+    public int GetNumOfHits() { return numOfHits; }
     public float GetAccuracy() { return accuracy; }
     public void AttackRan()
     {
@@ -211,21 +214,6 @@ public class AdaptiveDifficultyManager : MonoBehaviour
     {
         numOfHits++;
         if (ADDM != null) { ADDM.numOfHits = numOfHits; }
-    }
-
-
-    private int numOfDodges = 0, numOfHitsDodged = 0; //number of dodges and hits dodged to determine dodge percision
-    private float dodgeEffectiveness = 0f;
-    public float GetDodgeEffectiveness() { return dodgeEffectiveness; }
-    public void DodgeRan()
-    {
-        numOfDodges++;
-        if (ADDM != null) { ADDM.numOfDodges = numOfDodges; }
-    }
-    public void DodgeSuccess()
-    {
-        numOfHitsDodged++;
-        if (ADDM != null) { ADDM.numOfHitsDodged = numOfHitsDodged; }
     }
 
 
@@ -240,6 +228,8 @@ public class AdaptiveDifficultyManager : MonoBehaviour
 
     private int numOfSpellsCast = 0, numOfSpellsHit; //number of casts and hits to determine spell accuracy
     private float spellAccuracy = 0f, spellStrength = 0f;
+    public int GetNumOfSpellAttacks() { return numOfSpellsCast; }
+    public int GetNumOfSpellHits() { return numOfSpellsHit; }
     public float GetSpellAccuracy() { return spellAccuracy; }
     public void SetSpellStrength(float newSpellStrength) { spellStrength = newSpellStrength; }
     public void SpellRan()
@@ -252,6 +242,59 @@ public class AdaptiveDifficultyManager : MonoBehaviour
         //Debug.Log("Spell success");
         numOfSpellsHit++;
         if (ADDM != null) { ADDM.numOfMagicHits = numOfSpellsHit; }
+    }
+
+
+    public int totalDamageDealt = 0;
+    public int GetTotalDamageDealt() { return totalDamageDealt; }
+    public void AddDamageDealt(int damage)
+    {
+        totalDamageDealt += damage;
+        if (ADDM != null) { ADDM.totalDamageDealt = totalDamageDealt; }
+    }
+
+
+    public int totalSpellDamageDealt = 0;
+    public int GetTotalSpellDamageDealt() { return totalSpellDamageDealt; }
+    public void AddSpellDamageDealt(int damage)
+    {
+        totalSpellDamageDealt += damage;
+        if (ADDM != null) { ADDM.totalSpellDamageDealt = totalSpellDamageDealt; }
+    }
+
+
+    public int totalDamageTaken = 0;
+    public int GetTotalDamageTaken() { return totalDamageTaken; }
+    public void AddDamageTaken(int damage)
+    {
+        totalDamageTaken += damage;
+        if (ADDM != null) { ADDM.totalDamageTaken = totalDamageTaken; }
+    }
+
+
+    private int numOfDodges = 0, numOfHitsDodged = 0; //number of dodges and hits dodged to determine dodge percision
+    private float dodgeEffectiveness = 0f;
+    public int GetNumOfDodges() { return numOfDodges; }
+    public int GetNumOfHitsDodged() { return numOfHitsDodged; }
+    public float GetDodgeEffectiveness() { return dodgeEffectiveness; }
+    public void DodgeRan()
+    {
+        numOfDodges++;
+        if (ADDM != null) { ADDM.numOfDodges = numOfDodges; }
+    }
+    public void DodgeSuccess()
+    {
+        numOfHitsDodged++;
+        if (ADDM != null) { ADDM.numOfHitsDodged = numOfHitsDodged; }
+    }
+
+
+    private int consumablesUsed = 0; //number of consumables used
+    public int GetConsumablesUsed() { return consumablesUsed; }
+    public void ConsumableUsed()
+    {
+        consumablesUsed++;
+        if (ADDM != null) { ADDM.consumablesUsed = consumablesUsed; }
     }
     //~~~~~~track stats~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -293,14 +336,6 @@ public class AdaptiveDifficultyManager : MonoBehaviour
         //Debug.Log("skillScore: " + skillScore);
 
 
-        //calculate dodge effectiveness
-        if (numOfDodges > 0) { dodgeEffectiveness = (((float)numOfHitsDodged / (float)numOfDodges)); }
-        //Debug.Log("numOfHitsDodged: " + numOfHitsDodged + " / numOfDodges: " + numOfDodges);
-        //Debug.Log("dodge score: " + dodgeEffectiveness);
-        skillScore += dodgeEffectiveness;
-        //Debug.Log("skillScore: " + skillScore);
-
-
         //add combo useage
         //Debug.Log("combo scored: " + combosPerformed);
         skillScore += combosPerformed;
@@ -313,6 +348,14 @@ public class AdaptiveDifficultyManager : MonoBehaviour
         //Debug.Log("numOfSpellsHit: " + numOfSpellsHit + " / numOfSpellsCast: " + numOfSpellsCast);
         //Debug.Log("spellAccuracy score: " + spellAccuracy);
         skillScore += (spellAccuracy * spellStrength);
+        //Debug.Log("skillScore: " + skillScore);
+
+
+        //calculate dodge effectiveness
+        if (numOfDodges > 0) { dodgeEffectiveness = (((float)numOfHitsDodged / (float)numOfDodges)); }
+        //Debug.Log("numOfHitsDodged: " + numOfHitsDodged + " / numOfDodges: " + numOfDodges);
+        //Debug.Log("dodge score: " + dodgeEffectiveness);
+        skillScore += dodgeEffectiveness;
         //Debug.Log("skillScore: " + skillScore);
 
 
@@ -378,10 +421,20 @@ public class AdaptiveDifficultyManager : MonoBehaviour
             //Debug.Log("difficulty: hard");
             difficulty = 2;
         }
-        else if (skillScore > 175f)
+        else if (skillScore > 175f && skillScore <= 225f)
+        {
+            //Debug.Log("difficulty: tough");
+            difficulty = 3;
+        }
+        else if (skillScore > 225f && skillScore <= 275f)
         {
             //Debug.Log("difficulty: dire");
-            difficulty = 3;
+            difficulty = 4;
+        }
+        else if (skillScore > 275f)
+        {
+            //Debug.Log("difficulty: impossible");
+            difficulty = 5;
         }
 
         RG.SetPlayerSkillScore(skillScore);
@@ -445,11 +498,14 @@ public class AdaptiveDifficultyManager : MonoBehaviour
                     "Average Room Clear Time: " + avgRoomClearTime + "\n\n" +
                     "Attacks: " + numOfAttacks + ", Hits: " + numOfHits + "\n" +
                     "Accuracy: " + accuracy + "\n" +
-                    "Dodges: " + numOfDodges + ", Hits Dodged: " + numOfHitsDodged + "\n" +
-                    "Dodge Effectiveness: " + dodgeEffectiveness + "\n" +
                     "Combos Performed: " + combosPerformed + "\n\n" +
+                    "Magic Attacks: " + numOfSpellsCast + ", Magic Hits: " + numOfSpellsHit + "\n" +
+                    "Magic Accuracy: " + spellAccuracy + "\n\n" +
+                    "Dodges: " + numOfDodges + ", Hits Dodged: " + numOfHitsDodged + "\n" +
+                    "Dodge Effectiveness: " + dodgeEffectiveness + "\n\n" +
                     "Times Damage Taken: " + timeIndexsOfDamageLastTaken.Length + "\n" +
                     "Average Time Between Damage Taken: " + avgTimeBetweenDamageTaken + "\n\n" +
+                    "Consumables Used: " + consumablesUsed + "\n\n" +
                     "Score Gained This Room: " + ((avgTimeBetweenDamageTaken / 15) + accuracy + dodgeEffectiveness + combosPerformed - (avgRoomClearTime / 10f) + ((float)roomsCleared / 10f) - (avgFloorClearTime / 10f) + ((float)floorsCleared * 10f)) + "\n" +
                     "Skill Score: " + skillScore + "\n\n" +
                     "~~~~~~~~~~~~~~~~~~~\n";

@@ -60,7 +60,7 @@ public class ConditionForced : AbstractCondition
                 if (Physics.Raycast((collider.bounds.center + cornerOffsets[i]), dir, out RaycastHit hit, 0.1f))
                 {
                     //Debug.Log(this.gameObject.name + " solid collision: " + hit.collider.gameObject.name);
-                    targetScript.AlterHealth(-1);
+                    targetScript.DamageTarget(1, "force");
                     yield break;
                 }
             }

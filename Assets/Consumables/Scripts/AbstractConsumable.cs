@@ -41,6 +41,7 @@ public class AbstractConsumable : MonoBehaviour
             if (PC != null)
             {
                 PC.GetCVM().ApplyHUDVisual(consumableType, consumableTime); //update HUD visual
+                ASM.GetADM().ConsumableUsed();
                 ApplyEffect(PC); //apply effect to player
                 isUsed = true;
                 StartCoroutine(DestroyConsumable());

@@ -6,7 +6,7 @@ public class ShapeBall : AbstractShape
 {
     public override void StartShapeScript(SpellScript SS)
     { 
-        damageModifier = 1.5f; speedModifier = 2f; 
+        damageModifier = 1f; speedModifier = 2f; 
         shapeMesh = Resources.Load<Mesh>("CustomMeshes/shapeBall"); 
         castable = true;
         mainCamera = Camera.main;

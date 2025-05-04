@@ -6,7 +6,7 @@ public class ConditionBurning : AbstractCondition
 {
     void Update()
     {
-        if (curDuration >= triggerTime) { targetScript.AlterHealth(-1); triggerTime++; }
+        if (curDuration >= triggerTime) { targetScript.DamageTarget(1, "fire"); triggerTime++; }
 
         if (curDuration >= duration) { EndCondition(); }
         else { curDuration += Time.deltaTime; }

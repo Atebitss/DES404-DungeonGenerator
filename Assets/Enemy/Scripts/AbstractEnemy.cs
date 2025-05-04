@@ -134,10 +134,27 @@ public abstract class AbstractEnemy : MonoBehaviour
     public int GetMaxHealth() { return maxHealth; }
     public void SetMaxHealth(int newMaxHealth) { maxHealth = newMaxHealth; }
 
+    [SerializeField] private GameObject hitSplashPrefab; //hit splash prefab
     public int health;
     public int GetHealth() { return health; }
     public void SetHealth(int newHealth) { health = newHealth; HealthCheck(); }
-    public void AlterHealth(int change) { /*Debug.Log("altering health: " + change);*/ health += change; HealthCheck(); }
+    public void AlterHealth(int alter) 
+    {
+        /*Debug.Log("altering health: " + alter);*/
+        health += alter; 
+        HealthCheck(); 
+    }
+    public void DamageTarget(int alter, string dmgType)
+    {
+        /*Debug.Log("damaging enemy: " + alter);*/
+        GameObject curHitSplash = Instantiate(hitSplashPrefab, transform.position, Quaternion.Euler(0f, 0f, 0f));
+
+        //wake and play hit splash animation
+        curHitSplash.GetComponent<HitSplashController>().Wake(PC, alter, dmgType);
+
+        health -= alter;
+        HealthCheck();
+    }
     private void HealthCheck()
     {
         /*Debug.Log("health check: " + health);*/
