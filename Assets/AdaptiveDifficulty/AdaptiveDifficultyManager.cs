@@ -39,6 +39,7 @@ public class AdaptiveDifficultyManager : MonoBehaviour
 
         //update data with final stats
         statsData += "\n~~~PLAYER DEATH~~~\n\n";
+        if(statTracking) { EndStatWatch(); }
         FillDataFileRoom(); //fill room data
         FillDataFileFloor(); //fill floor data
         EndDataFile(); //end data file
@@ -150,6 +151,9 @@ public class AdaptiveDifficultyManager : MonoBehaviour
     public void HardResetStats()
     {
         //reset all variables
+        startTime = 0f;
+        endTime = 0f;
+
         numOfAttacks = 0;
         numOfHits = 0;
         accuracy = 0f;
@@ -182,7 +186,11 @@ public class AdaptiveDifficultyManager : MonoBehaviour
         skillScore = 100f;
         difficulty = 1;
 
-        if (ADDM != null) { ADDM.ResetRoomStats(); }
+        if (ADDM != null) 
+        {
+            ADDM.ResetRoomStats();
+            ADDM.playerSkillScore = skillScore;
+        }
     }
     private void ResetRoomStats()
     {
@@ -465,6 +473,9 @@ public class AdaptiveDifficultyManager : MonoBehaviour
 
         RG.SetPlayerSkillScore(skillScore);
         RG.SetRoomDifficulty(difficulty);
+
+        if(skillScore < 0f) { skillScore = 0f; }
+        else if (skillScore > 300f) { skillScore = 300f; }
 
         if (ADDM != null) { ADDM.playerSkillScore = skillScore; }
         if (SVM != null) { SVM.AddSkillScoreDataPoint(skillScore); }

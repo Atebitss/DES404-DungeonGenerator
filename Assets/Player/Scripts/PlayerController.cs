@@ -128,7 +128,6 @@ public class PlayerController : MonoBehaviour
             active = false;
             ADM.End();
             ASM.RestartScene();
-            ADM.HardResetStats();
         }
     }
 
@@ -1107,6 +1106,17 @@ public class PlayerController : MonoBehaviour
                 //SVDisplay.SetActive(false);
                 SpellDbugDisplay.SetActive(false);
             }
+        }
+    }
+
+
+    public void OnResetDungeon(InputAction.CallbackContext ctx)
+    {
+        if (ctx.performed)
+        {
+            //reset dungeon
+            Debug.Log("reset dungeon");
+            ASM.RestartScene();
         }
     }
     //~~~~~~debug~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

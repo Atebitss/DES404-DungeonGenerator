@@ -63,7 +63,7 @@ public class EnemyWeaponColliderManager : MonoBehaviour
             for (int hitIndex = 0; hitIndex < hitColliders.Length; hitIndex++)
             {
                 //Debug.Log(hitIndex + ": " + hitColliders[hitIndex].gameObject.name);
-                if (hitColliders[hitIndex].gameObject.tag == "Player")
+                if (hitColliders[hitIndex].gameObject.tag == "Player" && !hasHitPlayer)
                 {
                     Debug.Log("player found in overlap: " + hitColliders[hitIndex].gameObject.transform.parent.name);
                     hitColliders[hitIndex].gameObject.GetComponent<PlayerController>().DamageTarget(attackDamage);
