@@ -237,13 +237,13 @@ public abstract class AbstractEnemy : MonoBehaviour
                     Vector3 seperationForce = CalculateSeperationForce();
                     Vector3 newMovement = (directionToPlayer + seperationForce).normalized * movementSpeed;
 
-                    enemyRigid.velocity = new Vector3(newMovement.x, enemyRigid.velocity.y, newMovement.z);
+                    enemyRigid.linearVelocity = new Vector3(newMovement.x, enemyRigid.linearVelocity.y, newMovement.z);
                 }
                 else if(distToPlayer <= attackDistance)
                 {
                     Vector3 seperationForce = CalculateSeperationForce();
-                    Vector3 newMovement = new Vector3((seperationForce.x * movementSpeed), enemyRigid.velocity.y, (seperationForce.z * movementSpeed));
-                    enemyRigid.velocity = newMovement;
+                    Vector3 newMovement = new Vector3((seperationForce.x * movementSpeed), enemyRigid.linearVelocity.y, (seperationForce.z * movementSpeed));
+                    enemyRigid.linearVelocity = newMovement;
                     BeginAttack();
                 }
             }
@@ -257,7 +257,7 @@ public abstract class AbstractEnemy : MonoBehaviour
                 Vector3 seperationForce = CalculateSeperationForce();
                 Vector3 newMovement = (transform.forward + seperationForce).normalized * movementSpeed;
 
-                enemyRigid.velocity = new Vector3(newMovement.x, enemyRigid.velocity.y, newMovement.z);
+                enemyRigid.linearVelocity = new Vector3(newMovement.x, enemyRigid.linearVelocity.y, newMovement.z);
             }
         }
     }
@@ -298,7 +298,7 @@ public abstract class AbstractEnemy : MonoBehaviour
     {
         dodging = true;
         Vector3 dodgeVelocity = ((-enemyRigid.transform.forward * dodgeForce).normalized * (dodgeForce / dodgeTime));
-        enemyRigid.AddForce(dodgeVelocity - enemyRigid.velocity, ForceMode.VelocityChange); //set immediate velocity to calced velocity
+        enemyRigid.AddForce(dodgeVelocity - enemyRigid.linearVelocity, ForceMode.VelocityChange); //set immediate velocity to calced velocity
         Invoke("StopDodge", dodgeTime);
     }
     private void StopDodge() { dodging = false; }

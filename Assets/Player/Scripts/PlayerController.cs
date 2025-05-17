@@ -35,7 +35,7 @@ public class PlayerController : MonoBehaviour
 
         if (!active)
         {
-            playerRigid.velocity = Vector3.zero;
+            playerRigid.linearVelocity = Vector3.zero;
             playerRigid.angularVelocity = Vector3.zero;
         }
     }
@@ -247,15 +247,15 @@ public class PlayerController : MonoBehaviour
             {
                 //add velocity force in direction moving
                 playerVelocity = (((playerRigid.transform.right * movement.x) * movementSpeed) + ((playerRigid.transform.forward * movement.z) * movementSpeed));
-                playerRigid.AddForce(playerVelocity - playerRigid.velocity, ForceMode.VelocityChange);
+                playerRigid.AddForce(playerVelocity - playerRigid.linearVelocity, ForceMode.VelocityChange);
             }
             else if (dodging) //if player is dodging
             {
-                playerRigid.AddForce(dodgeVelocity - playerRigid.velocity, ForceMode.VelocityChange); //set immediate velocity to calced velocity
+                playerRigid.AddForce(dodgeVelocity - playerRigid.linearVelocity, ForceMode.VelocityChange); //set immediate velocity to calced velocity
 
                 if ((Time.time - dodgeStartTime) >= dodgeDuration) //if the player has been dodging for 1 second
                 {
-                    playerRigid.velocity = Vector3.zero; //reset velocity
+                    playerRigid.linearVelocity = Vector3.zero; //reset velocity
                                                          //for (int i = 0; i < dodgeLayerIDs.Length; i++) { Physics.IgnoreLayerCollision(gameObject.layer, dodgeLayerIDs[i], false); } //allow dodging through enemies
                                                          //Debug.Log("Dodge end");
                     dodging = false; //set tracker to false
