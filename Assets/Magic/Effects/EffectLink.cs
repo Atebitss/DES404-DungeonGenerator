@@ -1,16 +1,14 @@
 using UnityEngine;
 
-public class EffectLink : MonoBehaviour
+public class EffectLink : AbstractEffect
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public override void StartEffectScript(SpellScript SS)
     {
-        
+        componentWeight = 3; damageModifier = 0.25f; speedModifier = 1f; radiusModifier = 1f; cooldownModifier = 0.5f;
+        this.SS = SS;
     }
-
-    // Update is called once per frame
-    void Update()
+    public override void ApplyEffect()
     {
-        
+        Debug.Log("Explosion effect applied");
     }
 }

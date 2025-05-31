@@ -7,7 +7,7 @@ public class EnemyControllerLarge : AbstractEnemy
     private void Awake()
     {
         //update basic stats
-        maxHealth = 10;
+        maxHealth = 25;
         attackDamage = 3;
         type = "basicLarge";
     }

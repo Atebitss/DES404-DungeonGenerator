@@ -37,7 +37,7 @@ public class EnemyWeaponColliderManager : MonoBehaviour
         //Debug.Log(col.gameObject.name + ", " + col.gameObject.tag + ", attacking: " + attacking + ", hit player: " + hasHitPlayer);
         if (attacking && col.gameObject.tag == "Player" && !hasHitPlayer)
         {
-            Debug.Log("player found");
+            //Debug.Log("player found");
             col.gameObject.GetComponent<PlayerController>().DamageTarget(attackDamage);
             AM.Play("Sword_Hit" + Random.Range(1, 3));
             hasHitPlayer = true;

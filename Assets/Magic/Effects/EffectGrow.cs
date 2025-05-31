@@ -1,16 +1,14 @@
 using UnityEngine;
 
-public class EffectGrow : MonoBehaviour
+public class EffectGrow : AbstractEffect
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public override void StartEffectScript(SpellScript SS)
     {
-        
+        componentWeight = 4; damageModifier = 0.25f; speedModifier = 0.5f; radiusModifier = 5f; cooldownModifier = 2f;
+        this.SS = SS;
     }
-
-    // Update is called once per frame
-    void Update()
+    public override void ApplyEffect()
     {
-        
+        Debug.Log("Explosion effect applied");
     }
 }

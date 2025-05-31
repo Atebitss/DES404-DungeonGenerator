@@ -178,6 +178,7 @@ public abstract class AbstractEnemy : MonoBehaviour
     [SerializeField] public float attackCooldownMax = 2.5f;
     [SerializeField] public int attackDamage = 1; //dafault damage
     private int attackState = 0; //used to track attack state, 0 = idle, 1 = preparing, 2 = swinging, 3 = reset
+    private Coroutine curAttackCoroutine; //used to track current attack coroutine
     public int GetAttackDamage() { return attackDamage; }
     public void SetAttackDamage(int newDamage) { attackDamage = newDamage; }
 
@@ -206,7 +207,7 @@ public abstract class AbstractEnemy : MonoBehaviour
             attackCooldownTimer = attackCooldownMax;
             attacking = true; //set tracker
             attackStartTime = Time.time; //track when attack started
-            StartCoroutine(AttackPrepare());
+            curAttackCoroutine = StartCoroutine(AttackPrepare());
         }
     }
     private IEnumerator AttackPrepare()
@@ -222,7 +223,10 @@ public abstract class AbstractEnemy : MonoBehaviour
         yield return new WaitForSeconds(0.1f); //wait for animation to start
         yield return new WaitForSeconds((GetCurAnimLength() + (0.5f / attackSpeed))); //wait aniamtion length + overhead time
 
-
+        curAttackCoroutine = StartCoroutine(AttackSwing()); //start swinging attack coroutine
+    }
+    private IEnumerator AttackSwing()
+    {
         //swing attack
         //Debug.Log("swing attack");
         a.SetInteger("attackStage", 2);
@@ -236,7 +240,10 @@ public abstract class AbstractEnemy : MonoBehaviour
         AM.Play("Sword_Swing1");
         yield return new WaitForSeconds(GetCurAnimLength()); //exact animation length
 
-
+        curAttackCoroutine = StartCoroutine(AttackRest()); //start rest coroutine
+    }
+    private IEnumerator AttackRest()
+    {
         //reset attack
         //Debug.Log("reset attack");
         a.SetInteger("attackStage", 3);
@@ -244,7 +251,10 @@ public abstract class AbstractEnemy : MonoBehaviour
         yield return new WaitForSeconds(0.1f); //wait for animation to start
         yield return new WaitForSeconds(GetCurAnimLength());
 
-
+        curAttackCoroutine = StartCoroutine(AttackReset()); //start reset coroutine
+    }
+    private IEnumerator AttackReset()
+    {
         //idle
         yield return new WaitForSeconds(0.1f); //wait for animation to start
         //Debug.Log("return to idle");
@@ -256,6 +266,41 @@ public abstract class AbstractEnemy : MonoBehaviour
         attacking = false; //reset tracker
 
         Retreat();
+    }
+
+
+    public void InterruptAttack()
+    {
+        //Debug.Log("interrupt attack called on " + this.gameObject.name);
+
+        if (attacking)
+        {
+            //Debug.Log("interrupt attack");
+
+            StopCoroutine(curAttackCoroutine); //stop current attack coroutine
+            ResetAttackState();
+            Retreat();
+        }
+    }
+
+    public void ParryAttack()
+    {
+        if (attackState == 1) //if preparing swing
+        {
+            StopCoroutine(AttackPrepare());
+            ResetAttackState();
+            Retreat();
+        }
+    }
+
+    private void ResetAttackState()
+    {
+        //Debug.Log("reset attack state");
+        a.SetBool("attacking", false);
+        a.SetInteger("attackStage", 0);
+        attackState = 0; //set attack state to idle
+        attacking = false; //reset tracker
+        attackCooldownTimer = 1f; //reset cooldown timer
     }
     //~~~~~attacking~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

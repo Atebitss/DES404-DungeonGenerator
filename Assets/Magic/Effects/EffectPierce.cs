@@ -1,16 +1,14 @@
 using UnityEngine;
 
-public class EffectPierce : MonoBehaviour
+public class EffectPierce : AbstractEffect
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public override void StartEffectScript(SpellScript SS)
     {
-        
+        componentWeight = 1; damageModifier = 0.5f; speedModifier = 2f; radiusModifier = 1f; cooldownModifier = 1f;
+        this.SS = SS;
     }
-
-    // Update is called once per frame
-    void Update()
+    public override void ApplyEffect()
     {
-        
+        Debug.Log("Pierce effect applied");
     }
 }

@@ -21,7 +21,7 @@ public class EnemyControllerBoss : AbstractEnemy
                 type = "bossBeserk";
                 dual = true;
 
-                maxHealth = 25;
+                maxHealth = 50;
                 attackDamage = 1;
                 /*Debug.Log("id: " + randBossTypeID);
                 Debug.Log("type: " + type);

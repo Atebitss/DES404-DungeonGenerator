@@ -475,7 +475,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private GameObject weaponAttackCollider; //weapon collider
     [SerializeField] private PlayerWeaponColliderManager PWCM; //weapon collider script
 
-    [SerializeField] private int attackDamage = 2; //dafault damage
+    private int attackDamage = 5; //dafault damage
     public int GetAttackDamage() { return attackDamage; }
     private int attackDamageModifier = 0; //players attack damage modifier
     public int GetAttackDamageModifier() { return attackDamageModifier; }
@@ -714,9 +714,8 @@ public class PlayerController : MonoBehaviour
 
             //testing
             shapeName = "Ball";
-            effectName = "Automatic";
+            effectName = "Charge";
             elementName = "Fire";
-            spellStrength = 0.375f;
 
             curSpell.UpdateSpellScriptShape(shapeName);
             curSpell.UpdateSpellScriptEffect(effectName);
@@ -728,13 +727,33 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private bool autoCastHeld = false; //used to track if the player is holding down the auto cast
+    private bool castHeld = false; //used to track if the player is holding down the cast
+    public bool GetCastHeld() { return castHeld; }
+
     public void OnCast(InputAction.CallbackContext context)
     {
-        if(context.started && effectName.Contains("Automatic")) { autoCastHeld = true; }
-        if (context.canceled && effectName.Contains("Automatic")) { autoCastHeld = false; }
+        if (effectName.Contains("Automatic") || effectName.Contains("Charge"))
+        {
+            if (context.started) { castHeld = true; }
+            if (context.canceled) 
+            {
+                castHeld = false;
 
-        if (context.performed && !effectName.Contains("Automatic"))
+                if(effectName.Contains("Charge"))
+                {
+                    //Debug.Log("PlayerController, CastSpell");
+                    if (castable && spellReady) //if spell is castable
+                    {
+                        //Debug.Log("PlayerController, spell casted");
+                        curSpell.CastSpell();
+                        spellCooldownTimer = spellCooldownMax;
+                        ADM.SpellRan(); //update adaptive difficulty
+                    }
+                }
+            }
+        }
+
+        if (context.performed && !effectName.Contains("Automatic") && !effectName.Contains("Charge"))
         {
             //Debug.Log("PlayerController, CastSpell");
             if (castable && spellReady) //if spell is castable
@@ -775,10 +794,10 @@ public class PlayerController : MonoBehaviour
     {
         if (!invincible) 
         {
-            Debug.Log("damaging health: " + alter);
-            Debug.Log("resistance: " + resistanceModifier);
+            //Debug.Log("damaging health: " + alter);
+            //Debug.Log("resistance: " + resistanceModifier);
             alter += resistanceModifier; //apply resistance modifier
-            Debug.Log("damaging health after resistance: " + alter);
+            //Debug.Log("damaging health after resistance: " + alter);
             if (alter > 0)
             {
                 healthPointsCurrent -= alter;
@@ -941,7 +960,7 @@ public class PlayerController : MonoBehaviour
             }
 
             //automatic spell attack
-            if (autoCastHeld && castable && curSpell.GetSpellCastable()) //if spell is castable
+            if (castHeld && castable && curSpell.GetSpellCastable() && effectName.Contains("Automatic")) //if spell is castable
             {
                 //Debug.Log("PlayerController, spell casted");
                 curSpell.CastSpell();

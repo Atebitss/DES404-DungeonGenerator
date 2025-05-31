@@ -6,7 +6,7 @@ public class EffectArc : AbstractEffect
 {
     public override void StartEffectScript(SpellScript SS)
     { 
-        componentWeight = 1; damageModifier = 2f; speedModifier = 0.75f; radiusModifier = 1f; cooldownModifier = 1f;
+        componentWeight = 0; damageModifier = 2f; speedModifier = 0.75f; radiusModifier = 1f; cooldownModifier = 1f;
         this.SS = SS;
     }
 
