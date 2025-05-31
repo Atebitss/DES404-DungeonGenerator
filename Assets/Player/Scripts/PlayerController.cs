@@ -718,12 +718,12 @@ public class PlayerController : MonoBehaviour
             elementName = "Fire";
             spellStrength = 0.375f;
 
-            ADM.SetSpellStrength(spellStrength); //update adaptive difficulty
-
             curSpell.UpdateSpellScriptShape(shapeName);
             curSpell.UpdateSpellScriptEffect(effectName);
             curSpell.UpdateSpellScriptElement(elementName);
 
+            ADM.SetSpellStrength(spellStrength); //update adaptive difficulty
+            spellCooldownMax = curSpell.GetSpellCooldownMax(); //update spell cooldown max
             spellReady = true;
         }
     }
@@ -923,15 +923,6 @@ public class PlayerController : MonoBehaviour
 
 
             //spell attack
-            //automatic spell attack
-            if (autoCastHeld && castable && curSpell.GetSpellCastable()) //if spell is castable
-            {
-                //Debug.Log("PlayerController, spell casted");
-                curSpell.CastSpell();
-                spellCooldownTimer = spellCooldownMax;
-                ADM.SpellRan(); //update adaptive difficulty
-            }
-
             if(spellCooldownTimer > 0 && castable) //on cast
             {
                 castable = false; //set tracker
@@ -947,6 +938,15 @@ public class PlayerController : MonoBehaviour
                 castable = true;
                 curSpell = null;
                 AssignSpell(); //assign new spell
+            }
+
+            //automatic spell attack
+            if (autoCastHeld && castable && curSpell.GetSpellCastable()) //if spell is castable
+            {
+                //Debug.Log("PlayerController, spell casted");
+                curSpell.CastSpell();
+                spellCooldownTimer = spellCooldownMax;
+                ADM.SpellRan(); //update adaptive difficulty
             }
         }
     }

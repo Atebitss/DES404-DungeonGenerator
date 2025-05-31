@@ -642,6 +642,19 @@ public class SpellScript : MonoBehaviour
     }
 
 
+    public float GetSpellCooldownMax() 
+    {
+        float maxCD = 10;
+
+        maxCD *= shapeScript.cooldownModifier;
+        maxCD *= effectScript.cooldownModifier;
+        maxCD *= elementScript.cooldownModifier;
+
+        //Debug.Log("get spell cooldown max: " + maxCD);
+        return maxCD; 
+    }
+
+
 
 
 
