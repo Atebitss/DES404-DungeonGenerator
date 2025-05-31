@@ -6,12 +6,10 @@ public class ShapeBall : AbstractShape
 {
     public override void StartShapeScript(SpellScript SS)
     { 
-        damageModifier = 1f; speedModifier = 2f; 
+        damageModifier = 1f; speedModifier = 2f; radiusModifier = 1f; cooldownModifier = 1f;
         shapeMesh = Resources.Load<Mesh>("CustomMeshes/shapeBall"); 
-        castable = true;
         mainCamera = Camera.main;
         arcAxis = new Vector3(0, 1, 0);
-        firstPointConfirmed = true;
         this.SS = SS;
 
         //Debug.Log(transform.position);
@@ -34,6 +32,8 @@ public class ShapeBall : AbstractShape
 
             pathPoints[0] = this.transform.position;
         }
+
+        firstPointConfirmed = true;
     }
     private void FixedUpdate()
     {
@@ -42,6 +42,7 @@ public class ShapeBall : AbstractShape
         {
             aimingLine.SetPosition(0, this.transform.position);
             pathPoints[0] = this.transform.position;
+            if (!castable && aimPos != Vector3.zero) { castable = true; }
             //Debug.Log("aiming line set to: " + this.transform.position);
         }
     }

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ElementWater : AbstractElement
 {
-    void Awake() { damageModifier = 0.25f; speedModifier = 1f; radiusModifier = 3f; }
+    void Awake() { damageModifier = 0.25f; speedModifier = 1f; radiusModifier = 3f; cooldownModifier = 0.25f; }
     public override void ApplyElement(SpellScript SS)
     {
         //Debug.Log("Water element applied");

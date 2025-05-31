@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ElementElectric : AbstractElement
 {
-    void Awake() { damageModifier = 1.25f; speedModifier = 1f; }
+    void Awake() { damageModifier = 1.25f; speedModifier = 1f; radiusModifier = 1f; cooldownModifier = 0.5f; }
     public override void ApplyElement(SpellScript SS)
     {
         //Debug.Log("Electric element applied");

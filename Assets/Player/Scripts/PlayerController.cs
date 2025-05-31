@@ -633,6 +633,7 @@ public class PlayerController : MonoBehaviour
     private float spellStartTime = 0f;
     public void SetSpellCooldownTimer(float newCooldown) { spellCooldownTimer = newCooldown; }
     [SerializeField] private bool castable = true;
+    private bool spellReady = false;
 
     //spell
     [SerializeField] private GameObject spellPrefab;
@@ -713,7 +714,7 @@ public class PlayerController : MonoBehaviour
 
             //testing
             shapeName = "Ball";
-            effectName = "Explode";
+            effectName = "Automatic";
             elementName = "Fire";
             spellStrength = 0.375f;
 
@@ -722,17 +723,21 @@ public class PlayerController : MonoBehaviour
             curSpell.UpdateSpellScriptShape(shapeName);
             curSpell.UpdateSpellScriptEffect(effectName);
             curSpell.UpdateSpellScriptElement(elementName);
+
+            spellReady = true;
         }
     }
 
-
+    private bool autoCastHeld = false; //used to track if the player is holding down the auto cast
     public void OnCast(InputAction.CallbackContext context)
     {
-        if (context.performed)
+        if(context.started && effectName.Contains("Automatic")) { autoCastHeld = true; }
+        if (context.canceled && effectName.Contains("Automatic")) { autoCastHeld = false; }
+
+        if (context.performed && !effectName.Contains("Automatic"))
         {
             //Debug.Log("PlayerController, CastSpell");
-
-            if (castable) //if spell is castable
+            if (castable && spellReady) //if spell is castable
             {
                 //Debug.Log("PlayerController, spell casted");
                 curSpell.CastSpell();
@@ -918,9 +923,19 @@ public class PlayerController : MonoBehaviour
 
 
             //spell attack
+            //automatic spell attack
+            if (autoCastHeld && castable && curSpell.GetSpellCastable()) //if spell is castable
+            {
+                //Debug.Log("PlayerController, spell casted");
+                curSpell.CastSpell();
+                spellCooldownTimer = spellCooldownMax;
+                ADM.SpellRan(); //update adaptive difficulty
+            }
+
             if(spellCooldownTimer > 0 && castable) //on cast
             {
                 castable = false; //set tracker
+                spellReady = false;
                 spellStartTime = Time.time; //track when attack started
             }
 

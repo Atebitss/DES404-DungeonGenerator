@@ -5,7 +5,7 @@ public abstract class AbstractEffect : MonoBehaviour
     //will be overridden by concrete effect classes
     //spell vars
     public int componentWeight;
-    public float damageModifier, speedModifier, radiusModifier;
+    public float damageModifier, speedModifier, radiusModifier, cooldownModifier;
 
     //spell info
     public SpellScript SS;

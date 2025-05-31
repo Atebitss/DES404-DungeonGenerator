@@ -10,7 +10,7 @@ public class ShapeLine : AbstractShape
     public override void StartShapeScript(SpellScript SS) 
     {
         //Debug.Log("ShapeLine.StartShapeScript");
-        damageModifier = 0.5f; speedModifier = 0.75f; radiusModifier = 3f;
+        damageModifier = 0.5f; speedModifier = 1f; radiusModifier = 3f; cooldownModifier = 1.5f;
         shapeMesh = Resources.Load<Mesh>("CustomMeshes/shapeBall");
         spellMeshFilter = gameObject.GetComponent<MeshFilter>();
         spellMeshFilter.mesh = shapeMesh;

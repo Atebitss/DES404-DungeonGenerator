@@ -3,7 +3,7 @@ public abstract class AbstractElement : MonoBehaviour
 {
     //will be overridden by concrete element classes
     //spell vars
-    public float damageModifier, speedModifier, radiusModifier;
+    public float damageModifier, speedModifier, radiusModifier, cooldownModifier;
 
     //spell info
     public SpellScript SS;

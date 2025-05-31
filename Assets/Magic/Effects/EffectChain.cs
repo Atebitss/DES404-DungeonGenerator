@@ -10,7 +10,7 @@ public class EffectChain : AbstractEffect
 
     public override void StartEffectScript(SpellScript SS)
     {
-        componentWeight = 3; damageModifier = 1.5f; speedModifier = 0.75f; radiusModifier = 0.25f;    //spell vars
+        componentWeight = 3; damageModifier = 1.5f; speedModifier = 0.75f; radiusModifier = 0.25f; cooldownModifier = 1.5f; //set component weights for spell script to use
         this.SS = SS;
         SS.SetSpellPersist(true);   //ensures the spell wont be destroyed upon impact
 

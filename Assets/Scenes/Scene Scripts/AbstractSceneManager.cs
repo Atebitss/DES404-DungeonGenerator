@@ -314,13 +314,13 @@ public class AbstractSceneManager : MonoBehaviour
         ADM = this.gameObject.GetComponent<AdaptiveDifficultyManager>();
         CGM = this.gameObject.GetComponent<ConsumableGenerationManager>();
         PLVM = this.gameObject.GetComponent<PostLevelVisualManager>();
-        PLVM.Wake(this);
+        if (PLVM) { PLVM.Wake(this); }
 
         dbugMode = GetDbugMode();
         visualMode = GetVisualMode();
 
-        postLevelCamera.enabled = false;
-        loadingCamera.enabled = true;
+        if (postLevelCamera) { postLevelCamera.enabled = false; }
+        if (loadingCamera) { loadingCamera.enabled = true; }
     }
     void Start()
     {

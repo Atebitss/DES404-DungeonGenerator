@@ -177,6 +177,7 @@ public abstract class AbstractEnemy : MonoBehaviour
     [SerializeField] public float attackCooldownTimer = 0f, attackStartTime = 0f; //used to reset attack timer
     [SerializeField] public float attackCooldownMax = 2.5f;
     [SerializeField] public int attackDamage = 1; //dafault damage
+    private int attackState = 0; //used to track attack state, 0 = idle, 1 = preparing, 2 = swinging, 3 = reset
     public int GetAttackDamage() { return attackDamage; }
     public void SetAttackDamage(int newDamage) { attackDamage = newDamage; }
 
@@ -217,6 +218,7 @@ public abstract class AbstractEnemy : MonoBehaviour
         //Debug.Log("attack prepare");
         a.SetBool("attacking", true);
         a.SetInteger("attackStage", 1);
+        attackState = 1; //set attack state to preparing
         yield return new WaitForSeconds(0.1f); //wait for animation to start
         yield return new WaitForSeconds((GetCurAnimLength() + (0.5f / attackSpeed))); //wait aniamtion length + overhead time
 
@@ -224,6 +226,7 @@ public abstract class AbstractEnemy : MonoBehaviour
         //swing attack
         //Debug.Log("swing attack");
         a.SetInteger("attackStage", 2);
+        attackState = 2; //set attack state to swinging
         yield return new WaitForSeconds(0.1f); //wait for animation to start
         for (int i = 0; i < weaponAttackColliders.Length; i++)
         {
@@ -237,6 +240,7 @@ public abstract class AbstractEnemy : MonoBehaviour
         //reset attack
         //Debug.Log("reset attack");
         a.SetInteger("attackStage", 3);
+        attackState = 3; //set attack state to reset
         yield return new WaitForSeconds(0.1f); //wait for animation to start
         yield return new WaitForSeconds(GetCurAnimLength());
 
@@ -246,6 +250,7 @@ public abstract class AbstractEnemy : MonoBehaviour
         //Debug.Log("return to idle");
         a.SetBool("attacking", false);
         a.SetInteger("attackStage", 0);
+        attackState = 0; //set attack state to idle
 
         yield return new WaitForSeconds(0.1f); //wait for animation to start
         attacking = false; //reset tracker

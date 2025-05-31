@@ -6,7 +6,7 @@ public class EffectSplit : AbstractEffect
 {
     public override void StartEffectScript(SpellScript SS)
     {
-        componentWeight = 2; damageModifier = 2f; speedModifier = 0.75f;
+        componentWeight = 2; damageModifier = 2f; speedModifier = 0.75f; radiusModifier = 1f; cooldownModifier = 1f;
         this.SS = SS;
     }
     public override void ApplyEffect()

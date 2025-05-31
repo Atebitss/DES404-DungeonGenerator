@@ -3,14 +3,14 @@ public abstract class AbstractShape : MonoBehaviour
 {
     //will be overridden by concrete shape classes
     //spell vars
-    public float damageModifier, speedModifier, radiusModifier;
+    public float damageModifier, speedModifier, radiusModifier, cooldownModifier;
 
     //spell shape
     public Mesh shapeMesh;
     public MeshFilter spellMeshFilter, aimMeshFilter;
 
     //spell info
-    public bool castable;
+    public bool castable = false;
     public SpellScript SS;
     public abstract void StartShapeScript(SpellScript SS);
     public abstract void ApplyShape();

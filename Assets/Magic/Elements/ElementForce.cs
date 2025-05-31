@@ -5,7 +5,7 @@ using UnityEngine;
 public class ElementForce : AbstractElement
 {
     private Vector3 startPos, endPos, dir;
-    void Awake() { damageModifier = 0.25f; speedModifier = 1f; radiusModifier = 2f; }
+    void Awake() { damageModifier = 0.25f; speedModifier = 1f; radiusModifier = 2f; cooldownModifier = 1.5f; }
     public override void ApplyElement(SpellScript SS)
     {
         //Debug.Log("Force element applied");
