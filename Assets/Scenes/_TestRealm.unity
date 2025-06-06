@@ -5142,7 +5142,7 @@ MonoBehaviour:
   validEnemyTypes:
   - {fileID: 3375864117963020452, guid: 46bfd7227e5fe13448287a98bbe35f7b, type: 3}
   - {fileID: 3375864117963020452, guid: 73e0bdc0c73c3084d9f86851aacbc54b, type: 3}
-  maxEnemies: 0
+  maxEnemies: 3
 --- !u!4 &357799855
 Transform:
   m_ObjectHideFlags: 0

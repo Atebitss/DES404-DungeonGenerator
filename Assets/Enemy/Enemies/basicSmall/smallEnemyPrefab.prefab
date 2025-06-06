@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 5274499308307524676}
   - component: {fileID: 7658845363462699611}
   - component: {fileID: 4716318860976188386}
-  m_Layer: 7
+  m_Layer: 0
   m_Name: EnemyWeaponColliderR
   m_TagString: EnemyWeapon
   m_Icon: {fileID: 0}
@@ -200,7 +200,7 @@ GameObject:
   - component: {fileID: 8452932137980635183}
   - component: {fileID: 5652514220819604225}
   - component: {fileID: 6178674796021915901}
-  m_Layer: 7
+  m_Layer: 0
   m_Name: EnemyWeaponColliderL
   m_TagString: EnemyWeapon
   m_Icon: {fileID: 0}
@@ -5502,7 +5502,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3987276604464211926}
   - component: {fileID: 1935557783522769971}
-  m_Layer: 7
+  m_Layer: 0
   m_Name: EnemyWeaponParent
   m_TagString: Untagged
   m_Icon: {fileID: 0}

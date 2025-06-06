@@ -16,7 +16,5 @@ public class EffectSplit : AbstractEffect
         //create 2-5 spells
         //modify spell damage, size and radius by the number of spells created
         //send spells in random directions
-
-        SS.AlterRadius(0.5f);
     }
 }

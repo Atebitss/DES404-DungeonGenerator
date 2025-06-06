@@ -614,6 +614,25 @@ public class PlayerController : MonoBehaviour
         }
         return 0f;
     }
+
+
+    public void DamageEnemy(GameObject curEnemy)
+    {
+        Debug.Log("damaging enemy");
+
+        attackDamage = ((attackDamage + attackDamageModifier) + attackComboDamage);
+        ADM.AddDamageDealt(attackDamage); //increment damage total in adaptive difficulty manager
+
+        curEnemy.GetComponent<AbstractEnemy>().DamageTarget(attackDamage, ""); //deal damage to enemy
+
+        for(int i = 0; i < linkedEnemies.Length; i++)
+        {
+            if(linkedEnemies[i] != curEnemy)
+            {
+                linkedEnemies[i].GetComponent<AbstractEnemy>().DamageTarget(attackDamage, ""); //deal damage to linked enemies
+            }
+        }
+    }
     //~~~~~attacking~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
@@ -641,6 +660,41 @@ public class PlayerController : MonoBehaviour
     public SpellScript GetCurSpell() { return curSpell; }
     [SerializeField] private LayerMask aimLayerMask = 0;
     public LayerMask GetAimLayerMask() { return aimLayerMask; }
+
+    //linked enemies
+    private GameObject[] linkedEnemies = new GameObject[0]; //used to track enemies linked by link effect
+    public GameObject[] GetLinkedEnemies() { return linkedEnemies; } //get linked enemies array
+    public void AddLinkedEnemy(GameObject enemy)
+    {
+        //check if enemy is already linked
+        for (int i = 0; i < linkedEnemies.Length; i++) { if (linkedEnemies[i] == enemy) { return; } }
+
+        Debug.Log("linking " + enemy.name);
+
+        //if not, add it to array
+        GameObject[] newLinkedEnemies = new GameObject[linkedEnemies.Length + 1];
+        for (int i = 0; i < linkedEnemies.Length; i++) { newLinkedEnemies[i] = linkedEnemies[i]; }
+        newLinkedEnemies[linkedEnemies.Length] = enemy;
+        linkedEnemies = newLinkedEnemies;
+    }
+    public void RemoveLinkedEnemy(GameObject enemy)
+    {
+        //remove enemy from linked array
+        GameObject[] newLinkedEnemies = new GameObject[linkedEnemies.Length - 1];
+        int newIndex = 0;
+        for (int i = 0; i < linkedEnemies.Length; i++)
+        {
+            if (linkedEnemies[i] != enemy)
+            {
+                newLinkedEnemies[newIndex] = linkedEnemies[i];
+                newIndex++;
+            }
+            else { Debug.Log("unlinking " + enemy.name); }
+        }
+
+        linkedEnemies = newLinkedEnemies;
+    }
+
 
     //random spell assigned on awake
     public void AssignSpell()
@@ -714,7 +768,7 @@ public class PlayerController : MonoBehaviour
 
             //testing
             shapeName = "Ball";
-            effectName = "Charge";
+            effectName = "Link";
             elementName = "Fire";
 
             curSpell.UpdateSpellScriptShape(shapeName);

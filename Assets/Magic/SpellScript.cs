@@ -25,6 +25,7 @@ public class SpellScript : MonoBehaviour
     //target info
     private Vector3[] targetPoints = new Vector3[0];
     public Vector3[] GetTargetPoints() { return targetPoints; }
+    public void SetTargetPoint(int point, Vector3 pos) { targetPoints[point] = pos; } //set a specific target point
     private Vector3[] triggerPoints = new Vector3[0];
     public Vector3[] GetTriggerPoints() { return triggerPoints; }
     public void SetTriggerPoints(Vector3[] triggerPoints) { this.triggerPoints = triggerPoints; }
@@ -88,27 +89,6 @@ public class SpellScript : MonoBehaviour
     //radius of the spell object   ADD UPDATE PHYSICAL SIZE
     private float radius = 1f;
     public float GetRadius() { return radius; }
-    public void SetRadius(float change)
-    { 
-        radius = change; 
-        spellSphereCollider.radius = radius; 
-    }
-    public void AlterRadius(float change) 
-    { 
-        radius += change; 
-        spellSphereCollider.radius = radius; 
-    }
-    public void IncRadiusOverTime(float changeTime) //increase size over x seconds (for cones)
-    {
-        float timeIncrement = radius / changeTime;
-        radius = 0f;
-
-        for(int increment = 0; increment < changeTime; increment++)
-        {
-            radius += changeTime; 
-            spellSphereCollider.radius = radius;
-        }
-    }
 
     //speed
     private float speed = 10f;
@@ -154,7 +134,7 @@ public class SpellScript : MonoBehaviour
         //Debug.Log();
         //update this pos to aim pos
         if (shapeScript != null && !casted && spellActive) { shapeScript.AimSpell(); }
-        if (effectScript != null && effectScript.componentWeight == 0) { effectScript.ApplyEffect(); } //weight 0 assumes the effect impacts aiming
+        if (effectScript != null && effectScript.componentWeight == 0) { effectScript.ApplyEffect(); } //if effect weight is 0, assumes the effect impacts aiming
     }
 
 
@@ -170,7 +150,7 @@ public class SpellScript : MonoBehaviour
         //if script not null
         if (effectScript != null)
         {
-            //inform spell data, weight and modifiers 
+            //inform spell data, effect weight and modifiers 
             effectScript.StartEffectScript(this);
         }
     }
@@ -267,12 +247,14 @@ public class SpellScript : MonoBehaviour
             //Debug.Log(this.transform.position);
             //Debug.Log(effectName + elementName + shapeName);
 
-            if(effectScript.componentWeight == 1) { effectScript.ApplyEffect(); } //if effect weight is 1, apply effect immediately
+            this.transform.parent.transform.SetParent(null);
 
             targetPoints = shapeScript.pathPoints; //get appropriate aiming points from the shape script
 
             shapeScript.EndAim(); //end the aiming phase
             elementScript.SetupCondition(); //run any setup functions for the element script
+
+            if(effectScript.componentWeight == 1) { effectScript.ApplyEffect(); } //if effect weight is 1, apply effect as spell is cast
 
             //if more than one trigger point & the spell will expire, shape is line
             if (shapeScript.GetTriggerPoints().Length > 0 && !spellPersist)
@@ -341,6 +323,8 @@ public class SpellScript : MonoBehaviour
         //the start and end point of the line are constant
         this.transform.position = startPos; //move spell to start pos
 
+        Debug.Log("travel setup end pos: " + endPos);
+
         targetPoints[0] = startPos; //path point 0 is start pos
         targetPoints[targetPoints.Length - 1] = endPos; //path point end is end pos
 
@@ -377,7 +361,7 @@ public class SpellScript : MonoBehaviour
         }
     }
 
-    private void UpdateRadius()
+    public void UpdateRadius()
     {
         //Debug.Log(radius + "*(" + effectScript.radiusModifier + "+" + elementScript.radiusModifier + "+" + shapeScript.radiusModifier + ")");
         radius = 1f;
@@ -385,7 +369,9 @@ public class SpellScript : MonoBehaviour
         radius *= effectScript.radiusModifier; //apply effect radius modifier
         radius *= elementScript.radiusModifier; //apply element radius modifier
 
-        if (shapeScript.GetTriggerPoints().Length > 0 && spellPersist || radius == 0) { radius = 1; }
+        this.gameObject.transform.localScale = Vector3.one * radius;
+
+        //if (shapeScript.GetTriggerPoints().Length > 0 && spellPersist || radius == 0) { radius = 1; }
         //Debug.Log(radius);
     }
 
@@ -396,18 +382,19 @@ public class SpellScript : MonoBehaviour
         //Debug.Log(this.transform.position);
         int curTarget = 0;
 
+        speed *= shapeScript.speedModifier; //apply shape speed modifier
+        speed *= effectScript.speedModifier; //apply effect speed modifier
+        speed *= elementScript.speedModifier; //apply element speed modifier
+
         //update life time counter for analytics
         timeSinceCast = Time.time - castStartTime;
-
-        //update spell with component impact
-        if (effectScript.componentWeight == 2) { effectScript.ApplyEffect(); } //if effect weight is 2, apply effect during flight
-
 
         for (int step = 0; step < targetPoints.Length - 1; step++)
         {
             //Debug.Log(targetPoints.Length - 1); Debug.Log("step: " + step); Debug.Log(this.transform.position);
             //begining position, distance between start and end, time spell began travelling
             //for(int i = 0; i < targetPoints.Length; i++) { Debug.Log(targetPoints[i]); }
+
             Vector3 curStartPos = targetPoints[step];
             Vector3 curEndPos = targetPoints[step + 1];
             dir = (curEndPos - curStartPos).normalized;
@@ -465,6 +452,9 @@ public class SpellScript : MonoBehaviour
                         }
                     }
                 }
+
+                //update spell with component impact
+                if (effectScript.componentWeight == 2) { effectScript.ApplyEffect(); } //if effect weight is 2, apply effect during flight
 
                 curEndPos = targetPoints[step + 1];
                 dir = (curEndPos - curStartPos).normalized;
@@ -528,25 +518,12 @@ public class SpellScript : MonoBehaviour
         //Debug.Log(this.transform.position);
         //Debug.Log("SpellScript end spell");
 
-        if (effectScript.pathPoints.Length > 0 && !spellPersist) { DestroySpell(); }
+        targets = FindTargets(); //sets targets to those found within spell radius
+        if (effectScript.componentWeight == 3) { effectScript.ApplyEffect(); } //if effect weight is 3, apply effect upon impact
+        DealDamage(); //deals damage to any targets found within said radius
 
-        targets = FindTargets();                //sets targets to those found within spell radius
-        DealDamage();                           //deals damage to any targets found within said radius
-
-        //Debug.Log(effectScript.componentWeight);
-        //Debug.Log(spellPersist);
-        //Debug.Log(shapeScript.GetTriggerPoints().Length);
-        if (effectScript.componentWeight == 3 && spellPersist && shapeScript.GetTriggerPoints().Length == 0)   //shape is ball and effect is chain
-        { 
-            effectScript.ApplyEffect(); 
-            CastSpell(); 
-        }
-        else if(effectScript.componentWeight == 3 && !spellPersist)   //shape is ball and effect is not chain but has weight 3
-        {
-            effectScript.ApplyEffect();
-            DestroySpell();
-        }
-        else if (!spellPersist) { DestroySpell(); }  //destroys the spell if permited (used by effect chain)
+        if (spellPersist && shapeScript.GetTriggerPoints().Length == 0) { CastSpell(); } //if spell continues after impact and has 0 triggers
+        else if (!spellPersist) { DestroySpell(); } //destroys the spell if permited
     }
 
     private GameObject[] FindTargets()
@@ -651,7 +628,7 @@ public class SpellScript : MonoBehaviour
 
         if (triggerObjects != null) { for (int point = 0; point < triggerObjects.Length; point++) { Destroy(triggerObjects[point]); } }
 
-        Destroy(this.gameObject);
+        Destroy(this.transform.parent.gameObject);
     }
 
 

@@ -255,6 +255,16 @@ public class AbstractSceneManager : MonoBehaviour
     public void DestroyEnemyObjects()
     {
         if (MG != null) { if (dbugMode) { MG.UpdateHUDDbugText("Scene Manager: Destroying Enemies"); } }
+
+        GameObject[] linkedEnemies = PC.GetLinkedEnemies();
+        if(linkedEnemies != null)
+        {
+            for (int i = 0; i < linkedEnemies.Length; i++)
+            {
+                PC.RemoveLinkedEnemy(linkedEnemies[i]);
+            }
+        }
+
         for (int i = 0; i < enemyObjects.Length; i++)
         {
             if (enemyObjects[i] != null) { Destroy(enemyObjects[i]); }
@@ -266,7 +276,7 @@ public class AbstractSceneManager : MonoBehaviour
     {
         if (MG != null) { if (dbugMode) { MG.UpdateHUDDbugText("Scene Manager: Destroying Enemy " + enemy.name); } }
         //Debug.Log("removing enemy from array: " + enemy);
-        // Find index of enemy to remove
+        //find index of enemy to remove
         int removeIndex = -1;
         for(int i = 0; i < enemyObjects.Length; i++)
         {
@@ -279,13 +289,22 @@ public class AbstractSceneManager : MonoBehaviour
             }
         }
 
-        // If enemy was found, create new smaller array without it
-        if(removeIndex != -1)
+        GameObject[] linkedEnemies = PC.GetLinkedEnemies();
+        if (linkedEnemies != null)
+        {
+            for (int i = 0; i < linkedEnemies.Length; i++)
+            {
+                if (linkedEnemies[i] == enemy) { PC.RemoveLinkedEnemy(linkedEnemies[i]); }
+            }
+        }
+
+        //if enemy was found, create new smaller array without it
+        if (removeIndex != -1)
         {
             GameObject[] newArray = new GameObject[enemyObjects.Length - 1];
             int newArrayIndex = 0;
             
-            // Copy all elements except the removed enemy
+            //copy all elements except the removed enemy
             for(int i = 0; i < enemyObjects.Length; i++)
             {
                 if(i != removeIndex)
@@ -295,7 +314,7 @@ public class AbstractSceneManager : MonoBehaviour
                 }
             }
             
-            // Update enemy objects array and destroy removed enemy
+            //update array
             enemyObjects = newArray;
         }
 

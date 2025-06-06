@@ -470,8 +470,6 @@ public abstract class AbstractEnemy : MonoBehaviour
         Gizmos.DrawWireSphere(transform.position, seperationDistance);
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, attackDistance);
-        Gizmos.color = Color.blue;
-        Gizmos.DrawWireSphere(transform.position, 2.5f);
     }
     //~~~~~debug~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 }

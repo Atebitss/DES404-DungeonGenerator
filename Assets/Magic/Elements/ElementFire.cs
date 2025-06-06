@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ElementFire : AbstractElement
 {
-    void Awake() { damageModifier = 0.5f; speedModifier = 1f; radiusModifier = 1f; cooldownModifier = 1f; }
+    void Awake() { damageModifier = 1f; speedModifier = 1f; radiusModifier = 1f; cooldownModifier = 1f; }
     public override void ApplyElement(SpellScript SS)
     {
         //Debug.Log("Fire element applied");
