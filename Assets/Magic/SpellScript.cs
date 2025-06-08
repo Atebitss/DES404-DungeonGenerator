@@ -6,7 +6,8 @@ public class SpellScript : MonoBehaviour
 {
     //scene controller
     private AbstractSceneManager ASM;
-    
+    public AbstractSceneManager GetASM() { return ASM; }
+
     //player refs
     private GameObject playerObject;
     private PlayerController PC;
@@ -14,6 +15,9 @@ public class SpellScript : MonoBehaviour
 
     //component refs
     private string effectName, elementName, shapeName = "";
+    public string GetEffectName() { return effectName; }
+    public string GetElementName() { return elementName; }
+    public string GetShapeName() { return shapeName; }
     private string effectScriptName, elementScriptName, shapeScriptName = "";
     private AbstractEffect effectScript;
     public AbstractEffect GetEffectScript() { return effectScript; }
@@ -103,6 +107,7 @@ public class SpellScript : MonoBehaviour
     public int GetDamage() { return damageDealt; }
     private int spellPower;
     public int GetSpellPower() { return spellPower; }
+    public void SetSpellPower(int newSP) { spellPower = newSP; }
     [SerializeField] private GameObject hitSplashPrefab;
 
 
@@ -116,9 +121,9 @@ public class SpellScript : MonoBehaviour
         spellPower = 3;
         casted = false;
 
+        //Debug.Log("ASM: " + ASM);
         playerObject = ASM.GetPlayerObject();
         PC = ASM.GetPlayerController();
-        //Debug.Log("ASM: " + ASM);
         //Debug.Log("ASM.GetPlayerController(): " + ASM.GetPlayerController());
         //Debug.Log("PC: " + PC);
 
@@ -244,7 +249,7 @@ public class SpellScript : MonoBehaviour
         //Debug.Log(this.transform.position);
         if (shapeScript.castable && !casted) //if the spell can be cast and has not been cast yet
         {
-            //Debug.Log("castable & !casted");
+            Debug.Log("castable & !casted");
             //Debug.Log(this.transform.position);
             //Debug.Log(effectName + elementName + shapeName);
 
@@ -289,7 +294,7 @@ public class SpellScript : MonoBehaviour
         }
         else if (!shapeScript.castable)
         {
-            //Debug.Log("!castable");
+            Debug.Log("!castable");
             shapeScript.ApplyShape();
         }
         /*else if (spellPersist && casted)
@@ -310,7 +315,7 @@ public class SpellScript : MonoBehaviour
         }*/
         else if (!spellPersist && casted)
         {
-            //Debug.Log("!persistant & castable");
+            Debug.Log("!persistant & casted");
             targetPoints = effectScript.pathPoints;
             //for (int i = 0; i < targetPoints.Length; i++) { Debug.Log("Spell Script target point" + i + ": " + targetPoints[i]); }
             if (this.gameObject != null) { DestroySpell(); }
@@ -322,7 +327,7 @@ public class SpellScript : MonoBehaviour
     }
     private void TravelSetup()
     {
-        //Debug.Log("Spell Script travel setup");
+        Debug.Log("Spell Script travel setup");
 
         //start & end positions are set on aim destroy - run at start of CastSpell()
         //the start and end point of the line are constant
@@ -405,7 +410,7 @@ public class SpellScript : MonoBehaviour
             dir = (curEndPos - curStartPos).normalized;
             journeyLength = Vector3.Distance(curStartPos, curEndPos);
             startTime = Time.time;
-            //Debug.Log(curStartPos); Debug.Log(curEndPos); Debug.Log(dir); Debug.Log(journeyLength); Debug.Log(startTime);
+            Debug.Log(curStartPos); Debug.Log(curEndPos); Debug.Log(dir); Debug.Log(journeyLength); Debug.Log(startTime);
 
             if (aimingTargets != null && step > 0 && step < aimingTargets.Length && spellPersist) { curTarget++; }
             //Debug.Log(aimingTargets.Length);
