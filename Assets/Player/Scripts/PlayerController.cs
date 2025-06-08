@@ -618,7 +618,7 @@ public class PlayerController : MonoBehaviour
 
     public void DamageEnemy(GameObject curEnemy)
     {
-        Debug.Log("damaging enemy");
+        //Debug.Log("damaging enemy");
 
         attackDamage = ((attackDamage + attackDamageModifier) + attackComboDamage);
         ADM.AddDamageDealt(attackDamage); //increment damage total in adaptive difficulty manager
@@ -669,7 +669,7 @@ public class PlayerController : MonoBehaviour
         //check if enemy is already linked
         for (int i = 0; i < linkedEnemies.Length; i++) { if (linkedEnemies[i] == enemy) { return; } }
 
-        Debug.Log("linking " + enemy.name);
+        //Debug.Log("linking " + enemy.name);
 
         //if not, add it to array
         GameObject[] newLinkedEnemies = new GameObject[linkedEnemies.Length + 1];
@@ -689,11 +689,16 @@ public class PlayerController : MonoBehaviour
                 newLinkedEnemies[newIndex] = linkedEnemies[i];
                 newIndex++;
             }
-            else { Debug.Log("unlinking " + enemy.name); }
+            //else { Debug.Log("unlinking " + enemy.name); }
         }
 
         linkedEnemies = newLinkedEnemies;
     }
+
+    //burst cast
+    private int burstCounter, burstMax = 3; //used to track burst casts
+    private float burstCooldownTimer = 0.5f; //used to track burst cooldown
+    private bool bursting = false; //used to track if player is burst casting
 
 
     //random spell assigned on awake
@@ -703,7 +708,7 @@ public class PlayerController : MonoBehaviour
 
         if (castable && curSpell == null)
         {
-            //Debug.Log("init spell");
+            Debug.Log("creating new spell");
             //instantiate new spell game object & reference it's script while updating it with spell components
             GameObject spellInstance = Instantiate(spellPrefab, this.transform.position, Quaternion.identity);
             spellInstance.transform.SetParent(leftHand.transform);
@@ -712,7 +717,7 @@ public class PlayerController : MonoBehaviour
             //Debug.Log(curSpell);
         }
 
-
+        Debug.Log("setting up new spell");
         //1f for base difficulty, 0.5f for easy, 1.5f for hard
         float spellStrength = 1f; //used by adaptive difficulty as a spell skill modifier
         if (curSpell != null)
@@ -768,7 +773,7 @@ public class PlayerController : MonoBehaviour
 
             //testing
             shapeName = "Ball";
-            effectName = "Link";
+            effectName = "Multicast";
             elementName = "Fire";
 
             curSpell.UpdateSpellScriptShape(shapeName);
@@ -786,42 +791,80 @@ public class PlayerController : MonoBehaviour
 
     public void OnCast(InputAction.CallbackContext context)
     {
-        if (effectName.Contains("Automatic") || effectName.Contains("Charge"))
+        if (active && !bursting)
         {
-            if (context.started) { castHeld = true; }
-            if (context.canceled) 
+            if (effectName.Contains("Automatic") || effectName.Contains("Charge"))
             {
-                castHeld = false;
-
-                if(effectName.Contains("Charge"))
+                if (context.started) { castHeld = true; }
+                if (context.canceled)
                 {
-                    //Debug.Log("PlayerController, CastSpell");
-                    if (castable && spellReady) //if spell is castable
+                    castHeld = false;
+
+                    if (effectName.Contains("Charge"))
                     {
-                        //Debug.Log("PlayerController, spell casted");
+                        //Debug.Log("PlayerController, CastSpell");
+                        if (castable && spellReady) //if spell is castable
+                        {
+                            Debug.Log("PlayerController, spell casted");
+                            curSpell.CastSpell();
+                            spellCooldownTimer = spellCooldownMax;
+                            ADM.SpellRan(); //update adaptive difficulty
+                        }
+                    }
+                }
+            }
+
+            if (context.performed && !effectName.Contains("Automatic") && !effectName.Contains("Charge"))
+            {
+                //Debug.Log("PlayerController, CastSpell");
+                if (castable && spellReady) //if spell is castable
+                {
+                    Debug.Log("PlayerController, spell casted");
+
+                    if (effectName.Contains("Multicast"))
+                    {
+                        StartCoroutine(Multicast());
+                    }
+                    else
+                    {
                         curSpell.CastSpell();
                         spellCooldownTimer = spellCooldownMax;
                         ADM.SpellRan(); //update adaptive difficulty
                     }
                 }
+                else
+                {
+                    Debug.Log("PlayerController, spell not casted");
+                }
             }
+        }
+    }
+
+    private IEnumerator Multicast()
+    {
+        //start multicast
+        bursting = true; //set tracker to true
+        ADM.SpellRan(); //update adaptive difficulty
+
+        while (burstCounter < burstMax) //while counter has not reached max
+        {
+            Debug.Log("PlayerController, multicast spell casted");
+            curSpell.CastSpell(); //cast spell
+            burstCounter++; //increase counter
+
+            if (burstCounter == burstMax){ break; } //if counter has reached max, break loop
+
+            curSpell = null; //reset current spell
+            AssignSpell(); //assign new spell
+
+            yield return new WaitForSeconds(burstCooldownTimer); //wait for cooldown
+
         }
 
-        if (context.performed && !effectName.Contains("Automatic") && !effectName.Contains("Charge"))
-        {
-            //Debug.Log("PlayerController, CastSpell");
-            if (castable && spellReady) //if spell is castable
-            {
-                //Debug.Log("PlayerController, spell casted");
-                curSpell.CastSpell();
-                spellCooldownTimer = spellCooldownMax;
-                ADM.SpellRan(); //update adaptive difficulty
-            }
-            else
-            {
-                //Debug.Log("PlayerController, spell not casted");
-            }
-        }
+        //end multicast
+        spellCooldownTimer = spellCooldownMax; //set cooldown timer
+        bursting = false; //set tracker to false
+        burstCounter = 0; //reset counter
     }
     //~~~~~magic~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

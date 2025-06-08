@@ -109,7 +109,7 @@ public class SpellScript : MonoBehaviour
     //essentially a constructor
     public SpellScript StartSpellScript(AbstractSceneManager newASM)
     {
-        //Debug.Log("SpellScript start");
+        Debug.Log("SpellScript start");
         ASM = newASM;        
         castStartTime = Time.time;
         spellPower = 3;
@@ -237,7 +237,7 @@ public class SpellScript : MonoBehaviour
     //operation center
     public void CastSpell()
     {
-        //Debug.Log("SpellScript CastSpell");
+        Debug.Log("SpellScript CastSpell");
 
         //Debug.Log("shape castable: " + shapeScript.castable);
         //Debug.Log(this.transform.position);
