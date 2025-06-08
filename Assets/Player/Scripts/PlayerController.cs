@@ -773,7 +773,7 @@ public class PlayerController : MonoBehaviour
 
             //testing
             shapeName = "Ball";
-            effectName = "Multicast";
+            effectName = "Pierce";
             elementName = "Fire";
 
             curSpell.UpdateSpellScriptShape(shapeName);
@@ -848,7 +848,7 @@ public class PlayerController : MonoBehaviour
 
         while (burstCounter < burstMax) //while counter has not reached max
         {
-            Debug.Log("PlayerController, multicast spell casted");
+            //Debug.Log("PlayerController, multicast spell casted");
             curSpell.CastSpell(); //cast spell
             burstCounter++; //increase counter
 

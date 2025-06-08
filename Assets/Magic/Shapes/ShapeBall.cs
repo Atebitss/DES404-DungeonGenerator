@@ -63,7 +63,12 @@ public class ShapeBall : AbstractShape
         {
             //raycasts from center of view to world position, if hit then update, then return
             LayerMask aimingMask = 0;
-            if (SS.GetPlayerController() != null) { aimingMask = SS.GetPlayerController().GetAimLayerMask(); }
+            if (SS.GetPlayerController() != null) 
+            {
+                aimingMask = SS.GetPlayerController().GetAimLayerMask();
+
+                if (SS.GetSpellPersist()) { aimingMask = aimingMask & ~LayerMask.GetMask("Enemy"); }
+            }
 
             Ray cameraToWorld = mainCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
             if (Physics.Raycast(cameraToWorld, out RaycastHit hit, SS.GetMaxLength(), aimingMask))

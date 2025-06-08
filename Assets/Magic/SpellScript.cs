@@ -42,6 +42,7 @@ public class SpellScript : MonoBehaviour
     public void ResetIgnoredTargets() { ignoredTargets = new GameObject[1]; }
     private AbstractEnemy[] targetScripts = new AbstractEnemy[0];
     public AbstractEnemy[] GetTargetScripts() { return targetScripts; }
+    private GameObject[] hitTargets = new GameObject[0]; //targets hit by the spell
 
 
     //spell renderer
@@ -134,7 +135,7 @@ public class SpellScript : MonoBehaviour
         //Debug.Log();
         //update this pos to aim pos
         if (shapeScript != null && !casted && spellActive) { shapeScript.AimSpell(); }
-        if (effectScript != null && effectScript.componentWeight == 0) { effectScript.ApplyEffect(); } //if effect weight is 0, assumes the effect impacts aiming
+        if (effectScript != null && effectScript.componentWeight == 0 && !casted) { effectScript.ApplyEffect(); } //if effect weight is 0, assumes the effect impacts aiming
     }
 
 
@@ -291,18 +292,22 @@ public class SpellScript : MonoBehaviour
             //Debug.Log("!castable");
             shapeScript.ApplyShape();
         }
-        else if (spellPersist && casted)
+        /*else if (spellPersist && casted)
         {
             //Debug.Log("persistent & casted");
-            aimingTargets = effectScript.targets;
-            //for (int i = 0; i < aimingTargets.Length; i++) { if (aimingTargets[i] == null) { Debug.Log("aiming targets null"); } else { Debug.Log(aimingTargets[i]); } }
-            startPos = this.transform.position;
-            if (effectScript.targets[0] != null) { endPos = effectScript.targets[0].transform.position; }
-            targetPoints[0] = startPos;
-            targetPoints[1] = endPos;
+            if (!effectName.Contains("Pierce"))
+            {
+                aimingTargets = effectScript.targets;
+                //for (int i = 0; i < aimingTargets.Length; i++) { if (aimingTargets[i] == null) { Debug.Log("aiming targets null"); } else { Debug.Log(aimingTargets[i]); } }
+                startPos = this.transform.position;
+                if (effectScript.targets[0] != null) { endPos = effectScript.targets[0].transform.position; }
+                targetPoints[0] = startPos;
+                targetPoints[1] = endPos;
+            }
+
             //for (int i = 0; i < targetPoints.Length; i++) { Debug.Log("Spell Script target point" + i + ": " + targetPoints[i]); }
             if (this.gameObject != null) { StartCoroutine(MoveToTarget()); }
-        }
+        }*/
         else if (!spellPersist && casted)
         {
             //Debug.Log("!persistant & castable");
@@ -378,7 +383,7 @@ public class SpellScript : MonoBehaviour
 
     IEnumerator MoveToTarget()
     {
-        //Debug.Log("Spell Script move to target");
+        Debug.Log("Spell Script move to target");
         //Debug.Log(this.transform.position);
         int curTarget = 0;
 
@@ -465,12 +470,15 @@ public class SpellScript : MonoBehaviour
                 float travelInterpolate = (Time.time - startTime) * speed / journeyLength;
                 Vector3 nextPosition = Vector3.Lerp(curStartPos, curEndPos, travelInterpolate);
 
-                //check if the spell intersects with an object on the Solid layer, shouldnt end if colliding with ignored target
+
                 Debug.DrawRay(transform.position, dir, Color.red, 10f);
-                if (Physics.Raycast(transform.position, dir, out RaycastHit hit, Vector3.Distance(transform.position, nextPosition) + 0.1f, LayerMask.GetMask("Enemy")) && !CheckIgnoredTargets(hit.collider.gameObject)) 
-                {  
+                //check if the spell intersects with an object on the Enemy layer
+                if (Physics.Raycast(transform.position, dir, out RaycastHit hit, Vector3.Distance(transform.position, nextPosition) + 0.1f, LayerMask.GetMask("Enemy")) && !CheckIgnoredTargets(hit.collider.gameObject) && !HasAlreadyHitTarget(hit.collider.gameObject)) 
+                {
+                    Debug.Log("Spell hit: " + hit.collider.gameObject.name);
                     EndSpell();
-                    yield break; 
+
+                    if (!effectName.Contains("Pierce")) { break; } //exit
                 }
 
                 transform.position = nextPosition;
@@ -479,10 +487,11 @@ public class SpellScript : MonoBehaviour
             }
         }
 
+        if (effectName.Contains("Pierce")) { spellPersist = false; } //stop pierce persisting after reaching destination
+
         //if shape has no trigger points, run spell end on impact
         if (shapeScript.GetTriggerPoints().Length == 0) { EndSpell(); }
         else { DestroySpell(); }
-        //else if shape has one or more trigger points, destroy the spell on impact
     }
     void OnTriggerEnter(Collider col)
     {
@@ -516,7 +525,7 @@ public class SpellScript : MonoBehaviour
         //assuming the spell has no trigger points,
         //apply effect then find targets, deal damage, and destroy self
         //Debug.Log(this.transform.position);
-        //Debug.Log("SpellScript end spell");
+        Debug.Log("SpellScript end spell");
 
         targets = FindTargets(); //sets targets to those found within spell radius
         if (effectScript.componentWeight == 3) { effectScript.ApplyEffect(); } //if effect weight is 3, apply effect upon impact
@@ -557,7 +566,7 @@ public class SpellScript : MonoBehaviour
         AbstractEnemy[] newTargetScripts = new AbstractEnemy[0]; //set new tracking array
         for (int check = 0; check < collisions.Length; check++) //for each found object
         {
-            if (collisions[check] != null && collisions[check].gameObject.tag.Equals("Enemy")) //if their tag is enemy
+            if (collisions[check] != null && collisions[check].gameObject.tag.Equals("Enemy") && !HasAlreadyHitTarget(collisions[check].gameObject)) //if their tag is enemy
             {
                 //Debug.Log(collisions[check].name + " found at " + collisions[check].gameObject.transform.position);
                 numOfTargets++; //increase the number of found targets by one
@@ -573,12 +582,37 @@ public class SpellScript : MonoBehaviour
                 for (int i = 0; i < tempNewTargetScripts.Length; i++) { newTargetScripts[i] = tempNewTargetScripts[i]; } //fill new array with previously found targets
                 newTargetScripts[numOfTargets - 1] = collisions[check].gameObject.GetComponent<AbstractEnemy>(); //fill new arrays last position with enemy object
                 //Debug.Log("new target script " + (numOfTargets - 1) + ": " + newTargetScripts[numOfTargets - 1]);
+
+                AddHitTarget(collisions[check].gameObject); //add the enemy to the hit targets list
             }
         }
 
         //for(int i = 0; i < newTargets.Length; i++) { Debug.Log("new target " + i + ": " + newTargets[i]); }
         targetScripts = newTargetScripts; //update the target scripts to the new ones found
         return newTargets;
+    }
+    private bool HasAlreadyHitTarget(GameObject enemy)
+    {
+        for (int i = 0; i < hitTargets.Length; i++)
+        {
+            if (hitTargets[i] == enemy)
+            {
+                //Debug.Log("already hit enemy: " + enemy.name);
+                return true;
+            }
+        }
+
+        return false;
+    }
+    private void AddHitTarget(GameObject enemy)
+    {
+        GameObject[] newHitEnemies = new GameObject[hitTargets.Length + 1];
+        for (int i = 0; i < hitTargets.Length; i++)
+        {
+            newHitEnemies[i] = hitTargets[i];
+        }
+        newHitEnemies[hitTargets.Length] = enemy;
+        hitTargets = newHitEnemies;
     }
 
     private void DealDamage()
