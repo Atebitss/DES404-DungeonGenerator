@@ -534,6 +534,7 @@ public class SpellScript : MonoBehaviour
         Debug.Log("SpellScript end spell");
 
         targets = FindTargets(); //sets targets to those found within spell radius
+        for(int i = 0; i < targets.Length; i++) { Debug.Log("SpellScript spell target " + i + ": " + targets[i]); }
         if (effectScript.componentWeight == 3) { effectScript.ApplyEffect(); } //if effect weight is 3, apply effect upon impact
         DealDamage(); //deals damage to any targets found within said radius
 

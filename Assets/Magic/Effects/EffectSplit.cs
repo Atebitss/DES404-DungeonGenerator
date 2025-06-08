@@ -43,7 +43,7 @@ public class EffectSplit : AbstractEffect
 
                 //set random direction
                 Vector3 baseDirection = SS.GetDir(); //get origional direction
-                float randomAngleY = Random.Range(-45f, 45f);//random spread within 45 degrees
+                float randomAngleY = Random.Range(-45f, 45f); //random spread within 45 degrees
                 Vector3 randomDirection = (Quaternion.Euler(0, randomAngleY, 0) * baseDirection);
 
                 Vector3 startPos = currentPos;
