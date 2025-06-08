@@ -47,6 +47,7 @@ public class SpellScript : MonoBehaviour
     private AbstractEnemy[] targetScripts = new AbstractEnemy[0];
     public AbstractEnemy[] GetTargetScripts() { return targetScripts; }
     private GameObject[] hitTargets = new GameObject[0]; //targets hit by the spell
+    public GameObject[] GetHitTargets() { return hitTargets; }
 
 
     //spell renderer
@@ -410,7 +411,7 @@ public class SpellScript : MonoBehaviour
             dir = (curEndPos - curStartPos).normalized;
             journeyLength = Vector3.Distance(curStartPos, curEndPos);
             startTime = Time.time;
-            Debug.Log(curStartPos); Debug.Log(curEndPos); Debug.Log(dir); Debug.Log(journeyLength); Debug.Log(startTime);
+            //Debug.Log(curStartPos); Debug.Log(curEndPos); Debug.Log(dir); Debug.Log(journeyLength); Debug.Log(startTime);
 
             if (aimingTargets != null && step > 0 && step < aimingTargets.Length && spellPersist) { curTarget++; }
             //Debug.Log(aimingTargets.Length);

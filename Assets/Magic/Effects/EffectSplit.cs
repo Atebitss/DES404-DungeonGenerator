@@ -33,7 +33,7 @@ public class EffectSplit : AbstractEffect
                 GameObject splitSpell = Instantiate(Resources.Load<GameObject>("SpellParent"), currentPos, Quaternion.identity);
                 SpellScript splitSS = splitSpell.transform.GetChild(0).GetComponent<SpellScript>().StartSpellScript(SS.GetASM());
 
-                splitSS.SetIgnoredTargets(SS.GetIgnoredTargets()); //copy ignored targets
+                splitSS.SetIgnoredTargets(SS.GetHitTargets()); //copy ignored targets
                 splitSS.SetSpellPower(Mathf.RoundToInt(SS.GetSpellPower() / 2)); //reduce spell power
 
                 //copy original spell components
