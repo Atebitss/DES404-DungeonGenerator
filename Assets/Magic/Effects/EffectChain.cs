@@ -10,7 +10,7 @@ public class EffectChain : AbstractEffect
 
     public override void StartEffectScript(SpellScript SS)
     {
-        componentWeight = 3; damageModifier = 1.5f; speedModifier = 0.75f; radiusModifier = 0.25f; cooldownModifier = 1.5f; //set component weights for spell script to use
+        componentWeight = 3; damageModifier = 1f; speedModifier = .5f; radiusModifier = 1f; cooldownModifier = 1f; //set component weights for spell script to use
         this.SS = SS;
         SS.SetSpellPersist(true);   //ensures the spell wont be destroyed upon impact
 
@@ -23,7 +23,7 @@ public class EffectChain : AbstractEffect
     public override void ApplyEffect()
     {
         //Debug.Log("");
-        //Debug.Log("Effect Chain apply effect");
+        Debug.Log("Effect Chain apply effect");
         //find targets
         //sort targets by distance
         //set path points between spell and new target
@@ -217,16 +217,18 @@ public class EffectChain : AbstractEffect
         for (int i = 0; i < unsortedTargets.Length - 1; i++)
         {
             dists[i] = Vector3.Distance(this.transform.position, unsortedTargets[i].transform.position);
-            //Debug.Log(unsortedTargets[i].name + " " + dists[i] + " away from impact");
+            Debug.Log(unsortedTargets[i].gameObject.transform.parent.name + " " + dists[i] + " away from impact");
         }
 
         //sort distance from highest to lowest
-        for (int j = 0; j < dists.Length - 2; j++)
+        for (int j = 0; j < unsortedTargets.Length - 2; j++) //for each target
         {
-            for (int i = 0; i < dists.Length - 2; i++)
+            for (int i = 0; i < unsortedTargets.Length - 2; i++) //for each other target
             {
-                if (dists[i] > dists[i + 1])
+                if (dists[i] > dists[i + 1]) //if first distance is greaten than second distance
                 {
+                    Debug.Log("Swapping " + unsortedTargets[i].gameObject.transform.parent.name + " with " + unsortedTargets[i + 1].name);
+                    //swap distances
                     float tempDist = dists[i + 1];
                     dists[i + 1] = dists[i];
                     dists[i] = tempDist;
@@ -237,11 +239,11 @@ public class EffectChain : AbstractEffect
                 }
             }
         }
-        //Debug.Log("Closest target: " + unsortedTargets[0] + " - " + dists[0]);
 
         //update path points (for spell script later)
         if (unsortedTargets[0] != null)
         {
+            Debug.Log("Closest target: " + unsortedTargets[0].gameObject.transform.parent.name + " - " + dists[0]);
             targets[0] = unsortedTargets[0];
         }
         //Debug.Log("new startPos: " + pathPoints[0] + "   new endPos: " + pathPoints[1]);
@@ -288,22 +290,19 @@ public class EffectChain : AbstractEffect
         Collider[] collisions = Physics.OverlapSphere(this.transform.position, 25f);
         for (int check = 0; check < collisions.Length; check++)
         {
-            if (collisions[check].CompareTag("Enemy")) //ensure targets are enemies and not current target
+            if (collisions[check].CompareTag("Enemy") && !CheckPrevTargets(collisions[check].gameObject)) //ensure targets are enemies and not current target
             {
-                if (!CheckPrevTargets(collisions[check].gameObject)) //a seperate statement to not be run on every object hit, only tagged enemies
+                newTargets[numOfTargets] = collisions[check].gameObject;
+                //Debug.Log(collisions[check].name + " found at " + collisions[check].gameObject.transform.position);
+                numOfTargets++;
+
+                if (numOfTargets >= newTargets.Length)
                 {
-                    newTargets[numOfTargets] = collisions[check].gameObject;
-                    //Debug.Log(collisions[check].name + " found at " + collisions[check].gameObject.transform.position);
-                    numOfTargets++;
+                    GameObject[] tempTargets = new GameObject[numOfTargets + 1];
 
-                    if (numOfTargets >= newTargets.Length)
-                    {
-                        GameObject[] tempTargets = new GameObject[numOfTargets + 1];
+                    for (int i = 0; i < newTargets.Length; i++) { tempTargets[i] = newTargets[i]; }
 
-                        for (int i = 0; i < newTargets.Length; i++) { tempTargets[i] = newTargets[i]; }
-
-                        newTargets = tempTargets;
-                    }
+                    newTargets = tempTargets;
                 }
             }
         }

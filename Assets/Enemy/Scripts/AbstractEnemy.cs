@@ -351,16 +351,20 @@ public abstract class AbstractEnemy : MonoBehaviour
                 //if distance greater than melee distance, move into melee range
                 if (distToPlayer > attackDistance)
                 {
-                    Vector3 directionToPlayer = (PC.transform.position - transform.position).normalized;
+                    Vector3 directionToPlayer = (PC.transform.position - transform.position).normalized; 
                     Vector3 seperationForce = CalculateSeperationForce();
-                    Vector3 newMovement = (directionToPlayer + seperationForce).normalized * movementSpeed;
+                    Vector3 otherForce = CalculateOtherSeperationForces();
+                    Vector3 combinedForce = (seperationForce + otherForce);
+                    Vector3 newMovement = (directionToPlayer + combinedForce).normalized * movementSpeed;
 
                     enemyRigid.linearVelocity = new Vector3(newMovement.x, enemyRigid.linearVelocity.y, newMovement.z);
                 }
                 else if (distToPlayer <= attackDistance)
                 {
                     Vector3 seperationForce = CalculateSeperationForce();
-                    Vector3 newMovement = new Vector3((seperationForce.x * movementSpeed), enemyRigid.linearVelocity.y, (seperationForce.z * movementSpeed));
+                    Vector3 otherForce = CalculateOtherSeperationForces();
+                    Vector3 combinedForce = (seperationForce + otherForce);
+                    Vector3 newMovement = new Vector3((combinedForce.x * movementSpeed), enemyRigid.linearVelocity.y, (seperationForce.z * movementSpeed));
                     enemyRigid.linearVelocity = newMovement;
                     BeginAttack();
                 }
@@ -373,7 +377,9 @@ public abstract class AbstractEnemy : MonoBehaviour
 
                 //add velocity force in forward direction
                 Vector3 seperationForce = CalculateSeperationForce();
-                Vector3 newMovement = (transform.forward + seperationForce).normalized * movementSpeed;
+                Vector3 otherForce = CalculateOtherSeperationForces();
+                Vector3 combinedForce = (seperationForce + otherForce);
+                Vector3 newMovement = (transform.forward + combinedForce).normalized * movementSpeed;
 
                 enemyRigid.linearVelocity = new Vector3(newMovement.x, enemyRigid.linearVelocity.y, newMovement.z);
             }
@@ -381,8 +387,9 @@ public abstract class AbstractEnemy : MonoBehaviour
     }
     private Vector3 CalculateSeperationForce()
     {
-        GameObject[] enemiesNear = EDCNear.GetEnemiesNear();
         Vector3 seperationForce = Vector3.zero;
+
+        GameObject[] enemiesNear = EDCNear.GetEnemiesNear();
         int enemyCount = 0;
 
         foreach (GameObject enemy in enemiesNear)
@@ -407,9 +414,44 @@ public abstract class AbstractEnemy : MonoBehaviour
 
 
         //if there are enemies near, normalize the seperation force
-        if (enemyCount > 0) { seperationForce /= enemyCount; }
-
+        //if (enemyCount > 0) { seperationForce /= enemyCount; }
         return seperationForce;
+    }
+    private Vector3 CalculateOtherSeperationForces()
+    {
+        //Debug.Log("calculating other forces");
+        //calculate other forces from repel and compel objects
+        GameObject[] othersNear = EDCNear.GetOthersNear(); //get other objects
+        Vector3 otherForce = Vector3.zero; //init force
+        int otherCount = 0; //init counter
+
+        //for each other object
+        for (int i = 0; i < othersNear.Length; i++)
+        {
+            if (othersNear[i] != null)
+            {
+                //Debug.Log("other object: " + othersNear[i].name);
+                //get distance from other object
+                float distanceToOther = Vector3.Distance(transform.position, othersNear[i].transform.position);
+                //Debug.Log("distance to other: " + distanceToOther);
+
+                //if the other object
+                if (othersNear.Length != 0)
+                {
+                    SeperationForce otherScript = othersNear[i].GetComponent<SeperationForce>();
+                    if (distanceToOther < otherScript.GetSeperationDistance())
+                    {
+                        Vector3 directionFromOther = (transform.position - othersNear[i].transform.position).normalized;
+                        otherForce += (directionFromOther * otherScript.GetSeperationForce());
+                        Debug.Log(directionFromOther * otherScript.GetSeperationForce());
+                        otherCount++;
+                    }
+                }
+            }
+        }
+
+        //if (otherCount > 0) { otherForce /= otherCount; }
+        return otherForce;
     }
 
     private void Retreat()

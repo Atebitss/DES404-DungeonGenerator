@@ -67,7 +67,7 @@ public class ShapeBall : AbstractShape
             {
                 aimingMask = SS.GetPlayerController().GetAimLayerMask();
 
-                if (SS.GetSpellPersist()) { aimingMask = aimingMask & ~LayerMask.GetMask("Enemy"); }
+                if (SS.GetEffectName().Contains("Pierce")) { aimingMask = aimingMask & ~LayerMask.GetMask("Enemy"); }
             }
 
             Ray cameraToWorld = mainCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));

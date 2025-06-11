@@ -137,8 +137,6 @@ public class SpellScript : MonoBehaviour
 
     void FixedUpdate()
     {
-        //Debug.Log(this.transform.position);
-        //Debug.Log();
         //update this pos to aim pos
         if (shapeScript != null && !casted && spellActive) { shapeScript.AimSpell(); }
         if (effectScript != null && effectScript.componentWeight == 0 && !casted) { effectScript.ApplyEffect(); } //if effect weight is 0, assumes the effect impacts aiming
@@ -246,7 +244,8 @@ public class SpellScript : MonoBehaviour
     {
         Debug.Log("SpellScript CastSpell");
 
-        //Debug.Log("shape castable: " + shapeScript.castable);
+        Debug.Log("shape castable: " + shapeScript.castable);
+        Debug.Log("casted: " + casted);
         //Debug.Log(this.transform.position);
         if (shapeScript.castable && !casted) //if the spell can be cast and has not been cast yet
         {
@@ -266,14 +265,14 @@ public class SpellScript : MonoBehaviour
             //if more than one trigger point & the spell will expire, shape is line
             if (shapeScript.GetTriggerPoints().Length > 0 && !spellPersist)
             {
-                //Debug.Log("triggerPoints & !persistent");
+                Debug.Log("triggerPoints & !persistent");
                 triggerPoints = shapeScript.GetTriggerPoints(); //update trigger points
                 TravelSetup(); //determine spell movement
             }
             //if more than one trigger point & the spell will persist, shape is line and effect is chain
-            else if (shapeScript.GetTriggerPoints().Length > 0 && spellPersist)
+            /*else if (shapeScript.GetTriggerPoints().Length > 0 && spellPersist)
             {
-                //Debug.Log("triggerPoints & persistent");
+                Debug.Log("triggerPoints & persistent");
                 effectScript.ApplyEffect(); //find targets
                 aimingTargets = effectScript.targets; //set spell targets to those found
                 int numOfTargets = 0;
@@ -283,7 +282,7 @@ public class SpellScript : MonoBehaviour
                 //for (int i = 0; i < targetPoints.Length; i++) { Debug.Log("Spell Script target point" + i + ": " + targetPoints[i]); }
                 //triggerPoints = effectScript.pathPoints;
                 TravelSetup(); //determine spell movement
-            }
+            }*/
 
             UpdateRadius(); //apply component radius modifiers
             //Debug.Log(this.transform.position);
@@ -298,9 +297,9 @@ public class SpellScript : MonoBehaviour
             Debug.Log("!castable");
             shapeScript.ApplyShape();
         }
-        /*else if (spellPersist && casted)
+        else if (spellPersist && casted)
         {
-            //Debug.Log("persistent & casted");
+            Debug.Log("persistent & casted");
             if (!effectName.Contains("Pierce"))
             {
                 aimingTargets = effectScript.targets;
@@ -313,7 +312,7 @@ public class SpellScript : MonoBehaviour
 
             //for (int i = 0; i < targetPoints.Length; i++) { Debug.Log("Spell Script target point" + i + ": " + targetPoints[i]); }
             if (this.gameObject != null) { StartCoroutine(MoveToTarget()); }
-        }*/
+        }
         else if (!spellPersist && casted)
         {
             Debug.Log("!persistant & casted");
@@ -389,7 +388,7 @@ public class SpellScript : MonoBehaviour
 
     IEnumerator MoveToTarget()
     {
-        Debug.Log("Spell Script move to target");
+        Debug.Log("Spell Script move to target: " + endPos);
         //Debug.Log(this.transform.position);
         int curTarget = 0;
 
@@ -573,7 +572,7 @@ public class SpellScript : MonoBehaviour
         AbstractEnemy[] newTargetScripts = new AbstractEnemy[0]; //set new tracking array
         for (int check = 0; check < collisions.Length; check++) //for each found object
         {
-            if (collisions[check] != null && collisions[check].gameObject.tag.Equals("Enemy") && !HasAlreadyHitTarget(collisions[check].gameObject)) //if their tag is enemy
+            if (collisions[check] != null && collisions[check].gameObject.tag.Equals("Enemy") && !HasAlreadyHitTarget(collisions[check].gameObject) && !CheckIgnoredTargets(collisions[check].gameObject)) //if their tag is enemy
             {
                 //Debug.Log(collisions[check].name + " found at " + collisions[check].gameObject.transform.position);
                 numOfTargets++; //increase the number of found targets by one
