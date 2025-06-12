@@ -12,7 +12,7 @@ public class EffectRepel : AbstractEffect
         SS.gameObject.tag = "Repel"; //set spell object tag to Repel
         //add new sepertaion force script to spell object
         SeperationForce sf = SS.gameObject.AddComponent<SeperationForce>();
-        sf.SetSeperationDistance(10f); //set sepertaion distance
-        sf.SetSeperationForce(1f); //set seperation force
+        sf.SetSeperationDistance(25f); //set sepertaion distance
+        sf.SetSeperationForce(100f); //set seperation force
     }
 }

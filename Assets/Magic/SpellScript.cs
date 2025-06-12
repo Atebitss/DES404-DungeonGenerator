@@ -116,7 +116,7 @@ public class SpellScript : MonoBehaviour
     //essentially a constructor
     public SpellScript StartSpellScript(AbstractSceneManager newASM)
     {
-        Debug.Log("SpellScript start");
+        //Debug.Log("SpellScript start");
         ASM = newASM;        
         castStartTime = Time.time;
         spellPower = 3;
@@ -242,14 +242,14 @@ public class SpellScript : MonoBehaviour
     //operation center
     public void CastSpell()
     {
-        Debug.Log("SpellScript CastSpell");
+        //Debug.Log("SpellScript CastSpell");
 
-        Debug.Log("shape castable: " + shapeScript.castable);
-        Debug.Log("casted: " + casted);
+        //Debug.Log("shape castable: " + shapeScript.castable);
+        //Debug.Log("casted: " + casted);
         //Debug.Log(this.transform.position);
         if (shapeScript.castable && !casted) //if the spell can be cast and has not been cast yet
         {
-            Debug.Log("castable & !casted");
+            //Debug.Log("castable & !casted");
             //Debug.Log(this.transform.position);
             //Debug.Log(effectName + elementName + shapeName);
 
@@ -265,7 +265,7 @@ public class SpellScript : MonoBehaviour
             //if more than one trigger point & the spell will expire, shape is line
             if (shapeScript.GetTriggerPoints().Length > 0 && !spellPersist)
             {
-                Debug.Log("triggerPoints & !persistent");
+                //Debug.Log("triggerPoints & !persistent");
                 triggerPoints = shapeScript.GetTriggerPoints(); //update trigger points
                 TravelSetup(); //determine spell movement
             }
@@ -294,12 +294,12 @@ public class SpellScript : MonoBehaviour
         }
         else if (!shapeScript.castable)
         {
-            Debug.Log("!castable");
+            //Debug.Log("!castable");
             shapeScript.ApplyShape();
         }
         else if (spellPersist && casted)
         {
-            Debug.Log("persistent & casted");
+            //Debug.Log("persistent & casted");
             if (!effectName.Contains("Pierce"))
             {
                 aimingTargets = effectScript.targets;
@@ -315,7 +315,7 @@ public class SpellScript : MonoBehaviour
         }
         else if (!spellPersist && casted)
         {
-            Debug.Log("!persistant & casted");
+            //Debug.Log("!persistant & casted");
             targetPoints = effectScript.pathPoints;
             //for (int i = 0; i < targetPoints.Length; i++) { Debug.Log("Spell Script target point" + i + ": " + targetPoints[i]); }
             if (this.gameObject != null) { DestroySpell(); }
@@ -327,13 +327,13 @@ public class SpellScript : MonoBehaviour
     }
     private void TravelSetup()
     {
-        Debug.Log("Spell Script travel setup");
+        //Debug.Log("Spell Script travel setup");
 
         //start & end positions are set on aim destroy - run at start of CastSpell()
         //the start and end point of the line are constant
         this.transform.position = startPos; //move spell to start pos
 
-        Debug.Log("travel setup end pos: " + endPos);
+        //Debug.Log("travel setup end pos: " + endPos);
 
         targetPoints[0] = startPos; //path point 0 is start pos
         targetPoints[targetPoints.Length - 1] = endPos; //path point end is end pos
@@ -388,9 +388,10 @@ public class SpellScript : MonoBehaviour
 
     IEnumerator MoveToTarget()
     {
-        Debug.Log("Spell Script move to target: " + endPos);
+        //Debug.Log("Spell Script move to target: " + endPos);
         //Debug.Log(this.transform.position);
         int curTarget = 0;
+        bool spellEnded = false;
 
         speed *= shapeScript.speedModifier; //apply shape speed modifier
         speed *= effectScript.speedModifier; //apply effect speed modifier
@@ -480,13 +481,14 @@ public class SpellScript : MonoBehaviour
                 //check if the spell intersects with an object on the Enemy layer
                 if (Physics.Raycast(transform.position, dir, out RaycastHit hit, Vector3.Distance(transform.position, nextPosition) + 0.1f, LayerMask.GetMask("Enemy")) && !CheckIgnoredTargets(hit.collider.gameObject) && !HasAlreadyHitTarget(hit.collider.gameObject)) 
                 {
-                    Debug.Log("Spell hit: " + hit.collider.gameObject.name);
+                    //Debug.Log("Spell hit: " + hit.collider.gameObject.name);
+                    spellEnded = true;
                     EndSpell();
 
                     if (!effectName.Contains("Pierce")) { break; } //exit
                 }
 
-                transform.position = nextPosition;
+                if (this.gameObject != null) { transform.position = nextPosition; }
 
                 yield return null;
             }
@@ -494,9 +496,12 @@ public class SpellScript : MonoBehaviour
 
         if (effectName.Contains("Pierce")) { spellPersist = false; } //stop pierce persisting after reaching destination
 
-        //if shape has no trigger points, run spell end on impact
-        if (shapeScript.GetTriggerPoints().Length == 0) { EndSpell(); }
-        else { DestroySpell(); }
+        if (!spellEnded)
+        {
+            //if shape has no trigger points, run spell end on impact
+            if (shapeScript.GetTriggerPoints().Length == 0) { EndSpell(); }
+            else { DestroySpell(); }
+        }
     }
     void OnTriggerEnter(Collider col)
     {
@@ -530,10 +535,10 @@ public class SpellScript : MonoBehaviour
         //assuming the spell has no trigger points,
         //apply effect then find targets, deal damage, and destroy self
         //Debug.Log(this.transform.position);
-        Debug.Log("SpellScript end spell");
+        //Debug.Log("SpellScript end spell");
 
         targets = FindTargets(); //sets targets to those found within spell radius
-        for(int i = 0; i < targets.Length; i++) { Debug.Log("SpellScript spell target " + i + ": " + targets[i]); }
+        //for(int i = 0; i < targets.Length; i++) { Debug.Log("SpellScript spell target " + i + ": " + targets[i]); }
         if (effectScript.componentWeight == 3) { effectScript.ApplyEffect(); } //if effect weight is 3, apply effect upon impact
         DealDamage(); //deals damage to any targets found within said radius
 
@@ -572,7 +577,7 @@ public class SpellScript : MonoBehaviour
         AbstractEnemy[] newTargetScripts = new AbstractEnemy[0]; //set new tracking array
         for (int check = 0; check < collisions.Length; check++) //for each found object
         {
-            if (collisions[check] != null && collisions[check].gameObject.tag.Equals("Enemy") && !HasAlreadyHitTarget(collisions[check].gameObject) && !CheckIgnoredTargets(collisions[check].gameObject)) //if their tag is enemy
+            if (collisions[check] != null && collisions[check].gameObject.tag.Equals("Enemy") && !HasAlreadyHitTarget(collisions[check].gameObject)) //if their tag is enemy
             {
                 //Debug.Log(collisions[check].name + " found at " + collisions[check].gameObject.transform.position);
                 numOfTargets++; //increase the number of found targets by one

@@ -614,7 +614,7 @@ public class RoomGeneration : MonoBehaviour
         //find random boss type
         GameObject bossType = validBossTypes[Random.Range(0, (validBossTypes.Length - 1))];
         //Debug.Log("bossType: " + bossType.name);
-        ASM.SpawnEnemy(bossType, (literalPosition + roomCenter));
+        ASM.SpawnEnemy(bossType, (literalPosition + roomCenter), true);
     }
 
 
@@ -754,7 +754,7 @@ public class RoomGeneration : MonoBehaviour
             }
         }
 
-        if (enemyPositions.Length > 0){ ASM.SpawnEnemies(enemyTypes, enemyPositions); }
+        if (enemyPositions.Length > 0){ ASM.SpawnEnemies(enemyTypes, enemyPositions, true); }
     }
     //~~~~~enemies~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

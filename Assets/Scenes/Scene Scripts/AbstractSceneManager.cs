@@ -1,8 +1,4 @@
-using System.Collections;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UIElements;
 public class AbstractSceneManager : MonoBehaviour
 {
     //debug info
@@ -115,7 +111,7 @@ public class AbstractSceneManager : MonoBehaviour
     public GameObject[] GetEnemyObjects() { return enemyObjects; }
 
 
-    public void SpawnEnemy(GameObject enemy, Vector3 position)
+    public void SpawnEnemy(GameObject enemy, Vector3 position, bool active)
     {
         if (MG != null) { if (dbugMode) { MG.UpdateHUDDbugText("Scene Manager: Spawning Enemy " + enemy.name); } }
         int existingCount = enemyObjects.Length; //current number of enemies tracked
@@ -127,14 +123,14 @@ public class AbstractSceneManager : MonoBehaviour
         //spawn new enemies and add to new array
         int index = existingCount;
         newEnemyObjects[index] = Instantiate(enemy, position, Quaternion.identity);
-        GenerateEnemy(newEnemyObjects[index]);
+        GenerateEnemy(newEnemyObjects[index], active);
 
         if (!newEnemyObjects[index].name.Contains("boss")) { newEnemyObjects[index].name = "Enemy" + index; }
         else { newEnemyObjects[index].name = "Boss" + enemy.transform.GetChild(0).GetComponent<AbstractEnemy>().type; }
 
         enemyObjects = newEnemyObjects; //replace old array with new array
     }
-    public void SpawnEnemies(GameObject[] enemies, Vector3[] positions)
+    public void SpawnEnemies(GameObject[] enemies, Vector3[] positions, bool active)
     {
         if (MG != null) { if (dbugMode) { MG.UpdateHUDDbugText("Scene Manager: Spawning Enemies"); } }
         int existingCount = enemyObjects.Length; //current number of enemies tracked
@@ -149,16 +145,15 @@ public class AbstractSceneManager : MonoBehaviour
             if (dbugMode) { MG.UpdateHUDDbugText("Scene Manager: Spawning Enemy " + enemies[i].name); }
             int index = existingCount + i;
             newEnemyObjects[index] = Instantiate(enemies[i], positions[i], Quaternion.identity);
-            GenerateEnemy(newEnemyObjects[index]);
+            GenerateEnemy(newEnemyObjects[index], active);
             
-
             if (!newEnemyObjects[index].name.Contains("boss")) { newEnemyObjects[index].name = "Enemy" + index; }
             else { newEnemyObjects[index].name = "Boss" + newEnemyObjects[index].GetComponent<AbstractEnemy>().type; }
         }
 
         enemyObjects = newEnemyObjects; //replace old array with new array
     }
-    private void GenerateEnemy(GameObject curEnemy)
+    private void GenerateEnemy(GameObject curEnemy, bool active)
     {
         if (MG != null) { MG.UpdateHUDDbugText("Scene Manager: Generating Enemy"); }
         //Debug.Log("Generating enemy: " + curEnemy.name);
@@ -249,6 +244,17 @@ public class AbstractSceneManager : MonoBehaviour
         if(Random.Range(0, 100) <= dualChance && !curEnemyScript.GetDual())
         {
             curEnemyScript.SetDual(true);
+        }
+
+        //active state
+        curEnemyScript.SetIsActive(active);
+
+        //rotate to face player
+        if (PC != null)
+        {
+            Vector3 direction = PC.gameObject.transform.position - curEnemy.transform.position;
+            direction.y = 0; //keep rotation on the horizontal plane
+            curEnemy.transform.rotation = Quaternion.LookRotation(direction);
         }
     }
 

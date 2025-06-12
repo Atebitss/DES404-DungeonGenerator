@@ -10,11 +10,11 @@ public class EffectChain : AbstractEffect
 
     public override void StartEffectScript(SpellScript SS)
     {
-        componentWeight = 3; damageModifier = 1f; speedModifier = .5f; radiusModifier = 1f; cooldownModifier = 1f; //set component weights for spell script to use
+        componentWeight = 3; damageModifier = 1f; speedModifier = 1f; radiusModifier = 1f; cooldownModifier = 1f; //set component weights for spell script to use
         this.SS = SS;
         SS.SetSpellPersist(true);   //ensures the spell wont be destroyed upon impact
 
-        maxTargets = SS.GetSpellPower() * 3;   //set max targets to players level*3
+        maxTargets = SS.GetSpellPower();   //set max targets to players level
         targets = new GameObject[maxTargets];
         previousTargets = new GameObject[maxTargets];
 
@@ -29,7 +29,7 @@ public class EffectChain : AbstractEffect
         //set path points between spell and new target
 
         if (SS.GetShapeScript().GetTriggerPoints().Length == 0) { curTargetNum++; }   //increase the current number of chains
-        //Debug.Log("Chain effect applied, " + curTargetNum + "/" + maxTargets);
+        Debug.Log("Chain effect applied, " + curTargetNum + "/" + maxTargets);
 
         //if max chains reached, update spell script so its no longer persistent
         if (curTargetNum == maxTargets) 
@@ -227,7 +227,7 @@ public class EffectChain : AbstractEffect
             {
                 if (dists[i] > dists[i + 1]) //if first distance is greaten than second distance
                 {
-                    Debug.Log("Swapping " + unsortedTargets[i].gameObject.transform.parent.name + " with " + unsortedTargets[i + 1].name);
+                    Debug.Log("Swapping " + unsortedTargets[i].gameObject.transform.parent.name + " with " + unsortedTargets[i + 1].gameObject.transform.parent.name);
                     //swap distances
                     float tempDist = dists[i + 1];
                     dists[i + 1] = dists[i];

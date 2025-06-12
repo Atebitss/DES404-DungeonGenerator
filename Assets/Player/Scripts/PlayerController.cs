@@ -708,7 +708,7 @@ public class PlayerController : MonoBehaviour
 
         if (castable && curSpell == null)
         {
-            Debug.Log("creating new spell");
+            //Debug.Log("creating new spell");
             //instantiate new spell game object & reference it's script while updating it with spell components
             GameObject spellInstance = Instantiate(spellPrefab, this.transform.position, Quaternion.identity);
             spellInstance.transform.SetParent(leftHand.transform);
@@ -717,7 +717,7 @@ public class PlayerController : MonoBehaviour
             //Debug.Log(curSpell);
         }
 
-        Debug.Log("setting up new spell");
+        //Debug.Log("setting up new spell");
         //1f for base difficulty, 0.5f for easy, 1.5f for hard
         float spellStrength = 1f; //used by adaptive difficulty as a spell skill modifier
         if (curSpell != null)
@@ -773,7 +773,7 @@ public class PlayerController : MonoBehaviour
 
             //testing
             shapeName = "Ball";
-            effectName = "Chain";
+            effectName = "Repel";
             elementName = "Fire";
 
             curSpell.UpdateSpellScriptShape(shapeName);
@@ -805,7 +805,7 @@ public class PlayerController : MonoBehaviour
                         //Debug.Log("PlayerController, CastSpell");
                         if (castable && spellReady) //if spell is castable
                         {
-                            Debug.Log("PlayerController, spell casted");
+                            //Debug.Log("PlayerController, spell casted");
                             curSpell.CastSpell();
                             spellCooldownTimer = spellCooldownMax;
                             ADM.SpellRan(); //update adaptive difficulty
@@ -819,7 +819,7 @@ public class PlayerController : MonoBehaviour
                 //Debug.Log("PlayerController, CastSpell");
                 if (castable && spellReady) //if spell is castable
                 {
-                    Debug.Log("PlayerController, spell casted");
+                    //Debug.Log("PlayerController, spell casted");
 
                     if (effectName.Contains("Multicast"))
                     {
@@ -834,7 +834,7 @@ public class PlayerController : MonoBehaviour
                 }
                 else
                 {
-                    Debug.Log("PlayerController, spell not casted");
+                    //Debug.Log("PlayerController, spell not casted");
                 }
             }
         }
@@ -1176,7 +1176,7 @@ public class PlayerController : MonoBehaviour
         {
             //update interaction prompt
             RaycastHit hit;
-            Debug.DrawRay(playerCamera.transform.position, (playerCamera.transform.forward * interactDistance), Color.red, 1f);
+            //Debug.DrawRay(playerCamera.transform.position, (playerCamera.transform.forward * interactDistance), Color.red, 1f);
             if (Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward, out hit, interactDistance, interactionMask))
             {
                 string promptText = hit.collider.tag;
