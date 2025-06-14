@@ -44,7 +44,7 @@ public class TestRealmManager : AbstractSceneManager
         for (int i = 0; i < maxEnemies; i++)
         {
             //for each enemy, randomly select a position and a type
-            enemyPositions[i] = new Vector3(Random.Range(-15, 15), 0, Random.Range(5, 15)); 
+            enemyPositions[i] = new Vector3(Random.Range(-15, 15), 0, Random.Range(15, 25)); 
             enemyTypes[i] = validEnemyTypes[0];
         }
 

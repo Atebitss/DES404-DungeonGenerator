@@ -65,6 +65,7 @@ public class SpellScript : MonoBehaviour
     public bool GetSpellValid() { return spellValid; }
     private bool casted = false;
     public bool GetCasted() { return casted; }
+    private bool delayed = false;
     private bool spellActive = false;
     private float castStartTime = 0f;
     private float timeSinceCast = 0f;
@@ -289,8 +290,11 @@ public class SpellScript : MonoBehaviour
 
             casted = true;
 
-            //move the spell along a line from first position to target position
-            StartCoroutine(MoveToTarget());
+            if (!delayed)
+            {
+                //move the spell along a line from first position to target position
+                StartCoroutine(MoveToTarget());
+            }
         }
         else if (!shapeScript.castable)
         {
@@ -321,6 +325,16 @@ public class SpellScript : MonoBehaviour
             if (this.gameObject != null) { DestroySpell(); }
         }
     }
+    public IEnumerator DelayCast(float delayTime)
+    {
+        //Debug.Log("Spell Script delay cast");
+        delayed = true; //set delayed to true so the spell does not cast immediately
+        yield return new WaitForSeconds(delayTime); //wait for the specified time
+        delayed = false; //set delayed to false so the spell can be cast
+
+        StartCoroutine(MoveToTarget());
+    }
+
     public bool GetSpellCastable()
     {
         return shapeScript.castable;

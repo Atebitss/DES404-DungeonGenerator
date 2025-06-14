@@ -773,7 +773,7 @@ public class PlayerController : MonoBehaviour
 
             //testing
             shapeName = "Ball";
-            effectName = "Repel";
+            effectName = "Delay";
             elementName = "Fire";
 
             curSpell.UpdateSpellScriptShape(shapeName);
