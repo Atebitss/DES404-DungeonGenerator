@@ -38,55 +38,24 @@ public class ShapeLine : AbstractShape
         }
     }
 
-    public override void ApplyShape()
-    {
-        //Debug.Log("Line shape applied");
-        if (spellAim[1] == null)
-        {
-            //Debug.Log("confirmed pos 1");
-            //if second aim game object is empty
-            //set new game object as current aim
-            spellAim[1] = Instantiate(Resources.Load<GameObject>("AimSpellPrefab"), transform);
-            spellAim[1].transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
-
-            Destroy(spellAim[1].GetComponent<LineRenderer>());
-
-            aimMeshFilter = spellAim[1].GetComponent<MeshFilter>();
-            aimMeshFilter.mesh = shapeMesh;
-
-            Vector3[] tempPathPoints = pathPoints;
-            pathPoints = new Vector3[tempPathPoints.Length + 1];
-            for (int point = 0; point < tempPathPoints.Length; point++)
-            {
-                pathPoints[point] = tempPathPoints[point];
-            }
-
-            aimingLine.positionCount = pathPoints.Length;
-            aimingLine.SetPosition(pathPoints.Length - 1, transform.position);
-
-            //Debug.Log("castable now true");
-            firstPointConfirmed = true;
-            castable = true;
-        }
-    }
 
     //runs when shape is added to spell
     public override void AimSpell()
     {
-        if (spellAim[1] == null) 
-        { 
+        if (spellAim[1] == null)
+        {
             startPos = GetAimedWorldPos();
             startPos += new Vector3(0, 1, 0);
-            spellAim[0].transform.position = startPos; 
+            spellAim[0].transform.position = startPos;
             pathPoints[0] = startPos;
             aimingLine.SetPosition(0, startPos);
             //Debug.Log("spellaimtransformposition: " + spellAim[0].transform.position);
         }
-        else if (spellAim[1] != null) 
-        { 
+        else if (spellAim[1] != null)
+        {
             endPos = GetAimedWorldPos();
             endPos += new Vector3(0, 1, 0);
-            spellAim[1].transform.position = endPos; 
+            spellAim[1].transform.position = endPos;
             pathPoints[pathPoints.Length - 1] = endPos;
 
             //calculate triggering path
@@ -121,23 +90,6 @@ public class ShapeLine : AbstractShape
             }
         }
     }
-    private Vector3 GetAimedWorldPos()
-    {
-        if (mainCamera != null)
-        {
-            //raycasts from camera position to world position, if hit then update, then return
-            Ray cameraToWorld = mainCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
-            if (Physics.Raycast(cameraToWorld, out RaycastHit hit, SS.GetMaxLength()))
-            {
-                aimPos = hit.point;
-            }
-
-            //Debug.Log("aimpos: " + aimPos);
-            return aimPos;
-        }
-
-        return Vector3.zero;
-    }
 
     public override void UpdateAimPath(Vector3[] addPoints)
     {
@@ -157,4 +109,43 @@ public class ShapeLine : AbstractShape
         pathPoints[0] = pathPointStart;
         pathPoints[pathPoints.Length - 1] = pathPointEnd;
     }
+
+
+    private void FixedUpdate()
+    {
+    }
+
+
+    public override void ApplyShape()
+    {
+        //Debug.Log("Line shape applied");
+        if (spellAim[1] == null)
+        {
+            //Debug.Log("confirmed pos 1");
+            //if second aim game object is empty
+            //set new game object as current aim
+            spellAim[1] = Instantiate(Resources.Load<GameObject>("AimSpellPrefab"), transform);
+            spellAim[1].transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+
+            Destroy(spellAim[1].GetComponent<LineRenderer>());
+
+            aimMeshFilter = spellAim[1].GetComponent<MeshFilter>();
+            aimMeshFilter.mesh = shapeMesh;
+
+            Vector3[] tempPathPoints = pathPoints;
+            pathPoints = new Vector3[tempPathPoints.Length + 1];
+            for (int point = 0; point < tempPathPoints.Length; point++)
+            {
+                pathPoints[point] = tempPathPoints[point];
+            }
+
+            aimingLine.positionCount = pathPoints.Length;
+            aimingLine.SetPosition(pathPoints.Length - 1, transform.position);
+
+            //Debug.Log("castable now true");
+            firstPointConfirmed = true;
+            castable = true;
+        }
+    }
+
 }

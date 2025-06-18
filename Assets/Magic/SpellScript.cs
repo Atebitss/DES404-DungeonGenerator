@@ -36,13 +36,25 @@ public class SpellScript : MonoBehaviour
     private GameObject[] targets = new GameObject[0];
     public void SetSpellTargets(GameObject[] targets) { this.targets = targets; }
     public GameObject[] GetSpellTargets() { return targets; }
-    private GameObject[] aimingTargets = new GameObject[0];
-    public void SetAimingTargets(GameObject[] aimTargets) { this.aimingTargets = aimTargets; }
-    public GameObject[] GetAimingTargets() { return aimingTargets; }
     private GameObject[] ignoredTargets = new GameObject[1];
     public void SetIgnoredTargets(GameObject[] targets) { ignoredTargets = targets; }
     public void SetIgnoredTarget(GameObject target) { ignoredTargets[0] = target; }
     public GameObject[] GetIgnoredTargets() { return ignoredTargets; }
+    public bool CheckIgnoredTargets(GameObject hitTarget)
+    {
+        //Debug.Log("hitTarget: " + hitTarget);
+        for (int i = 0; i < ignoredTargets.Length; i++)
+        {
+            //Debug.Log("ignoredTargets" + i + ": " + ignoredTargets[i]);
+            if (ignoredTargets[i] == hitTarget)
+            {
+                //Debug.Log("ignored target found: " + ignoredTargets[i]);
+                return true;
+            }
+        }
+
+        return false;
+    }
     public void ResetIgnoredTargets() { ignoredTargets = new GameObject[1]; }
     private AbstractEnemy[] targetScripts = new AbstractEnemy[0];
     public AbstractEnemy[] GetTargetScripts() { return targetScripts; }
@@ -58,7 +70,7 @@ public class SpellScript : MonoBehaviour
     [SerializeField] private SphereCollider spellSphereCollider;
     [SerializeField] private GameObject lineMarkerPrefab;
     private GameObject[] triggerObjects;
-    public GameObject[] GettriggerObjects() { return triggerObjects; }
+    public GameObject[] GetTriggerObjects() { return triggerObjects; }
 
     //spell info
     private bool spellValid = false;
@@ -66,24 +78,23 @@ public class SpellScript : MonoBehaviour
     private bool casted = false;
     public bool GetCasted() { return casted; }
     private bool delayed = false;
+    public bool GetDelayed() { return delayed; }
     private bool spellActive = false;
+    public bool GetSpellActive() { return spellActive; }
     private float castStartTime = 0f;
     private float timeSinceCast = 0f;
-    private float maxLength = 50f;
-    public float GetMaxLength() { return maxLength; }
-    public void SetMaxLength(float newMax) { maxLength = newMax; }
+    private float maxLookLength = 500f;
+    public float GetMaxLookLength() { return maxLookLength; }
+    public void SetMaxLookLength(float newMax) { maxLookLength = newMax; }
+    private float maxSpellLength = 500f;
+    public float GetMaxSpellLength() { return maxSpellLength; }
+    public void SetMaxSpellLength(float newMax) { maxSpellLength = newMax; }
     private Vector3 startPos;
     public void SetStartPos(Vector3 startPos) { /*Debug.Log("set start pos: " + startPos);*/ this.startPos = startPos; }
     public Vector3 GetStartPos() { /*Debug.Log("get start pos: " + startPos);*/ return startPos; }
     private Vector3 endPos;
     public void SetEndPos(Vector3 endPos) { /*Debug.Log("set end pos: " + endPos);*/ this.endPos = endPos; }
     public Vector3 GetEndPos() { /*Debug.Log("get end pos: " + endPos);*/ return endPos; }
-    private Vector3 dir;
-    public Vector3 GetDir() { return dir; }
-    private float journeyLength;
-    public float GetJourneyLength() { return journeyLength; }
-    private float startTime;
-    public float GetStartTime() { return startTime; }
     private bool spellPersist = false;
     public bool GetSpellPersist() { /*Debug.Log("GetSpellPersist");*/ return spellPersist; }
     public void SetSpellPersist(bool persist) { /*Debug.Log("SetSpellPersist: " + persist);*/ spellPersist = persist; }
@@ -243,6 +254,30 @@ public class SpellScript : MonoBehaviour
     //operation center
     public void CastSpell()
     {
+        if (shapeScript.castable && !casted)
+        {
+            Debug.Log("SpellScript cast spell, castable & not casted");
+            this.transform.parent.transform.SetParent(null);
+
+            targetPoints = shapeScript.pathPoints;
+            shapeScript.EndAim();
+            elementScript.SetupCondition();
+
+            if (effectScript.componentWeight == 1) { effectScript.ApplyEffect(); }
+
+            UpdateRadius();
+            casted = true;
+
+            shapeScript.ApplyShape();
+        }
+        else if(effectName.Contains("Chain") && casted)
+        {
+            Debug.Log("SpellScript cast spell, chain & casted");
+            shapeScript.ApplyShape();
+        }
+    }
+    /*public void CastSpell()
+    {
         //Debug.Log("SpellScript CastSpell");
 
         //Debug.Log("shape castable: " + shapeScript.castable);
@@ -263,38 +298,12 @@ public class SpellScript : MonoBehaviour
 
             if(effectScript.componentWeight == 1) { effectScript.ApplyEffect(); } //if effect weight is 1, apply effect as spell is cast
 
-            //if more than one trigger point & the spell will expire, shape is line
-            if (shapeScript.GetTriggerPoints().Length > 0 && !spellPersist)
-            {
-                //Debug.Log("triggerPoints & !persistent");
-                triggerPoints = shapeScript.GetTriggerPoints(); //update trigger points
-                TravelSetup(); //determine spell movement
-            }
-            //if more than one trigger point & the spell will persist, shape is line and effect is chain
-            /*else if (shapeScript.GetTriggerPoints().Length > 0 && spellPersist)
-            {
-                Debug.Log("triggerPoints & persistent");
-                effectScript.ApplyEffect(); //find targets
-                aimingTargets = effectScript.targets; //set spell targets to those found
-                int numOfTargets = 0;
-                for (int i = 0; i < aimingTargets.Length; i++) { if (aimingTargets[i] != null) { numOfTargets++; } }
-                targetPoints = new Vector3[numOfTargets + 2]; //spell path +2 to include start and end 
-                triggerPoints = new Vector3[numOfTargets + 1]; //where the spell should trigger +1 to include end point
-                //for (int i = 0; i < targetPoints.Length; i++) { Debug.Log("Spell Script target point" + i + ": " + targetPoints[i]); }
-                //triggerPoints = effectScript.pathPoints;
-                TravelSetup(); //determine spell movement
-            }*/
+            shapeScript.ApplyShape();
 
             UpdateRadius(); //apply component radius modifiers
             //Debug.Log(this.transform.position);
 
             casted = true;
-
-            if (!delayed)
-            {
-                //move the spell along a line from first position to target position
-                StartCoroutine(MoveToTarget());
-            }
         }
         else if (!shapeScript.castable)
         {
@@ -324,22 +333,9 @@ public class SpellScript : MonoBehaviour
             //for (int i = 0; i < targetPoints.Length; i++) { Debug.Log("Spell Script target point" + i + ": " + targetPoints[i]); }
             if (this.gameObject != null) { DestroySpell(); }
         }
-    }
-    public IEnumerator DelayCast(float delayTime)
-    {
-        //Debug.Log("Spell Script delay cast");
-        delayed = true; //set delayed to true so the spell does not cast immediately
-        yield return new WaitForSeconds(delayTime); //wait for the specified time
-        delayed = false; //set delayed to false so the spell can be cast
+    }*/
 
-        StartCoroutine(MoveToTarget());
-    }
-
-    public bool GetSpellCastable()
-    {
-        return shapeScript.castable;
-    }
-    private void TravelSetup()
+    /*private void TravelSetup()
     {
         //Debug.Log("Spell Script travel setup");
 
@@ -383,7 +379,7 @@ public class SpellScript : MonoBehaviour
                 triggerObjects[point].name = "LineMarker" + (point + 1);
             }
         }
-    }
+    }*/
 
     public void UpdateRadius()
     {
@@ -400,7 +396,7 @@ public class SpellScript : MonoBehaviour
     }
 
 
-    IEnumerator MoveToTarget()
+    /*IEnumerator MoveToTarget()
     {
         //Debug.Log("Spell Script move to target: " + endPos);
         //Debug.Log(this.transform.position);
@@ -516,7 +512,7 @@ public class SpellScript : MonoBehaviour
             if (shapeScript.GetTriggerPoints().Length == 0) { EndSpell(); }
             else { DestroySpell(); }
         }
-    }
+    }*/
     void OnTriggerEnter(Collider col)
     {
         //triggers when passing through a marker, triggering the spells effect
@@ -528,28 +524,13 @@ public class SpellScript : MonoBehaviour
         }
     }
 
-    private bool CheckIgnoredTargets(GameObject hitTarget)
-    {
-        //Debug.Log("hitTarget: " + hitTarget);
-        for (int i = 0; i < ignoredTargets.Length; i++)
-        {
-            //Debug.Log("ignoredTargets" + i + ": " + ignoredTargets[i]);
-            if (ignoredTargets[i] == hitTarget)
-            {
-                //Debug.Log("ignored target found: " + ignoredTargets[i]);
-                return true;
-            }
-        }
 
-        return false;
-    }
-
-    private void EndSpell()
+    public void EndSpell()
     {
         //assuming the spell has no trigger points,
         //apply effect then find targets, deal damage, and destroy self
         //Debug.Log(this.transform.position);
-        //Debug.Log("SpellScript end spell");
+        Debug.Log("SpellScript end spell");
 
         targets = FindTargets(); //sets targets to those found within spell radius
         //for(int i = 0; i < targets.Length; i++) { Debug.Log("SpellScript spell target " + i + ": " + targets[i]); }
@@ -616,13 +597,13 @@ public class SpellScript : MonoBehaviour
         targetScripts = newTargetScripts; //update the target scripts to the new ones found
         return newTargets;
     }
-    private bool HasAlreadyHitTarget(GameObject enemy)
+    public bool HasAlreadyHitTarget(GameObject enemy)
     {
         for (int i = 0; i < hitTargets.Length; i++)
         {
             if (hitTargets[i] == enemy)
             {
-                //Debug.Log("already hit enemy: " + enemy.name);
+                Debug.Log("already hit enemy: " + enemy.name);
                 return true;
             }
         }

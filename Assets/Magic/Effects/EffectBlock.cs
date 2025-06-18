@@ -4,7 +4,7 @@ public class EffectBlock : AbstractEffect
 {
     public override void StartEffectScript(SpellScript SS)
     {
-        componentWeight = 3; damageModifier = 0.1f; speedModifier = 2f; radiusModifier = 5f; cooldownModifier = .25f;
+        componentWeight = 3; damageModifier = 0.1f; speedModifier = 1f; radiusModifier = 1f; cooldownModifier = 1f;
         this.SS = SS;
     }
     public override void ApplyEffect()

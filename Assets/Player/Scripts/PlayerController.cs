@@ -217,12 +217,9 @@ public class PlayerController : MonoBehaviour
             SDM.targetPoints = curSpell.GetTargetPoints().Length;
             SDM.triggerPoints = curSpell.GetTriggerPoints().Length;
             SDM.targets = curSpell.GetSpellTargets().Length;
-            SDM.aimingTargets = curSpell.GetAimingTargets().Length;
             SDM.ignoredTargets = curSpell.GetIgnoredTargets().Length;
             SDM.startPos = curSpell.GetStartPos();
             SDM.endPos = curSpell.GetEndPos();
-            SDM.direction = curSpell.GetDir();
-            SDM.distance = curSpell.GetJourneyLength();
         }
     }
     //~~~~~misc~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -773,7 +770,7 @@ public class PlayerController : MonoBehaviour
 
             //testing
             shapeName = "Ball";
-            effectName = "Delay";
+            effectName = "Arc";
             elementName = "Fire";
 
             curSpell.UpdateSpellScriptShape(shapeName);
@@ -1057,7 +1054,7 @@ public class PlayerController : MonoBehaviour
             }
 
             //automatic spell attack
-            if (castHeld && castable && curSpell.GetSpellCastable() && effectName.Contains("Automatic")) //if spell is castable
+            if (castHeld && castable && curSpell.GetShapeScript().GetSpellCastable() && effectName.Contains("Automatic")) //if spell is castable
             {
                 //Debug.Log("PlayerController, spell casted");
                 curSpell.CastSpell();

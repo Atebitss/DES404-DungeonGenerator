@@ -206,11 +206,11 @@ public class EffectChain : AbstractEffect
         //Debug.Log("CheckPos: " + this.transform.position);
         //reset targets for new check
         targets = new GameObject[1];
-        unsortedTargets = new GameObject[maxTargets];
+        unsortedTargets = new GameObject[10];
 
         //find possible targets, ignoring current target
         unsortedTargets = FindTargets();
-        SS.SetIgnoredTargets(previousTargets);
+
 
         //for each target, find distance between spell and target
         float[] dists = new float[unsortedTargets.Length];
@@ -240,49 +240,39 @@ public class EffectChain : AbstractEffect
             }
         }
 
-        //update path points (for spell script later)
+        //update primary target with closest target
         if (unsortedTargets[0] != null)
         {
             Debug.Log("Closest target: " + unsortedTargets[0].gameObject.transform.parent.name + " - " + dists[0]);
             targets[0] = unsortedTargets[0];
         }
         //Debug.Log("new startPos: " + pathPoints[0] + "   new endPos: " + pathPoints[1]);
-
-        //fill lowest open position with current target to be ignored later
-        for (int i = 0; i < previousTargets.Length; i++)
-        {
-            if (previousTargets[i] == null && unsortedTargets[0] != null)
-            {
-                //Debug.Log("adding prev target " + targets[0].name);
-                previousTargets[i] = unsortedTargets[0];
-                break;
-            }
-
-            if (previousTargets[i] == null)
-            {
-                SS.SpellDestroy();
-                break;
-            }
-        }
     }
     private GameObject[] FindTargets()
     {
-        //Debug.Log("Finding targets at " + this.transform.position);
+        Debug.Log("Finding targets at " + this.transform.position);
+
 
         //tiny check to find current target
         Collider[] targetCol = Physics.OverlapSphere(this.transform.position, 0.25f);
-        if (previousTargets[0] == null)
+        for (int check = 0; check < previousTargets.Length; check++) //for each position
         {
-            for (int check = 0; check < targetCol.Length; check++)
+            for (int obj = 0; obj < targetCol.Length; obj++) //for each found object
             {
-                //Debug.Log(targetCol[check]);
-                if (targetCol[check].CompareTag("Enemy"))
+                //if the previous target is null, is an enemy, and is not already in the previous targets
+                if (previousTargets[check] == null && targetCol[obj].CompareTag("Enemy") && !CheckPrevTargets(targetCol[obj].gameObject))
                 {
-                    previousTargets[0] = targetCol[check].gameObject;
+                    //add found target to first empty previous targets pos
+                    Debug.Log("current target found: " + targetCol[obj].transform.parent.name);
+                    previousTargets[check] = targetCol[obj].gameObject;
+                    SS.SetIgnoredTargets(previousTargets);
+
+                    check = previousTargets.Length; //break out of loop, no need to check further
+                    break;
                 }
             }
-            //if (previousTargets[0] != null) { Debug.Log("previous target: " + previousTargets[0].name); }
         }
+
 
         //find all nearby targets
         int numOfTargets = 0;
@@ -292,16 +282,16 @@ public class EffectChain : AbstractEffect
         {
             if (collisions[check].CompareTag("Enemy") && !CheckPrevTargets(collisions[check].gameObject)) //ensure targets are enemies and not current target
             {
+                //add found target to end of new targets array
                 newTargets[numOfTargets] = collisions[check].gameObject;
                 //Debug.Log(collisions[check].name + " found at " + collisions[check].gameObject.transform.position);
                 numOfTargets++;
 
+                //increase size of new targets array
                 if (numOfTargets >= newTargets.Length)
                 {
                     GameObject[] tempTargets = new GameObject[numOfTargets + 1];
-
                     for (int i = 0; i < newTargets.Length; i++) { tempTargets[i] = newTargets[i]; }
-
                     newTargets = tempTargets;
                 }
             }

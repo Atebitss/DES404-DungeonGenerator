@@ -4,32 +4,18 @@ public class EffectHoming : AbstractEffect
 {
     public override void StartEffectScript(SpellScript SS)
     {
-        componentWeight = 2; damageModifier = 1f; speedModifier = 1f; radiusModifier = 1f; cooldownModifier = 1f;
+        componentWeight = 1; damageModifier = 1f; speedModifier = 1f; radiusModifier = 1f; cooldownModifier = 1f;
         this.SS = SS;
     }
     public override void ApplyEffect()
     {
         //Debug.Log("Homing effect applied");
 
-        if (targets == null)
+        if (targets[0] == null)
         {
             //on initial call, find closest target to aim position
             Debug.Log("Homing effect initial call");
-
-            targets = new GameObject[1];
             targets[0] = FindClosestEnemyToPos(SS.GetEndPos());
-
-            if (targets[0] != null) 
-            {
-                Debug.Log("Homing effect new position: " + targets[0].transform.position);
-                SS.SetTargetPoint((SS.GetTargetPoints().Length - 1), targets[0].transform.position); 
-            }
-        }
-        else if (targets[0] != null)
-        {
-            //on subsequent calls, update the target position
-            Debug.Log("Homing effect subsequent call");
-            SS.SetTargetPoint((SS.GetTargetPoints().Length - 1), targets[0].transform.position);
         }
     }
 

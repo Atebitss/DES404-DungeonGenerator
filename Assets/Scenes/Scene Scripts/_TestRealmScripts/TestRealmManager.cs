@@ -12,7 +12,7 @@ public class TestRealmManager : AbstractSceneManager
     [SerializeField] bool enemiesActive = true;
     //[SerializeField] enum TestRealmEnemyType { SmallEnemy, LargeEnemy, BossBerserk, Random };
     //[SerializeField] enum TestRealmEnemyNumber { One, Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten };
-    enum spawnVarient { Random, Line, Diagonal };
+    enum spawnVarient { Random, Cluster, Line, Diagonal };
     [SerializeField] private spawnVarient spawnType = spawnVarient.Random;
 
     void Start()
@@ -26,6 +26,9 @@ public class TestRealmManager : AbstractSceneManager
             {
                 case spawnVarient.Random:
                     SpawnVarientRandom();
+                    break;
+                case spawnVarient.Cluster:
+                    SpawnVarientCluster();
                     break;
                 case spawnVarient.Line:
                     SpawnVarientLine();
@@ -44,7 +47,21 @@ public class TestRealmManager : AbstractSceneManager
         for (int i = 0; i < maxEnemies; i++)
         {
             //for each enemy, randomly select a position and a type
-            enemyPositions[i] = new Vector3(Random.Range(-15, 15), 0, Random.Range(15, 25)); 
+            enemyPositions[i] = new Vector3(Random.Range(-15, 15), 0, Random.Range(15, 30));
+            enemyTypes[i] = validEnemyTypes[0];
+        }
+
+        SpawnEnemies(enemyTypes, enemyPositions, enemiesActive);
+    }
+
+    private void SpawnVarientCluster()
+    {
+        Vector3[] enemyPositions = new Vector3[maxEnemies];
+        GameObject[] enemyTypes = new GameObject[maxEnemies];
+        for (int i = 0; i < maxEnemies; i++)
+        {
+            //for each enemy, randomly select a position and a type
+            enemyPositions[i] = new Vector3(Random.Range(-5, 5), 0, Random.Range(15, 25));
             enemyTypes[i] = validEnemyTypes[0];
         }
 

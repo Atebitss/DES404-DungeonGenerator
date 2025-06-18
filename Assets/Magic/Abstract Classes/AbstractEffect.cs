@@ -12,7 +12,7 @@ public abstract class AbstractEffect : MonoBehaviour
     //spell info
     public SpellScript SS;
     public Vector3[] pathPoints = new Vector3[2];
-    public GameObject[] targets;
+    public GameObject[] targets = new GameObject[1];
     public abstract void StartEffectScript(SpellScript SS);
     public abstract void ApplyEffect();
 }

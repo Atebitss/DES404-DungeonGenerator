@@ -22,7 +22,7 @@ public class EffectSplit : AbstractEffect
             //modify spell damage, size and radius by the number of spells created
             //send spells in random directions
             triggered = true; //ensure this effect only runs once per spell
-            Vector3 currentPos = this.transform.position; // current position of the spell
+            Vector3 currentPos = this.transform.parent.position; // current position of the spell
             int splitCount = Random.Range(splitMin, splitMax); //randomly choose how many spells to create
 
             //create x split projectiles
@@ -34,6 +34,10 @@ public class EffectSplit : AbstractEffect
                 SpellScript splitSS = splitSpell.transform.GetChild(0).GetComponent<SpellScript>().StartSpellScript(SS.GetASM());
 
                 splitSS.SetIgnoredTargets(SS.GetHitTargets()); //copy ignored targets
+                for (int j = 0; j < SS.GetHitTargets().Length; j++)
+                {
+                    Debug.Log("Split spell ignored target: " + SS.GetHitTargets()[j].name);
+                }
                 splitSS.SetSpellPower(Mathf.RoundToInt(SS.GetSpellPower() / 2)); //reduce spell power
 
                 //copy original spell components
@@ -42,19 +46,19 @@ public class EffectSplit : AbstractEffect
                 splitSS.UpdateSpellScriptElement(SS.GetElementName());
 
                 //set random direction
-                Vector3 baseDirection = SS.GetDir(); //get origional direction
+                Vector3 baseDirection = SS.GetShapeScript().GetDir(); //get origional direction
                 float randomAngleY = Random.Range(-45f, 45f); //random spread within 45 degrees
                 Vector3 randomDirection = (Quaternion.Euler(0, randomAngleY, 0) * baseDirection);
 
                 Vector3 startPos = currentPos;
-                Vector3 endPos = startPos + (randomDirection * 10f); //10 unit range
+                Vector3 endPos = (startPos + (randomDirection * 10f)); //10 unit range
 
                 Vector3[] newTargetPoints = new Vector3[2];
                 newTargetPoints[0] = startPos;
                 newTargetPoints[1] = endPos;
 
                 AbstractShape splitShapeScript = splitSS.GetShapeScript();
-                Debug.Log(endPos + " " + startPos + " " + splitShapeScript);
+                Debug.Log(startPos + " " + endPos);
                 if (splitShapeScript != null)
                 {
                     splitShapeScript.pathPoints = newTargetPoints;

@@ -14,7 +14,7 @@ public class EffectDelay : AbstractEffect
         //delays the spell upon cast
         if (callCounter == 0)
         {
-            StartCoroutine(SS.DelayCast(delayTime));
+            StartCoroutine(SS.GetShapeScript().DelayCast(delayTime));
         }
 
         callCounter++;

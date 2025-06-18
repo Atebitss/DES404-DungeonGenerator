@@ -1,13 +1,13 @@
 using UnityEngine;
 
-public class ShapeRing : AbstractShape
+public class ShapeBeam : AbstractShape
 {
     public override void StartShapeScript(SpellScript SS)
     {
-        Debug.Log("Ring shape script started");
+        Debug.Log("Beam shape script started");
 
         damageModifier = 1f; speedModifier = 1f; radiusModifier = 1f; cooldownModifier = 1f;
-        shapeMesh = Resources.Load<Mesh>("CustomMeshes/shapeRing");
+        shapeMesh = Resources.Load<Mesh>("CustomMeshes/shapeBeam");
         mainCamera = Camera.main;
         arcAxis = new Vector3(0, 1, 0);
         this.SS = SS;
@@ -17,12 +17,12 @@ public class ShapeRing : AbstractShape
     //runs when shape is added to spell
     public override void AimSpell()
     {
-        Debug.Log("Ring shape aim spell");
+        Debug.Log("Beam shape aim spell");
     }
 
     public override void UpdateAimPath(Vector3[] addPoints)
     {
-        Debug.Log("Ring shape update aim path");
+        Debug.Log("Beam shape update aim path");
     }
 
 
@@ -34,6 +34,6 @@ public class ShapeRing : AbstractShape
     //runs when spell is cast
     public override void ApplyShape()
     {
-        Debug.Log("Ring shape applied");
+        Debug.Log("Beam shape applied");
     }
 }
