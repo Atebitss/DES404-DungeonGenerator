@@ -147,8 +147,12 @@ public class AbstractSceneManager : MonoBehaviour
             newEnemyObjects[index] = Instantiate(enemies[i], positions[i], Quaternion.identity);
             GenerateEnemy(newEnemyObjects[index], active);
             
-            if (!newEnemyObjects[index].name.Contains("boss")) { newEnemyObjects[index].name = "Enemy" + index; }
-            else { newEnemyObjects[index].name = "Boss" + newEnemyObjects[index].GetComponent<AbstractEnemy>().type; }
+            if (newEnemyObjects[index].name.Contains("boss")) { newEnemyObjects[index].name = "Boss" + newEnemyObjects[index].GetComponent<AbstractEnemy>().type; }
+            else
+            {
+                newEnemyObjects[index].name = "Enemy" + index;
+                newEnemyObjects[index].transform.GetChild(0).name = "EnemyCharacter" + index;
+            }
         }
 
         enemyObjects = newEnemyObjects; //replace old array with new array

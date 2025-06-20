@@ -36,4 +36,14 @@ public class ShapeField : AbstractShape
     {
         Debug.Log("Field shape applied");
     }
+
+
+    public override GameObject[] FindShapeTargets()
+    {
+        Debug.Log("ShapeField, FindShapeTargets");
+
+
+
+        return null;
+    }
 }

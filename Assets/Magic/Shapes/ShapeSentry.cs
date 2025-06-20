@@ -36,4 +36,14 @@ public class ShapeSentry : AbstractShape
     {
         Debug.Log("Sentry shape applied");
     }
+
+
+    public override GameObject[] FindShapeTargets()
+    {
+        Debug.Log("ShapeBeam, FindShapeTargets");
+
+
+
+        return null;
+    }
 }

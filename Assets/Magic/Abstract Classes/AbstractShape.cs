@@ -48,6 +48,25 @@ public abstract class AbstractShape : MonoBehaviour
     public float GetStartTime() { return startTime; }
 
 
+    //targetting
+    public abstract GameObject[] FindShapeTargets();
+
+    public GameObject[] targets = new GameObject[0]; //to keep track of targets that have already been hit
+    public bool HasAlreadyHitTarget(GameObject enemy)
+    {
+        for (int i = 0; i < targets.Length; i++)
+        {
+            if (targets[i] == enemy)
+            {
+                Debug.Log("already hit enemy: " + enemy.name);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
     public abstract void StartShapeScript(SpellScript SS);
     public abstract void AimSpell();
     public abstract void UpdateAimPath(Vector3[] pathPoints);

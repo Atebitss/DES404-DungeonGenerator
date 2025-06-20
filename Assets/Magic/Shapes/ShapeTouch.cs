@@ -36,4 +36,14 @@ public class ShapeTouch : AbstractShape
     {
         Debug.Log("Touch shape applied");
     }
+
+
+    public override GameObject[] FindShapeTargets()
+    {
+        Debug.Log("ShapeTouch, FindShapeTargets");
+
+
+
+        return null;
+    }
 }

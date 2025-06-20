@@ -148,4 +148,13 @@ public class ShapeLine : AbstractShape
         }
     }
 
+
+    public override GameObject[] FindShapeTargets()
+    {
+        Debug.Log("ShapeLine, FindShapeTargets");
+
+
+
+        return null;
+    }
 }

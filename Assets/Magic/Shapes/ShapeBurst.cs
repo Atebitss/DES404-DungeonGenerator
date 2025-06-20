@@ -35,4 +35,14 @@ public class ShapeBurst : AbstractShape
     {
         Debug.Log("Burst shape applied");
     }
+
+
+    public override GameObject[] FindShapeTargets()
+    {
+        Debug.Log("ShapeBurst, FindShapeTargets");
+
+
+
+        return null;
+    }
 }

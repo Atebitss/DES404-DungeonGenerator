@@ -36,4 +36,14 @@ public class ShapeRing : AbstractShape
     {
         Debug.Log("Ring shape applied");
     }
+
+
+    public override GameObject[] FindShapeTargets()
+    {
+        Debug.Log("ShapeRing, FindShapeTargets");
+
+
+
+        return null;
+    }
 }

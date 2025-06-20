@@ -276,110 +276,7 @@ public class SpellScript : MonoBehaviour
             shapeScript.ApplyShape();
         }
     }
-    /*public void CastSpell()
-    {
-        //Debug.Log("SpellScript CastSpell");
 
-        //Debug.Log("shape castable: " + shapeScript.castable);
-        //Debug.Log("casted: " + casted);
-        //Debug.Log(this.transform.position);
-        if (shapeScript.castable && !casted) //if the spell can be cast and has not been cast yet
-        {
-            //Debug.Log("castable & !casted");
-            //Debug.Log(this.transform.position);
-            //Debug.Log(effectName + elementName + shapeName);
-
-            this.transform.parent.transform.SetParent(null);
-
-            targetPoints = shapeScript.pathPoints; //get appropriate aiming points from the shape script
-
-            shapeScript.EndAim(); //end the aiming phase
-            elementScript.SetupCondition(); //run any setup functions for the element script
-
-            if(effectScript.componentWeight == 1) { effectScript.ApplyEffect(); } //if effect weight is 1, apply effect as spell is cast
-
-            shapeScript.ApplyShape();
-
-            UpdateRadius(); //apply component radius modifiers
-            //Debug.Log(this.transform.position);
-
-            casted = true;
-        }
-        else if (!shapeScript.castable)
-        {
-            //Debug.Log("!castable");
-            shapeScript.ApplyShape();
-        }
-        else if (spellPersist && casted)
-        {
-            //Debug.Log("persistent & casted");
-            if (!effectName.Contains("Pierce"))
-            {
-                aimingTargets = effectScript.targets;
-                //for (int i = 0; i < aimingTargets.Length; i++) { if (aimingTargets[i] == null) { Debug.Log("aiming targets null"); } else { Debug.Log(aimingTargets[i]); } }
-                startPos = this.transform.position;
-                if (effectScript.targets[0] != null) { endPos = effectScript.targets[0].transform.position; }
-                targetPoints[0] = startPos;
-                targetPoints[1] = endPos;
-            }
-
-            //for (int i = 0; i < targetPoints.Length; i++) { Debug.Log("Spell Script target point" + i + ": " + targetPoints[i]); }
-            if (this.gameObject != null) { StartCoroutine(MoveToTarget()); }
-        }
-        else if (!spellPersist && casted)
-        {
-            //Debug.Log("!persistant & casted");
-            targetPoints = effectScript.pathPoints;
-            //for (int i = 0; i < targetPoints.Length; i++) { Debug.Log("Spell Script target point" + i + ": " + targetPoints[i]); }
-            if (this.gameObject != null) { DestroySpell(); }
-        }
-    }*/
-
-    /*private void TravelSetup()
-    {
-        //Debug.Log("Spell Script travel setup");
-
-        //start & end positions are set on aim destroy - run at start of CastSpell()
-        //the start and end point of the line are constant
-        this.transform.position = startPos; //move spell to start pos
-
-        //Debug.Log("travel setup end pos: " + endPos);
-
-        targetPoints[0] = startPos; //path point 0 is start pos
-        targetPoints[targetPoints.Length - 1] = endPos; //path point end is end pos
-
-        triggerPoints[triggerPoints.Length - 1] = endPos; //trigger point end is end pos
-
-        //if there are targeted objects and no defined trigger objects
-        //set the trigger object pos' & trigger points to that of the targets
-        //must be updatable later as the targets will constantly move - use UpdateTravel
-        if (aimingTargets != null && triggerObjects == null)
-        {
-            //Debug.Log("aiming targets & no trigger objects");
-
-            for (int i = 0; i < aimingTargets.Length; i++) 
-            {
-                if (aimingTargets[i] != null)
-                {
-                    targetPoints[i + 1] = aimingTargets[i].transform.position; //skips starting pos and doesnt go as far as end pos
-                    triggerPoints[i] = aimingTargets[i].transform.position;
-                }
-                //Debug.Log("target points" + (i + 1) + ": " + targetPoints[i + 1]);
-            }
-        }
-
-        //create trigger objects
-        if (triggerObjects == null)
-        {
-            triggerObjects = new GameObject[triggerPoints.Length]; //new game object array to store triggers
-            for (int point = 0; point < triggerPoints.Length; point++)
-            {
-                //Debug.Log("Adding trigger point" + point + " at " + triggerPoints[point]);
-                triggerObjects[point] = Instantiate(lineMarkerPrefab, triggerPoints[point], Quaternion.identity);
-                triggerObjects[point].name = "LineMarker" + (point + 1);
-            }
-        }
-    }*/
 
     public void UpdateRadius()
     {
@@ -396,144 +293,20 @@ public class SpellScript : MonoBehaviour
     }
 
 
-    /*IEnumerator MoveToTarget()
-    {
-        //Debug.Log("Spell Script move to target: " + endPos);
-        //Debug.Log(this.transform.position);
-        int curTarget = 0;
-        bool spellEnded = false;
-
-        speed *= shapeScript.speedModifier; //apply shape speed modifier
-        speed *= effectScript.speedModifier; //apply effect speed modifier
-        speed *= elementScript.speedModifier; //apply element speed modifier
-
-        //update life time counter for analytics
-        timeSinceCast = Time.time - castStartTime;
-
-        for (int step = 0; step < targetPoints.Length - 1; step++)
-        {
-            //Debug.Log(targetPoints.Length - 1); Debug.Log("step: " + step); Debug.Log(this.transform.position);
-            //begining position, distance between start and end, time spell began travelling
-            //for(int i = 0; i < targetPoints.Length; i++) { Debug.Log(targetPoints[i]); }
-
-            Vector3 curStartPos = targetPoints[step];
-            Vector3 curEndPos = targetPoints[step + 1];
-            dir = (curEndPos - curStartPos).normalized;
-            journeyLength = Vector3.Distance(curStartPos, curEndPos);
-            startTime = Time.time;
-            //Debug.Log(curStartPos); Debug.Log(curEndPos); Debug.Log(dir); Debug.Log(journeyLength); Debug.Log(startTime);
-
-            if (aimingTargets != null && step > 0 && step < aimingTargets.Length && spellPersist) { curTarget++; }
-            //Debug.Log(aimingTargets.Length);
-
-            //while the spell is not at the target (with a small leeway) and not beyond the maximum travel distance, 
-            while (Vector3.Distance(this.transform.position, curEndPos) > 0.01f && Vector3.Distance(curStartPos, this.transform.position) < maxLength)
-            {
-                //update target position for lerp if needed and move along interpolated lerp
-                //if the spell is persistent and has aiming targets
-                if (aimingTargets != null)
-                {
-                    if (spellPersist && aimingTargets.Length > 1 && step < aimingTargets.Length)
-                    {
-                        //update target position
-                        //if the target isnt null
-                        //Debug.Log(aimingTargets[curTarget]);
-                        if (aimingTargets[curTarget] != null)
-                        {
-                            //update points with the targets position
-                            targetPoints[curTarget + 1] = aimingTargets[curTarget].transform.position;
-                            //Debug.Log("update target pos " + curTarget + ": " + targetPoints[curTarget] + " @ " + aimingTargets[curTarget].transform.position);
-                            triggerPoints[curTarget] = aimingTargets[curTarget].transform.position;
-
-                            triggerObjects[curTarget].transform.position = triggerPoints[curTarget]; //update the trigger positions accordingly
-                        }
-                        else
-                        {
-                            int nonNullIndex = -1;
-                            for (int i = step + 2; i < targetPoints.Length; i++) { if (targetPoints[i] != null) { nonNullIndex = i; break; } }
-                            if (nonNullIndex != -1)
-                            {
-                                //update the point with a middle ground between the last and next position
-                                targetPoints[curTarget + 1] = Vector3.Lerp(curStartPos, targetPoints[nonNullIndex], 0.5f);
-                                triggerPoints[curTarget] = targetPoints[curTarget];
-                                triggerObjects[curTarget].transform.position = triggerPoints[curTarget];
-                            }
-                        }
-                    }
-                    else if(spellPersist && aimingTargets.Length == 1 && step < aimingTargets.Length)
-                    {
-                        //update target position
-                        //if the target isnt null
-                        //Debug.Log(aimingTargets[curTarget]);
-                        if (aimingTargets[curTarget] != null)
-                        {
-                            //update points with the targets position
-                            targetPoints[curTarget + 1] = aimingTargets[curTarget].transform.position;
-                            //Debug.Log("update target pos " + curTarget + ": " + targetPoints[curTarget] + " @ " + aimingTargets[curTarget].transform.position);
-                        }
-                    }
-                }
-
-                //update spell with component impact
-                if (effectScript.componentWeight == 2) { effectScript.ApplyEffect(); } //if effect weight is 2, apply effect during flight
-
-                curEndPos = targetPoints[step + 1];
-                dir = (curEndPos - curStartPos).normalized;
-                journeyLength = Vector3.Distance(curStartPos, curEndPos);
-
-
-                //Debug.Log(Vector3.Distance(this.transform.position, endPos) > 0.01f);
-                float travelInterpolate = (Time.time - startTime) * speed / journeyLength;
-                Vector3 nextPosition = Vector3.Lerp(curStartPos, curEndPos, travelInterpolate);
-
-
-                Debug.DrawRay(transform.position, dir, Color.red, 10f);
-                //check if the spell intersects with an object on the Enemy layer
-                if (Physics.Raycast(transform.position, dir, out RaycastHit hit, Vector3.Distance(transform.position, nextPosition) + 0.1f, LayerMask.GetMask("Enemy")) && !CheckIgnoredTargets(hit.collider.gameObject) && !HasAlreadyHitTarget(hit.collider.gameObject)) 
-                {
-                    //Debug.Log("Spell hit: " + hit.collider.gameObject.name);
-                    spellEnded = true;
-                    EndSpell();
-
-                    if (!effectName.Contains("Pierce")) { break; } //exit
-                }
-
-                if (this.gameObject != null) { transform.position = nextPosition; }
-
-                yield return null;
-            }
-        }
-
-        if (effectName.Contains("Pierce")) { spellPersist = false; } //stop pierce persisting after reaching destination
-
-        if (!spellEnded)
-        {
-            //if shape has no trigger points, run spell end on impact
-            if (shapeScript.GetTriggerPoints().Length == 0) { EndSpell(); }
-            else { DestroySpell(); }
-        }
-    }*/
-    void OnTriggerEnter(Collider col)
-    {
-        //triggers when passing through a marker, triggering the spells effect
-        if (col.gameObject.tag.Equals("PathMarker"))
-        {
-            //Debug.Log("spell collision with path marker");
-            targets = FindTargets();
-            DealDamage();
-        }
-    }
-
-
     public void EndSpell()
     {
         //assuming the spell has no trigger points,
         //apply effect then find targets, deal damage, and destroy self
-        //Debug.Log(this.transform.position);
         Debug.Log("SpellScript end spell");
 
-        targets = FindTargets(); //sets targets to those found within spell radius
-        //for(int i = 0; i < targets.Length; i++) { Debug.Log("SpellScript spell target " + i + ": " + targets[i]); }
+        targets = shapeScript.FindShapeTargets(); //sets targets to those found within shape area
+        targetScripts = new AbstractEnemy[(targets.Length - 1)]; //reset target scripts array
+        for (int i = 0; i < (targets.Length - 1); i++) 
+        {
+            Debug.Log("SpellScript spell target " + i + ": " + targets[i]);
+            targetScripts[i] = targets[i].GetComponent<AbstractEnemy>(); //get the enemy scripts for each target
+        }
+
         if (effectScript.componentWeight == 3) { effectScript.ApplyEffect(); } //if effect weight is 3, apply effect upon impact
         DealDamage(); //deals damage to any targets found within said radius
 
@@ -541,89 +314,10 @@ public class SpellScript : MonoBehaviour
         else if (!spellPersist) { DestroySpell(); } //destroys the spell if permited
     }
 
-    private GameObject[] FindTargets()
-    {
-        //checked for target within range, send list of targets to spell for damage
-        //Debug.Log("SpellScript find targets");
-        //Debug.Log("Finding targets near " + this.transform.position + " within " + radius);
-
-        int numOfTargets = 0;
-        Collider[] collisions = Physics.OverlapSphere(this.transform.position, radius); //find all objects within radius of spell
-        //for (int i = 0; i < collisions.Length; i++) { Debug.Log("collisions " + i + ": " + collisions[i]); }
-
-        //ensure nothing's collided twice by removing multiple colliders attached to the same object
-        for (int pos = 0; pos < collisions.Length; pos++) //for each collision
-        {
-            Collider curCol = collisions[pos]; //current collider
-            //Debug.Log("cur: " + curCol);
-
-            for (int check = pos + 1; check < collisions.Length; check++) //for each other collision
-            {
-                //Debug.Log("check: " + collisions[check]);
-                if (collisions[check] != null && curCol != null && collisions[check].gameObject == curCol.gameObject) //if current collider equal to checked collider
-                {
-                    //Debug.Log("dupe found, nulling");
-                    collisions[check] = null; //empty position at checked collider
-                }
-            }
-        }
-
-        GameObject[] newTargets = new GameObject[0]; //set new tracking array
-        AbstractEnemy[] newTargetScripts = new AbstractEnemy[0]; //set new tracking array
-        for (int check = 0; check < collisions.Length; check++) //for each found object
-        {
-            if (collisions[check] != null && collisions[check].gameObject.tag.Equals("Enemy") && !HasAlreadyHitTarget(collisions[check].gameObject)) //if their tag is enemy
-            {
-                //Debug.Log(collisions[check].name + " found at " + collisions[check].gameObject.transform.position);
-                numOfTargets++; //increase the number of found targets by one
-
-                GameObject[] tempNewTargets = newTargets; //prep to increase arrays size
-                newTargets = new GameObject[numOfTargets]; //increase array size to number of found targets
-                for(int i = 0; i < tempNewTargets.Length; i++) { newTargets[i] = tempNewTargets[i]; } //fill new array with previously found targets
-                newTargets[numOfTargets - 1] = collisions[check].gameObject; //fill new arrays last position with enemy object
-                //Debug.Log("new target " + (numOfTargets - 1) + ": " + newTargets[numOfTargets - 1]);
-
-                AbstractEnemy[] tempNewTargetScripts = newTargetScripts; //prep to increase arrays size
-                newTargetScripts = new AbstractEnemy[numOfTargets]; //increase array size to number of found targets
-                for (int i = 0; i < tempNewTargetScripts.Length; i++) { newTargetScripts[i] = tempNewTargetScripts[i]; } //fill new array with previously found targets
-                newTargetScripts[numOfTargets - 1] = collisions[check].gameObject.GetComponent<AbstractEnemy>(); //fill new arrays last position with enemy object
-                //Debug.Log("new target script " + (numOfTargets - 1) + ": " + newTargetScripts[numOfTargets - 1]);
-
-                AddHitTarget(collisions[check].gameObject); //add the enemy to the hit targets list
-            }
-        }
-
-        //for(int i = 0; i < newTargets.Length; i++) { Debug.Log("new target " + i + ": " + newTargets[i]); }
-        targetScripts = newTargetScripts; //update the target scripts to the new ones found
-        return newTargets;
-    }
-    public bool HasAlreadyHitTarget(GameObject enemy)
-    {
-        for (int i = 0; i < hitTargets.Length; i++)
-        {
-            if (hitTargets[i] == enemy)
-            {
-                Debug.Log("already hit enemy: " + enemy.name);
-                return true;
-            }
-        }
-
-        return false;
-    }
-    private void AddHitTarget(GameObject enemy)
-    {
-        GameObject[] newHitEnemies = new GameObject[hitTargets.Length + 1];
-        for (int i = 0; i < hitTargets.Length; i++)
-        {
-            newHitEnemies[i] = hitTargets[i];
-        }
-        newHitEnemies[hitTargets.Length] = enemy;
-        hitTargets = newHitEnemies;
-    }
 
     private void DealDamage()
     {
-        //Debug.Log("SpellScript deal dmg");
+        Debug.Log("SpellScript deal dmg");
         int[] damagesDealt = new int[targets.Length];
 
         //calculation of damage, rounded <0.5>
@@ -634,10 +328,11 @@ public class SpellScript : MonoBehaviour
 
         if (targets != null)
         {
-            for (int targetNum = 0; targetNum < targets.Length; targetNum++)
+            for (int targetNum = 0; targetNum < (targets.Length - 1); targetNum++)
             {
                 if (targets[targetNum] != null)
                 {
+                    Debug.Log("SpellScript dealing damage to: " + targets[targetNum].name);
                     int randDamage = Random.Range(0, 2);
 
                     damageDealt = Mathf.RoundToInt(damageCalc);
@@ -648,7 +343,7 @@ public class SpellScript : MonoBehaviour
                     targetScripts[targetNum].DamageTarget(damageDealt, damageType);
                     ASM.GetADM().SpellSuccess();
                     ASM.GetADM().AddSpellDamageDealt(damageDealt);
-                    //Debug.Log("dmg calc on " + targets[targetNum].name + ": " + damageDealt);
+                    Debug.Log("dmg calc on " + targets[targetNum].name + ": " + damageDealt);
                 }
             }
         }
@@ -664,7 +359,7 @@ public class SpellScript : MonoBehaviour
     private void DestroySpell()
     {
         //Debug.Log(this.transform.position);
-        //Debug.Log("Spell Script destroy spell");
+        Debug.Log("Spell Script destroy spell");
 
         if (triggerObjects != null) { for (int point = 0; point < triggerObjects.Length; point++) { Destroy(triggerObjects[point]); } }
 

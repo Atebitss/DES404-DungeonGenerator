@@ -36,4 +36,14 @@ public class ShapeSelf : AbstractShape
     {
         Debug.Log("Self shape applied");
     }
+
+
+    public override GameObject[] FindShapeTargets()
+    {
+        Debug.Log("ShapeSelf, FindShapeTargets");
+
+
+
+        return null;
+    }
 }

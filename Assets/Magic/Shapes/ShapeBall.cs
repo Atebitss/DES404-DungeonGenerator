@@ -113,7 +113,7 @@ public class ShapeBall : AbstractShape
     }
     private IEnumerator MoveBall()
     {
-        Debug.Log("MoveBall started");
+        Debug.Log("ShapeBall, MoveBall");
         for (int step = 0; step < pathPoints.Length - 1; step++)
         {
             Vector3 curStartPos = pathPoints[step];
@@ -144,9 +144,9 @@ public class ShapeBall : AbstractShape
 
                 Debug.DrawRay(transform.position, dir, Color.red, 10f);
                 //check if the spell intersects with an object on the Enemy layer
-                if (Physics.Raycast(transform.position, dir, out RaycastHit hit, Vector3.Distance(transform.position, nextPosition) + 0.1f, LayerMask.GetMask("Enemy")) && !SS.CheckIgnoredTargets(hit.collider.gameObject) && !SS.HasAlreadyHitTarget(hit.collider.gameObject))
+                if (Physics.Raycast(transform.position, dir, out RaycastHit hit, Vector3.Distance(transform.position, nextPosition) + 0.1f, LayerMask.GetMask("Enemy")) && !SS.CheckIgnoredTargets(hit.collider.gameObject) && !HasAlreadyHitTarget(hit.collider.gameObject))
                 {
-                    Debug.Log("Spell hit: " + hit.collider.gameObject.transform.parent.name);
+                    //Debug.Log("Spell hit: " + hit.collider.gameObject.transform.parent.name);
                     SS.EndSpell();
                     spellEnded = true;
                     if (!SS.GetEffectName().Contains("Pierce")) { break; } //stop if not piercing
@@ -167,5 +167,29 @@ public class ShapeBall : AbstractShape
         } 
 
         if (!spellEnded) { SS.EndSpell(); }
+    }
+
+    public override GameObject[] FindShapeTargets()
+    {
+        Debug.Log("ShapeBall, FindShapeTargets");
+        Collider[] cols = Physics.OverlapSphere(this.transform.position, SS.GetRadius());
+
+        //add all unhit & unignored enemies to targets array
+        for (int i = 0; i < cols.Length; i++) //for each collision
+        {
+            //if collider belongs to a unhit & uinignored enemy
+            if (cols[i].gameObject.tag == "Enemy" && !SS.CheckIgnoredTargets(cols[i].gameObject) && !HasAlreadyHitTarget(cols[i].gameObject))
+            {
+                Debug.Log("Found target: " + cols[i].gameObject.name);
+                //increase targets array and add the enemy
+                GameObject[] tempTargets = new GameObject[targets.Length + 1];
+                for (int j = 0; j < targets.Length; j++) { tempTargets[j] = targets[j]; }
+                tempTargets[tempTargets.Length - 1] = cols[i].gameObject;
+                targets = tempTargets;
+            }
+        }
+
+        Debug.Log("Shape Ball, found " + targets.Length + " targets");
+        return targets;
     }
 }
