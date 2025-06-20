@@ -12,7 +12,7 @@ public class ElementWater : AbstractElement
         SS.SetDamageType("water");
 
         //set spell colour
-        Material elementMaterial = Resources.Load<Material>("SpellMaterials/ElementWaterMaterial");
+        Material elementMaterial = Resources.Load<Material>("Materials/Spells/ElementWaterMaterial");
         SS.SetSpellColour(elementMaterial);
     }
 

@@ -16,7 +16,7 @@ public class ConditionForced : AbstractCondition
         targetScript.SetIsActive(false);
 
         //set enemy colour
-        Material elementMaterial = Resources.Load<Material>("SpellMaterials/ElementForceMaterial");
+        Material elementMaterial = Resources.Load<Material>("Materials/Spells/ElementForceMaterial");
         targetScript.SetMaterial(elementMaterial);
         spellStartTime = Time.time;
         StartCoroutine(MoveToTarget());

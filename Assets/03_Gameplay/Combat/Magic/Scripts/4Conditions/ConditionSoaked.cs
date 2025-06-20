@@ -19,7 +19,7 @@ public class ConditionSoaked : AbstractCondition
         targetScript = this.GetComponent<AbstractEnemy>();
 
         //set enemy colour
-        Material elementMaterial = Resources.Load<Material>("SpellMaterials/ElementWaterMaterial");
+        Material elementMaterial = Resources.Load<Material>("Materials/Spells/ElementWaterMaterial");
         targetScript.SetMaterial(elementMaterial);
 
         duration = 60;

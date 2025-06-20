@@ -12,7 +12,7 @@ public class ElementFire : AbstractElement
         SS.SetDamageType("fire");
 
         //set spell colour
-        Material elementMaterial = Resources.Load<Material>("SpellMaterials/ElementFireMaterial");
+        Material elementMaterial = Resources.Load<Material>("Materials/Spells/ElementFireMaterial");
         SS.SetSpellColour(elementMaterial);
     }
 

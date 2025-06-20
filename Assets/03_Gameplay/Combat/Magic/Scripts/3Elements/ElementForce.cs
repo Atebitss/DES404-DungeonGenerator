@@ -13,7 +13,7 @@ public class ElementForce : AbstractElement
         SS.SetDamageType("force");
 
         //set spell colour
-        Material elementMaterial = Resources.Load<Material>("SpellMaterials/ElementForceMaterial");
+        Material elementMaterial = Resources.Load<Material>("Materials/Spells/ElementForceMaterial");
         SS.SetSpellColour(elementMaterial);
     }
 

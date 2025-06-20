@@ -12,7 +12,7 @@ public class ElementElectric : AbstractElement
         SS.SetDamageType("electric");
 
         //set spell colour
-        Material elementMaterial = Resources.Load<Material>("SpellMaterials/ElementElectricMaterial");
+        Material elementMaterial = Resources.Load<Material>("Materials/Spells/ElementElectricMaterial");
         SS.SetSpellColour(elementMaterial);
     }
 

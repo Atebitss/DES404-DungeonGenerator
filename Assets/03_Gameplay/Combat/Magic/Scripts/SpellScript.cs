@@ -211,6 +211,7 @@ public class SpellScript : MonoBehaviour
         {
             System.Type effectType = System.Type.GetType(effectScriptName);
             effectScript = this.gameObject.AddComponent(effectType) as AbstractEffect;
+            //Debug.Log("effect script: " + effectScript);
         }
     }
 
@@ -231,6 +232,7 @@ public class SpellScript : MonoBehaviour
         {
             System.Type elementType = System.Type.GetType(elementScriptName);
             elementScript = this.gameObject.AddComponent(elementType) as AbstractElement;
+            //Debug.Log("element script: " + elementScript);
         }
     }
 
@@ -251,6 +253,7 @@ public class SpellScript : MonoBehaviour
         {
             System.Type shapeType = System.Type.GetType(shapeScriptName);
             shapeScript = this.gameObject.AddComponent(shapeType) as AbstractShape;
+            //Debug.Log("shape script: " + shapeScript);
         }
     }
 

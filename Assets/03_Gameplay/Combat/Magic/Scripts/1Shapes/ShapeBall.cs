@@ -23,7 +23,7 @@ public class ShapeBall : AbstractShape
         if (spellAim[0] == null)
         {
             //set new game object and update mesh then remove the objects collider
-            spellAim[0] = Instantiate(Resources.Load<GameObject>("AimSpellPrefab"), transform);
+            spellAim[0] = Instantiate(Resources.Load<GameObject>("SpellAiming/AimSpellPrefab"), transform);
             spellAim[0].transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
 
             aimingLine = spellAim[0].GetComponent<LineRenderer>();

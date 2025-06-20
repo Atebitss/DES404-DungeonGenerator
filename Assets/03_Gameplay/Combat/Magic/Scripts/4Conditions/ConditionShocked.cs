@@ -19,7 +19,7 @@ public class ConditionShocked : AbstractCondition
         targetScript = this.GetComponent<AbstractEnemy>();
 
         //set enemy colour
-        Material elementMaterial = Resources.Load<Material>("SpellMaterials/ElementElectricMaterial");
+        Material elementMaterial = Resources.Load<Material>("Materials/Spells/ElementElectricMaterial");
         targetScript.SetMaterial(elementMaterial);
 
         duration = 2;

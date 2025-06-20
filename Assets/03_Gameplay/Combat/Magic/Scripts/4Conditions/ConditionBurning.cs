@@ -21,7 +21,7 @@ public class ConditionBurning : AbstractCondition
         targetScript = this.GetComponent<AbstractEnemy>();
 
         //set enemy colour
-        Material elementMaterial = Resources.Load<Material>("SpellMaterials/ElementFireMaterial");
+        Material elementMaterial = Resources.Load<Material>("Materials/Spells/ElementFireMaterial");
         targetScript.SetMaterial(elementMaterial);
 
         duration = 5;
