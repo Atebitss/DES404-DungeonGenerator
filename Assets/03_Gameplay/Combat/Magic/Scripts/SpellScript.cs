@@ -72,7 +72,7 @@ public class SpellScript : MonoBehaviour
     private float radius = 1f;
     public float GetRadius() { return radius; }
 
-    private float maxLookLength = 500f;
+    private float maxLookLength = 1000f;
     public float GetMaxLookLength() { return maxLookLength; }
     public void SetMaxLookLength(float newMax) { maxLookLength = newMax; }
 
@@ -159,6 +159,8 @@ public class SpellScript : MonoBehaviour
         radius *= effectScript.radiusModifier;
         radius *= elementScript.radiusModifier;
         this.gameObject.transform.localScale = Vector3.one * radius;
+        //Debug.Log("SpellScript radius updated: " + radius);
+        //Debug.Log("shape rmod: " + shapeScript.radiusModifier + ", effect rmod: " + effectScript.radiusModifier + ", element rmod: " + elementScript.radiusModifier);
     }
 
     public float GetSpellCooldownMax()
@@ -274,9 +276,13 @@ public class SpellScript : MonoBehaviour
         if (shapeScript.castable && !casted)
         {
             Debug.Log("SpellScript cast spell, castable & not casted");
-            this.transform.parent.transform.SetParent(null);
+            if (shapeName.Contains("Ball")) 
+            {
+                this.transform.parent.transform.SetParent(null);
+                shapeScript.EndAim();
+            }
+            else if (shapeName.Contains("Beam")) { /*keep parent*/ }
 
-            shapeScript.EndAim();
             elementScript.SetupCondition();
 
             if (effectScript.componentWeight == 1) { effectScript.ApplyEffect(); }
@@ -286,9 +292,9 @@ public class SpellScript : MonoBehaviour
 
             shapeScript.ApplyShape();
         }
-        else if (effectName.Contains("Chain") && casted)
+        else if (casted)
         {
-            Debug.Log("SpellScript cast spell, chain & casted");
+            Debug.Log("SpellScript cast spell, casted");
             shapeScript.ApplyShape();
         }
     }
@@ -301,17 +307,20 @@ public class SpellScript : MonoBehaviour
         Debug.Log("SpellScript end spell");
 
         targets = shapeScript.FindShapeTargets();
-        targetScripts = new AbstractEnemy[(targets.Length - 1)];
-        for (int i = 0; i < (targets.Length - 1); i++)
+        targetScripts = new AbstractEnemy[targets.Length];
+        for (int i = 0; i < targets.Length; i++)
         {
-            Debug.Log("SpellScript spell target " + i + ": " + targets[i]);
-            targetScripts[i] = targets[i].GetComponent<AbstractEnemy>();
+            if (targets[i] != null)
+            {
+                Debug.Log("SpellScript spell target " + i + ": " + targets[i]);
+                targetScripts[i] = targets[i].GetComponent<AbstractEnemy>();
+            }
         }
 
         if (effectScript.componentWeight == 3) { effectScript.ApplyEffect(); }
         DealDamage();
 
-        if (spellPersist && shapeScript.GetTriggerPoints().Length == 0) { CastSpell(); }
+        if (spellPersist && shapeName.Contains("Ball")) { CastSpell(); }
         else if (!spellPersist) { DestroySpell(); }
     }
 
@@ -325,10 +334,12 @@ public class SpellScript : MonoBehaviour
         damageCalc *= effectScript.damageModifier;
         damageCalc *= elementScript.damageModifier;
 
+        Debug.Log("targets.Length: " + targets.Length);
         if (targets != null)
         {
-            for (int targetNum = 0; targetNum < (targets.Length - 1); targetNum++)
+            for (int targetNum = 0; targetNum < targets.Length; targetNum++)
             {
+                Debug.Log("target " + targetNum + ": " + targets[targetNum]);
                 if (targets[targetNum] != null)
                 {
                     Debug.Log("SpellScript dealing damage to: " + targets[targetNum].name);

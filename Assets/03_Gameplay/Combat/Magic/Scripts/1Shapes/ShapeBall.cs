@@ -17,6 +17,7 @@ public class ShapeBall : AbstractShape
         arcAxis = new Vector3(0, 1, 0);
 
         this.SS = SS;
+        maxLength = SS.GetMaxSpellLength();
 
         //Debug.Log(transform.position);
         //if current aim game object is empty
@@ -46,7 +47,14 @@ public class ShapeBall : AbstractShape
     //runs when shape is added to spell
     public override void AimSpell()
     {
-        spellAim[0].transform.position = GetAimedWorldPos();
+        Vector3 playerPos = this.transform.position;
+        Vector3 aimPos = GetAimedWorldPos();
+
+        aimingLine.SetPosition(0, playerPos);
+        aimingLine.SetPosition(1, aimPos);
+
+        pathPoints[0] = playerPos;
+        pathPoints[1] = aimPos;
         //Debug.Log("spellaimtransformposition: " + spellAim[0].transform.position);
     }
 
@@ -75,9 +83,6 @@ public class ShapeBall : AbstractShape
         //if spell is being aimed, update first line renderer point with player position
         if (firstPointConfirmed && !lastPointConfirmed)
         {
-            aimingLine.SetPosition(0, this.transform.position);
-            pathPoints[0] = this.transform.position;
-            maxLength = SS.GetMaxSpellLength();
             if (!castable && aimPos != Vector3.zero) { castable = true; }
             //Debug.Log("aiming line set to: " + this.transform.position);
         }

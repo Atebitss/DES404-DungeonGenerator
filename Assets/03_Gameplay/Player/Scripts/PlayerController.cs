@@ -767,8 +767,8 @@ public class PlayerController : MonoBehaviour
             }
 
             //testing
-            shapeName = "Ball";
-            effectName = "Explode";
+            shapeName = "Beam";
+            effectName = "Null";
             elementName = "Fire";
 
             curSpell.UpdateSpellScriptShape(shapeName);

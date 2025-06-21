@@ -81,7 +81,7 @@ public abstract class AbstractShape : MonoBehaviour
                 aimingMask = SS.GetPlayerController().GetAimLayerMask();
 
                 //if the spell has a pierce effect, then ignore enemies
-                if (SS.GetEffectName().Contains("Pierce")) { aimingMask = aimingMask & ~LayerMask.GetMask("Enemy"); }
+                if (SS.GetEffectName().Contains("Pierce") || SS.GetShapeName().Contains("Beam")) { aimingMask = aimingMask & ~LayerMask.GetMask("Enemy"); }
             }
 
             Ray cameraToWorld = mainCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
