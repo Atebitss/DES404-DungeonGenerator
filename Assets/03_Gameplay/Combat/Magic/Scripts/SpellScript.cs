@@ -128,6 +128,7 @@ public class SpellScript : MonoBehaviour
     // ===============================================================
     [SerializeField] private Renderer spellRenderer;
     public void SetSpellColour(Material newMaterial) { spellRenderer.material = newMaterial; }
+    public Material GetSpellMaterial() { return spellRenderer.material; }
 
 
     // ===============================================================

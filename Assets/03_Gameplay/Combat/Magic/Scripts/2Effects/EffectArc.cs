@@ -17,16 +17,34 @@ public class EffectArc : AbstractEffect
         {
             //calculate arced path
             int numOfPoints = 10;
-            Vector3[] arcPathPoints = new Vector3[numOfPoints+1];
+            Vector3[] arcPathPoints = new Vector3[numOfPoints];
 
             //get path length based from start point to end point
             //divide total length by x providing a number of points for the curve to follow
             //while less than half way through point total, increase each point by x on the X axis
             //while more than half way through point total, lower each point by x on the X axis
             //update the line renderer with the new points
-
             Vector3 startPoint = SS.GetShapeScript().pathPoints[0];   //begin point of arc
-            Vector3 endPoint = SS.GetShapeScript().pathPoints[(SS.GetShapeScript().pathPoints.Length - 1)];   //end point of arc
+            Vector3 endPoint;
+
+            //if shape is beam, apply range limitation
+            if (SS.GetShapeName().Contains("Beam"))
+            {
+                //calculate limited endpoint for beam shapes
+                Vector3 aimPos = SS.GetShapeScript().GetAimedWorldPos();
+                Vector3 dir = (aimPos - startPoint).normalized;
+
+                //use beam's effective range (length * 3f * radius scaling)
+                float beamRange = 6f * SS.GetRadius(); // 2f * 3f * radius like in ShapeBeam
+
+                endPoint = startPoint + (dir * beamRange);
+            }
+            else
+            {
+                //use normal endpoint for non-beam shapes
+                endPoint = SS.GetShapeScript().pathPoints[(SS.GetShapeScript().pathPoints.Length - 1)];
+            }
+
             float maxDist = Vector3.Distance(startPoint, endPoint);
 
             for (int point = 0; point < numOfPoints; point++)

@@ -4,7 +4,9 @@ using UnityEngine;
 
 public class ShapeBeam : AbstractShape
 {
-    private BoxCollider beamCollider;
+    private BoxCollider[] beamSegments = new BoxCollider[0]; 
+    private MeshRenderer[] beamMeshes = new MeshRenderer[0];
+    private int segmentCount = 1;
     private float width = 1f, length = 2f;
     private float maxRunTime = 1f, checkInterval = 0.5f;
     private bool casting = false;
@@ -14,10 +16,10 @@ public class ShapeBeam : AbstractShape
         Debug.Log("Beam shape script started");
 
         damageModifier = 1f; speedModifier = 1f; radiusModifier = 1f; cooldownModifier = 1f;
-        shapeMesh = Resources.Load<Mesh>("CustomMeshes/shapeBeam");
+        this.SS = SS;
         mainCamera = Camera.main;
         arcAxis = new Vector3(0, 1, 0);
-        this.SS = SS;
+        shapeMesh = Resources.Load<Mesh>("CustomMeshes/shapeBeamSegment");
         SS.SetSpellPersist(true);
 
         //if current aim game object is empty
@@ -48,27 +50,46 @@ public class ShapeBeam : AbstractShape
     //runs when shape is added to spell
     public override void AimSpell()
     {
-        //Debug.Log("Beam shape aim spell");
+        Debug.Log("Beam shape aim spell");
         Vector3 startPos = this.transform.position;
         Vector3 aimPos = GetAimedWorldPos();
         Vector3 dir = (aimPos - startPos).normalized;
+        Vector3 endPos = (startPos + (dir * length));
 
         transform.position = startPos;
         transform.rotation = Quaternion.LookRotation(dir);
 
         aimingLine.SetPosition(0, startPos);
-        aimingLine.SetPosition(1, aimPos);
+        aimingLine.SetPosition(1, endPos);
 
         pathPoints[0] = startPos;
-        pathPoints[1] = aimPos;
+        pathPoints[1] = endPos;
 
         SS.SetStartPos(pathPoints[0]);
-        SS.SetEndPos(pathPoints[pathPoints.Length - 1]);
+        SS.SetEndPos(pathPoints[1]);
     }
 
     public override void UpdateAimPath(Vector3[] addPoints)
     {
         Debug.Log("Beam shape update aim path");
+
+        Vector3 pathPointStart = pathPoints[0];
+        Vector3 pathPointEnd = pathPoints[pathPoints.Length - 1];
+        pathPoints = new Vector3[addPoints.Length];
+        aimingLine.positionCount = pathPoints.Length - 1;
+
+        for (int i = 0; i < addPoints.Length - 1; i++)
+        {
+            //Debug.Log("addPoints["+i+"]: " + addPoints[i]);
+            pathPoints[i] = addPoints[i];
+
+            aimingLine.SetPosition(i, pathPoints[i]);
+        }
+
+        pathPoints[0] = pathPointStart;
+        pathPoints[pathPoints.Length - 1] = pathPointEnd;
+
+        CreateBeamSegments();
     }
 
 
@@ -98,11 +119,7 @@ public class ShapeBeam : AbstractShape
             transform.rotation = Quaternion.LookRotation(dir);
             transform.localScale = new Vector3(width, width, length);
 
-            //setup collider for beam detection
-            beamCollider = gameObject.AddComponent<BoxCollider>();
-            beamCollider.isTrigger = true;
-            beamCollider.size = new Vector3(width, width, 6f);
-            beamCollider.center = new Vector3(0f, 0f, 3f);
+            CreateBeamSegments();
 
             //disallow more casts
             casting = true;
@@ -126,38 +143,99 @@ public class ShapeBeam : AbstractShape
     {
         yield return new WaitForSeconds(maxRunTime); //wait for 1 second
         Debug.Log("Ending beam shape");
+
+        for (int i = 0; i < beamSegments.Length; i++)
+        {
+            if (beamSegments[i] != null)
+            {
+                Destroy(beamSegments[i].gameObject);
+            }
+        }
+
+        beamSegments = new BoxCollider[0];
+        beamMeshes = new MeshRenderer[0];
         casting = false;
         SS.SetSpellPersist(false);
         StopCoroutine(OverlapCheck());
         SS.EndSpell();
     }
 
+    private void CreateBeamSegments()
+    {
+        //clean up existing segments
+        for (int i = 0; i < beamSegments.Length; i++)
+        {
+            if (beamSegments[i] != null)
+            {
+                Destroy(beamSegments[i].gameObject);
+            }
+        }
+
+        //determine number of segments based on path points
+        segmentCount = (pathPoints.Length - 1);
+        beamSegments = new BoxCollider[segmentCount];
+        beamMeshes = new MeshRenderer[segmentCount];
+
+        //create individual segments
+        for (int i = 0; i < (segmentCount - 1); i++)
+        {
+            Vector3 segStart = pathPoints[i];
+            Vector3 segEnd = pathPoints[i + 1];
+            Vector3 segCenter = (segStart + segEnd) * 0.5f;
+            Vector3 segDir = (segEnd - segStart).normalized;
+            float segLength = Vector3.Distance(segStart, segEnd);
+
+            //create segment
+            GameObject segmentObj = new GameObject("BeamSegment" + i);
+            segmentObj.transform.parent = this.transform;
+            segmentObj.transform.position = segCenter;
+            segmentObj.transform.localScale = new Vector3(width, width, (segLength*2.5f));
+            segmentObj.transform.rotation = Quaternion.LookRotation(segDir);
+
+            beamSegments[i] = segmentObj.AddComponent<BoxCollider>();
+            beamSegments[i].isTrigger = true;
+            beamSegments[i].size = new Vector3((width*2), (width*2), (segLength*3));
+
+
+            MeshFilter meshFilter = segmentObj.AddComponent<MeshFilter>();
+            meshFilter.mesh = shapeMesh;
+
+            beamMeshes[i] = segmentObj.AddComponent<MeshRenderer>();
+            beamMeshes[i].material = SS.GetSpellMaterial();
+        }
+    }
+
+
 
     public override GameObject[] FindShapeTargets()
     {
         Debug.Log("ShapeBeam, FindShapeTargets");
         targets = new GameObject[0];
-
-        //check for overlapping enemy colliders
-        Collider[] cols = Physics.OverlapBox
-        (
-            beamCollider.transform.position,
-            beamCollider.bounds.extents,
-            beamCollider.transform.rotation,
-            LayerMask.GetMask("Enemy")
-        );
-
-        for (int i = 0; i < cols.Length; i++)
+        for (int seg = 0; seg < beamSegments.Length; seg++)
         {
-            Debug.Log(i + ": " + cols[i].gameObject.name);
-            if (cols[i].gameObject.tag == "Enemy" && !SS.CheckIgnoredTargets(cols[i].gameObject) && !HasAlreadyHitTarget(cols[i].gameObject))
+            if (beamSegments[seg] != null)
             {
-                Debug.Log("Found target: " + cols[i].gameObject.name);
-                //increase targets array and add the enemy
-                GameObject[] tempTargets = new GameObject[targets.Length + 1];
-                for (int j = 0; j < targets.Length; j++) { tempTargets[j] = targets[j]; }
-                tempTargets[tempTargets.Length - 1] = cols[i].gameObject;
-                targets = tempTargets;
+                //check for overlapping enemy colliders
+                Collider[] cols = Physics.OverlapBox(
+                    beamSegments[seg].bounds.center,
+                    beamSegments[seg].bounds.extents,
+                    beamSegments[seg].transform.rotation,
+                    LayerMask.GetMask("Enemy")
+                );
+
+                for (int i = 0; i < cols.Length; i++)
+                {
+                    Debug.Log(i + ": " + cols[i].gameObject.name);
+                    if (cols[i].gameObject.tag == "Enemy" && !SS.CheckIgnoredTargets(cols[i].gameObject) && !HasAlreadyHitTarget(cols[i].gameObject))
+                    {
+                        Debug.Log("Found target: " + cols[i].gameObject.name);
+                        //increase targets array and add the enemy
+                        GameObject[] tempTargets = new GameObject[targets.Length + 1];
+                        for (int j = 0; j < targets.Length; j++) { tempTargets[j] = targets[j]; }
+                        tempTargets[tempTargets.Length - 1] = cols[i].gameObject;
+                        targets = tempTargets;
+                    }
+                }
             }
         }
 
@@ -169,14 +247,27 @@ public class ShapeBeam : AbstractShape
 
     void OnDrawGizmos()
     {
-        if (beamCollider == null) return;
+        if (beamSegments == null || beamSegments.Length == 0) return;
 
         Gizmos.color = Color.red;
-        Gizmos.matrix = transform.localToWorldMatrix;
 
-        Vector3 center = beamCollider.center;
-        Vector3 size = beamCollider.size;
+        // Draw each beam segment
+        for (int i = 0; i < beamSegments.Length; i++)
+        {
+            if (beamSegments[i] != null)
+            {
+                // Set matrix to segment's transform for proper rotation
+                Gizmos.matrix = beamSegments[i].transform.localToWorldMatrix;
 
-        Gizmos.DrawWireCube(center, size);
+                // Draw wireframe cube at segment's local center
+                Vector3 center = beamSegments[i].center;
+                Vector3 size = beamSegments[i].size;
+
+                Gizmos.DrawWireCube(center, size);
+            }
+        }
+
+        // Reset matrix
+        Gizmos.matrix = Matrix4x4.identity;
     }
 }
