@@ -159,7 +159,7 @@ public class SpellScript : MonoBehaviour
         radius *= shapeScript.radiusModifier;
         radius *= effectScript.radiusModifier;
         radius *= elementScript.radiusModifier;
-        this.gameObject.transform.localScale = Vector3.one * radius;
+        //this.gameObject.transform.localScale = Vector3.one * radius;
         //Debug.Log("SpellScript radius updated: " + radius);
         //Debug.Log("shape rmod: " + shapeScript.radiusModifier + ", effect rmod: " + effectScript.radiusModifier + ", element rmod: " + elementScript.radiusModifier);
     }

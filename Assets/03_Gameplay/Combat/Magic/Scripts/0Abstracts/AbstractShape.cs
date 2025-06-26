@@ -80,7 +80,7 @@ public abstract class AbstractShape : MonoBehaviour
             {
                 aimingMask = SS.GetPlayerController().GetAimLayerMask();
 
-                //if the spell has a pierce effect, then ignore enemies
+                //if the spell has a x component, then ignore enemies
                 if (SS.GetEffectName().Contains("Pierce") || SS.GetShapeName().Contains("Beam")) { aimingMask = aimingMask & ~LayerMask.GetMask("Enemy"); }
             }
 
@@ -89,10 +89,9 @@ public abstract class AbstractShape : MonoBehaviour
             {
                 //Debug.Log("hit: " + hit.collider.gameObject);
                 aimPos = hit.point;
-                pathPoints[pathPoints.Length - 1] = aimPos;
             }
 
-            Debug.Log("aiming line: " + aimingLine + ", pathPoints.Length: " + pathPoints.Length + ", aimingLine.Length: " + aimingLine.positionCount);
+            //Debug.Log("aiming line: " + aimingLine + ", pathPoints.Length: " + pathPoints.Length + ", aimingLine.Length: " + aimingLine.positionCount);
             if (aimingLine.positionCount < 3) { aimingLine.SetPosition(pathPoints.Length - 1, aimPos); }
             //Debug.Log("aimpos: " + aimPos);
             return aimPos;

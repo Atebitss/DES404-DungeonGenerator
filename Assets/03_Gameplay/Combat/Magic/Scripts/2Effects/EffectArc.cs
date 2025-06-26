@@ -35,7 +35,7 @@ public class EffectArc : AbstractEffect
                 Vector3 dir = (aimPos - startPoint).normalized;
 
                 //use beam's effective range (length * 3f * radius scaling)
-                float beamRange = 6f * SS.GetRadius(); // 2f * 3f * radius like in ShapeBeam
+                float beamRange = (6f * SS.GetRadius()); // 2f * 3f * radius like in ShapeBeam
 
                 endPoint = startPoint + (dir * beamRange);
             }
