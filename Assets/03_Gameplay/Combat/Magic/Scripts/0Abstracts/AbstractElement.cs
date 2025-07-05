@@ -7,6 +7,8 @@ public abstract class AbstractElement : MonoBehaviour
 
     //spell info
     public SpellScript SS;
+    public AbstractEffect effectScript;
+    public AbstractShape shapeScript;
     public abstract void ApplyElement(SpellScript SS);
     public abstract void SetupCondition();
     public abstract void ApplyCondition();

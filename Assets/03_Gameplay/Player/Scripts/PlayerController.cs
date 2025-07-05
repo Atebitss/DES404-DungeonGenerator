@@ -768,12 +768,27 @@ public class PlayerController : MonoBehaviour
 
             //testing
             shapeName = "Beam";
-            effectName = "Automatic";
+            effectName = "Arc";
             elementName = "Fire";
 
+
+            //update spell references
             curSpell.UpdateSpellScriptShape(shapeName);
             curSpell.UpdateSpellScriptEffect(effectName);
             curSpell.UpdateSpellScriptElement(elementName);
+
+            //update shape spell references
+            curSpell.GetShapeScript().effectScript = curSpell.GetEffectScript();
+            curSpell.GetShapeScript().elementScript = curSpell.GetElementScript();
+            
+            //update effect spell references
+            curSpell.GetEffectScript().shapeScript = curSpell.GetShapeScript();
+            curSpell.GetEffectScript().elementScript = curSpell.GetElementScript();
+
+            //update element spell references
+            curSpell.GetElementScript().shapeScript = curSpell.GetShapeScript();
+            curSpell.GetElementScript().effectScript = curSpell.GetEffectScript();
+
 
             ADM.SetSpellStrength(spellStrength); //update adaptive difficulty
             spellCooldownMax = curSpell.GetSpellCooldownMax(); //update spell cooldown max

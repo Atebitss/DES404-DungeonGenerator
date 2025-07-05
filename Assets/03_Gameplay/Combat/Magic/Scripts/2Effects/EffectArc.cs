@@ -13,7 +13,7 @@ public class EffectArc : AbstractEffect
     public override void ApplyEffect()
     {
         //Debug.Log("Arc effect applied");
-        if (SS.GetShapeScript() != null && SS.GetShapeScript().spellAim != null && SS.GetShapeScript().firstPointConfirmed)
+        if (shapeScript != null && shapeScript.spellAim != null && shapeScript.firstPointConfirmed)
         {
             //calculate arced path
             int numOfPoints = 10;
@@ -24,14 +24,14 @@ public class EffectArc : AbstractEffect
             //while less than half way through point total, increase each point by x on the X axis
             //while more than half way through point total, lower each point by x on the X axis
             //update the line renderer with the new points
-            Vector3 startPoint = SS.GetShapeScript().pathPoints[0];   //begin point of arc
+            Vector3 startPoint = shapeScript.pathPoints[0];   //begin point of arc
             Vector3 endPoint;
 
             //if shape is beam, apply range limitation
             if (SS.GetShapeName().Contains("Beam"))
             {
                 //calculate limited endpoint for beam shapes
-                Vector3 aimPos = SS.GetShapeScript().GetAimedWorldPos();
+                Vector3 aimPos = shapeScript.GetAimedWorldPos();
                 Vector3 dir = (aimPos - startPoint).normalized;
 
                 //use beam's effective range (length * 3f * radius scaling)
@@ -42,7 +42,7 @@ public class EffectArc : AbstractEffect
             else
             {
                 //use normal endpoint for non-beam shapes
-                endPoint = SS.GetShapeScript().pathPoints[(SS.GetShapeScript().pathPoints.Length - 1)];
+                endPoint = shapeScript.pathPoints[(shapeScript.pathPoints.Length - 1)];
             }
 
             float maxDist = Vector3.Distance(startPoint, endPoint);
@@ -52,13 +52,13 @@ public class EffectArc : AbstractEffect
                 float progress = point / (float)(numOfPoints - 1); //complete % from 0 to 1
                 Vector3 curvePoint = Vector3.Lerp(startPoint, endPoint, progress);
                 float arcOffset = Mathf.Sin(progress * Mathf.PI) * maxDist * 0.1f;
-                curvePoint += SS.GetShapeScript().arcAxis * arcOffset;
+                curvePoint += shapeScript.arcAxis * arcOffset;
                 arcPathPoints[point] = curvePoint;
                 //Debug.Log("progress: " + progress + "\tcurvePoint: " + curvePoint);
             }
 
             //Debug.Log(SS.GetCasted());
-            if (!SS.GetCasted()) { SS.GetShapeScript().UpdateAimPath(arcPathPoints); }
+            if (!SS.GetCasted()) { shapeScript.UpdateAimPath(arcPathPoints); }
         }
     }
 }

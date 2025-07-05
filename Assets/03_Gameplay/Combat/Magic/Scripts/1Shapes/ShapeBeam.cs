@@ -43,6 +43,7 @@ public class ShapeBeam : AbstractShape
         this.GetComponent<Renderer>().enabled = false; //hide the parent object
 
         SS.SetSpellPersist(true);
+        firstPointConfirmed = true;
         castable = true;
     }
 
@@ -106,7 +107,6 @@ public class ShapeBeam : AbstractShape
             //disallow more casts
             casting = true;
             castable = false;
-            firstPointConfirmed = true;
             if (SS.GetEffectName().Contains("Automatic")) { AimSpell(); } //ensure spell is aimed before casting
 
             //start overlap check coroutine & end timer
