@@ -9,13 +9,13 @@ public class EffectHoming : AbstractEffect
     }
     public override void ApplyEffect()
     {
-        //Debug.Log("Homing effect applied");
-
         if (targets[0] == null)
         {
+            Debug.Log("Homing effect applied");
             //on initial call, find closest target to aim position
             Debug.Log("Homing effect initial call");
             targets[0] = FindClosestEnemyToPos(SS.GetEndPos());
+            Debug.Log("Homing effect target found: " + targets[0].name + " @ " + targets[0].transform.position);
         }
     }
 

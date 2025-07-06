@@ -8,6 +8,8 @@ public class EffectArc : AbstractEffect
     { 
         componentWeight = 0; damageModifier = 1f; speedModifier = 1f; radiusModifier = 1f; cooldownModifier = .1f;
         this.SS = SS;
+        elementScript = SS.GetElementScript();   //get the element script for this spell
+        shapeScript = SS.GetShapeScript();   //get the shape script for this spell
     }
 
     public override void ApplyEffect()

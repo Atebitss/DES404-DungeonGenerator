@@ -602,7 +602,7 @@ MonoBehaviour:
   IntelligencePoints: 1
   WisdomPoints: 1
   invincible: 0
-  permaInvincible: 0
+  permaInvincible: 1
   invincibilityTimer: 0
   vignetteOverlayAnimator: {fileID: 5627751566675936464}
   interactionMask:

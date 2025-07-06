@@ -7,8 +7,9 @@ public class ShapeBeam : AbstractShape
     private GameObject[] beamSegments = new GameObject[0];
     private int segmentCount = 1;
     private float width = 1f, length = 2f;
-    private float maxRunTime = 1f, checkInterval = 0.5f;
+    private float maxRunTime = 10f, checkInterval = 1f;
     private bool casting = false, segmentsCreated = false;
+    private GameObject[] homingTargets = new GameObject[0];
 
     public override void StartShapeScript(SpellScript SS)
     {
@@ -75,13 +76,13 @@ public class ShapeBeam : AbstractShape
         //Debug.Log("Beam shape update aim path");
 
         Vector3 pathPointStart = pathPoints[0];
-        Vector3 pathPointEnd = pathPoints[pathPoints.Length - 1];
+        Vector3 pathPointEnd = addPoints[addPoints.Length - 1];
         pathPoints = new Vector3[addPoints.Length];
         aimingLine.positionCount = pathPoints.Length - 1;
 
         for (int i = 0; i < addPoints.Length - 1; i++)
         {
-            //Debug.Log("addPoints["+i+"]: " + addPoints[i]);
+            Debug.Log("addPoints["+i+"]: " + addPoints[i]);
             pathPoints[i] = addPoints[i];
 
             aimingLine.SetPosition(i, pathPoints[i]);
@@ -89,13 +90,36 @@ public class ShapeBeam : AbstractShape
 
         pathPoints[0] = pathPointStart;
         pathPoints[pathPoints.Length - 1] = pathPointEnd;
+
+        segmentsCreated = false; //reset segments created flag to false so segments will be recreated next FixedUpdate
     }
 
 
     private void FixedUpdate()
     {
         if (!segmentsCreated) { CreateBeamSegments(); }
-        if (!castable && casting) { AimSpell(); }
+        if (!castable && casting) //while the beam is being cast, before ending
+        {
+            if (SS.GetEffectName().Contains("Homing"))
+            {
+                //if effect homing, update end position with found target
+                if (effectScript.targets[0] != null)
+                {
+                    pathPoints[pathPoints.Length - 1] = effectScript.targets[0].transform.position;
+                    segmentsCreated = false; //reset segments created flag to false so segments will be recreated next update
+                }
+                else
+                {
+                    //if no target found, end spell
+                    SS.SetSpellPersist(false);
+                    SS.EndSpell();
+                }
+            }
+            else
+            {
+                AimSpell();
+            }
+        }
     }
 
 
@@ -107,7 +131,7 @@ public class ShapeBeam : AbstractShape
             //disallow more casts
             casting = true;
             castable = false;
-            if (SS.GetEffectName().Contains("Automatic")) { AimSpell(); } //ensure spell is aimed before casting
+            AimSpell(); //ensure spell is aimed before casting
 
             //start overlap check coroutine & end timer
             StartCoroutine(EndBeam());
@@ -118,7 +142,7 @@ public class ShapeBeam : AbstractShape
     {
         while (!castable && casting)
         {
-            //Debug.Log("Checking for overlapping targets");
+            Debug.Log("Checking for overlapping targets");
             SS.EndSpell();
             yield return new WaitForSeconds(checkInterval); //wait for 0.25 seconds
         }
@@ -126,7 +150,7 @@ public class ShapeBeam : AbstractShape
     private IEnumerator EndBeam()
     {
         yield return new WaitForSeconds(maxRunTime); //wait for 1 second
-        //Debug.Log("Ending beam shape");
+        Debug.Log("Ending beam shape");
 
         for (int i = 0; i < beamSegments.Length; i++)
         {
@@ -146,11 +170,21 @@ public class ShapeBeam : AbstractShape
     {
         Debug.Log("Creating beam segments");
 
-        //determine number of segments based on path points
-        segmentCount = (pathPoints.Length - 1);
+        //destroy old segments if they exist
+        for (int i = 0; i < beamSegments.Length; i++)
+        {
+            if (beamSegments[i] != null)
+            {
+                Destroy(beamSegments[i].gameObject);
+            }
+        }
+
+        segmentCount = (pathPoints.Length - 1); //determine number of segments based on path points
+        pathPoints[0] = this.transform.position; //ensure first point is the spell position
 
         if (SS.GetEffectName().Contains("Arc"))
         {
+            //update mesh type and remove end segment
             shapeMesh = Resources.Load<Mesh>("CustomMeshes/shapeBeamSegment");
             segmentCount--;
         }
@@ -158,21 +192,31 @@ public class ShapeBeam : AbstractShape
         Debug.Log("segmentCount: " + segmentCount);
         beamSegments = new GameObject[segmentCount];
 
+        for (int i = 0; i < pathPoints.Length; i++)
+        {
+            Debug.Log("pathPoints[" + i + "]: " + pathPoints[i]);
+        }
+
         //create individual segments
         for (int i = 0; i < segmentCount; i++)
         {
+            Debug.Log("Creating segment " + (i + 1) + " of " + segmentCount);
+
             //calculate position
             Vector3 segStart = pathPoints[i];
             Vector3 segEnd = pathPoints[i + 1];
-            Vector3 segCenter = (segStart + segEnd) / 2f;
             Vector3 segDir = (segEnd - segStart).normalized;
             float segLength = Vector3.Distance(segStart, segEnd);
+            if (SS.GetEffectName().Contains("Homing")){ segLength -= (segLength * 0.333f); } //reduce segment length by 33% to avoid overshooting
+            else if(SS.GetEffectName().Contains("Arc")) { segLength *= 2f; } //double segment length to fill gaps
+            Vector3 segCenter = segStart + (segDir * (segLength / 2f));
+            Debug.Log("Segment " + (i + 1) + " start: " + segStart + ", end: " + segEnd + ", length: " + segLength);
 
             //create segment parent
             beamSegments[i] = new GameObject("BeamSegment" + (i + 1));
             beamSegments[i].transform.parent = this.transform;
             beamSegments[i].transform.position = segStart;
-            beamSegments[i].transform.localScale = new Vector3(width, width, length);
+            beamSegments[i].transform.localScale = new Vector3(width, width, segLength);
             beamSegments[i].transform.rotation = Quaternion.LookRotation(segDir);
 
             //add visual

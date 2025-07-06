@@ -141,6 +141,17 @@ public class SpellScript : MonoBehaviour
     // ===============================================================
     // COMPLEX METHODS
     // ===============================================================
+    public bool CheckTargets(GameObject hitTarget)
+    {
+        for (int i = 0; i < targets.Length; i++)
+        {
+            if (targets[i] == hitTarget)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
     public bool CheckIgnoredTargets(GameObject hitTarget)
     {
         for (int i = 0; i < ignoredTargets.Length; i++)
