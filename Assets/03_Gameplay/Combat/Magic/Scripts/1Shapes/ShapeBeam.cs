@@ -1,11 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 public class ShapeBeam : AbstractShape
 {
     private GameObject[] beamSegments = new GameObject[0];
-    private int segmentCount = 1;
+    private int segmentCount = 1, targetCheckCount = 0;
     private float width = 1f, length = 2f;
     private float maxRunTime = 10f, checkInterval = 1f;
     private bool casting = false, segmentsCreated = false;
@@ -53,6 +54,7 @@ public class ShapeBeam : AbstractShape
     public override void AimSpell()
     {
         //Debug.Log("Beam shape aim spell");
+        //for (int i = 0; i < pathPoints.Length; i++) { Debug.Log("pathPoints[" + i + "]: " + pathPoints[i]); }
         Vector3 startPos = this.transform.position;
         Vector3 aimPos = GetAimedWorldPos();
         Vector3 dir = (aimPos - startPos).normalized;
@@ -75,23 +77,15 @@ public class ShapeBeam : AbstractShape
     {
         //Debug.Log("Beam shape update aim path");
 
-        Vector3 pathPointStart = pathPoints[0];
-        Vector3 pathPointEnd = addPoints[addPoints.Length - 1];
-        pathPoints = new Vector3[addPoints.Length];
-        aimingLine.positionCount = pathPoints.Length - 1;
+        Vector3 pathPointStart = pathPoints[0]; //keep initial start point
+        Vector3 pathPointEnd = addPoints[addPoints.Length - 1]; //get last point from addPoints
+        pathPoints = addPoints; //update pathPoints with new points
 
-        for (int i = 0; i < addPoints.Length - 1; i++)
-        {
-            Debug.Log("addPoints["+i+"]: " + addPoints[i]);
-            pathPoints[i] = addPoints[i];
-
-            aimingLine.SetPosition(i, pathPoints[i]);
-        }
-
-        pathPoints[0] = pathPointStart;
-        pathPoints[pathPoints.Length - 1] = pathPointEnd;
-
-        segmentsCreated = false; //reset segments created flag to false so segments will be recreated next FixedUpdate
+        aimingLine.positionCount = pathPoints.Length - 1; //remove extra point at the end of the line renderer
+        pathPoints[0] = pathPointStart; //ensure first point is original start point
+        pathPoints[pathPoints.Length - 1] = pathPointEnd; //ensure last point is the end point from addPoints
+        for (int i = 0; i < pathPoints.Length - 1; i++) { aimingLine.SetPosition(i, pathPoints[i]); } //update line renderer positions
+        segmentsCreated = false; //reset segments created flag to false so segments will be recreated next update
     }
 
 
@@ -113,6 +107,30 @@ public class ShapeBeam : AbstractShape
                     //if no target found, end spell
                     SS.SetSpellPersist(false);
                     SS.EndSpell();
+                }
+            }
+            else if(SS.GetEffectName().Contains("Chain"))
+            {
+                if (effectScript.maxTargets > 0)
+                {
+                    Vector3[] newPath = new Vector3[(effectScript.maxTargets + 1)];
+                    newPath[0] = pathPoints[0]; //set first point to start position
+
+                    //update subsequent points with target positions
+                    for (int i = 1; i < newPath.Length; i++)
+                    {
+                        if (effectScript.targets[(i - 1)] != null)
+                        {
+                            newPath[i] = effectScript.targets[(i - 1)].transform.position;
+                        }
+                    }
+
+                    pathPoints = newPath; //update pathPoints with new points
+                    segmentsCreated = false; //reset segments created flag to false so segments will be recreated next update
+                }
+                else if(effectScript.maxTargets == 0) 
+                {
+                    AimSpell();
                 }
             }
             else
@@ -144,6 +162,7 @@ public class ShapeBeam : AbstractShape
         {
             Debug.Log("Checking for overlapping targets");
             SS.EndSpell();
+            targetCheckCount++;
             yield return new WaitForSeconds(checkInterval); //wait for 0.25 seconds
         }
     }
@@ -202,22 +221,25 @@ public class ShapeBeam : AbstractShape
         {
             Debug.Log("Creating segment " + (i + 1) + " of " + segmentCount);
 
+            //skip first segment if effect is chain and it's not the first target check
+            if (SS.GetEffectName().Contains("Chain") && i == 0 && targetCheckCount > 1) { i++; }
+
             //calculate position
             Vector3 segStart = pathPoints[i];
             Vector3 segEnd = pathPoints[i + 1];
             Vector3 segDir = (segEnd - segStart).normalized;
-            float segLength = Vector3.Distance(segStart, segEnd);
-            if (SS.GetEffectName().Contains("Homing")){ segLength -= (segLength * 0.333f); } //reduce segment length by 33% to avoid overshooting
-            else if(SS.GetEffectName().Contains("Arc")) { segLength *= 2f; } //double segment length to fill gaps
-            Vector3 segCenter = segStart + (segDir * (segLength / 2f));
-            Debug.Log("Segment " + (i + 1) + " start: " + segStart + ", end: " + segEnd + ", length: " + segLength);
+            float realSegLength = Vector3.Distance(segStart, segEnd);
+            float newSegLength = realSegLength; //initialize segment length to real length
+            if (SS.GetEffectName().Contains("Homing") || SS.GetEffectName().Contains("Chain")) { newSegLength -= (newSegLength * 0.3f); } //reduce segment length by 33% to avoid overshooting
+            else if(SS.GetEffectName().Contains("Arc")) { newSegLength *= 2f; } //double segment length to fill gaps
+            Debug.Log("Segment " + (i + 1) + " start: " + segStart + ", end: " + segEnd + ", length: " + newSegLength);
 
             //create segment parent
-            beamSegments[i] = new GameObject("BeamSegment" + (i + 1));
-            beamSegments[i].transform.parent = this.transform;
-            beamSegments[i].transform.position = segStart;
-            beamSegments[i].transform.localScale = new Vector3(width, width, segLength);
-            beamSegments[i].transform.rotation = Quaternion.LookRotation(segDir);
+            beamSegments[i] = new GameObject("BeamSegment" + (i + 1)); //create new game object for segment 
+            beamSegments[i].transform.parent = this.transform; //set parent to spell object
+            beamSegments[i].transform.position = segStart; //set position to segment start
+            beamSegments[i].transform.localScale = new Vector3(width, width, newSegLength); //set scale to segment width and length
+            beamSegments[i].transform.rotation = Quaternion.LookRotation(segDir); //set rotation to segment direction
 
             //add visual
             MeshFilter meshFilter = beamSegments[i].AddComponent<MeshFilter>();
@@ -226,8 +248,8 @@ public class ShapeBeam : AbstractShape
             renderer.material = SS.GetSpellMaterial();
 
             //add collider
-            BoxCollider curSegmentCollider = beamSegments[i].AddComponent<BoxCollider>();
-            curSegmentCollider.isTrigger = true;
+            BoxCollider curSegmentCollider = beamSegments[i].AddComponent<BoxCollider>(); //create new box collider for segment
+            curSegmentCollider.isTrigger = true; //set collider as trigger to avoid physics interactions
         }
 
         segmentsCreated = true;
@@ -237,28 +259,38 @@ public class ShapeBeam : AbstractShape
 
     public override GameObject[] FindShapeTargets()
     {
-        //Debug.Log("ShapeBeam, FindShapeTargets");
+        Debug.Log("ShapeBeam, FindShapeTargets");
+        Debug.Log("Beam segments length: " + beamSegments.Length);
         targets = new GameObject[0];
         for (int seg = 0; seg < beamSegments.Length; seg++)
         {
+            Debug.Log("Checking segment " + (seg + 1) + " of " + beamSegments.Length + ": " + beamSegments[seg]);
             if (beamSegments[seg] != null)
             {
                 BoxCollider segmentCollider = beamSegments[seg].GetComponent<BoxCollider>();
+                Vector3 worldCenter = segmentCollider.transform.TransformPoint(segmentCollider.center);
+                Vector3 worldHalfExtents = Vector3.Scale(segmentCollider.size * 0.5f, segmentCollider.transform.lossyScale);
+                Quaternion worldRotation = segmentCollider.transform.rotation;
+                Debug.Log("Segment collider: " + segmentCollider);
+                Debug.Log("Segment collider bounds: " + segmentCollider.bounds);
+                Debug.Log("Segment collider rotation: " + segmentCollider.transform.rotation);
+
 
                 //check for overlapping enemy colliders
                 Collider[] cols = Physics.OverlapBox(
-                    segmentCollider.bounds.center,
-                    segmentCollider.bounds.extents,
-                    segmentCollider.transform.rotation,
-                    LayerMask.GetMask("Enemy")
+                    worldCenter,
+                    worldHalfExtents,
+                    worldRotation
+                    //LayerMask.GetMask("Enemy")
                 );
 
+                Debug.Log("Found " + cols.Length + " colliders in segment " + (seg + 1));
                 for (int i = 0; i < cols.Length; i++)
                 {
-                    //Debug.Log(i + ": " + cols[i].gameObject.name);
+                    Debug.Log(i + ": " + cols[i].gameObject.name);
                     if (cols[i].gameObject.tag == "Enemy" && !SS.CheckIgnoredTargets(cols[i].gameObject) && !HasAlreadyHitTarget(cols[i].gameObject))
                     {
-                        //Debug.Log("Found target: " + cols[i].gameObject.name);
+                        Debug.Log("Found target: " + cols[i].gameObject.name);
                         //increase targets array and add the enemy
                         GameObject[] tempTargets = new GameObject[targets.Length + 1];
                         for (int j = 0; j < targets.Length; j++) { tempTargets[j] = targets[j]; }
@@ -269,7 +301,7 @@ public class ShapeBeam : AbstractShape
             }
         }
 
-        //Debug.Log("Shape Beam, found " + targets.Length + " targets");
+        Debug.Log("Shape Beam, found " + targets.Length + " targets");
         return targets;
     }
 

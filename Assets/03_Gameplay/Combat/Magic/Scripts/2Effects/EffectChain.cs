@@ -4,9 +4,10 @@ using UnityEngine;
 
 public class EffectChain : AbstractEffect
 {
-    private int maxTargets, curTargetNum = 0;           //maximum number of chaining, current number of chains
-    private GameObject[] unsortedTargets, previousTargets;      //all targets found within range, the previously hit targets
-    public Vector3[] checkPoss;
+    private GameObject[] unsortedTargets, previousTargets, groupTargets;      //all targets found within range, the previously hit targets
+    public Vector3[] checkPoss; //create array to hold targets for path points
+    private Vector3 searchPos;
+    private bool triggered = false;
 
     public override void StartEffectScript(SpellScript SS)
     {
@@ -15,194 +16,61 @@ public class EffectChain : AbstractEffect
         SS.SetSpellPersist(true);   //ensures the spell wont be destroyed upon impact
 
         maxTargets = SS.GetSpellPower();   //set max targets to players level
-        targets = new GameObject[maxTargets];
+        targets = new GameObject[1];
         previousTargets = new GameObject[maxTargets];
 
         checkPoss = new Vector3[maxTargets];
+
+        //if shape is beam, find targets on cast
+        if (SS.GetShapeName().Contains("Beam")) { componentWeight = 1; }
     }
     public override void ApplyEffect()
     {
-        //Debug.Log("");
         Debug.Log("Effect Chain apply effect");
         //find targets
         //sort targets by distance
         //set path points between spell and new target
 
-        if (SS.GetShapeScript().GetTriggerPoints().Length == 0) { curTargetNum++; }   //increase the current number of chains
-        Debug.Log("Chain effect applied, " + curTargetNum + "/" + maxTargets);
+        //if (shapeScript.GetTriggerPoints().Length == 0) { curTargetNum++; }   //increase the current number of chains
 
         //if max chains reached, update spell script so its no longer persistent
-        if (curTargetNum == maxTargets) 
+        if (SS.GetShapeName().Contains("Ball") && curTargetNum == maxTargets) 
         { 
             SS.SetSpellPersist(false);
         }
         //otherwise if max chains not reached,
-        //check if there are trigger points & if the spell isnt yet casted
-        else if (curTargetNum < maxTargets && SS.GetShapeScript().GetTriggerPoints().Length > 0 && !SS.GetCasted())
-        {
-            MultiPointSort();
-        }
         //check if the spell has been cast
-        else if (curTargetNum < maxTargets && SS.GetShapeScript().GetTriggerPoints().Length == 0 && SS.GetCasted())
+        else if (curTargetNum < maxTargets)
         {
-            SinglePointSort();
-        }
-    }
-
-
-    //change trigger points, path points
-    private void MultiPointSort()
-    {
-        //Debug.Log("");
-        //Debug.Log("EffectChain MultiPointSort");
-
-        //get trigger & path points from spell script
-        Vector3 startPoint = SS.GetStartPos();
-        Vector3 endPoint = SS.GetEndPos();
-
-        //debug
-        //Debug.Log("startPoi: " + startPoint);
-        //Debug.Log("endPoi: " + endPoint);
-
-        //get distance from point a & b then divide distance by max targets, initialise new path for spell to use
-        float totalDist = Vector3.Distance(startPoint, endPoint);
-        float checkDist = totalDist / maxTargets;
-        //Vector3[] newPathPoints = new Vector3[maxTargets + 2];
-        //newPathPoints[0] = startPoint;
-        //newPathPoints[newPathPoints.Length - 1] = endPoint;
-
-        //find nearest target to each point
-        for (int point = 0; point < maxTargets; point++)
-        {
-            //Debug.Log("");
-
-            //reset target array
-            unsortedTargets = new GameObject[1];
-
-            //calc point to check
-            Vector3 checkPos = Vector3.Lerp(startPoint, endPoint, ((float)(point + 1) / (maxTargets + 1)));
-            checkPoss[point] = checkPos;
-            //Debug.Log("CheckPos" + (point + 1) + ": " + checkPos);
-
-            //find targets in sphere overlap at points along path
-            unsortedTargets = FindTargetsAt(checkPos); //increases the size of unsorted array
-
-
-            //if there was at least one target found
-            if (unsortedTargets[0] != null)
+            if (SS.GetShapeName().Contains("Beam"))
             {
-                //for each point, find distance between check pos and point
-                float[] dists = new float[unsortedTargets.Length - 1];
-                for (int i = 0; i < unsortedTargets.Length - 1; i++)
+                groupTargets = new GameObject[maxTargets]; //create array to hold targets for path points
+
+                //for each possible target
+                for (int i = 0; curTargetNum < maxTargets; i++)
                 {
-                    dists[i] = Vector3.Distance(checkPos, unsortedTargets[i].transform.position);
-                    //Debug.Log(targets[i].name + " found at " + targets[i].gameObject.transform.position + ", " + dists[i] + " away");
+                    Debug.Log("Chain effect applied, " + curTargetNum + "/" + maxTargets);
+                    SinglePointSort(); //run finder
+                    Debug.Log("Target found: " + targets[0].gameObject.transform.parent.name + " at " + targets[0].transform.position);
+                    groupTargets[i] = targets[0]; //add target position to array
+                    previousTargets[i] = targets[0]; //add target to previous targets array
+                    Debug.Log("Target confirmed: " + groupTargets[i]);
+                    curTargetNum++;
                 }
 
-                //sort distance from highest to lowest
-                for (int j = 0; j < dists.Length - 1; j++)
-                {
-                    for (int i = 0; i < dists.Length - 1; i++)
-                    {
-                        if (dists[i] > dists[i + 1])
-                        {
-                            float tempDist = dists[i + 1];
-                            dists[i + 1] = dists[i];
-                            dists[i] = tempDist;
-
-                            GameObject tempTarget = unsortedTargets[i + 1];
-                            unsortedTargets[i + 1] = unsortedTargets[i];
-                            unsortedTargets[i] = tempTarget;
-                        }
-                    }
-                }
-                //Debug.Log("Closest point: " + unsortedTargets[0] + " - " + dists[0]);
-
-                //add closest unsorted target to lowest empty target array pos
-                if (unsortedTargets[0] != null) 
-                { 
-                    for (int pos = 0; pos < targets.Length; pos++) 
-                    {
-                        if (targets[pos] == null) 
-                        {
-                            //Debug.Log("target pos" + pos + " empty, adding " + unsortedTargets[0]); 
-                            targets[pos] = unsortedTargets[0];
-                            break;
-                        }
-                    }
-                }
-
-                //set new path points array to point positions (first & last must stay the same)
-                //newPathPoints[point + 1] = targets[0].transform.position;
-                //Debug.Log("new path points" + point + ": " + targets[0].transform.position);
-
-                //fill lowest open position with current target to be ignored later
-                for (int i = 0; i < previousTargets.Length; i++)
-                {
-                    if (previousTargets[i] == null && unsortedTargets[0] != null)
-                    {
-                        //Debug.Log("adding prev target " + targets[0].name);
-                        previousTargets[i] = unsortedTargets[0];
-                        break;
-                    }
-                }
-
-                //for(int i = 0; i < newPathPoints.Length; i++) { Debug.Log("new path points" + i + ": " + newPathPoints[i]); }
+                targets = groupTargets;
+                triggered = true;
             }
-            //else { newPathPoints[point + 1] = checkPos; }//Debug.Log("targets null"); }
-            curTargetNum++;
-        }
-
-        //pathPoints = newPathPoints; 
-        //for(int i = 0; i < targets.Length; i++) { Debug.Log("Effect Chain target " + i + ": " + targets[i]); }
-
-        if (curTargetNum == maxTargets && SS.GetShapeScript().GetTriggerPoints().Length > 0)
-        {
-            //for (int i = 0; i < previousTargets.Length; i++) { Debug.Log("Effect Chain prev target" + i + ": " + previousTargets[i]); }
-            SS.SetIgnoredTargets(previousTargets);
-        }
-    }
-    private GameObject[] FindTargetsAt(Vector3 checkPos)
-    {
-        //Debug.Log("");
-        //Debug.Log("Finding targets at " + checkPos);
-        //find all nearby targets
-        int numOfTargets = 0;
-        GameObject[] newTargets = new GameObject[1];
-        Collider[] collisions = Physics.OverlapSphere(checkPos, 25f);
-        for (int check = 0; check < collisions.Length; check++)
-        {
-            if (collisions[check].CompareTag("Enemy")) //ensure targets are enemies and not current target
+            else if(SS.GetCasted())
             {
-                if (!CheckPrevTargets(collisions[check].gameObject)) //a seperate statement to not be run on every object hit, only tagged enemies
-                {
-                    newTargets[numOfTargets] = collisions[check].gameObject;
-                    //Debug.Log(collisions[check].name + " found at " + collisions[check].gameObject.transform.position);
-                    numOfTargets++;
-
-                    if (numOfTargets >= newTargets.Length)
-                    {
-                        GameObject[] tempTargets = new GameObject[numOfTargets + 1];
-
-                        for (int i = 0; i < newTargets.Length; i++) { tempTargets[i] = newTargets[i]; }
-
-                        newTargets = tempTargets;
-                    }
-                }
+                SinglePointSort();
             }
         }
-
-        //if (newTargets[0] != null) { for (int i = 0; i < newTargets.Length - 1; i++) { Debug.Log("new target: " + newTargets[i]); } }
-        //else { Debug.Log("new targets null"); }
-        //Debug.Log("");
-        return newTargets;
     }
-
-
 
     private void SinglePointSort()
     {
-        //Debug.Log("EffectChain SinglePointSort");
+        Debug.Log("EffectChain SinglePointSort");
         //Debug.Log("CheckPos: " + this.transform.position);
         //reset targets for new check
         targets = new GameObject[1];
@@ -217,7 +85,7 @@ public class EffectChain : AbstractEffect
         for (int i = 0; i < unsortedTargets.Length - 1; i++)
         {
             dists[i] = Vector3.Distance(this.transform.position, unsortedTargets[i].transform.position);
-            Debug.Log(unsortedTargets[i].gameObject.transform.parent.name + " " + dists[i] + " away from impact");
+            //Debug.Log(unsortedTargets[i].gameObject.transform.parent.name + " " + dists[i] + " away from impact");
         }
 
         //sort distance from highest to lowest
@@ -227,7 +95,7 @@ public class EffectChain : AbstractEffect
             {
                 if (dists[i] > dists[i + 1]) //if first distance is greaten than second distance
                 {
-                    Debug.Log("Swapping " + unsortedTargets[i].gameObject.transform.parent.name + " with " + unsortedTargets[i + 1].gameObject.transform.parent.name);
+                    //Debug.Log("Swapping " + unsortedTargets[i].gameObject.transform.parent.name + " with " + unsortedTargets[i + 1].gameObject.transform.parent.name);
                     //swap distances
                     float tempDist = dists[i + 1];
                     dists[i + 1] = dists[i];
@@ -250,29 +118,47 @@ public class EffectChain : AbstractEffect
     }
     private GameObject[] FindTargets()
     {
-        Debug.Log("Finding targets at " + this.transform.position);
-
-
-        //tiny check to find current target
-        Collider[] targetCol = Physics.OverlapSphere(this.transform.position, 0.25f);
-        for (int check = 0; check < previousTargets.Length; check++) //for each position
+        if (SS.GetShapeName().Contains("Beam"))
         {
-            for (int obj = 0; obj < targetCol.Length; obj++) //for each found object
+            //Debug.Log("z, " + groupTargets[(curTargetNum - 1)] + ", " + (curTargetNum - 1));
+            if (curTargetNum > 1)
             {
-                //if the previous target is null, is an enemy, and is not already in the previous targets
-                if (previousTargets[check] == null && targetCol[obj].CompareTag("Enemy") && !CheckPrevTargets(targetCol[obj].gameObject))
-                {
-                    //add found target to first empty previous targets pos
-                    Debug.Log("current target found: " + targetCol[obj].transform.parent.name);
-                    previousTargets[check] = targetCol[obj].gameObject;
-                    SS.SetIgnoredTargets(previousTargets);
+                Debug.Log("Finding targets at " + groupTargets[(curTargetNum - 2)].transform.position);
+                searchPos = groupTargets[(curTargetNum - 2)].transform.position;
+            }
+            else
+            {
+                Debug.Log("Finding targets at " + SS.GetEndPos());
+                searchPos = SS.GetEndPos();
+            }
+        }
+        else
+        {
+            Debug.Log("Finding targets at " + this.transform.position);
+            searchPos = this.transform.position; //default search position is the spell position
+        }
 
-                    check = previousTargets.Length; //break out of loop, no need to check further
-                    break;
+        if (SS.GetShapeName().Contains("Ball"))
+        {
+            //tiny check to find current target
+            Collider[] targetCol = Physics.OverlapSphere(searchPos, 0.1f);
+            for (int check = 0; check < previousTargets.Length; check++) //for each position
+            {
+                for (int obj = 0; obj < targetCol.Length; obj++) //for each found object
+                {
+                    //if the previous target is null, is an enemy, and is not already in the previous targets
+                    if (previousTargets[check] == null && targetCol[obj].CompareTag("Enemy") && !CheckPrevTargets(targetCol[obj].gameObject))
+                    {
+                        //add found target to first empty previous targets pos
+                        Debug.Log("current target found: " + targetCol[obj].transform.parent.name);
+                        previousTargets[check] = targetCol[obj].gameObject;
+                        //SS.SetIgnoredTargets(previousTargets);
+                        check = previousTargets.Length; //break out of loop, no need to check further
+                        break;
+                    }
                 }
             }
         }
-
 
         //find all nearby targets
         int numOfTargets = 0;
@@ -317,13 +203,64 @@ public class EffectChain : AbstractEffect
     }
 
 
+    private void FixedUpdate()
+    {
+        if (triggered)
+        {
+            bool foundDeadEnemy = false;
+
+            //check if any enemies are dead
+            for (int enemyID = 0; enemyID < groupTargets.Length; enemyID++)
+            {
+                if (groupTargets[enemyID] == null)
+                {
+                    foundDeadEnemy = true;
+                    break;
+                }
+            }
+
+            //if dead enemies found, rebuild the array
+            if (foundDeadEnemy)
+            {
+                //count living enemies
+                int livingCount = 0;
+                for (int i = 0; i < groupTargets.Length; i++)
+                {
+                    if (groupTargets[i] != null)
+                    {
+                        livingCount++;
+                    }
+                }
+
+                //create new array with only living enemies
+                GameObject[] newTargets = new GameObject[livingCount];
+                int newIndex = 0;
+                for (int i = 0; i < groupTargets.Length; i++)
+                {
+                    if (groupTargets[i] != null)
+                    {
+                        newTargets[newIndex] = groupTargets[i];
+                        newIndex++;
+                    }
+                }
+
+                //update vars
+                groupTargets = newTargets;
+                targets = groupTargets;
+                maxTargets = livingCount;
+                curTargetNum = livingCount;
+            }
+        }
+    }
+
 
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.yellow; // Set the color of the gizmo
         Gizmos.DrawWireSphere(this.transform.position, 10f); // Draw the wire sphere
 
-        Gizmos.color = Color.yellow;
-        if (checkPoss != null) { for (int i = 0; i < checkPoss.Length; i++) { Gizmos.DrawSphere(checkPoss[i], .1f); } }
+        Gizmos.color = Color.green;
+        if (checkPoss[0] != Vector3.zero) { for (int i = 0; i < checkPoss.Length; i++) { Gizmos.DrawSphere(checkPoss[i], .1f); } }
+        else { Gizmos.DrawSphere(searchPos, .25f); }
     }
 }

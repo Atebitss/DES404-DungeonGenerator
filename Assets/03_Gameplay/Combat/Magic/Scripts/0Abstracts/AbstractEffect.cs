@@ -8,6 +8,7 @@ public abstract class AbstractEffect : MonoBehaviour
     public int componentWeight; //-1 = no effect, 0 = aiming, 1 = on cast, 2 = flight, 3 = impact
     public float damageModifier, speedModifier, radiusModifier, cooldownModifier;
     public float damageIncrement, radiusIncrement;
+    public int maxTargets, curTargetNum = 0;
 
     //spell info
     public SpellScript SS;
