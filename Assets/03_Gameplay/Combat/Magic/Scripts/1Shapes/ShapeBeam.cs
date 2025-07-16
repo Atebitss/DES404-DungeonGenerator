@@ -63,8 +63,11 @@ public class ShapeBeam : AbstractShape
         transform.position = startPos;
         transform.rotation = Quaternion.LookRotation(dir);
 
-        aimingLine.SetPosition(0, startPos);
-        aimingLine.SetPosition(1, endPos);
+        if (aimingLine != null)
+        {
+            aimingLine.SetPosition(0, startPos);
+            aimingLine.SetPosition(1, endPos);
+        }
 
         pathPoints[0] = startPos;
         pathPoints[1] = endPos;
@@ -91,9 +94,6 @@ public class ShapeBeam : AbstractShape
 
     private void FixedUpdate()
     {
-        //width *= spellRadius; //update width based on spell radius
-        //length *= spellRadius; //update length based on spell radius
-
         if (!segmentsCreated) { CreateBeamSegments(); }
         if (!castable && casting) //while the beam is being cast, before ending
         {
@@ -136,7 +136,7 @@ public class ShapeBeam : AbstractShape
                     AimSpell();
                 }
             }
-            else
+            else if(!SS.GetEffectName().Contains("Delay"))
             {
                 AimSpell();
             }
@@ -147,12 +147,12 @@ public class ShapeBeam : AbstractShape
     //runs when spell is cast
     public override void ApplyShape()
     {
-        if (castable && !casting)
+        if (castable && !casting && !delayed)
         {
             //disallow more casts
             casting = true;
             castable = false;
-            AimSpell(); //ensure spell is aimed before casting
+            if (!SS.GetEffectName().Contains("Delay")) { AimSpell(); } //ensure spell is aimed before casting
 
             //start overlap check coroutine & end timer
             StartCoroutine(EndBeam());

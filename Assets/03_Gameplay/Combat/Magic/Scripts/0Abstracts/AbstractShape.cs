@@ -104,7 +104,7 @@ public abstract class AbstractShape : MonoBehaviour
             }
 
             //Debug.Log("aiming line: " + aimingLine + ", pathPoints.Length: " + pathPoints.Length + ", aimingLine.Length: " + aimingLine.positionCount);
-            if (aimingLine.positionCount < 2) { aimingLine.SetPosition(pathPoints.Length - 1, aimPos); }
+            if (aimingLine != null && aimingLine.positionCount < 2) { aimingLine.SetPosition(pathPoints.Length - 1, aimPos); }
             //Debug.Log("aimpos: " + aimPos);
             return aimPos;
         }

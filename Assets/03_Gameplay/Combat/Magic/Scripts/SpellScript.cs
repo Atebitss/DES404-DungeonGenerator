@@ -42,9 +42,6 @@ public class SpellScript : MonoBehaviour
     private bool casted = false;
     public bool GetCasted() { return casted; }
 
-    private bool delayed = false;
-    public bool GetDelayed() { return delayed; }
-
     private bool spellActive = false;
     public bool GetSpellActive() { return spellActive; }
 
@@ -293,7 +290,11 @@ public class SpellScript : MonoBehaviour
                 this.transform.parent.transform.SetParent(null);
                 shapeScript.EndAim();
             }
-            else if (shapeName.Contains("Beam")) { /*keep parent*/ }
+            else if (shapeName.Contains("Beam") && effectName.Contains("Delay"))
+            {
+                this.transform.parent.transform.SetParent(null);
+                shapeScript.EndAim();
+            }
 
             elementScript.SetupCondition();
 
