@@ -31,7 +31,7 @@ public class EffectChain : AbstractEffect
         //sort targets by distance
         //set path points between spell and new target
 
-        //if (shapeScript.GetTriggerPoints().Length == 0) { curTargetNum++; }   //increase the current number of chains
+        if (!SS.GetShapeName().Contains("Beam")) { curTargetNum++; }   //increase the current number of chains for incremental shapes
 
         //if max chains reached, update spell script so its no longer persistent
         if (SS.GetShapeName().Contains("Ball") && curTargetNum == maxTargets) 
@@ -141,20 +141,25 @@ public class EffectChain : AbstractEffect
         if (SS.GetShapeName().Contains("Ball"))
         {
             //tiny check to find current target
-            Collider[] targetCol = Physics.OverlapSphere(searchPos, 0.1f);
-            for (int check = 0; check < previousTargets.Length; check++) //for each position
+            Collider[] targetCol = Physics.OverlapSphere(searchPos, 0.25f);
+            for (int obj = 0; obj < targetCol.Length; obj++) //for each found object
             {
-                for (int obj = 0; obj < targetCol.Length; obj++) //for each found object
+                Debug.Log("targetCol: " + targetCol[obj]);
+
+                //if the previous target is null, is an enemy, and is not already in the previous targets
+                if (targetCol[obj].CompareTag("Enemy") && !CheckPrevTargets(targetCol[obj].gameObject))
                 {
-                    //if the previous target is null, is an enemy, and is not already in the previous targets
-                    if (previousTargets[check] == null && targetCol[obj].CompareTag("Enemy") && !CheckPrevTargets(targetCol[obj].gameObject))
+                    for (int check = 0; check < previousTargets.Length; check++) //for each position
                     {
-                        //add found target to first empty previous targets pos
-                        Debug.Log("current target found: " + targetCol[obj].transform.parent.name);
-                        previousTargets[check] = targetCol[obj].gameObject;
-                        //SS.SetIgnoredTargets(previousTargets);
-                        check = previousTargets.Length; //break out of loop, no need to check further
-                        break;
+                        if (previousTargets[check] == null)
+                        {
+                            //add found target to first empty previous targets pos
+                            Debug.Log("current target found: " + targetCol[obj].transform.parent.name);
+                            previousTargets[check] = targetCol[obj].gameObject;
+                            //SS.SetIgnoredTargets(previousTargets);
+                            check = previousTargets.Length; //break out of loop, no need to check further
+                            break;
+                        }
                     }
                 }
             }
