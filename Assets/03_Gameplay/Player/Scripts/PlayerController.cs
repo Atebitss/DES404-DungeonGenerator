@@ -768,7 +768,7 @@ public class PlayerController : MonoBehaviour
 
             //testing
             shapeName = "Beam";
-            effectName = "Chain";
+            effectName = "Charge";
             elementName = "Fire";
 
 

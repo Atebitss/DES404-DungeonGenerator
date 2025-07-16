@@ -91,6 +91,9 @@ public class ShapeBeam : AbstractShape
 
     private void FixedUpdate()
     {
+        //width *= spellRadius; //update width based on spell radius
+        //length *= spellRadius; //update length based on spell radius
+
         if (!segmentsCreated) { CreateBeamSegments(); }
         if (!castable && casting) //while the beam is being cast, before ending
         {

@@ -80,6 +80,9 @@ public class ShapeBall : AbstractShape
 
     private void FixedUpdate()
     {
+        //increase spell prefab scale based on radius
+        //this.gameObject.transform.localScale = (Vector3.one * spellRadius);
+
         //if spell is being aimed, update first line renderer point with player position
         if (firstPointConfirmed && !lastPointConfirmed)
         {
