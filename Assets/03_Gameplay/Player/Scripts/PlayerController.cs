@@ -768,7 +768,7 @@ public class PlayerController : MonoBehaviour
 
             //testing
             shapeName = "Beam";
-            effectName = "Delay";
+            effectName = "Explode";
             elementName = "Fire";
 
 
@@ -792,6 +792,7 @@ public class PlayerController : MonoBehaviour
 
             ADM.SetSpellStrength(spellStrength); //update adaptive difficulty
             spellCooldownMax = curSpell.GetSpellCooldownMax(); //update spell cooldown max
+            curSpell.UpdateRadius(); //update spell radius before casting
             spellReady = true;
         }
     }

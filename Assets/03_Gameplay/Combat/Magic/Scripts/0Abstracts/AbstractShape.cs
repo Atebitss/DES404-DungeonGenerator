@@ -39,6 +39,7 @@ public abstract class AbstractShape : MonoBehaviour
 
     public Vector3 arcAxis;
     public Vector3[] pathPoints = new Vector3[2];
+    public Vector3[] GetPathPoints() { return pathPoints; }
 
     public GameObject[] targetObjects = new GameObject[0];
     public void AddTargetObject(GameObject newTarget)

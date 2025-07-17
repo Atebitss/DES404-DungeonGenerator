@@ -112,7 +112,7 @@ public class ShapeBeam : AbstractShape
                     SS.EndSpell();
                 }
             }
-            else if(SS.GetEffectName().Contains("Chain"))
+            else if (SS.GetEffectName().Contains("Chain"))
             {
                 if (effectScript.maxTargets > 0)
                 {
@@ -131,12 +131,12 @@ public class ShapeBeam : AbstractShape
                     pathPoints = newPath; //update pathPoints with new points
                     segmentsCreated = false; //reset segments created flag to false so segments will be recreated next update
                 }
-                else if(effectScript.maxTargets == 0) 
+                else if (effectScript.maxTargets == 0)
                 {
                     AimSpell();
                 }
             }
-            else if(!SS.GetEffectName().Contains("Delay"))
+            else if (!SS.GetEffectName().Contains("Delay"))
             {
                 AimSpell();
             }
@@ -222,7 +222,7 @@ public class ShapeBeam : AbstractShape
         //create individual segments
         for (int i = 0; i < segmentCount; i++)
         {
-            Debug.Log("Creating segment " + (i + 1) + " of " + segmentCount);
+            //Debug.Log("Creating segment " + (i + 1) + " of " + segmentCount);
 
             //skip first segment if effect is chain and it's not the first target check
             if (SS.GetEffectName().Contains("Chain") && i == 0 && targetCheckCount > 1) { i++; }
@@ -232,16 +232,15 @@ public class ShapeBeam : AbstractShape
             Vector3 segEnd = pathPoints[i + 1];
             Vector3 segDir = (segEnd - segStart).normalized;
             float realSegLength = Vector3.Distance(segStart, segEnd);
-            float newSegLength = realSegLength; //initialize segment length to real length
-            if (SS.GetEffectName().Contains("Homing") || SS.GetEffectName().Contains("Chain")) { newSegLength -= (newSegLength * 0.3f); } //reduce segment length by 33% to avoid overshooting
-            else if(SS.GetEffectName().Contains("Arc")) { newSegLength *= 2f; } //double segment length to fill gaps
-            Debug.Log("Segment " + (i + 1) + " start: " + segStart + ", end: " + segEnd + ", length: " + newSegLength);
+            if (SS.GetEffectName().Contains("Homing") || SS.GetEffectName().Contains("Chain")) { realSegLength -= (realSegLength * 0.3f); } //reduce segment length by 33% to avoid overshooting
+            else if(SS.GetEffectName().Contains("Arc")) { realSegLength *= 2f; } //double segment length to fill gaps
+            //Debug.Log("Segment " + (i + 1) + " start: " + segStart + ", end: " + segEnd + ", length: " + realSegLength);
 
             //create segment parent
             beamSegments[i] = new GameObject("BeamSegment" + (i + 1)); //create new game object for segment 
             beamSegments[i].transform.parent = this.transform; //set parent to spell object
             beamSegments[i].transform.position = segStart; //set position to segment start
-            beamSegments[i].transform.localScale = new Vector3(width, width, newSegLength); //set scale to segment width and length
+            beamSegments[i].transform.localScale = new Vector3(width, width, realSegLength); //set scale to segment width and length
             beamSegments[i].transform.rotation = Quaternion.LookRotation(segDir); //set rotation to segment direction
 
             //add visual
@@ -265,40 +264,49 @@ public class ShapeBeam : AbstractShape
         Debug.Log("ShapeBeam, FindShapeTargets");
         Debug.Log("Beam segments length: " + beamSegments.Length);
         targets = new GameObject[0];
-        for (int seg = 0; seg < beamSegments.Length; seg++)
+
+        if (SS.GetEffectName().Contains("Explode"))
         {
-            Debug.Log("Checking segment " + (seg + 1) + " of " + beamSegments.Length + ": " + beamSegments[seg]);
-            if (beamSegments[seg] != null)
+            effectScript.ApplyEffect(); //run explosion effect to find targets
+            targets = effectScript.targets; //get targets from effect script
+        }
+        else
+        {
+            for (int seg = 0; seg < beamSegments.Length; seg++)
             {
-                BoxCollider segmentCollider = beamSegments[seg].GetComponent<BoxCollider>();
-                Vector3 worldCenter = segmentCollider.transform.TransformPoint(segmentCollider.center);
-                Vector3 worldHalfExtents = Vector3.Scale(segmentCollider.size * 0.5f, segmentCollider.transform.lossyScale);
-                Quaternion worldRotation = segmentCollider.transform.rotation;
-                Debug.Log("Segment collider: " + segmentCollider);
-                Debug.Log("Segment collider bounds: " + segmentCollider.bounds);
-                Debug.Log("Segment collider rotation: " + segmentCollider.transform.rotation);
-
-
-                //check for overlapping enemy colliders
-                Collider[] cols = Physics.OverlapBox(
-                    worldCenter,
-                    worldHalfExtents,
-                    worldRotation
-                    //LayerMask.GetMask("Enemy")
-                );
-
-                Debug.Log("Found " + cols.Length + " colliders in segment " + (seg + 1));
-                for (int i = 0; i < cols.Length; i++)
+                Debug.Log("Checking segment " + (seg + 1) + " of " + beamSegments.Length + ": " + beamSegments[seg]);
+                if (beamSegments[seg] != null)
                 {
-                    Debug.Log(i + ": " + cols[i].gameObject.name);
-                    if (cols[i].gameObject.tag == "Enemy" && !SS.CheckIgnoredTargets(cols[i].gameObject) && !HasAlreadyHitTarget(cols[i].gameObject))
+                    BoxCollider segmentCollider = beamSegments[seg].GetComponent<BoxCollider>();
+                    Vector3 worldCenter = segmentCollider.transform.TransformPoint(segmentCollider.center);
+                    Vector3 worldHalfExtents = Vector3.Scale(segmentCollider.size * 0.5f, segmentCollider.transform.lossyScale);
+                    Quaternion worldRotation = segmentCollider.transform.rotation;
+                    Debug.Log("Segment collider: " + segmentCollider);
+                    Debug.Log("Segment collider bounds: " + segmentCollider.bounds);
+                    Debug.Log("Segment collider rotation: " + segmentCollider.transform.rotation);
+
+
+                    //check for overlapping enemy colliders
+                    Collider[] cols = Physics.OverlapBox(
+                        worldCenter,
+                        worldHalfExtents,
+                        worldRotation,
+                        LayerMask.GetMask("Enemy")
+                    );
+
+                    Debug.Log("Found " + cols.Length + " colliders in segment " + (seg + 1));
+                    for (int i = 0; i < cols.Length; i++)
                     {
-                        Debug.Log("Found target: " + cols[i].gameObject.name);
-                        //increase targets array and add the enemy
-                        GameObject[] tempTargets = new GameObject[targets.Length + 1];
-                        for (int j = 0; j < targets.Length; j++) { tempTargets[j] = targets[j]; }
-                        tempTargets[tempTargets.Length - 1] = cols[i].gameObject;
-                        targets = tempTargets;
+                        Debug.Log(i + ": " + cols[i].gameObject.name);
+                        if (cols[i].gameObject.tag == "Enemy" && !SS.CheckIgnoredTargets(cols[i].gameObject) && !HasAlreadyHitTarget(cols[i].gameObject))
+                        {
+                            Debug.Log("Found target: " + cols[i].gameObject.name);
+                            //increase targets array and add the enemy
+                            GameObject[] tempTargets = new GameObject[targets.Length + 1];
+                            for (int j = 0; j < targets.Length; j++) { tempTargets[j] = targets[j]; }
+                            tempTargets[tempTargets.Length - 1] = cols[i].gameObject;
+                            targets = tempTargets;
+                        }
                     }
                 }
             }

@@ -22,11 +22,11 @@ public class ElementFire : AbstractElement
         //Debug.Log("Fire element condition");
 
         GameObject[] targets = SS.GetSpellTargets();
-        //for (int i = 0; i < targets.Length; i++) { Debug.Log("Element target" + i + ": " + targets[i]); }
+        for (int i = 0; i < targets.Length; i++) { Debug.Log("Element target" + i + ": " + targets[i]); }
 
-        if (targets != null)
+        for (int i = 0; i < targets.Length; i++)
         {
-            for (int i = 0; i < targets.Length; i++)
+            if (targets[i] != null)
             {
                 //Debug.Log("Element target" + i + ": " + targets[i]);
 
