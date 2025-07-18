@@ -97,6 +97,9 @@ public class ShapeBeam : AbstractShape
         if (!segmentsCreated) { CreateBeamSegments(); }
         if (!castable && casting) //while the beam is being cast, before ending
         {
+            //update spell with component impact
+            if (effectScript.componentWeight == 2) { effectScript.ApplyEffect(); } //if effect weight is 2, apply effect during cast
+
             if (SS.GetEffectName().Contains("Homing"))
             {
                 //if effect homing, update end position with found target
