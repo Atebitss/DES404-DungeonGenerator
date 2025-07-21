@@ -318,8 +318,54 @@ public class SpellScript : MonoBehaviour
     public void EndSpell()
     {
         Debug.Log("SpellScript end spell");
+        if (effectScript.componentWeight == 3) { effectScript.ApplyEffect(); }
+        FindTargets();
+        DealDamage();
 
-        targets = shapeScript.FindShapeTargets();
+        if (spellPersist && shapeName.Contains("Ball")) { CastSpell(); }
+        else if (!spellPersist) { DestroySpell(); }
+    }
+
+    private void FindTargets()
+    {
+        targets = shapeScript.FindShapeTargets(); //find targets found in shape
+
+        if (effectName.Contains("Link")) //if the spell has effect link
+        {
+            //add the linked enemies to the target array
+            GameObject[] linkedTargets = PC.GetLinkedEnemies();
+            Debug.Log("linked targets length: " + linkedTargets.Length);
+
+            //for each linked target
+            for (int i = 0; i < linkedTargets.Length; i++)
+            {
+                if (linkedTargets[i] != null)
+                {
+                    //check if it is already in the targets array
+                    bool alreadyInArray = false;
+                    for (int j = 0; j < targets.Length; j++)
+                    {
+                        if (targets[j] == linkedTargets[i])
+                        {
+                            alreadyInArray = true;
+                            break;
+                        }
+                    }
+
+                    //if not in the array, add it
+                    if (!alreadyInArray)
+                    {
+                        Debug.Log("SpellScript adding linked enemy: " + linkedTargets[i].name);
+                        GameObject[] newTargets = new GameObject[targets.Length + 1];
+                        for (int target = 0; target < targets.Length; target++) { newTargets[target] = targets[target]; }
+                        newTargets[newTargets.Length - 1] = linkedTargets[i];
+                        targets = newTargets;
+                    }
+                }
+            }
+        }
+
+        //add hit targets scripts
         targetScripts = new AbstractEnemy[targets.Length];
         for (int i = 0; i < targets.Length; i++)
         {
@@ -329,17 +375,13 @@ public class SpellScript : MonoBehaviour
                 targetScripts[i] = targets[i].GetComponent<AbstractEnemy>();
             }
         }
-
-        if (effectScript.componentWeight == 3) { effectScript.ApplyEffect(); }
-        DealDamage();
-
-        if (spellPersist && shapeName.Contains("Ball")) { CastSpell(); }
-        else if (!spellPersist) { DestroySpell(); }
     }
 
     private void DealDamage()
     {
         Debug.Log("SpellScript deal dmg");
+
+        //track damage dealt to each target
         int[] damagesDealt = new int[targets.Length];
 
         damageCalc = spellPower;

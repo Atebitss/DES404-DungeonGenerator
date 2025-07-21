@@ -193,7 +193,7 @@ public class ShapeBeam : AbstractShape
 
     private void CreateBeamSegments()
     {
-        Debug.Log("Creating beam segments");
+        //Debug.Log("Creating beam segments");
 
         //destroy old segments if they exist
         for (int i = 0; i < beamSegments.Length; i++)
@@ -214,13 +214,10 @@ public class ShapeBeam : AbstractShape
             segmentCount--;
         }
 
-        Debug.Log("segmentCount: " + segmentCount);
+        //Debug.Log("segmentCount: " + segmentCount);
         beamSegments = new GameObject[segmentCount];
 
-        for (int i = 0; i < pathPoints.Length; i++)
-        {
-            Debug.Log("pathPoints[" + i + "]: " + pathPoints[i]);
-        }
+        //for (int i = 0; i < pathPoints.Length; i++) { Debug.Log("pathPoints[" + i + "]: " + pathPoints[i]); }
 
         //create individual segments
         for (int i = 0; i < segmentCount; i++)
@@ -264,8 +261,8 @@ public class ShapeBeam : AbstractShape
 
     public override GameObject[] FindShapeTargets()
     {
-        Debug.Log("ShapeBeam, FindShapeTargets");
-        Debug.Log("Beam segments length: " + beamSegments.Length);
+        //Debug.Log("ShapeBeam, FindShapeTargets");
+        //Debug.Log("Beam segments length: " + beamSegments.Length);
         targets = new GameObject[0];
 
         if (SS.GetEffectName().Contains("Explode"))
@@ -277,16 +274,16 @@ public class ShapeBeam : AbstractShape
         {
             for (int seg = 0; seg < beamSegments.Length; seg++)
             {
-                Debug.Log("Checking segment " + (seg + 1) + " of " + beamSegments.Length + ": " + beamSegments[seg]);
+                //Debug.Log("Checking segment " + (seg + 1) + " of " + beamSegments.Length + ": " + beamSegments[seg]);
                 if (beamSegments[seg] != null)
                 {
                     BoxCollider segmentCollider = beamSegments[seg].GetComponent<BoxCollider>();
                     Vector3 worldCenter = segmentCollider.transform.TransformPoint(segmentCollider.center);
                     Vector3 worldHalfExtents = Vector3.Scale(segmentCollider.size * 0.5f, segmentCollider.transform.lossyScale);
                     Quaternion worldRotation = segmentCollider.transform.rotation;
-                    Debug.Log("Segment collider: " + segmentCollider);
-                    Debug.Log("Segment collider bounds: " + segmentCollider.bounds);
-                    Debug.Log("Segment collider rotation: " + segmentCollider.transform.rotation);
+                    //Debug.Log("Segment collider: " + segmentCollider);
+                    //Debug.Log("Segment collider bounds: " + segmentCollider.bounds);
+                    //Debug.Log("Segment collider rotation: " + segmentCollider.transform.rotation);
 
 
                     //check for overlapping enemy colliders
@@ -297,13 +294,13 @@ public class ShapeBeam : AbstractShape
                         LayerMask.GetMask("Enemy")
                     );
 
-                    Debug.Log("Found " + cols.Length + " colliders in segment " + (seg + 1));
+                    //Debug.Log("Found " + cols.Length + " colliders in segment " + (seg + 1));
                     for (int i = 0; i < cols.Length; i++)
                     {
-                        Debug.Log(i + ": " + cols[i].gameObject.name);
+                        //Debug.Log(i + ": " + cols[i].gameObject.name);
                         if (cols[i].gameObject.tag == "Enemy" && !SS.CheckIgnoredTargets(cols[i].gameObject) && !HasAlreadyHitTarget(cols[i].gameObject))
                         {
-                            Debug.Log("Found target: " + cols[i].gameObject.name);
+                            //Debug.Log("Found target: " + cols[i].gameObject.name);
                             //increase targets array and add the enemy
                             GameObject[] tempTargets = new GameObject[targets.Length + 1];
                             for (int j = 0; j < targets.Length; j++) { tempTargets[j] = targets[j]; }
@@ -315,7 +312,7 @@ public class ShapeBeam : AbstractShape
             }
         }
 
-        Debug.Log("Shape Beam, found " + targets.Length + " targets");
+        //Debug.Log("Shape Beam, found " + targets.Length + " targets");
         return targets;
     }
 

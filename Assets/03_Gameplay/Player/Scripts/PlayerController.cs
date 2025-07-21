@@ -664,7 +664,7 @@ public class PlayerController : MonoBehaviour
         //check if enemy is already linked
         for (int i = 0; i < linkedEnemies.Length; i++) { if (linkedEnemies[i] == enemy) { return; } }
 
-        //Debug.Log("linking " + enemy.name);
+        Debug.Log("linking " + enemy.name);
 
         //if not, add it to array
         GameObject[] newLinkedEnemies = new GameObject[linkedEnemies.Length + 1];
@@ -768,7 +768,7 @@ public class PlayerController : MonoBehaviour
 
             //testing
             shapeName = "Beam";
-            effectName = "Grow";
+            effectName = "Link";
             elementName = "Fire";
 
 
