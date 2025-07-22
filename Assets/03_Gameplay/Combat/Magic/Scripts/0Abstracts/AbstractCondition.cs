@@ -9,6 +9,7 @@ public abstract class AbstractCondition : MonoBehaviour
 
     //spell info
     public AbstractEnemy targetScript;
+    public StatusVisualManager targetStatusDisplay;
     public abstract void ApplyCondition();
     public void AlterConditionTime(int change) { duration += change; }
     public void EndCondition() { Destroy(this); }

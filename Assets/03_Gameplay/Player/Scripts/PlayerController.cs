@@ -622,7 +622,7 @@ public class PlayerController : MonoBehaviour
 
         for(int i = 0; i < linkedEnemies.Length; i++)
         {
-            if(linkedEnemies[i] != curEnemy)
+            if(linkedEnemies[i] != curEnemy && linkedEnemies[i] != null)
             {
                 linkedEnemies[i].GetComponent<AbstractEnemy>().DamageTarget(attackDamage, ""); //deal damage to linked enemies
             }
@@ -662,7 +662,7 @@ public class PlayerController : MonoBehaviour
     public void AddLinkedEnemy(GameObject enemy)
     {
         //check if enemy is already linked
-        for (int i = 0; i < linkedEnemies.Length; i++) { if (linkedEnemies[i] == enemy) { return; } }
+        for (int i = 0; i < linkedEnemies.Length; i++) { if (linkedEnemies[i] == enemy) { Debug.Log("enemy already linked"); return; } }
 
         Debug.Log("linking " + enemy.name);
 
@@ -671,6 +671,19 @@ public class PlayerController : MonoBehaviour
         for (int i = 0; i < linkedEnemies.Length; i++) { newLinkedEnemies[i] = linkedEnemies[i]; }
         newLinkedEnemies[linkedEnemies.Length] = enemy;
         linkedEnemies = newLinkedEnemies;
+
+        StartCoroutine("UnlinkEnemy", enemy);
+    }
+    private IEnumerator UnlinkEnemy(GameObject enemy)
+    {
+        yield return new WaitForSeconds(30f); //wait 30 seconds before unlinking enemy
+        for (int i = 0; i < linkedEnemies.Length; i++)
+        {
+            if (linkedEnemies[i] == enemy)
+            {
+                RemoveLinkedEnemy(enemy);
+            }
+        }
     }
     public void RemoveLinkedEnemy(GameObject enemy)
     {
@@ -769,7 +782,7 @@ public class PlayerController : MonoBehaviour
             //testing
             shapeName = "Beam";
             effectName = "Link";
-            elementName = "Fire";
+            elementName = "Null";
 
 
             //update spell references
@@ -777,18 +790,7 @@ public class PlayerController : MonoBehaviour
             curSpell.UpdateSpellScriptEffect(effectName);
             curSpell.UpdateSpellScriptElement(elementName);
 
-            //update shape spell references
-            curSpell.GetShapeScript().effectScript = curSpell.GetEffectScript();
-            curSpell.GetShapeScript().elementScript = curSpell.GetElementScript();
-            
-            //update effect spell references
-            curSpell.GetEffectScript().shapeScript = curSpell.GetShapeScript();
-            curSpell.GetEffectScript().elementScript = curSpell.GetElementScript();
-
-            //update element spell references
-            curSpell.GetElementScript().shapeScript = curSpell.GetShapeScript();
-            curSpell.GetElementScript().effectScript = curSpell.GetEffectScript();
-
+            curSpell.UpdateComponentRefs(); //update spell components with other component references
 
             ADM.SetSpellStrength(spellStrength); //update adaptive difficulty
             spellCooldownMax = curSpell.GetSpellCooldownMax(); //update spell cooldown max

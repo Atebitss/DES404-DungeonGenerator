@@ -14,7 +14,6 @@ public class EffectHoming : AbstractEffect
             Debug.Log("Homing effect applied");
             //on initial call, find closest target to aim position
             targets[0] = FindClosestEnemyToPos(SS.GetEndPos());
-            Debug.Log("Homing effect target found: " + targets[0].name + " @ " + targets[0].transform.position);
         }
     }
 
@@ -41,7 +40,7 @@ public class EffectHoming : AbstractEffect
             }
         }
 
-        if (closestEnemy != null) { Debug.Log("Homing effect target: " + closestEnemy.name); }
+        if (closestEnemy != null) { Debug.Log("Homing effect target found: " + closestEnemy.name + " @ " + closestEnemy.transform.position); }
         return closestEnemy;
     }
 }

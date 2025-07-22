@@ -17,10 +17,12 @@ public class ConditionSoaked : AbstractCondition
         //add dripping animation
 
         targetScript = this.GetComponent<AbstractEnemy>();
+        targetStatusDisplay = this.GetComponent<StatusVisualManager>();
 
         //set enemy colour
         Material elementMaterial = Resources.Load<Material>("Materials/Spells/ElementWaterMaterial");
         targetScript.SetMaterial(elementMaterial);
+        targetStatusDisplay.ApplyVisual("Soaked", duration);
 
         duration = 60;
         curDuration = 0;

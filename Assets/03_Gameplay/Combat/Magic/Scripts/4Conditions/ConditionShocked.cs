@@ -17,12 +17,14 @@ public class ConditionShocked : AbstractCondition
         //add shock animation
 
         targetScript = this.GetComponent<AbstractEnemy>();
+        targetStatusDisplay = this.GetComponent<StatusVisualManager>();
 
         //set enemy colour
         Material elementMaterial = Resources.Load<Material>("Materials/Spells/ElementElectricMaterial");
         targetScript.SetMaterial(elementMaterial);
+        targetStatusDisplay.ApplyVisual("Shocked", duration);
 
-        duration = 2;
+        duration = 1;
         curDuration = 0;
 
         if (this.gameObject.GetComponent<ConditionSoaked>()) { /*Debug.Log(targetScript.gameObject.name + " already soaked, extra electric damage");*/ targetScript.DamageTarget(10, "electric"); }

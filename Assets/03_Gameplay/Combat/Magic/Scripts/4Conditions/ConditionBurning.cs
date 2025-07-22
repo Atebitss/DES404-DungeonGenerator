@@ -18,14 +18,16 @@ public class ConditionBurning : AbstractCondition
         //Debug.Log("Burning condition applied to " + this.gameObject.name);
         //add burning animation
 
-        targetScript = this.GetComponent<AbstractEnemy>();
-
-        //set enemy colour
-        Material elementMaterial = Resources.Load<Material>("Materials/Spells/ElementFireMaterial");
-        targetScript.SetMaterial(elementMaterial);
-
         duration = 5;
         curDuration = 0;
+
+        targetScript = this.GetComponent<AbstractEnemy>();
+        targetStatusDisplay = this.GetComponent<StatusVisualManager>();
+
+        //set enemy colour & icon display
+        Material elementMaterial = Resources.Load<Material>("Materials/Spells/ElementFireMaterial");
+        targetScript.SetMaterial(elementMaterial);
+        targetStatusDisplay.ApplyVisual("Burning", duration);
     }
 
 

@@ -33,11 +33,6 @@ public class EffectSplit : AbstractEffect
                 GameObject splitSpell = Instantiate(Resources.Load<GameObject>("SpellParent"), currentPos, Quaternion.identity);
                 SpellScript splitSS = splitSpell.transform.GetChild(0).GetComponent<SpellScript>().StartSpellScript(SS.GetASM());
 
-                splitSS.SetIgnoredTargets(SS.GetHitTargets()); //copy ignored targets
-                for (int j = 0; j < SS.GetHitTargets().Length; j++)
-                {
-                    Debug.Log("Split spell ignored target: " + SS.GetHitTargets()[j].name);
-                }
                 splitSS.SetSpellPower(Mathf.RoundToInt(SS.GetSpellPower() / 2)); //reduce spell power
 
                 //copy original spell components
@@ -66,8 +61,17 @@ public class EffectSplit : AbstractEffect
                     splitShapeScript.castable = true;
                 }
 
+                //set spell start & end
                 splitSS.SetStartPos(startPos);
                 splitSS.SetEndPos(endPos);
+
+                splitSS.SetIgnoredTargets(shapeScript.targets); //add hit targets to ignore list
+                for (int j = 0; j < SS.GetHitTargets().Length; j++)
+                {
+                    Debug.Log("Split spell ignored target: " + SS.GetHitTargets()[j].name);
+                }
+
+                splitSS.UpdateComponentRefs(); //update component references
 
                 //setup spell
                 splitSS.CastSpell(); //cast the split spell

@@ -95,6 +95,10 @@ public class ShapeBall : AbstractShape
         {
             Debug.Log("Ball shape applied");
 
+            Debug.Log(SS);
+            Debug.Log(speedModifier);
+            Debug.Log(effectScript);
+            Debug.Log(elementScript);
             speed = SS.GetSpeed();
             speed *= speedModifier;
             speed *= effectScript.speedModifier;

@@ -13,11 +13,13 @@ public class ConditionForced : AbstractCondition
         //Debug.Log("Force condition applied to " + this.gameObject.name);
 
         targetScript = this.GetComponent<AbstractEnemy>();
+        targetStatusDisplay = this.GetComponent<StatusVisualManager>();
         targetScript.SetIsActive(false);
 
         //set enemy colour
         Material elementMaterial = Resources.Load<Material>("Materials/Spells/ElementForceMaterial");
         targetScript.SetMaterial(elementMaterial);
+        targetStatusDisplay.ApplyVisual("Forced", duration);
         spellStartTime = Time.time;
         StartCoroutine(MoveToTarget());
     }

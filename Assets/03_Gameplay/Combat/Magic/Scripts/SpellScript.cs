@@ -268,6 +268,22 @@ public class SpellScript : MonoBehaviour
         }
     }
 
+
+    public void UpdateComponentRefs()
+    {
+        //update shape spell references
+        shapeScript.effectScript = effectScript;
+        shapeScript.elementScript = elementScript;
+
+        //update effect spell references
+        effectScript.shapeScript = shapeScript;
+        effectScript.elementScript = elementScript;
+
+        //update element spell references
+        elementScript.shapeScript = shapeScript;
+        elementScript.effectScript = effectScript;
+    }
+
     // ===============================================================
     // RUNTIME UPDATE & AIMING
     // ===============================================================
@@ -318,8 +334,8 @@ public class SpellScript : MonoBehaviour
     public void EndSpell()
     {
         Debug.Log("SpellScript end spell");
-        if (effectScript.componentWeight == 3) { effectScript.ApplyEffect(); }
         FindTargets();
+        if (effectScript.componentWeight == 3) { effectScript.ApplyEffect(); }
         DealDamage();
 
         if (spellPersist && shapeName.Contains("Ball")) { CastSpell(); }
