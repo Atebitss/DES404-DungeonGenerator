@@ -74,21 +74,24 @@ public class EnemyDetectionColliderNear : MonoBehaviour
         }
         if (col.gameObject.tag == "Repel" || col.gameObject.tag == "Compel")
         {
-            //remove other from array
-            GameObject[] tempOthersNear = new GameObject[othersNear.Length - 1]; //decrease array size
-            int tempIndex = 0;
-            for (int i = 0; i < othersNear.Length; i++) //copy old array except the other that left
+            if (othersNear.Length > 0)
             {
-                if (othersNear[i] != col.gameObject)
+                //remove other from array
+                GameObject[] tempOthersNear = new GameObject[othersNear.Length - 1]; //decrease array size
+                int tempIndex = 0;
+                for (int i = 0; i < othersNear.Length; i++) //copy old array except the other that left
                 {
-                    tempOthersNear[tempIndex] = othersNear[i];
-                    tempIndex++;
+                    if (othersNear[i] != col.gameObject)
+                    {
+                        tempOthersNear[tempIndex] = othersNear[i];
+                        tempIndex++;
+                    }
                 }
-            }
-            othersNear = tempOthersNear; //assign new array
-            otherCount--; //decrease other count
+                othersNear = tempOthersNear; //assign new array
+                otherCount--; //decrease other count
 
-            if (otherCount <= 0) { otherNear = false; }
+                if (otherCount <= 0) { otherNear = false; }
+            }
         }
     }
 }

@@ -81,7 +81,6 @@ public class SpellScript : MonoBehaviour
     // ===============================================================
     // COLLISION & TARGETING SYSTEM
     // ===============================================================
-    [SerializeField] private SphereCollider spellSphereCollider;
     [SerializeField] private GameObject lineMarkerPrefab;
     private GameObject[] triggerObjects;
     public GameObject[] GetTriggerObjects() { return triggerObjects; }

@@ -5,12 +5,11 @@ using UnityEngine;
 
 public class ShapeBeam : AbstractShape
 {
-    private GameObject[] beamSegments = new GameObject[0];
     private int segmentCount = 1, targetCheckCount = 0;
     private float width = 1f, length = 2f;
     private float maxRunTime = 10f;
     private bool casting = false, segmentsCreated = false;
-    private GameObject[] homingTargets = new GameObject[0];
+    private GameObject[] beamSegments = new GameObject[0];
 
     public override void StartShapeScript(SpellScript SS)
     {
@@ -169,12 +168,12 @@ public class ShapeBeam : AbstractShape
             Debug.Log("Checking for overlapping targets");
             SS.EndSpell();
             targetCheckCount++;
-            yield return new WaitForSeconds(checkInterval); //wait for 0.25 seconds
+            yield return new WaitForSeconds(checkInterval); //wait for x seconds
         }
     }
     private IEnumerator EndBeam()
     {
-        yield return new WaitForSeconds(maxRunTime); //wait for 1 second
+        yield return new WaitForSeconds(maxRunTime); //wait for y second
         Debug.Log("Ending beam shape");
 
         for (int i = 0; i < beamSegments.Length; i++)
@@ -252,6 +251,7 @@ public class ShapeBeam : AbstractShape
             //add collider
             BoxCollider curSegmentCollider = beamSegments[i].AddComponent<BoxCollider>(); //create new box collider for segment
             curSegmentCollider.isTrigger = true; //set collider as trigger to avoid physics interactions
+            this.GetComponent<SphereCollider>().center = new Vector3(0, 0, ((realSegLength * 3f) * 2f)); //set collider position to segment end
         }
 
         segmentsCreated = true;
