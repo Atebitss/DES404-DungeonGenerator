@@ -233,7 +233,7 @@ public class ShapeBeam : AbstractShape
             Vector3 segDir = (segEnd - segStart).normalized;
             float realSegLength = Vector3.Distance(segStart, segEnd);
             if (SS.GetEffectName().Contains("Homing") || SS.GetEffectName().Contains("Chain")) { realSegLength -= (realSegLength * 0.3f); } //reduce segment length by 33% to avoid overshooting
-            else if(SS.GetEffectName().Contains("Arc")) { realSegLength *= 2f; } //double segment length to fill gaps
+            else if(SS.GetEffectName().Contains("Arc") || SS.GetEffectName().Contains("Pierce")) { realSegLength *= 2f; } //double segment length to fill gaps
             //Debug.Log("Segment " + (i + 1) + " start: " + segStart + ", end: " + segEnd + ", length: " + realSegLength);
 
             //create segment parent

@@ -781,7 +781,7 @@ public class PlayerController : MonoBehaviour
 
             //testing
             shapeName = "Beam";
-            effectName = "Multicast";
+            effectName = "Pierce";
             elementName = "Null";
 
 
