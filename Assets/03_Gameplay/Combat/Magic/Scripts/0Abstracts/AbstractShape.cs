@@ -58,6 +58,7 @@ public abstract class AbstractShape : MonoBehaviour
     public float GetJourneyLength() { return journeyLength; }
     public float startTime;
     public float GetStartTime() { return startTime; }
+    public float checkInterval = 1f;
 
 
     //targetting

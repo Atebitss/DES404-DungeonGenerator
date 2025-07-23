@@ -8,7 +8,7 @@ public class ShapeBeam : AbstractShape
     private GameObject[] beamSegments = new GameObject[0];
     private int segmentCount = 1, targetCheckCount = 0;
     private float width = 1f, length = 2f;
-    private float maxRunTime = 10f, checkInterval = 1f;
+    private float maxRunTime = 10f;
     private bool casting = false, segmentsCreated = false;
     private GameObject[] homingTargets = new GameObject[0];
 

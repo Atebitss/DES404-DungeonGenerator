@@ -19,7 +19,7 @@ public class StatusVisualManager : MonoBehaviour
     {
         Debug.Log("StatusVisualManager, applying status visual: " + statusType + " for " + statusTime + " seconds");
 
-        //~~~~~   ADD CHECK TO AVOID DUPLICATE VISUALS   ~~~~~~//
+                                 //~~~~~   ADD CHECK TO AVOID DUPLICATE VISUALS   ~~~~~~//
 
         //determine which status image to use
         Sprite statusImage = null;
@@ -68,6 +68,7 @@ public class StatusVisualManager : MonoBehaviour
         curSV.transform.GetChild(2).GetComponent<Image>().sprite = statusImage;
 
         //set the position of the visual based on the number of visuals
+                                                                            //~~~~~ RECALCULATE SPAWN OFFSET ~~~~~//
         if (spawnOffset == 0) { spawnOffset = (curSV.GetComponent<RectTransform>().rect.width + 10f); }
         curSV.transform.localPosition = new Vector3((spawnOffset * (statusVisuals.Length - 1)), 0, 0);
 

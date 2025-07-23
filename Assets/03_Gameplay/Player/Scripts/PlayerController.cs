@@ -781,7 +781,7 @@ public class PlayerController : MonoBehaviour
 
             //testing
             shapeName = "Beam";
-            effectName = "Link";
+            effectName = "Multicast";
             elementName = "Null";
 
 
@@ -834,7 +834,7 @@ public class PlayerController : MonoBehaviour
                 {
                     //Debug.Log("PlayerController, spell casted");
 
-                    if (effectName.Contains("Multicast"))
+                    if (shapeName.Contains("Ball") && effectName.Contains("Multicast"))
                     {
                         StartCoroutine(Multicast());
                     }
