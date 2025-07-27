@@ -6,7 +6,7 @@ public class EffectArc : AbstractEffect
 {
     public override void StartEffectScript(SpellScript SS)
     { 
-        componentWeight = 0; damageModifier = 1f; speedModifier = 1f; radiusModifier = 1f; cooldownModifier = .1f;
+        componentWeight = 0; damageModifier = 1f; speedModifier = 1f; radiusModifier = 1f; cooldownModifier = 1f;
         this.SS = SS;
         elementScript = SS.GetElementScript();   //get the element script for this spell
         shapeScript = SS.GetShapeScript();   //get the shape script for this spell

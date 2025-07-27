@@ -52,27 +52,30 @@ public class ShapeBeam : AbstractShape
     //runs when shape is added to spell
     public override void AimSpell()
     {
-        //Debug.Log("Beam shape aim spell");
-        //for (int i = 0; i < pathPoints.Length; i++) { Debug.Log("pathPoints[" + i + "]: " + pathPoints[i]); }
-        Vector3 startPos = this.transform.position;
-        Vector3 aimPos = GetAimedWorldPos();
-        Vector3 dir = (aimPos - startPos).normalized;
-        Vector3 endPos = (startPos + (dir * length));
-
-        transform.position = startPos;
-        transform.rotation = Quaternion.LookRotation(dir);
-
-        if (aimingLine != null)
+        if (active)
         {
-            aimingLine.SetPosition(0, startPos);
-            aimingLine.SetPosition(1, endPos);
+            //Debug.Log("Beam shape aim spell");
+            //for (int i = 0; i < pathPoints.Length; i++) { Debug.Log("pathPoints[" + i + "]: " + pathPoints[i]); }
+            startPos = this.transform.position;
+            aimPos = GetAimedWorldPos();
+            dir = (aimPos - startPos).normalized;
+            endPos = (startPos + (dir * length));
+
+            transform.position = startPos;
+            transform.rotation = Quaternion.LookRotation(dir);
+
+            if (aimingLine != null)
+            {
+                aimingLine.SetPosition(0, startPos);
+                aimingLine.SetPosition(1, endPos);
+            }
+
+            pathPoints[0] = startPos;
+            pathPoints[1] = endPos;
+
+            SS.SetStartPos(pathPoints[0]);
+            SS.SetEndPos(pathPoints[1]);
         }
-
-        pathPoints[0] = startPos;
-        pathPoints[1] = endPos;
-
-        SS.SetStartPos(pathPoints[0]);
-        SS.SetEndPos(pathPoints[1]);
     }
 
     public override void UpdateAimPath(Vector3[] addPoints)
@@ -105,7 +108,7 @@ public class ShapeBeam : AbstractShape
                 if (effectScript.targets[0] != null)
                 {
                     pathPoints[pathPoints.Length - 1] = effectScript.targets[0].transform.position;
-                    segmentsCreated = false; //reset segments created flag to false so segments will be recreated next update
+                    segmentsCreated = false; //reset segments created flag so segments will be recreated next update
                 }
                 else
                 {
@@ -118,7 +121,16 @@ public class ShapeBeam : AbstractShape
             {
                 if (effectScript.maxTargets > 0)
                 {
-                    Vector3[] newPath = new Vector3[(effectScript.maxTargets + 1)];
+                    int validTargetCount = 0;
+                    for (int i = 0; i < effectScript.maxTargets; i++)
+                    {
+                        if (effectScript.targets[i] != null)
+                        {
+                            validTargetCount++;
+                        }
+                    }
+
+                    Vector3[] newPath = new Vector3[(validTargetCount + 1)];
                     newPath[0] = pathPoints[0]; //set first point to start position
 
                     //update subsequent points with target positions
@@ -226,11 +238,17 @@ public class ShapeBeam : AbstractShape
             //skip first segment if effect is chain and it's not the first target check
             if (SS.GetEffectName().Contains("Chain") && i == 0 && targetCheckCount > 1) { i++; }
 
+            if (i + 1 >= pathPoints.Length)
+            {
+                //Debug.Log("Segment index out of bounds: " + (i + 1) + " >= " + pathPoints.Length);
+                break;
+            }
+
             //calculate position
             Vector3 segStart = pathPoints[i];
             Vector3 segEnd = pathPoints[i + 1];
             Vector3 segDir = (segEnd - segStart).normalized;
-            float realSegLength = Vector3.Distance(segStart, segEnd);
+            realSegLength = Vector3.Distance(segStart, segEnd);
             if (SS.GetEffectName().Contains("Homing") || SS.GetEffectName().Contains("Chain")) { realSegLength -= (realSegLength * 0.3f); } //reduce segment length by 33% to avoid overshooting
             else if(SS.GetEffectName().Contains("Arc") || SS.GetEffectName().Contains("Pierce")) { realSegLength *= 2f; } //double segment length to fill gaps
             //Debug.Log("Segment " + (i + 1) + " start: " + segStart + ", end: " + segEnd + ", length: " + realSegLength);

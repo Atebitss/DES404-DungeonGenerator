@@ -4,7 +4,7 @@ public class EffectGrow : AbstractEffect
 {
     public override void StartEffectScript(SpellScript SS)
     {
-        componentWeight = 2; damageModifier = 1f; speedModifier = 1f; radiusModifier = 1f; cooldownModifier = .1f;
+        componentWeight = 2; damageModifier = 1f; speedModifier = 1f; radiusModifier = 1f; cooldownModifier = 1f;
         this.SS = SS;
 
         damageIncrement = damageModifier * 0.01f; // 10% of current damage modifier

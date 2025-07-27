@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class ShapeBall : AbstractShape
 {
@@ -47,15 +48,19 @@ public class ShapeBall : AbstractShape
     //runs when shape is added to spell
     public override void AimSpell()
     {
-        Vector3 playerPos = this.transform.position;
-        Vector3 aimPos = GetAimedWorldPos();
+        startPos = this.transform.position;
+        aimPos = GetAimedWorldPos();
+        dir = (aimPos - startPos).normalized;
+        endPos = aimPos;
 
-        aimingLine.SetPosition(0, playerPos);
+        aimingLine.SetPosition(0, startPos);
         aimingLine.SetPosition(1, aimPos);
 
-        pathPoints[0] = playerPos;
-        pathPoints[1] = aimPos;
-        //Debug.Log("spellaimtransformposition: " + spellAim[0].transform.position);
+        pathPoints[0] = startPos;
+        pathPoints[1] = endPos;
+
+        SS.SetStartPos(pathPoints[0]);
+        SS.SetEndPos(pathPoints[1]);
     }
 
     public override void UpdateAimPath(Vector3[] addPoints)
@@ -83,7 +88,7 @@ public class ShapeBall : AbstractShape
         //if spell is being aimed, update first line renderer point with player position
         if (firstPointConfirmed && !lastPointConfirmed)
         {
-            if (!castable && aimPos != Vector3.zero) { castable = true; }
+            if (!castable && endPos != Vector3.zero) { castable = true; }
             //Debug.Log("aiming line set to: " + this.transform.position);
         }
     }

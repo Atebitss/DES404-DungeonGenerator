@@ -10,7 +10,7 @@ public abstract class AbstractShape : MonoBehaviour
     //will be overridden by concrete shape classes
     //spell vars
     public float damageModifier, speedModifier, radiusModifier, cooldownModifier;
-    public float speed = 1f, maxLength = 10f;
+    public float speed = 1f, maxLength = 10f, realSegLength = 0f;
 
     //spell shape
     public Mesh shapeMesh;
@@ -19,7 +19,7 @@ public abstract class AbstractShape : MonoBehaviour
     //public void SetSpellRadius(float newRadius) { spellRadius = newRadius; }
 
     //spell info
-    public bool castable = false, delayed = false, spellEnded = false;
+    public bool castable = false, delayed = false, spellEnded = false, active = true;
     public bool GetSpellCastable() { return castable; }
     public bool GetSpellDelayed() { return delayed; }
     public SpellScript SS;

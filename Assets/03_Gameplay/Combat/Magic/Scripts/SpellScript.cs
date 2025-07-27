@@ -41,6 +41,7 @@ public class SpellScript : MonoBehaviour
 
     private bool casted = false;
     public bool GetCasted() { return casted; }
+    public void SetCasted(bool casted) { this.casted = casted; }
 
     private bool spellActive = false;
     public bool GetSpellActive() { return spellActive; }

@@ -1564,14 +1564,14 @@ public class DungeonGeneration : MonoBehaviour
                     {
                         //Debug.Log("Dungeon Generation, assigning large room: " + roomID);
                         bool valid = false;
-                        int inc = 0;
+                        int sign = 0;
                         int[] curValidRoomIDs = FindThresholdRooms(scale, roomID); //find valid room types
                         int index = Random.Range(0, curValidRoomIDs.Length); //random ID between 0 and max valid types
                         int roomTypeID = curValidRoomIDs[index]; //find random room type
                         int tryCount = 0; //track number of tries
                         //Debug.Log("Dungeon Generation, large roomTypeID: " + curValidRoomIDs[index]);
 
-                        while (inc == 0) { inc = Random.Range(-1, 1); } //choose to check up or down first
+                        while (sign == 0) { sign = Random.Range(-1, 2); } //choose to check up or down first
 
                         while (!valid && tryCount < 3) //while room invalid
                         {
@@ -1584,17 +1584,17 @@ public class DungeonGeneration : MonoBehaviour
                             else if (!valid) //find unused room type, then loop
                             {
                                 //Debug.Log("Dungeon Generation, large room not valid");
-                                if (inc == 1 && index >= curValidRoomIDs.Length) //wrap around if exceeding array length
+                                if (sign == 1 && index >= curValidRoomIDs.Length) //wrap around if exceeding array length
                                 {
                                     index = 0;
                                 }
-                                else if (inc == -1 && index <= 0) //wrap around if exceeding array length
+                                else if (sign == -1 && index <= 0) //wrap around if exceeding array length
                                 {
                                     index = (curValidRoomIDs.Length - 1);
                                 }
                                 else //increment to find the next room type
                                 {
-                                    index += inc;
+                                    index += sign;
                                 }
 
                                 //Debug.Log("Dungeon Generation, large roomType: " + index + " / " + curValidRoomIDs.Length);
@@ -1644,14 +1644,14 @@ public class DungeonGeneration : MonoBehaviour
                         //Debug.Log((roomID - largeRoomNum) + "/" + usedTypeMediumIDs.Length);
                         //select random room
                         bool valid = false;
-                        int inc = 0;
+                        int sign = 0;
                         int[] curValidRoomIDs = FindThresholdRooms(scale, roomID); //find valid medium rooms
                         int index = Random.Range(0, curValidRoomIDs.Length); //random number between 0 and max valid rooms
                         int roomTypeID = curValidRoomIDs[index]; //find random room type
                         int tryCount = 0; //track number of tries
                         //Debug.Log("Dungeon Generation, medium roomTypeID: " + curValidRoomIDs[index]);
 
-                        while (inc == 0) { inc = Random.Range(-1, 1); } //decide whether to look up or down
+                        while (sign == 0) { sign = Random.Range(-1, 2); } //decide whether to look up or down
 
                         if (roomStates[roomID] == "Special")
                         {
@@ -1670,12 +1670,12 @@ public class DungeonGeneration : MonoBehaviour
                                 if (valid) { break; }
                                 else if (!valid) //find unused room type, then loop
                                 {
-                                    roomTypeID += inc; //increment to find the next room type
-                                    if (inc == 1 && roomTypeID >= specialRoomType.Length)
+                                    roomTypeID += sign; //increment to find the next room type
+                                    if (sign == 1 && roomTypeID >= specialRoomType.Length)
                                     {
                                         roomTypeID = 0; //wrap around if exceeding array length
                                     }
-                                    else if (inc == -1 && roomTypeID <= 0)
+                                    else if (sign == -1 && roomTypeID <= 0)
                                     {
                                         roomTypeID = (specialRoomType.Length - 1);
                                     }
@@ -1726,17 +1726,17 @@ public class DungeonGeneration : MonoBehaviour
                                 else if (!valid) //find unused room type, then loop
                                 {
                                     //Debug.Log(index + "/" + curValidRoomIDs.Length);
-                                    if (inc == 1 && index >= curValidRoomIDs.Length) //wrap around if exceeding array length
+                                    if (sign == 1 && index >= curValidRoomIDs.Length) //wrap around if exceeding array length
                                     {
                                         index = 0;
                                     }
-                                    else if (inc == -1 && index <= 0) //wrap around if exceeding array length
+                                    else if (sign == -1 && index <= 0) //wrap around if exceeding array length
                                     {
                                         index = (curValidRoomIDs.Length - 1);
                                     }
                                     else //increment to find the next room type
                                     {
-                                        index += inc;
+                                        index += sign;
                                     }
 
                                     //Debug.Log("Dungeon Generation, medium roomType: " + index + " / " + curValidRoomIDs.Length);
@@ -1779,11 +1779,11 @@ public class DungeonGeneration : MonoBehaviour
                         //Debug.Log("Dungeon Generation, assigning small room: " + roomID);
                         //Debug.Log((roomID - largeRoomNum - mediumRoomNum) + "/" + smallRoomNum);
                         bool valid = false;
-                        int inc = 0;
+                        int sign = 0;
                         int roomTypeID = 0;
                         int tryCount = 0;
 
-                        while (inc == 0) { inc = Random.Range(-1, 1); } //decide whether to look up or down
+                        while (sign == 0) { sign = Random.Range(-1, 2); } //decide whether to look up or down
 
                         if (roomStates[roomID] == "Special")
                         {
@@ -1800,13 +1800,13 @@ public class DungeonGeneration : MonoBehaviour
                                 if (valid) { break; } //if the room is valid, break the loop & move on to next room
                                 else if (!valid) //find unused room type, then loop
                                 {
-                                    roomTypeID += inc; //increment to find the next room type
-                                    if (inc == 1 && roomTypeID >= specialRoomType.Length)
+                                    roomTypeID += sign; //increment to find the next room type
+                                    if (sign == 1 && roomTypeID >= specialRoomType.Length)
                                     {
                                         //Debug.Log("roomTypeID = " + roomTypeID + ", looping");
                                         roomTypeID = 0; //wrap around if exceeding array length
                                     }
-                                    else if (inc == -1 && roomTypeID < 0)
+                                    else if (sign == -1 && roomTypeID < 0)
                                     {
                                         //Debug.Log("roomTypeID = " + roomTypeID + ", looping");
                                         roomTypeID = (specialRoomType.Length - 1);
@@ -1845,13 +1845,13 @@ public class DungeonGeneration : MonoBehaviour
                                 if (valid) { break; }
                                 else if (!valid) //find unused room type, then loop
                                 {
-                                    roomTypeID += inc; //increment to find the next room type
-                                    if (inc == 1 && roomTypeID >= treasureRoomType.Length)
+                                    roomTypeID += sign; //increment to find the next room type
+                                    if (sign == 1 && roomTypeID >= treasureRoomType.Length)
                                     {
                                         //Debug.Log("roomTypeID = " + roomTypeID + ", looping");
                                         roomTypeID = 0; //wrap around if exceeding array length
                                     }
-                                    else if (inc == -1 && roomTypeID < 0)
+                                    else if (sign == -1 && roomTypeID < 0)
                                     {
                                         //Debug.Log("roomTypeID = " + roomTypeID + ", looping");
                                         roomTypeID = (treasureRoomType.Length - 1);

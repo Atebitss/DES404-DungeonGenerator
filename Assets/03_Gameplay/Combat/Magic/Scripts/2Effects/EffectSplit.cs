@@ -22,8 +22,11 @@ public class EffectSplit : AbstractEffect
             //modify spell damage, size and radius by the number of spells created
             //send spells in random directions
             triggered = true; //ensure this effect only runs once per spell
-            Vector3 currentPos = this.transform.parent.position; // current position of the spell
-            int splitCount = Random.Range(splitMin, splitMax); //randomly choose how many spells to create
+            Vector3 currentPos = Vector3.zero; //current position of the spell
+            if (SS.GetShapeName().Contains("Ball")){ currentPos = this.transform.parent.position; }
+            else if (SS.GetShapeName().Contains("Beam") && shapeScript.targets[0] != null) { currentPos = shapeScript.targets[0].transform.position; }
+            else { currentPos = SS.GetStartPos(); } //default to start position
+            int splitCount = Random.Range(splitMin, splitMax); //randomly choose how many split spells to create
 
             //create x split projectiles
             for (int i = 0; i < splitCount; i++)
@@ -40,13 +43,37 @@ public class EffectSplit : AbstractEffect
                 splitSS.UpdateSpellScriptEffect("Null");
                 splitSS.UpdateSpellScriptElement(SS.GetElementName());
 
+                splitSS.GetShapeScript().active = false; //disable the shape script to prevent it from moving
+
                 //set random direction
-                Vector3 baseDirection = SS.GetShapeScript().GetDir(); //get origional direction
-                float randomAngleY = Random.Range(-45f, 45f); //random spread within 45 degrees
+                Vector3 baseDirection = shapeScript.GetDir(); //get origional direction
+                //Debug.Log("Base direction: " + baseDirection);
+
+                int sign = 0;
+                while(sign == 0) { sign = Random.Range(-1, 2); } //ensure sign is not zero
+
+                float randomAngleY = 0f;
+                if(sign == 1)
+                {
+                    randomAngleY = Random.Range(10f, 45f); //random spread within 35 degrees
+                }
+                else if (sign == -1)
+                {
+                    randomAngleY = Random.Range(-10f, -45f); //random spread within -35 degrees
+                }
+
+                Debug.Log("Random angle Y: " + randomAngleY);
                 Vector3 randomDirection = (Quaternion.Euler(0, randomAngleY, 0) * baseDirection);
 
                 Vector3 startPos = currentPos;
-                Vector3 endPos = (startPos + (randomDirection * 10f)); //10 unit range
+                Vector3 endPos = Vector3.zero;
+                if (SS.GetShapeName().Contains("Ball")) { endPos = (startPos + (randomDirection * 10f)); } //10 unit range
+                else if (SS.GetShapeName().Contains("Beam")) 
+                {
+                    endPos = (startPos + (randomDirection * shapeScript.realSegLength));
+                    splitSpell.transform.SetParent(shapeScript.targets[0].transform);
+                    SS.SetSpellPersist(false);
+                }
 
                 Vector3[] newTargetPoints = new Vector3[2];
                 newTargetPoints[0] = startPos;
