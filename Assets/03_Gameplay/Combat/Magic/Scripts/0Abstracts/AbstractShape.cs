@@ -19,7 +19,7 @@ public abstract class AbstractShape : MonoBehaviour
     //public void SetSpellRadius(float newRadius) { spellRadius = newRadius; }
 
     //spell info
-    public bool castable = false, delayed = false, spellEnded = false, active = true;
+    public bool castable = false, delayed = false, spellEnded = false, casting = false, active = true;
     public bool GetSpellCastable() { return castable; }
     public bool GetSpellDelayed() { return delayed; }
     public SpellScript SS;
@@ -59,6 +59,8 @@ public abstract class AbstractShape : MonoBehaviour
     public float startTime;
     public float GetStartTime() { return startTime; }
     public float checkInterval = 1f;
+    public float GetCheckInterval() { return checkInterval; }
+
 
 
     //targetting
@@ -95,7 +97,7 @@ public abstract class AbstractShape : MonoBehaviour
                 aimingMask = SS.GetPlayerController().GetAimLayerMask();
 
                 //if the spell has a x component, then ignore enemies
-                if (SS.GetEffectName().Contains("Pierce") || SS.GetShapeName().Contains("Beam")) { aimingMask = aimingMask & ~LayerMask.GetMask("Enemy"); }
+                if (SS.GetEffectName().Contains("Pierce") || SS.GetShapeName().Contains("Beam") || SS.GetShapeName().Contains("Field")) { aimingMask = aimingMask & ~LayerMask.GetMask("Enemy"); }
             }
 
             Ray cameraToWorld = mainCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
@@ -115,7 +117,7 @@ public abstract class AbstractShape : MonoBehaviour
     }
     public void EndAim() 
     {
-        /*Debug.Log("shape end aim");*/
+        Debug.Log("shape end aim");
         lastPointConfirmed = true;
         SS.SetStartPos(pathPoints[0]);
         SS.SetEndPos(pathPoints[pathPoints.Length - 1]);

@@ -70,7 +70,7 @@ public class SpellScript : MonoBehaviour
     private float radius = 1f;
     public float GetRadius() { return radius; }
 
-    private float maxLookLength = 1000f;
+    private float maxLookLength = 100f;
     public float GetMaxLookLength() { return maxLookLength; }
     public void SetMaxLookLength(float newMax) { maxLookLength = newMax; }
 
@@ -168,7 +168,7 @@ public class SpellScript : MonoBehaviour
         radius *= effectScript.radiusModifier;
         radius *= elementScript.radiusModifier;
         this.gameObject.transform.localScale = Vector3.one * radius;
-        //Debug.Log("SpellScript radius updated: " + radius);
+        Debug.Log("SpellScript radius updated: " + radius);
         //Debug.Log("shape rmod: " + shapeScript.radiusModifier + ", effect rmod: " + effectScript.radiusModifier + ", element rmod: " + elementScript.radiusModifier);
     }
 
@@ -301,7 +301,7 @@ public class SpellScript : MonoBehaviour
         if (shapeScript.castable && !casted)
         {
             Debug.Log("SpellScript cast spell, castable & not casted");
-            if (shapeName.Contains("Ball")) 
+            if (shapeName.Contains("Ball") || shapeName.Contains("Field")) 
             {
                 this.transform.parent.transform.SetParent(null);
                 shapeScript.EndAim();
@@ -346,49 +346,52 @@ public class SpellScript : MonoBehaviour
     {
         targets = shapeScript.FindShapeTargets(); //find targets found in shape
 
-        if (effectName.Contains("Link")) //if the spell has effect link
+        if (targets.Length > 0)
         {
-            //add the linked enemies to the target array
-            GameObject[] linkedTargets = PC.GetLinkedEnemies();
-            Debug.Log("linked targets length: " + linkedTargets.Length);
-
-            //for each linked target
-            for (int i = 0; i < linkedTargets.Length; i++)
+            if (effectName.Contains("Link")) //if the spell has effect link
             {
-                if (linkedTargets[i] != null)
-                {
-                    //check if it is already in the targets array
-                    bool alreadyInArray = false;
-                    for (int j = 0; j < targets.Length; j++)
-                    {
-                        if (targets[j] == linkedTargets[i])
-                        {
-                            alreadyInArray = true;
-                            break;
-                        }
-                    }
+                //add the linked enemies to the target array
+                GameObject[] linkedTargets = PC.GetLinkedEnemies();
+                Debug.Log("linked targets length: " + linkedTargets.Length);
 
-                    //if not in the array, add it
-                    if (!alreadyInArray)
+                //for each linked target
+                for (int i = 0; i < linkedTargets.Length; i++)
+                {
+                    if (linkedTargets[i] != null)
                     {
-                        Debug.Log("SpellScript adding linked enemy: " + linkedTargets[i].name);
-                        GameObject[] newTargets = new GameObject[targets.Length + 1];
-                        for (int target = 0; target < targets.Length; target++) { newTargets[target] = targets[target]; }
-                        newTargets[newTargets.Length - 1] = linkedTargets[i];
-                        targets = newTargets;
+                        //check if it is already in the targets array
+                        bool alreadyInArray = false;
+                        for (int j = 0; j < targets.Length; j++)
+                        {
+                            if (targets[j] == linkedTargets[i])
+                            {
+                                alreadyInArray = true;
+                                break;
+                            }
+                        }
+
+                        //if not in the array, add it
+                        if (!alreadyInArray)
+                        {
+                            Debug.Log("SpellScript adding linked enemy: " + linkedTargets[i].name);
+                            GameObject[] newTargets = new GameObject[targets.Length + 1];
+                            for (int target = 0; target < targets.Length; target++) { newTargets[target] = targets[target]; }
+                            newTargets[newTargets.Length - 1] = linkedTargets[i];
+                            targets = newTargets;
+                        }
                     }
                 }
             }
-        }
 
-        //add hit targets scripts
-        targetScripts = new AbstractEnemy[targets.Length];
-        for (int i = 0; i < targets.Length; i++)
-        {
-            if (targets[i] != null)
+            //add hit targets scripts
+            targetScripts = new AbstractEnemy[targets.Length];
+            for (int i = 0; i < targets.Length; i++)
             {
-                Debug.Log("SpellScript spell target " + i + ": " + targets[i]);
-                targetScripts[i] = targets[i].GetComponent<AbstractEnemy>();
+                if (targets[i] != null)
+                {
+                    Debug.Log("SpellScript spell target " + i + ": " + targets[i]);
+                    targetScripts[i] = targets[i].GetComponent<AbstractEnemy>();
+                }
             }
         }
     }

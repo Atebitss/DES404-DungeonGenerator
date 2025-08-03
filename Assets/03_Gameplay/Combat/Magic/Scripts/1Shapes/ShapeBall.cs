@@ -1,7 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UIElements;
+using System.Collections;
 
 public class ShapeBall : AbstractShape
 {
@@ -48,8 +46,14 @@ public class ShapeBall : AbstractShape
     //runs when shape is added to spell
     public override void AimSpell()
     {
+        //Debug.Log("Ball shape aim spell");
+        //set start pos as player pos
+        //set end pos as aimed world pos
+        //update vars & line renderer
+
         startPos = this.transform.position;
         aimPos = GetAimedWorldPos();
+        spellAim[0].transform.position = aimPos;
         dir = (aimPos - startPos).normalized;
         endPos = aimPos;
 
@@ -96,14 +100,12 @@ public class ShapeBall : AbstractShape
 
     public override void ApplyShape()
     {
+        //move ball from start to end position
+
         if (!delayed)
         {
             Debug.Log("Ball shape applied");
 
-            Debug.Log(SS);
-            Debug.Log(speedModifier);
-            Debug.Log(effectScript);
-            Debug.Log(elementScript);
             speed = SS.GetSpeed();
             speed *= speedModifier;
             speed *= effectScript.speedModifier;

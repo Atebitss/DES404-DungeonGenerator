@@ -1,14 +1,12 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
 using UnityEngine;
+using System.Collections;
 
 public class ShapeBeam : AbstractShape
 {
     private int segmentCount = 1, targetCheckCount = 0;
     private float width = 1f, length = 2f;
     private float maxRunTime = 10f;
-    private bool casting = false, segmentsCreated = false;
+    private bool segmentsCreated = false;
     private GameObject[] beamSegments = new GameObject[0];
 
     public override void StartShapeScript(SpellScript SS)
@@ -55,9 +53,13 @@ public class ShapeBeam : AbstractShape
         if (active)
         {
             //Debug.Log("Beam shape aim spell");
-            //for (int i = 0; i < pathPoints.Length; i++) { Debug.Log("pathPoints[" + i + "]: " + pathPoints[i]); }
+            //set start pos as player pos
+            //set end pos as aimed world pos
+            //update vars & line renderer
+
             startPos = this.transform.position;
             aimPos = GetAimedWorldPos();
+            spellAim[0].transform.position = aimPos;
             dir = (aimPos - startPos).normalized;
             endPos = (startPos + (dir * length));
 
@@ -161,11 +163,21 @@ public class ShapeBeam : AbstractShape
     //runs when spell is cast
     public override void ApplyShape()
     {
+        //check for targets within shape bounds
+        //begin end of spell
+
         if (castable && !casting && !delayed)
         {
+            Debug.Log("Beam shape apply shape");
+
+            //set beam time and check interval
+            maxRunTime = (SS.GetSpellCooldownMax() / 2f); //set max run time to half of spell cooldown
+            checkInterval = ((maxRunTime - 0.25f) / 3f); //set check interval to 1/3 of max run time
+
             //disallow more casts
             casting = true;
             castable = false;
+
             if (!SS.GetEffectName().Contains("Delay")) { AimSpell(); } //ensure spell is aimed before casting
 
             //start overlap check coroutine & end timer

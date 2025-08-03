@@ -15,6 +15,18 @@ public class EffectArc : AbstractEffect
     public override void ApplyEffect()
     {
         //Debug.Log("Arc effect applied");
+        if (SS.GetShapeName().Contains("Ball") || SS.GetShapeName().Contains("Beam"))
+        {
+            CalculateArcMovement();
+        }
+        else if(SS.GetShapeName().Contains("Field"))
+        {
+            CalculateArcPlacement();
+        }
+    }
+
+    private void CalculateArcMovement()
+    {
         if (shapeScript != null && shapeScript.spellAim != null && shapeScript.firstPointConfirmed)
         {
             //calculate arced path
@@ -61,6 +73,51 @@ public class EffectArc : AbstractEffect
 
             //Debug.Log(SS.GetCasted());
             if (!SS.GetCasted()) { shapeScript.UpdateAimPath(arcPathPoints); }
+        }
+    }
+
+    private void CalculateArcPlacement()
+    {
+        //calculate arc points with end point as center
+        //Debug.Log("Arc placement effect applied");
+        if (shapeScript != null && shapeScript.spellAim != null && shapeScript.firstPointConfirmed)
+        {
+            int numOfPoints = 5; //maximum number of points for arc
+            float segmentSpacing = SS.GetRadius(); //spacing between arc points
+            Vector3[] arcPathPoints = new Vector3[numOfPoints]; //position points for arc
+            Vector3 centerPoint = Vector3.zero;
+            if (SS.GetShapeName().Contains("Field")) { centerPoint = shapeScript.pathPoints[0]; }
+            else { centerPoint = shapeScript.pathPoints[(shapeScript.pathPoints.Length - 1)]; }
+
+            Vector3 aimDirection = shapeScript.GetDir(); //get direction of the spell
+            Vector3 arcDirection = new Vector3(-aimDirection.z, 0, aimDirection.x); // //calculate arc direction by rotating aim direction 90 degrees
+            Debug.Log("NumOfPoints: " + numOfPoints + ", Center point: " + centerPoint + ", Aim direction: " + aimDirection + ", Arc direction: " + arcDirection + ", Spacing: " + segmentSpacing);
+
+            //calculate each arc point based on the center point
+            for (int i = 0; i < numOfPoints; i++)
+            {
+                float offset = (i - (numOfPoints - 1) / 2f); //calculate wedge position
+                Debug.Log("Offset for point " + i + ": " + offset);
+
+                if (offset == 0)
+                {
+                    Debug.Log("Arc point " + i + ": " + centerPoint);
+                    arcPathPoints[i] = centerPoint; //if offset is 0, use center point
+                }
+                else
+                {
+                    //left/right side
+                    Vector3 sideOffset = arcDirection * (offset * 2) * segmentSpacing; //calculate sideways position
+                    Vector3 backOffset = -aimDirection * (Mathf.Abs(offset) * segmentSpacing); //calculate backwards position
+                    Vector3 tempPos = centerPoint + sideOffset + backOffset; //calculate final position
+                    tempPos.y = centerPoint.y; //keep y level with center point
+                    Debug.Log("Arc point " + i + ": " + tempPos);
+                    arcPathPoints[i] = tempPos; //update path points with new position
+                }
+            }
+
+            Debug.Log("Arc path points: " + string.Join(", ", arcPathPoints));
+            if (!SS.GetCasted()) { shapeScript.UpdateAimPath(arcPathPoints); } //update the shape script with the new arcing points
         }
     }
 }
