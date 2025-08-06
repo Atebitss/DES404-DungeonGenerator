@@ -85,6 +85,7 @@ public class ShapeField : AbstractShape
     private void FixedUpdate()
     {
         if (!segmentsCreated) { CreateFieldSegments(); }
+        if (!casting) { segmentsCreated = false; }
     }
 
 

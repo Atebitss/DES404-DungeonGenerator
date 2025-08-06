@@ -780,7 +780,7 @@ public class PlayerController : MonoBehaviour
             }
 
             //testing
-            shapeName = "Beam";
+            shapeName = "Field";
             effectName = "Arc";
             elementName = "Null";
 
