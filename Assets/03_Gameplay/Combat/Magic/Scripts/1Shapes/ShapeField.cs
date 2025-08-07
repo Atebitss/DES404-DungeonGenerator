@@ -10,7 +10,7 @@ public class ShapeField : AbstractShape
     {
         Debug.Log("Field shape script started");
 
-        damageModifier = 1f; speedModifier = 1f; radiusModifier = 1f; cooldownModifier = 1f;
+        damageModifier = 1f; speedModifier = 1f; radiusModifier = 1f; cooldownModifier = 2f;
         shapeMesh = Resources.Load<Mesh>("CustomMeshes/shapeField");
         mainCamera = Camera.main;
         arcAxis = new Vector3(0, 1, 0);
@@ -55,10 +55,12 @@ public class ShapeField : AbstractShape
             //set end pos as aimed world pos
             //update vars & line renderer
 
-            startPos = this.transform.position;
+            startPos = this.transform.parent.transform.position;
             aimPos = GetAimedWorldPos();
+            this.transform.position = aimPos;
             spellAim[0].transform.position = aimPos;
             dir = (aimPos - startPos).normalized;
+            dir = new Vector3(dir.x, 0, dir.z); //flatten the direction vector to only use x and z axis
             endPos = aimPos;
 
             aimingLine.SetPosition(0, startPos);
@@ -93,6 +95,31 @@ public class ShapeField : AbstractShape
 
         if (!segmentsCreated) { CreateFieldSegments(); }
         if (!casting) { segmentsCreated = false; }
+
+        if (!castable && casting) //while the beam is being cast, before ending
+        {
+            //update spell with component impact
+            if (effectScript.componentWeight == 2) { effectScript.ApplyEffect(); } //if effect weight is 2, apply effect during cast
+
+            if (SS.GetEffectName().Contains("Homing"))
+            {
+                //if effect homing, update end position with found target
+                if (effectScript.targets[0] != null)
+                {
+                    pathPoints[pathPoints.Length - 1] = effectScript.targets[0].transform.position;
+                    segmentsCreated = false; //reset segments created flag so segments will be recreated next update
+                }
+                else
+                {
+                    //if no target found, end spell
+                    SS.SetSpellPersist(false);
+                    SS.EndSpell();
+                }
+            }
+            else if (SS.GetEffectName().Contains("Chain"))
+            {
+            }
+        }
     }
 
 
@@ -173,6 +200,7 @@ public class ShapeField : AbstractShape
             fieldSegments[seg] = new GameObject("FieldSegment" + (seg + 1)); //create new game object for segment 
             fieldSegments[seg].transform.parent = this.transform; //set segment parent
             fieldSegments[seg].transform.position = pathPoints[seg]; //set position to start pos
+            fieldSegments[seg].transform.rotation = Quaternion.LookRotation(dir);
             fieldSegments[seg].transform.localScale = new Vector3((SS.GetRadius() * 5), 0.1f, (SS.GetRadius() * 5)); //set scale to radius of spell
 
             //add visual

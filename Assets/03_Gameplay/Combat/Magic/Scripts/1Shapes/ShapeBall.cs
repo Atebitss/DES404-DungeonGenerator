@@ -10,7 +10,7 @@ public class ShapeBall : AbstractShape
 
     public override void StartShapeScript(SpellScript SS)
     {
-        damageModifier = 1f; speedModifier = 1f; radiusModifier = 1f; cooldownModifier = 1f;
+        damageModifier = 1f; speedModifier = 1f; radiusModifier = 1f; cooldownModifier = 0.5f;
         shapeMesh = Resources.Load<Mesh>("CustomMeshes/shapeBall");
         mainCamera = Camera.main;
         arcAxis = new Vector3(0, 1, 0);

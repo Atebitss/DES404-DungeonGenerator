@@ -167,14 +167,23 @@ public class SpellScript : MonoBehaviour
         radius *= shapeScript.radiusModifier;
         radius *= effectScript.radiusModifier;
         radius *= elementScript.radiusModifier;
-        this.gameObject.transform.localScale = Vector3.one * radius;
-        Debug.Log("SpellScript radius updated: " + radius);
+
+        if (GetShapeName().Contains("Field"))
+        {
+            this.gameObject.transform.localScale = new Vector3(radius, 1f, radius);
+        }
+        else
+        {
+            this.gameObject.transform.localScale = Vector3.one * radius;
+        }
+
+            Debug.Log("SpellScript radius updated: " + radius);
         //Debug.Log("shape rmod: " + shapeScript.radiusModifier + ", effect rmod: " + effectScript.radiusModifier + ", element rmod: " + elementScript.radiusModifier);
     }
 
     public float GetSpellCooldownMax()
     {
-        float maxCD = 10;
+        float maxCD = 5;
         maxCD *= shapeScript.cooldownModifier;
         maxCD *= effectScript.cooldownModifier;
         maxCD *= elementScript.cooldownModifier;

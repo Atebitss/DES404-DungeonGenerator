@@ -91,17 +91,17 @@ public class EffectArc : AbstractEffect
 
             Vector3 aimDirection = shapeScript.GetDir(); //get direction of the spell
             Vector3 arcDirection = new Vector3(-aimDirection.z, 0, aimDirection.x); // //calculate arc direction by rotating aim direction 90 degrees
-            Debug.Log("NumOfPoints: " + numOfPoints + ", Center point: " + centerPoint + ", Aim direction: " + aimDirection + ", Arc direction: " + arcDirection + ", Spacing: " + segmentSpacing);
+            //Debug.Log("NumOfPoints: " + numOfPoints + ", Center point: " + centerPoint + ", Aim direction: " + aimDirection + ", Arc direction: " + arcDirection + ", Spacing: " + segmentSpacing);
 
             //calculate each arc point based on the center point
             for (int i = 0; i < numOfPoints; i++)
             {
                 float offset = (i - (numOfPoints - 1) / 2f); //calculate wedge position
-                Debug.Log("Offset for point " + i + ": " + offset);
+                //Debug.Log("Offset for point " + i + ": " + offset);
 
                 if (offset == 0)
                 {
-                    Debug.Log("Arc point " + i + ": " + centerPoint);
+                    //Debug.Log("Arc point " + i + ": " + centerPoint);
                     arcPathPoints[i] = centerPoint; //if offset is 0, use center point
                 }
                 else
@@ -111,12 +111,12 @@ public class EffectArc : AbstractEffect
                     Vector3 backOffset = -aimDirection * (Mathf.Abs(offset) * segmentSpacing); //calculate backwards position
                     Vector3 tempPos = centerPoint + sideOffset + backOffset; //calculate final position
                     tempPos.y = centerPoint.y; //keep y level with center point
-                    Debug.Log("Arc point " + i + ": " + tempPos);
+                    //Debug.Log("Arc point " + i + ": " + tempPos);
                     arcPathPoints[i] = tempPos; //update path points with new position
                 }
             }
 
-            Debug.Log("Arc path points: " + string.Join(", ", arcPathPoints));
+            //Debug.Log("Arc path points: " + string.Join(", ", arcPathPoints));
             if (!SS.GetCasted()) { shapeScript.UpdateAimPath(arcPathPoints); } //update the shape script with the new arcing points
         }
     }

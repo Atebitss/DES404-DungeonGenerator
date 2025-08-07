@@ -645,7 +645,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float spellCooldownTimer = 0f;
     public float GetSpellCooldownTimer() { return spellCooldownTimer; } //get current spell cooldown timer
     public void SetSpellCooldownTimer(float newCooldown) { spellCooldownTimer = newCooldown; }
-    [SerializeField] private float spellCooldownMax = 10f;
+    [SerializeField] private float spellCooldownMax = 5f;
     private float spellStartTime = 0f;
     [SerializeField] private bool castable = true;
     private bool spellReady = false;
@@ -782,7 +782,7 @@ public class PlayerController : MonoBehaviour
 
             //testing
             shapeName = "Field";
-            effectName = "Delay";
+            effectName = "Grow";
             elementName = "Null";
 
 

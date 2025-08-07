@@ -11,6 +11,7 @@ public class EffectExplode : AbstractEffect
         this.SS = SS;
 
         if (SS.GetShapeName().Contains("Beam")) { radiusModifier = 2f; }
+        else if (SS.GetShapeName().Contains("Field")) { componentWeight = 3; damageModifier = 5f; radiusModifier = 1f; }
     }
     public override void ApplyEffect()
     {
@@ -28,7 +29,7 @@ public class EffectExplode : AbstractEffect
             {
                 Vector3 segStart = pathPoints[pathPos];
                 Vector3 segEnd = pathPoints[pathPos + 1];
-                float segLength = (Vector3.Distance(segStart, segEnd) * (1.5f *  radius)); //~~~SPAGHETTI~~~//
+                float segLength = (Vector3.Distance(segStart, segEnd) * (1.5f * radius));
 
                 //for each explosion in the segment
                 for (int explosionCount = 0; explosionCount < explosionsPerSegment; explosionCount++)
@@ -58,6 +59,7 @@ public class EffectExplode : AbstractEffect
                 }
             }
         }
+        else if (SS.GetShapeName().Contains("Field") && shapeScript.targets.Length > 0) { SS.SetSpellPersist(false); }
     }
     private bool HasAlreadyHitTarget(GameObject enemy)
     {
