@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using UnityEngine.UIElements;
 
 public class ShapeBall : AbstractShape
 {
@@ -7,6 +8,8 @@ public class ShapeBall : AbstractShape
     // 2. Aiming phase functions
     // 3. Unity lifecycle
     // 4. Execution phase
+
+    private SphereCollider shapeCollider;
 
     public override void StartShapeScript(SpellScript SS)
     {
@@ -16,6 +19,8 @@ public class ShapeBall : AbstractShape
         arcAxis = new Vector3(0, 1, 0);
 
         this.SS = SS;
+        shapeCollider = this.gameObject.AddComponent<SphereCollider>();
+        shapeCollider.isTrigger = true; //set collider as trigger
         maxLength = SS.GetMaxSpellLength();
 
         //Debug.Log(transform.position);
@@ -110,6 +115,8 @@ public class ShapeBall : AbstractShape
             speed *= speedModifier;
             speed *= effectScript.speedModifier;
             speed *= elementScript.speedModifier;
+
+            shapeCollider.radius = SS.GetRadius();
 
             pathPoints[0] = this.transform.position;
             Debug.Log("start pos: " + pathPoints[0]);

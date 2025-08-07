@@ -37,7 +37,7 @@ public class EnemyDetectionColliderNear : MonoBehaviour
         }
         if (col.gameObject.tag == "Repel" || col.gameObject.tag == "Compel")
         {
-            Debug.Log("Other detected: " + col.gameObject.name);
+            //Debug.Log("Other detected: " + col.gameObject.name);
             otherNear = true;
 
             //add other to array

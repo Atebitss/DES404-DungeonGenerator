@@ -3,6 +3,7 @@ using System.Collections;
 
 public class ShapeBeam : AbstractShape
 {
+    private BoxCollider shapeCollider;
     private float width = 1f, length = 2f;
     private GameObject[] beamSegments = new GameObject[0];
 
@@ -12,6 +13,8 @@ public class ShapeBeam : AbstractShape
 
         damageModifier = 1f; speedModifier = 1f; radiusModifier = 1f; cooldownModifier = 1f;
         this.SS = SS;
+        shapeCollider = this.gameObject.AddComponent<BoxCollider>();
+        shapeCollider.isTrigger = true; //set collider as trigger
         mainCamera = Camera.main;
         arcAxis = new Vector3(0, 1, 0);
         shapeMesh = Resources.Load<Mesh>("CustomMeshes/shapeBeam");
@@ -167,6 +170,8 @@ public class ShapeBeam : AbstractShape
         {
             Debug.Log("Beam shape apply shape");
 
+            shapeCollider.size = new Vector3(width, width, length);
+
             //set beam time and check interval
             maxRunTime = (SS.GetSpellCooldownMax() / 2f); //set max run time to half of spell cooldown
             checkInterval = ((maxRunTime - 0.25f) / 3f); //set check interval to 1/3 of max run time
@@ -278,7 +283,7 @@ public class ShapeBeam : AbstractShape
             //add collider
             BoxCollider curSegmentCollider = beamSegments[i].AddComponent<BoxCollider>(); //create new box collider for segment
             curSegmentCollider.isTrigger = true; //set collider as trigger to avoid physics interactions
-            this.GetComponent<SphereCollider>().center = new Vector3(0, 0, ((realSegLength * 3f) * 2f)); //set collider position to segment end
+            this.GetComponent<BoxCollider>().center = new Vector3(0, 0, ((realSegLength * 3f) * 2f)); //set collider position to segment end
         }
 
         segmentsCreated = true;

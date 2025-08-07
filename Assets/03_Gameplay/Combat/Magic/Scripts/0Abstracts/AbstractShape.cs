@@ -15,8 +15,6 @@ public abstract class AbstractShape : MonoBehaviour
     //spell shape
     public Mesh shapeMesh;
     public MeshFilter spellMeshFilter, aimMeshFilter;
-    //public float spellRadius = 1f; //radius of the spell shape, used for collision detection and visual representation
-    //public void SetSpellRadius(float newRadius) { spellRadius = newRadius; }
 
     //spell info
     public bool castable = false, delayed = false, spellEnded = false, casting = false, active = true;

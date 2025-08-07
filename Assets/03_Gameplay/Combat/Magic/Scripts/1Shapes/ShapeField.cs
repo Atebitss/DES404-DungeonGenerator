@@ -3,6 +3,7 @@ using System.Collections;
 
 public class ShapeField : AbstractShape
 {
+    private BoxCollider shapeCollider;
     private GameObject[] fieldSegments = new GameObject[1];
     bool timeSet = false;
 
@@ -15,6 +16,8 @@ public class ShapeField : AbstractShape
         mainCamera = Camera.main;
         arcAxis = new Vector3(0, 1, 0);
         this.SS = SS;
+        shapeCollider = this.gameObject.AddComponent<BoxCollider>();
+        shapeCollider.isTrigger = true; //set collider as trigger
         pathPoints = new Vector3[1];
 
         //if current aim game object is empty
@@ -61,6 +64,7 @@ public class ShapeField : AbstractShape
             spellAim[0].transform.position = aimPos;
             dir = (aimPos - startPos).normalized;
             dir = new Vector3(dir.x, 0, dir.z); //flatten the direction vector to only use x and z axis
+            this.transform.rotation = Quaternion.LookRotation(dir); //set rotation to face forwar
             endPos = aimPos;
 
             aimingLine.SetPosition(0, startPos);
@@ -131,7 +135,9 @@ public class ShapeField : AbstractShape
         if (castable && !casting && !delayed)
         {
             Debug.Log("Field shape applied");
-            Debug.Log("maxRunTime: " + maxRunTime + ", checkInterval: " + checkInterval);
+            //Debug.Log("maxRunTime: " + maxRunTime + ", checkInterval: " + checkInterval);
+
+            shapeCollider.size = new Vector3((SS.GetRadius() * 25), 0.1f, (SS.GetRadius() * 25));
 
             //disallow more casts
             casting = true;

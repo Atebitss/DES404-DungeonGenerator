@@ -443,7 +443,7 @@ public abstract class AbstractEnemy : MonoBehaviour
                     {
                         Vector3 directionFromOther = (transform.position - othersNear[i].transform.position).normalized;
                         otherForce += (directionFromOther * otherScript.GetSeperationForce());
-                        Debug.Log(directionFromOther * otherScript.GetSeperationForce());
+                        //Debug.Log(directionFromOther * otherScript.GetSeperationForce());
                         otherCount++;
                     }
                 }

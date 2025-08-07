@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 8066213640959695665}
   - component: {fileID: 3388959507094496855}
   - component: {fileID: 3639176699990929183}
-  - component: {fileID: 195017810088769525}
   - component: {fileID: 3351999768825324802}
   m_Layer: 0
   m_Name: SpellPrefab
@@ -101,31 +100,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 51e111304a43eb942a148d4b4c606143, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spellRenderer: {fileID: 3388959507094496855}
-  spellSphereCollider: {fileID: 195017810088769525}
   lineMarkerPrefab: {fileID: 7769474659901635927, guid: 713401e4cb1b92148b010aa7bf0c6e23, type: 3}
   hitSplashPrefab: {fileID: 2683464079042679606, guid: 03b0fd0cb7bf08349877fd7a75a3598b, type: 3}
---- !u!135 &195017810088769525
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3082573235795342522}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Radius: 1
-  m_Center: {x: 0, y: 0, z: 0}
+  spellRenderer: {fileID: 3388959507094496855}
 --- !u!54 &3351999768825324802
 Rigidbody:
   m_ObjectHideFlags: 0
