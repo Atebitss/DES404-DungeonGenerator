@@ -3,10 +3,8 @@ using System.Collections;
 
 public class ShapeField : AbstractShape
 {
-    private int segmentCount = 1, targetCheckCount = 0;
-    private float maxRunTime = 10f;
-    private bool segmentsCreated = false;
     private GameObject[] fieldSegments = new GameObject[1];
+    bool timeSet = false;
 
     public override void StartShapeScript(SpellScript SS)
     {
@@ -84,6 +82,15 @@ public class ShapeField : AbstractShape
 
     private void FixedUpdate()
     {
+        if(!timeSet)
+        {
+            //set beam time and check interval
+            if (!SS.GetEffectName().Contains("Delay")) { maxRunTime = (SS.GetSpellCooldownMax() / 2f); }
+            else { maxRunTime = (SS.GetSpellCooldownMax()); }
+            checkInterval = ((maxRunTime - 0.25f) / 3f); //set check interval to 1/3 of max run time
+            timeSet = true; //set time set to true to avoid resetting it every frame
+        }
+
         if (!segmentsCreated) { CreateFieldSegments(); }
         if (!casting) { segmentsCreated = false; }
     }
@@ -97,10 +104,7 @@ public class ShapeField : AbstractShape
         if (castable && !casting && !delayed)
         {
             Debug.Log("Field shape applied");
-
-            //set beam time and check interval
-            maxRunTime = (SS.GetSpellCooldownMax() / 2f); //set max run time to half of spell cooldown
-            checkInterval = ((maxRunTime - 0.25f) / 3f); //set check interval to 1/3 of max run time
+            Debug.Log("maxRunTime: " + maxRunTime + ", checkInterval: " + checkInterval);
 
             //disallow more casts
             casting = true;
@@ -119,7 +123,7 @@ public class ShapeField : AbstractShape
     {
         while (!castable && casting)
         {
-            Debug.Log("Checking for overlapping targets");
+            //Debug.Log("Checking for overlapping targets");
             SS.EndSpell();
             targetCheckCount++;
             yield return new WaitForSeconds(checkInterval); //wait for x seconds
@@ -128,7 +132,7 @@ public class ShapeField : AbstractShape
     private IEnumerator EndField()
     {
         yield return new WaitForSeconds(maxRunTime); //wait for y second
-        Debug.Log("Ending beam shape");
+        Debug.Log("Ending field shape");
 
         for (int i = 0; i < fieldSegments.Length; i++)
         {
@@ -157,13 +161,13 @@ public class ShapeField : AbstractShape
             }
         }
 
-        Debug.Log("segmentCount: " + segmentCount);
+        //Debug.Log("segmentCount: " + segmentCount);
         fieldSegments = new GameObject[segmentCount];
 
         //create new segments
         for (int seg = 0; seg < segmentCount; seg++)
         {
-            Debug.Log("Creating segment " + (seg + 1) + " of " + segmentCount + ": " + pathPoints[seg]);
+            //Debug.Log("Creating segment " + (seg + 1) + " of " + segmentCount + ": " + pathPoints[seg]);
 
             //create segment parent
             fieldSegments[seg] = new GameObject("FieldSegment" + (seg + 1)); //create new game object for segment 
@@ -188,8 +192,8 @@ public class ShapeField : AbstractShape
 
     public override GameObject[] FindShapeTargets()
     {
-        Debug.Log("ShapeField, FindShapeTargets");
-        Debug.Log("Field segments length: " + fieldSegments.Length);
+        //Debug.Log("ShapeField, FindShapeTargets");
+        //Debug.Log("Field segments length: " + fieldSegments.Length);
 
         targets = new GameObject[0];
 
@@ -232,7 +236,7 @@ public class ShapeField : AbstractShape
             }
         }
 
-        Debug.Log("Shape Field, found " + targets.Length + " targets");
+        //Debug.Log("Shape Field, found " + targets.Length + " targets");
         return targets;
     }
 }

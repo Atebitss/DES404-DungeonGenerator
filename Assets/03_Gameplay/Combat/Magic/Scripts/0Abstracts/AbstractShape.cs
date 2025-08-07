@@ -58,8 +58,13 @@ public abstract class AbstractShape : MonoBehaviour
     public float GetJourneyLength() { return journeyLength; }
     public float startTime;
     public float GetStartTime() { return startTime; }
+
     public float checkInterval = 1f;
     public float GetCheckInterval() { return checkInterval; }
+    public float maxRunTime = 10f;
+    public float GetMaxRunTime() { return maxRunTime; }
+    public int segmentCount = 1, targetCheckCount = 0;
+    public bool segmentsCreated = false;
 
 
 
@@ -128,12 +133,17 @@ public abstract class AbstractShape : MonoBehaviour
 
     public IEnumerator DelayCast(float delayTime)
     {
-        //Debug.Log("Spell Script delay cast");
+        Debug.Log("Spell Shape delay cast");
         delayed = true; //set delayed to true so the spell does not cast immediately
         yield return new WaitForSeconds(delayTime); //wait for the specified time
         delayed = false; //set delayed to false so the spell can be cast
 
         ApplyShape();
+    }
+    public void EndDelay()
+    {
+        Debug.Log("Spell Shape end delay");
+        StopCoroutine(DelayCast(0f));
     }
 
 

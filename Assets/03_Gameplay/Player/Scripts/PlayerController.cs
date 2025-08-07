@@ -643,9 +643,10 @@ public class PlayerController : MonoBehaviour
 
     //cooldown
     [SerializeField] private float spellCooldownTimer = 0f;
+    public float GetSpellCooldownTimer() { return spellCooldownTimer; } //get current spell cooldown timer
+    public void SetSpellCooldownTimer(float newCooldown) { spellCooldownTimer = newCooldown; }
     [SerializeField] private float spellCooldownMax = 10f;
     private float spellStartTime = 0f;
-    public void SetSpellCooldownTimer(float newCooldown) { spellCooldownTimer = newCooldown; }
     [SerializeField] private bool castable = true;
     private bool spellReady = false;
 
@@ -781,7 +782,7 @@ public class PlayerController : MonoBehaviour
 
             //testing
             shapeName = "Field";
-            effectName = "Arc";
+            effectName = "Delay";
             elementName = "Null";
 
 
@@ -794,6 +795,7 @@ public class PlayerController : MonoBehaviour
 
             ADM.SetSpellStrength(spellStrength); //update adaptive difficulty
             spellCooldownMax = curSpell.GetSpellCooldownMax(); //update spell cooldown max
+            Debug.Log("Cooldown Max: " + spellCooldownMax);
             curSpell.UpdateRadius(); //update spell radius before casting
             spellReady = true;
         }

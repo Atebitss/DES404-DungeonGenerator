@@ -6,7 +6,7 @@ public class EffectDelay : AbstractEffect
 
     public override void StartEffectScript(SpellScript SS)
     {
-        componentWeight = 1; damageModifier = 1f; speedModifier = 1f; radiusModifier = 1f; cooldownModifier = 1f;
+        componentWeight = 1; damageModifier = 1f; speedModifier = 1f; radiusModifier = 1f; cooldownModifier = 0.5f;
         this.SS = SS;
     }
     public override void ApplyEffect()
@@ -15,8 +15,10 @@ public class EffectDelay : AbstractEffect
         if (callCounter == 0)
         {
             StartCoroutine(SS.GetShapeScript().DelayCast(delayTime));
-        }
 
-        callCounter++;
+            if(SS.GetShapeName().Contains("Field")) { shapeScript.maxRunTime = (shapeScript.maxRunTime * 2); }
+
+            callCounter++;
+        }
     }
 }

@@ -3,10 +3,7 @@ using System.Collections;
 
 public class ShapeBeam : AbstractShape
 {
-    private int segmentCount = 1, targetCheckCount = 0;
     private float width = 1f, length = 2f;
-    private float maxRunTime = 10f;
-    private bool segmentsCreated = false;
     private GameObject[] beamSegments = new GameObject[0];
 
     public override void StartShapeScript(SpellScript SS)

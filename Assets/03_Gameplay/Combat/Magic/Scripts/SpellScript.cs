@@ -398,7 +398,7 @@ public class SpellScript : MonoBehaviour
 
     private void DealDamage()
     {
-        Debug.Log("SpellScript deal dmg");
+        //Debug.Log("SpellScript deal dmg");
 
         //track damage dealt to each target
         int[] damagesDealt = new int[targets.Length];
@@ -408,15 +408,15 @@ public class SpellScript : MonoBehaviour
         damageCalc *= effectScript.damageModifier;
         damageCalc *= elementScript.damageModifier;
 
-        Debug.Log("targets.Length: " + targets.Length);
+        //Debug.Log("targets.Length: " + targets.Length);
         if (targets != null)
         {
             for (int targetNum = 0; targetNum < targets.Length; targetNum++)
             {
-                Debug.Log("target " + targetNum + ": " + targets[targetNum]);
+                //Debug.Log("target " + targetNum + ": " + targets[targetNum]);
                 if (targets[targetNum] != null)
                 {
-                    Debug.Log("SpellScript dealing damage to: " + targets[targetNum].name);
+                    //Debug.Log("SpellScript dealing damage to: " + targets[targetNum].name);
                     int randDamage = Random.Range(0, 2);
 
                     damageDealt = Mathf.RoundToInt(damageCalc);
@@ -427,7 +427,7 @@ public class SpellScript : MonoBehaviour
                     targetScripts[targetNum].DamageTarget(damageDealt, damageType);
                     ASM.GetADM().SpellSuccess();
                     ASM.GetADM().AddSpellDamageDealt(damageDealt);
-                    Debug.Log("dmg calc on " + targets[targetNum].name + ": " + damageDealt);
+                    //Debug.Log("dmg calc on " + targets[targetNum].name + ": " + damageDealt);
                 }
             }
         }
