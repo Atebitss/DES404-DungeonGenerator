@@ -100,7 +100,9 @@ public class ShapeField : AbstractShape
                 //if effect homing, update end position with found target
                 if (effectScript.targets[0] != null)
                 {
-                    pathPoints[pathPoints.Length - 1] = effectScript.targets[0].transform.position;
+                    pathPoints[pathPoints.Length - 1] = Vector3.Lerp(pathPoints[pathPoints.Length - 1],
+                    effectScript.targets[0].transform.position,
+                    (0.5f * Time.deltaTime));
                     segmentsCreated = false; //reset segments created flag so segments will be recreated next update
                 }
                 else
@@ -244,13 +246,13 @@ public class ShapeField : AbstractShape
             fieldSegments[seg].transform.localScale = new Vector3((SS.GetRadius() * 5), 0.1f, (SS.GetRadius() * 5)); //set scale to radius of spell
 
             //check if position is over terrain
-            Debug.DrawRay(fieldSegments[seg].transform.position, (Vector3.down * 5f), Color.red, 5f);
+            //Debug.DrawRay(fieldSegments[seg].transform.position, (Vector3.down * 5f), Color.red, 5f);
             if (Physics.Raycast(fieldSegments[seg].transform.position, Vector3.down, out RaycastHit standHit, 5f, LayerMask.GetMask("Terrain")))
             {
-                Debug.Log("Landing position is valid: " + standHit.point);
+                //Debug.Log("Landing position is valid: " + standHit.point);
                 fieldSegments[seg].transform.position = standHit.point;
             }
-            else { Debug.Log("Landing position is not valid, trying again"); }
+            //else { Debug.Log("Landing position is not valid, trying again"); }
 
             //add visual
             MeshFilter meshFilter = fieldSegments[seg].AddComponent<MeshFilter>();

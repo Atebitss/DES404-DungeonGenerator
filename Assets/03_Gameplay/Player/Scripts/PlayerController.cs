@@ -782,7 +782,7 @@ public class PlayerController : MonoBehaviour
 
             //testing
             shapeName = "Field";
-            effectName = "Chain";
+            effectName = "Homing";
             elementName = "Null";
 
 
