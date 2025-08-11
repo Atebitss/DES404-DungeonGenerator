@@ -164,8 +164,11 @@ public class ShapeField : AbstractShape
         float referenceTime = 2f; //average expected time for a field shape to be active
         float curvePower = 1f; //lower means lower interval, higher means higher interval
 
-        if (!SS.GetEffectName().Contains("Delay")) { maxRunTime = (SS.GetSpellCooldownMax() / 2f); } // //if spell does not have a delay, set max run time to half of the cooldown
-        else { maxRunTime = (SS.GetSpellCooldownMax()); } //if spell has a delay, set max run time to the full cooldown
+        if (SS.GetEffectName().Contains("Delay")) { maxRunTime = SS.GetSpellCooldownMax(); } //if spell has a delay, set max run time to the full cooldown
+        else if (SS.GetEffectName().Contains("Multicast")) { maxRunTime = (SS.GetSpellCooldownMax() * 2); }
+        else { maxRunTime = (SS.GetSpellCooldownMax() / 2f); } // //if spell does not have a delay, set max run time to half of the cooldown
+
+        if (SS.GetEffectName().Contains("Pierce")) { curvePower = 2f; }
 
         float normalizedValue = Mathf.Pow((referenceTime / maxRunTime), curvePower); //calculate duration compared to reference time
         float percentage = Mathf.Lerp(minPercentage, maxPercentage, normalizedValue); //calculate percentage based on normalized value
