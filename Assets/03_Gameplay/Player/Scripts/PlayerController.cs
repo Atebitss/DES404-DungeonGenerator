@@ -781,9 +781,12 @@ public class PlayerController : MonoBehaviour
             }
 
             //testing
-            shapeName = "Field";
-            effectName = "Split";
-            elementName = "Null";
+            if (ASM.GetDevMode())
+            {
+                shapeName = ASM.GetShapeType();
+                effectName = ASM.GetEffectType();
+                elementName = ASM.GetElementType();
+            }
 
 
             //update spell references

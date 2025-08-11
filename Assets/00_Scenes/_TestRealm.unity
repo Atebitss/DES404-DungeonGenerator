@@ -5340,7 +5340,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2140f40bfe1ca442b4de2afdafb43d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  devMode: 0
+  devMode: 1
   dbugMode: 0
   visualMode: 0
   regenMode: 0
@@ -5350,6 +5350,27 @@ MonoBehaviour:
   playerCamera: {fileID: 0}
   loadingCamera: {fileID: 0}
   postLevelCamera: {fileID: 0}
+  healthModifierOverwrite: 100
+  damageModifierOverwrite: 1
+  speedModifierOverwrite: 1
+  attackSpeedModifierOverwrite: 1
+  dualChanceOverwrite: 10
+  playerHealthOverwrite: 1
+  playerSpeedOverwrite: 1
+  playerDodgeForceOverwrite: 1
+  playerDodgeDurationOverwrite: 1
+  playerDodgeDistanceOverwrite: 1
+  playerDodgeCooldownOverwrite: 1
+  playerMeleeDamageOverwrite: 1
+  playerMeleeAttackSpeedOverwrite: 1
+  playerLightMeleeAttackCooldownOverwrite: 1
+  playerLightMeleeAttackComboTimerMaxOverwrite: 1
+  playerHeavyMeleeAttackCooldownOverwrite: 1
+  shapeType: 0
+  effectType: 0
+  elementType: 0
+  playerMagicAttackCooldownOverwrite: 1
+  playerLookSensitivityOverwrite: 1
   AM: {fileID: 0}
   player: {fileID: 0}
   PC: {fileID: 0}

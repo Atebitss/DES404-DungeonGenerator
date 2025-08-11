@@ -137,6 +137,7 @@ public abstract class AbstractEnemy : MonoBehaviour
     [SerializeField] private GameObject hitSplashPrefab; //hit splash prefab
     public int health;
     public int GetHealth() { return health; }
+    public void FullHeal() { health = maxHealth; HealthCheck(); }
     public void SetHealth(int newHealth) { health = newHealth; HealthCheck(); }
     public void AlterHealth(int alter) 
     {

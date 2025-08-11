@@ -27,6 +27,52 @@ public class AbstractSceneManager : MonoBehaviour
     [SerializeField] public Camera loadingCamera;
     [SerializeField] public Camera postLevelCamera;
 
+    //enemy overwrite
+    [SerializeField] [Range(0.1f,100f)] private float healthModifierOverwrite = 1.0f;
+    [SerializeField] [Range(0.1f, 100f)] private float damageModifierOverwrite = 1.0f;
+    [SerializeField] [Range(0.1f, 100f)] private float speedModifierOverwrite = 1.0f;
+    [SerializeField] [Range(0.1f, 100f)] private float attackSpeedModifierOverwrite = 1.0f;
+    [SerializeField] [Range(0, 100)] private int dualChanceOverwrite = 10;
+
+    //player stats overwrite
+    //health
+    [SerializeField][Range(0.1f, 100f)] public float playerHealthOverwrite = 1.0f;
+
+    //speed
+    [SerializeField][Range(0.1f, 100f)] public float playerSpeedOverwrite = 1.0f;
+
+    //dodge
+    [SerializeField][Range(0.1f, 100f)] public float playerDodgeForceOverwrite = 1.0f;
+    [SerializeField][Range(0.1f, 100f)] public float playerDodgeDurationOverwrite = 1.0f;
+    [SerializeField][Range(0.1f, 100f)] public float playerDodgeDistanceOverwrite = 1.0f;
+    [SerializeField][Range(0.1f, 100f)] public float playerDodgeCooldownOverwrite = 1.0f;
+
+    //melee
+    [SerializeField][Range(0.1f, 100f)] public float playerMeleeDamageOverwrite = 1.0f;
+    [SerializeField][Range(0.1f, 100f)] public float playerMeleeAttackSpeedOverwrite = 1.0f;
+    [SerializeField][Range(0.1f, 100f)] public float playerLightMeleeAttackCooldownOverwrite = 1.0f;
+    [SerializeField][Range(0.1f, 100f)] public float playerLightMeleeAttackComboTimerMaxOverwrite = 1.0f;
+    [SerializeField][Range(0.1f, 100f)] public float playerHeavyMeleeAttackCooldownOverwrite = 1.0f;
+
+    //magic
+    enum shapeVarient { Ball, Beam, Field };
+    [SerializeField] private shapeVarient shapeType = shapeVarient.Ball;
+    public string GetShapeType() { return shapeType.ToString(); }
+
+    enum effectVarient { Arc, Automatic, Block, Chain, Charge, Delay, Explode, Grow, Homing, Link, Multicast, Null, Pierce, Repel, Split, Teleport };
+    [SerializeField] private effectVarient effectType = effectVarient.Arc;
+    public string GetEffectType() { return effectType.ToString(); }
+
+    enum elementVarient { Electric, Fire, Force, Null, Water };
+    [SerializeField] private elementVarient elementType = elementVarient.Electric;
+    public string GetElementType() { return elementType.ToString(); }
+
+    [SerializeField][Range(0.1f, 100f)] public float playerMagicAttackCooldownOverwrite = 1.0f;
+
+    //misc
+    [SerializeField][Range(0.1f, 100f)] public float playerLookSensitivityOverwrite = 1.0f;
+
+
 
     //Generation Managers
     private MapGeneration MG;
@@ -225,14 +271,27 @@ public class AbstractSceneManager : MonoBehaviour
         }
 
 
+        //testing
+        if (devMode)
+        {
+            healthModifier = healthModifierOverwrite;
+            damageModifier = damageModifierOverwrite;
+            speedModifier = speedModifierOverwrite;
+            attackSpeedModifier = attackSpeedModifierOverwrite;
+            dualChance = dualChanceOverwrite;
+        }
+
+
         //wake enemy
         curEnemyScript.Wake(this);
         //Debug.Log("Enemy awake: " + curEnemyScript.name);
 
         //set enemy stats
         //health
+        Debug.Log(healthModifier);
         int newHealth = Mathf.RoundToInt(curEnemyScript.GetMaxHealth() * healthModifier);
         curEnemyScript.SetMaxHealth(newHealth);
+        curEnemyScript.FullHeal();
 
         //damamge
         int newAttackDamage = Mathf.RoundToInt(curEnemyScript.GetAttackDamage() * damageModifier);
