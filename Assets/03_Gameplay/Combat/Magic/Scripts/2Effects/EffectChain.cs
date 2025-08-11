@@ -40,17 +40,19 @@ public class EffectChain : AbstractEffect
         }
         //otherwise if max chains not reached,
         //check if the spell has been cast
-        else if (curTargetNum < maxTargets)
+        else if (curTargetNum <= maxTargets)
         {
+            Debug.Log(curTargetNum + " < " + maxTargets + ", checking for targets");
             if (SS.GetShapeName().Contains("Beam"))
             {
+                //find all targets
                 groupTargets = new GameObject[maxTargets]; //create array to hold targets for path points
 
                 //for each possible target
                 for (int i = 0; curTargetNum < maxTargets; i++)
                 {
                     Debug.Log("Chain effect applied, " + curTargetNum + "/" + maxTargets);
-                    SinglePointSort(); //run finder
+                    SinglePointSort(); //find one target
                     Debug.Log("Target found: " + targets[0].gameObject.transform.parent.name + " at " + targets[0].transform.position);
                     groupTargets[i] = targets[0]; //add target position to array
                     previousTargets[i] = targets[0]; //add target to previous targets array
@@ -63,6 +65,7 @@ public class EffectChain : AbstractEffect
             }
             else if(SS.GetCasted())
             {
+                //find one target
                 SinglePointSort();
             }
         }
@@ -138,13 +141,13 @@ public class EffectChain : AbstractEffect
             searchPos = this.transform.position; //default search position is the spell position
         }
 
-        if (SS.GetShapeName().Contains("Ball"))
+        if (!SS.GetShapeName().Contains("Beam"))
         {
             //tiny check to find current target
             Collider[] targetCol = Physics.OverlapSphere(searchPos, 0.25f);
             for (int obj = 0; obj < targetCol.Length; obj++) //for each found object
             {
-                Debug.Log("targetCol: " + targetCol[obj]);
+                //Debug.Log("targetCol: " + targetCol[obj]);
 
                 //if the previous target is null, is an enemy, and is not already in the previous targets
                 if (targetCol[obj].CompareTag("Enemy") && !CheckPrevTargets(targetCol[obj].gameObject))

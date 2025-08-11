@@ -110,9 +110,6 @@ public class ShapeField : AbstractShape
                     SS.EndSpell();
                 }
             }
-            else if (SS.GetEffectName().Contains("Chain"))
-            {
-            }
         }
     }
 
@@ -126,7 +123,7 @@ public class ShapeField : AbstractShape
             Debug.Log("Field shape applied");
             //Debug.Log("maxRunTime: " + maxRunTime + ", checkInterval: " + checkInterval);
 
-            CalculateRuntimes();
+            CalculateRunTimes();
 
             shapeCollider.size = new Vector3((SS.GetRadius() * 25), 0.1f, (SS.GetRadius() * 25));
 
@@ -135,6 +132,18 @@ public class ShapeField : AbstractShape
             castable = false;
 
             if (!SS.GetEffectName().Contains("Delay") && !SS.GetEffectName().Contains("Arc")) { AimSpell(); } //ensure spell is aimed before casting
+            
+            if (SS.GetEffectName().Contains("Chain"))
+            {
+                effectScript.maxTargets = (int)(maxRunTime / checkInterval);
+                effectScript.ApplyEffect();
+                if (effectScript.targets[0] != null)
+                {
+                    pathPoints[pathPoints.Length - 1] = effectScript.targets[0].transform.position;
+                    this.transform.position = pathPoints[pathPoints.Length - 1]; //set position to last target position
+                    segmentsCreated = false;
+                }
+            }
 
             CreateFieldSegments();
 
@@ -143,9 +152,11 @@ public class ShapeField : AbstractShape
             StartCoroutine(OverlapCheck());
         }
     }
-    private void CalculateRuntimes()
+    private void CalculateRunTimes()
     {
-        Debug.Log("Setting maximum time and check interval for field shape");
+        //Debug.Log("Setting maximum time and check interval for field shape");
+        //determine maximum run time
+        //calculate check interval based on run time
 
         float minPercentage = 0.1f, maxPercentage = 0.5f; // 10% minimum, 50% maximum of spell cooldown
         float referenceTime = 2f; //average expected time for a field shape to be active
@@ -166,9 +177,23 @@ public class ShapeField : AbstractShape
         while (!castable && casting)
         {
             //Debug.Log("Checking for overlapping targets");
+            yield return new WaitForSeconds(checkInterval); //wait for x seconds
+
             SS.EndSpell();
             targetCheckCount++;
-            yield return new WaitForSeconds(checkInterval); //wait for x seconds
+
+            //if effect is chain, update the last point in the path to the next target and reset segments
+            if (SS.GetEffectName().Contains("Chain"))
+            {
+                if (effectScript.curTargetNum >= effectScript.maxTargets) { SS.SetSpellPersist(false); }
+                if (effectScript.targets[0] != null)
+                {
+                    pathPoints[pathPoints.Length - 1] = effectScript.targets[0].transform.position;
+                    this.transform.position = pathPoints[pathPoints.Length - 1]; //set position to last target position
+                    segmentsCreated = false;
+                }
+                else { SS.SetSpellPersist(false); }
+            }
         }
     }
     private IEnumerator EndField()
@@ -217,6 +242,15 @@ public class ShapeField : AbstractShape
             fieldSegments[seg].transform.position = pathPoints[seg]; //set position to start pos
             fieldSegments[seg].transform.rotation = Quaternion.LookRotation(dir);
             fieldSegments[seg].transform.localScale = new Vector3((SS.GetRadius() * 5), 0.1f, (SS.GetRadius() * 5)); //set scale to radius of spell
+
+            //check if position is over terrain
+            Debug.DrawRay(fieldSegments[seg].transform.position, (Vector3.down * 5f), Color.red, 5f);
+            if (Physics.Raycast(fieldSegments[seg].transform.position, Vector3.down, out RaycastHit standHit, 5f, LayerMask.GetMask("Terrain")))
+            {
+                Debug.Log("Landing position is valid: " + standHit.point);
+                fieldSegments[seg].transform.position = standHit.point;
+            }
+            else { Debug.Log("Landing position is not valid, trying again"); }
 
             //add visual
             MeshFilter meshFilter = fieldSegments[seg].AddComponent<MeshFilter>();
