@@ -5,7 +5,6 @@ public class ShapeField : AbstractShape
 {
     private BoxCollider shapeCollider;
     private GameObject[] fieldSegments = new GameObject[1];
-    bool timeSet = false;
 
     public override void StartShapeScript(SpellScript SS)
     {
@@ -88,15 +87,6 @@ public class ShapeField : AbstractShape
 
     private void FixedUpdate()
     {
-        if(!timeSet)
-        {
-            //set beam time and check interval
-            if (!SS.GetEffectName().Contains("Delay")) { maxRunTime = (SS.GetSpellCooldownMax() / 2f); }
-            else { maxRunTime = (SS.GetSpellCooldownMax()); }
-            checkInterval = ((maxRunTime - 0.25f) / 3f); //set check interval to 1/3 of max run time
-            timeSet = true; //set time set to true to avoid resetting it every frame
-        }
-
         if (!segmentsCreated) { CreateFieldSegments(); }
         if (!casting) { segmentsCreated = false; }
 
@@ -131,11 +121,12 @@ public class ShapeField : AbstractShape
     public override void ApplyShape()
     {
         //place the field segments at the aimed position
-
         if (castable && !casting && !delayed)
         {
             Debug.Log("Field shape applied");
             //Debug.Log("maxRunTime: " + maxRunTime + ", checkInterval: " + checkInterval);
+
+            CalculateRuntimes();
 
             shapeCollider.size = new Vector3((SS.GetRadius() * 25), 0.1f, (SS.GetRadius() * 25));
 
@@ -151,6 +142,24 @@ public class ShapeField : AbstractShape
             StartCoroutine(EndField());
             StartCoroutine(OverlapCheck());
         }
+    }
+    private void CalculateRuntimes()
+    {
+        Debug.Log("Setting maximum time and check interval for field shape");
+
+        float minPercentage = 0.1f, maxPercentage = 0.5f; // 10% minimum, 50% maximum of spell cooldown
+        float referenceTime = 2f; //average expected time for a field shape to be active
+        float curvePower = 1f; //lower means lower interval, higher means higher interval
+
+        if (!SS.GetEffectName().Contains("Delay")) { maxRunTime = (SS.GetSpellCooldownMax() / 2f); } // //if spell does not have a delay, set max run time to half of the cooldown
+        else { maxRunTime = (SS.GetSpellCooldownMax()); } //if spell has a delay, set max run time to the full cooldown
+
+        float normalizedValue = Mathf.Pow((referenceTime / maxRunTime), curvePower); //calculate duration compared to reference time
+        float percentage = Mathf.Lerp(minPercentage, maxPercentage, normalizedValue); //calculate percentage based on normalized value
+        percentage = Mathf.Clamp(percentage, minPercentage, maxPercentage); //limit percentage to min and max values
+        checkInterval = maxRunTime * percentage; //set check interval to calculated percentage of max run time
+
+        Debug.Log("maxRunTime: " + maxRunTime + ", checkInterval: " + checkInterval);
     }
     private IEnumerator OverlapCheck()
     {
