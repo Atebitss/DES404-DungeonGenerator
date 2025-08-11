@@ -23,7 +23,7 @@ public class EffectSplit : AbstractEffect
             //send spells in random directions
             triggered = true; //ensure this effect only runs once per spell
             Vector3 currentPos = Vector3.zero; //current position of the spell
-            if (SS.GetShapeName().Contains("Ball")){ currentPos = this.transform.parent.position; }
+            if (SS.GetShapeName().Contains("Ball") || SS.GetShapeName().Contains("Field")) { currentPos = this.transform.parent.position; }
             else if (SS.GetShapeName().Contains("Beam") && shapeScript.targets[0] != null) { currentPos = shapeScript.targets[0].transform.position; }
             else { currentPos = SS.GetStartPos(); } //default to start position
             int splitCount = Random.Range(splitMin, splitMax); //randomly choose how many split spells to create
@@ -67,7 +67,7 @@ public class EffectSplit : AbstractEffect
 
                 Vector3 startPos = currentPos;
                 Vector3 endPos = Vector3.zero;
-                if (SS.GetShapeName().Contains("Ball")) { endPos = (startPos + (randomDirection * 10f)); } //10 unit range
+                if (SS.GetShapeName().Contains("Ball") || SS.GetShapeName().Contains("Field")) { endPos = (startPos + (randomDirection * 10f)); } //10 unit range
                 else if (SS.GetShapeName().Contains("Beam")) 
                 {
                     endPos = (startPos + (randomDirection * shapeScript.realSegLength));

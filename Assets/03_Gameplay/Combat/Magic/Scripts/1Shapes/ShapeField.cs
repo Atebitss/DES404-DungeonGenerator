@@ -133,8 +133,8 @@ public class ShapeField : AbstractShape
             casting = true;
             castable = false;
 
-            if (!SS.GetEffectName().Contains("Delay") && !SS.GetEffectName().Contains("Arc")) { AimSpell(); } //ensure spell is aimed before casting
-            
+            if (!SS.GetEffectName().Contains("Delay") && !SS.GetEffectName().Contains("Arc") && !SS.GetEffectName().Contains("Null")) { AimSpell(); } //ensure spell is aimed before casting
+
             if (SS.GetEffectName().Contains("Chain"))
             {
                 effectScript.maxTargets = (int)(maxRunTime / checkInterval);
@@ -145,6 +145,12 @@ public class ShapeField : AbstractShape
                     this.transform.position = pathPoints[pathPoints.Length - 1]; //set position to last target position
                     segmentsCreated = false;
                 }
+            }
+            else if(!SS.GetEffectName().Contains("Arc") && !SS.GetEffectName().Contains("Null"))
+            {
+                Debug.Log("Setting field position to last target position: " + this.transform.position);
+                this.transform.parent.transform.position = this.transform.position; //set position to last target position
+                this.transform.localPosition = Vector3.zero;
             }
 
             CreateFieldSegments();
@@ -244,9 +250,11 @@ public class ShapeField : AbstractShape
             //create segment parent
             fieldSegments[seg] = new GameObject("FieldSegment" + (seg + 1)); //create new game object for segment 
             fieldSegments[seg].transform.parent = this.transform; //set segment parent
-            fieldSegments[seg].transform.position = pathPoints[seg]; //set position to start pos
+            if (SS.GetEffectName().Contains("Null")) { fieldSegments[seg].transform.position = pathPoints[(pathPoints.Length - 1)]; } //set position to end pos
+            else { fieldSegments[seg].transform.position = pathPoints[seg]; } //set position to relative pos
             fieldSegments[seg].transform.rotation = Quaternion.LookRotation(dir);
             fieldSegments[seg].transform.localScale = new Vector3((SS.GetRadius() * 5), 0.1f, (SS.GetRadius() * 5)); //set scale to radius of spell
+            //Debug.Log("Segment " + (seg + 1) + " position: " + fieldSegments[seg].transform.position);
 
             //check if position is over terrain
             //Debug.DrawRay(fieldSegments[seg].transform.position, (Vector3.down * 5f), Color.red, 5f);
