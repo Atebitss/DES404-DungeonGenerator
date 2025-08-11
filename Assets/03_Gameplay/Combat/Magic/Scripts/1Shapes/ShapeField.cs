@@ -250,10 +250,18 @@ public class ShapeField : AbstractShape
             //create segment parent
             fieldSegments[seg] = new GameObject("FieldSegment" + (seg + 1)); //create new game object for segment 
             fieldSegments[seg].transform.parent = this.transform; //set segment parent
-            if (SS.GetEffectName().Contains("Null")) { fieldSegments[seg].transform.position = pathPoints[(pathPoints.Length - 1)]; } //set position to end pos
-            else { fieldSegments[seg].transform.position = pathPoints[seg]; } //set position to relative pos
-            fieldSegments[seg].transform.rotation = Quaternion.LookRotation(dir);
             fieldSegments[seg].transform.localScale = new Vector3((SS.GetRadius() * 5), 0.1f, (SS.GetRadius() * 5)); //set scale to radius of spell
+            fieldSegments[seg].transform.rotation = Quaternion.LookRotation(dir);
+
+            if (SS.GetEffectName().Contains("Null"))
+            {
+                fieldSegments[seg].transform.position = pathPoints[(pathPoints.Length - 1)];  //set position to end pos
+            }
+            else
+            {
+                fieldSegments[seg].transform.position = pathPoints[seg];  //set position to relative pos
+            }
+            
             //Debug.Log("Segment " + (seg + 1) + " position: " + fieldSegments[seg].transform.position);
 
             //check if position is over terrain

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class EffectSplit : AbstractEffect
 {
-    private int splitMin = 2, splitMax = 2;
+    private int splitMin = 2, splitMax = 2, usedSign = 0;
     private bool triggered = false;
 
     public override void StartEffectScript(SpellScript SS)
@@ -52,15 +52,20 @@ public class EffectSplit : AbstractEffect
                 int sign = 0;
                 while(sign == 0) { sign = Random.Range(-1, 2); } //ensure sign is not zero
 
+                if (sign == usedSign) { sign = (sign * -1); }
+                
                 float randomAngleY = 0f;
-                if(sign == 1)
+                if (sign == 1)
                 {
                     randomAngleY = Random.Range(10f, 45f); //random spread within 35 degrees
+                    usedSign = 1;
                 }
                 else if (sign == -1)
                 {
                     randomAngleY = Random.Range(-10f, -45f); //random spread within -35 degrees
+                    usedSign = -1;
                 }
+
 
                 Debug.Log("Random angle Y: " + randomAngleY);
                 Vector3 randomDirection = (Quaternion.Euler(0, randomAngleY, 0) * baseDirection);
@@ -84,13 +89,10 @@ public class EffectSplit : AbstractEffect
                 if (splitShapeScript != null)
                 {
                     splitShapeScript.pathPoints = newTargetPoints;
+                    splitShapeScript.dir = randomDirection;
                     splitShapeScript.lastPointConfirmed = true;
                     splitShapeScript.castable = true;
                 }
-
-                //set spell start & end
-                splitSS.SetStartPos(startPos);
-                splitSS.SetEndPos(endPos);
 
                 splitSS.SetIgnoredTargets(shapeScript.targets); //add hit targets to ignore list
                 for (int j = 0; j < SS.GetHitTargets().Length; j++)
