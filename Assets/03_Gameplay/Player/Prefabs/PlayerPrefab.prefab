@@ -529,6 +529,22 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 3300e60d-295d-4e7c-8d59-dcb8145550aa
     m_ActionName: 'Normal/ResetDungeon[/Keyboard/escape,/XInputControllerWindows/leftShoulder,/XInputControllerWindows/rightShoulder,/XInputControllerWindows/buttonWest]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 7362370709811634931}
+        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
+        m_MethodName: OnSpellInput
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: cd5c7b91-f8ed-4b9d-989a-a34c6f01025b
+    m_ActionName: 'Normal/SpellInput[/XInputControllerWindows/buttonSouth,/XInputControllerWindows/buttonEast,/XInputControllerWindows/buttonWest,/XInputControllerWindows/buttonNorth]'
   m_NeverAutoSwitchControlSchemes: 1
   m_DefaultControlScheme: 
   m_DefaultActionMap: Normal
@@ -591,6 +607,7 @@ MonoBehaviour:
   aimLayerMask:
     serializedVersion: 2
     m_Bits: 136
+  playerSpellbook: {fileID: 3687069478463772794}
   healthPointsCurrent: 10
   healthPointsMax: 10
   staminaPointsCurrent: 10
@@ -985,6 +1002,38 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!1 &1162533929112517271
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 133766333931579948}
+  m_Layer: 6
+  m_Name: PlayerSpellbookParent
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &133766333931579948
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1162533929112517271}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1235918566823758747}
+  m_Father: {fileID: 9056195174696925637}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1539858294061766738
 GameObject:
   m_ObjectHideFlags: 0
@@ -3326,6 +3375,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 133766333931579948}
   - {fileID: 4678704643193438089}
   m_Father: {fileID: 2595516016614872570}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -11572,3 +11622,78 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!1001 &4545939776713146059
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 133766333931579948}
+    m_Modifications:
+    - target: {fileID: 881990861171893937, guid: 8f75c03fceb1e2444bc2ff3a0b510908, type: 3}
+      propertyPath: m_Name
+      value: PlayerSpellbook
+      objectReference: {fileID: 0}
+    - target: {fileID: 3328355044530140496, guid: 8f75c03fceb1e2444bc2ff3a0b510908, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3328355044530140496, guid: 8f75c03fceb1e2444bc2ff3a0b510908, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3328355044530140496, guid: 8f75c03fceb1e2444bc2ff3a0b510908, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3328355044530140496, guid: 8f75c03fceb1e2444bc2ff3a0b510908, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3328355044530140496, guid: 8f75c03fceb1e2444bc2ff3a0b510908, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 3328355044530140496, guid: 8f75c03fceb1e2444bc2ff3a0b510908, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.83057845
+      objectReference: {fileID: 0}
+    - target: {fileID: 3328355044530140496, guid: 8f75c03fceb1e2444bc2ff3a0b510908, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.52913684
+      objectReference: {fileID: 0}
+    - target: {fileID: 3328355044530140496, guid: 8f75c03fceb1e2444bc2ff3a0b510908, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.14645344
+      objectReference: {fileID: 0}
+    - target: {fileID: 3328355044530140496, guid: 8f75c03fceb1e2444bc2ff3a0b510908, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0.09330114
+      objectReference: {fileID: 0}
+    - target: {fileID: 3328355044530140496, guid: 8f75c03fceb1e2444bc2ff3a0b510908, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -65
+      objectReference: {fileID: 0}
+    - target: {fileID: 3328355044530140496, guid: 8f75c03fceb1e2444bc2ff3a0b510908, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -20
+      objectReference: {fileID: 0}
+    - target: {fileID: 3328355044530140496, guid: 8f75c03fceb1e2444bc2ff3a0b510908, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 8f75c03fceb1e2444bc2ff3a0b510908, type: 3}
+--- !u!4 &1235918566823758747 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3328355044530140496, guid: 8f75c03fceb1e2444bc2ff3a0b510908, type: 3}
+  m_PrefabInstance: {fileID: 4545939776713146059}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &3687069478463772794 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 881990861171893937, guid: 8f75c03fceb1e2444bc2ff3a0b510908, type: 3}
+  m_PrefabInstance: {fileID: 4545939776713146059}
+  m_PrefabAsset: {fileID: 0}

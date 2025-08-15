@@ -88,6 +88,11 @@ public class PlayerController : MonoBehaviour
         if (PPS != null) { PWCM.SetHitParticle(PPS); }
         PWCM.SetPC(this);
 
+        //update spellbook references
+        if (leftHand.transform.GetChild(0).GetChild(0) != null) { SM = leftHand.transform.GetChild(0).GetChild(0).GetComponent<SpellbookManager>(); }
+        if (SM != null && ASM.GetDevMode()) { SM.AddAllAvailableComponents(); }
+        if(SM != null) { SM.Wake(this); }
+
         //display debug infos
         if (ASM.GetDevMode())
         {
@@ -207,17 +212,21 @@ public class PlayerController : MonoBehaviour
             SDM.spellElement = elementName;
             SDM.spellCooldown = spellCooldownTimer;
             SDM.spellCooldownMax = spellCooldownMax;
-            SDM.radius = curSpell.GetRadius();
-            SDM.speed = curSpell.GetSpeed();
-            SDM.damage = curSpell.GetDamage();
-            SDM.spellPower = curSpell.GetSpellPower();
-            SDM.valid = curSpell.GetSpellValid();
-            SDM.casted = curSpell.GetCasted();
-            SDM.persistent = curSpell.GetSpellPersist();
-            SDM.targets = curSpell.GetSpellTargets().Length;
-            SDM.ignoredTargets = curSpell.GetIgnoredTargets().Length;
-            SDM.startPos = curSpell.GetStartPos();
-            SDM.endPos = curSpell.GetEndPos();
+
+            if (curSpell != null)
+            {
+                SDM.radius = curSpell.GetRadius();
+                SDM.speed = curSpell.GetSpeed();
+                SDM.damage = curSpell.GetDamage();
+                SDM.spellPower = curSpell.GetSpellPower();
+                SDM.valid = curSpell.GetSpellValid();
+                SDM.casted = curSpell.GetCasted();
+                SDM.persistent = curSpell.GetSpellPersist();
+                SDM.targets = curSpell.GetSpellTargets().Length;
+                SDM.ignoredTargets = curSpell.GetIgnoredTargets().Length;
+                SDM.startPos = curSpell.GetStartPos();
+                SDM.endPos = curSpell.GetEndPos();
+            }
         }
     }
     //~~~~~misc~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -651,11 +660,16 @@ public class PlayerController : MonoBehaviour
     private bool spellReady = false;
 
     //spell
+    private float spellStrength = 1f; //used by adaptive difficulty as a spell skill modifier
     [SerializeField] private GameObject spellPrefab;
     [SerializeField] private SpellScript curSpell;
     public SpellScript GetCurSpell() { return curSpell; }
     [SerializeField] private LayerMask aimLayerMask = 0;
     public LayerMask GetAimLayerMask() { return aimLayerMask; }
+
+    //spellbook
+    [SerializeField] private GameObject playerSpellbook;
+    private SpellbookManager SM;
 
     //linked enemies
     private GameObject[] linkedEnemies = new GameObject[0]; //used to track enemies linked by link effect
@@ -711,13 +725,13 @@ public class PlayerController : MonoBehaviour
 
 
     //random spell assigned on awake
-    public void AssignSpell()
+    public void AssignSpell(string shapeName, string effectName, string elementName)
     {
-        //Debug.Log("PlayerController, AssignSpell");
+        Debug.Log("PlayerController, AssignSpell");
 
         if (castable && curSpell == null)
         {
-            //Debug.Log("creating new spell");
+            Debug.Log("creating new spell");
             //instantiate new spell game object & reference it's script while updating it with spell components
             GameObject spellInstance = Instantiate(spellPrefab, this.transform.position, Quaternion.identity);
             spellInstance.transform.SetParent(leftHand.transform);
@@ -726,10 +740,40 @@ public class PlayerController : MonoBehaviour
             //Debug.Log(curSpell);
         }
 
-        //Debug.Log("setting up new spell");
+        Debug.Log("setting up new spell");
         //1f for base difficulty, 0.5f for easy, 1.5f for hard
-        float spellStrength = 1f; //used by adaptive difficulty as a spell skill modifier
         if (curSpell != null)
+        {
+            this.shapeName = shapeName;
+            this.effectName = effectName;
+            this.elementName = elementName;
+
+            //AssignRandomComponents(); //assign random components to spell script
+
+            //testing
+            if (ASM.GetDevMode() && ASM.GetPlayerSpellOverwrite())
+            {
+                shapeName = ASM.GetShapeType();
+                effectName = ASM.GetEffectType();
+                elementName = ASM.GetElementType();
+            }
+
+
+            //update spell references
+            curSpell.UpdateSpellScriptShape(shapeName);
+            curSpell.UpdateSpellScriptEffect(effectName);
+            curSpell.UpdateSpellScriptElement(elementName);
+
+            curSpell.UpdateComponentRefs(); //update spell components with other component references
+
+            ADM.SetSpellStrength(spellStrength); //update adaptive difficulty
+            spellCooldownMax = curSpell.GetSpellCooldownMax(); //update spell cooldown max
+            Debug.Log("Cooldown Max: " + spellCooldownMax);
+            curSpell.UpdateRadius(); //update spell radius before casting
+            spellReady = true;
+        }
+    }
+    private void AssignRandomSpell()
         {
             //determine random spell shape, effect, and element
             switch (Random.Range(0, 1))
@@ -779,30 +823,7 @@ public class PlayerController : MonoBehaviour
                     spellStrength *= 1.5f;
                     break;
             }
-
-            //testing
-            if (ASM.GetDevMode())
-            {
-                shapeName = ASM.GetShapeType();
-                effectName = ASM.GetEffectType();
-                elementName = ASM.GetElementType();
-            }
-
-
-            //update spell references
-            curSpell.UpdateSpellScriptShape(shapeName);
-            curSpell.UpdateSpellScriptEffect(effectName);
-            curSpell.UpdateSpellScriptElement(elementName);
-
-            curSpell.UpdateComponentRefs(); //update spell components with other component references
-
-            ADM.SetSpellStrength(spellStrength); //update adaptive difficulty
-            spellCooldownMax = curSpell.GetSpellCooldownMax(); //update spell cooldown max
-            Debug.Log("Cooldown Max: " + spellCooldownMax);
-            curSpell.UpdateRadius(); //update spell radius before casting
-            spellReady = true;
         }
-    }
 
     private bool castHeld = false; //used to track if the player is holding down the cast
     public bool GetCastHeld() { return castHeld; }
@@ -811,24 +832,18 @@ public class PlayerController : MonoBehaviour
     {
         if (active && !bursting)
         {
-            if (effectName.Contains("Automatic") || effectName.Contains("Charge"))
-            {
-                if (context.started) { castHeld = true; }
-                if (context.canceled)
-                {
-                    castHeld = false;
+            if (context.started) { castHeld = true; }
+            else if (context.canceled) { castHeld = false; }
 
-                    if (effectName.Contains("Charge"))
-                    {
-                        //Debug.Log("PlayerController, CastSpell");
-                        if (castable && spellReady) //if spell is castable
-                        {
-                            //Debug.Log("PlayerController, spell casted");
-                            curSpell.CastSpell();
-                            spellCooldownTimer = spellCooldownMax;
-                            ADM.SpellRan(); //update adaptive difficulty
-                        }
-                    }
+            if ( effectName.Contains("Charge"))
+            {
+                //Debug.Log("PlayerController, CastSpell");
+                if (castable && spellReady) //if spell is castable
+                {
+                    //Debug.Log("PlayerController, spell casted");
+                    curSpell.CastSpell();
+                    spellCooldownTimer = spellCooldownMax;
+                    ADM.SpellRan(); //update adaptive difficulty
                 }
             }
 
@@ -857,6 +872,38 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
+    public void OnSpellInput(InputAction.CallbackContext context)
+    {
+        if (active && castHeld && context.performed)
+        {
+            Debug.Log(context.control.name);
+            int inputID = -1;
+
+            switch(context.control.name)
+            {
+                case "buttonSouth":
+                    inputID = 0;
+                    break;
+                case "buttonEast":
+                    inputID = 1;
+                    break;
+                case "buttonWest":
+                    inputID = 2;
+                    break;
+                case "buttonNorth":
+                    inputID = 3;
+                    break;
+                default:
+                    inputID = -1;
+                    break;
+            }
+
+            if(SM.GetSpellbookActive())
+            {
+                SM.SpellbookInput(inputID);
+            }
+        }
+    }
 
     private IEnumerator Multicast()
     {
@@ -873,7 +920,7 @@ public class PlayerController : MonoBehaviour
             if (burstCounter == burstMax){ break; } //if counter has reached max, break loop
 
             curSpell = null; //reset current spell
-            AssignSpell(); //assign new spell
+            AssignSpell(shapeName, effectName, elementName); //assign new spell
 
             yield return new WaitForSeconds(burstCooldownTimer); //wait for cooldown
 
@@ -903,8 +950,21 @@ public class PlayerController : MonoBehaviour
     [SerializeField] Animator vignetteOverlayAnimator;
 
     //health points
-    public void SetCurrentHealthPoints(int newHealth) { if (!invincible) { /*Debug.Log("setting health: " + newHealth);*/ healthPointsCurrent = newHealth; HealthCheck(); } }
-    public void AlterCurrentHealthPoints(int alter) { /*Debug.Log("altering health: " + alter);*/ healthPointsCurrent += alter; HealthCheck(); }
+    public void SetCurrentHealthPoints(int newHealth) 
+    {
+        if (!invincible) 
+        {
+            /*Debug.Log("setting health: " + newHealth);*/ 
+            healthPointsCurrent = newHealth; 
+            HealthCheck(); 
+        }
+    }
+    public void AlterCurrentHealthPoints(int alter) 
+    {
+        /*Debug.Log("altering health: " + alter);*/ 
+        healthPointsCurrent += alter; 
+        HealthCheck(); 
+    }
     public void DamageTarget(int alter) 
     {
         if (!invincible) 
@@ -1056,8 +1116,20 @@ public class PlayerController : MonoBehaviour
 
 
 
+            //spell creation
+            if (curSpell == null && castHeld) //if no spell is currently assigned and cast button is held
+            {
+                //bring up spell selection UI
+                SM.Held();
+            }
+            else if(SM.GetSpellbookActive() && !castHeld) //if spellbook is active and cast button is not held
+            {
+                //hide spell selection UI
+                SM.Release();
+            }
+
             //spell attack
-            if(spellCooldownTimer > 0 && castable) //on cast
+            if (spellCooldownTimer > 0 && castable) //on cast
             {
                 castable = false; //set tracker
                 spellReady = false;
@@ -1071,16 +1143,19 @@ public class PlayerController : MonoBehaviour
                 spellStartTime = 0;
                 castable = true;
                 curSpell = null;
-                AssignSpell(); //assign new spell
+                //AssignSpell(); //assign new spell
             }
 
             //automatic spell attack
-            if (castHeld && castable && curSpell.GetShapeScript().GetSpellCastable() && effectName.Contains("Automatic")) //if spell is castable
+            if (curSpell != null)
             {
-                //Debug.Log("PlayerController, spell casted");
-                curSpell.CastSpell();
-                spellCooldownTimer = spellCooldownMax;
-                ADM.SpellRan(); //update adaptive difficulty
+                if (castHeld && castable && curSpell.GetShapeScript().GetSpellCastable() && effectName.Contains("Automatic")) //if spell is castable
+                {
+                    //Debug.Log("PlayerController, spell casted");
+                    curSpell.CastSpell();
+                    spellCooldownTimer = spellCooldownMax;
+                    ADM.SpellRan(); //update adaptive difficulty
+                }
             }
         }
     }

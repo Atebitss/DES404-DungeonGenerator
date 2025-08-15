@@ -15,6 +15,9 @@ public class AbstractSceneManager : MonoBehaviour
     [SerializeField] private bool regenMode = false;
     public bool GetRegenMode() { return regenMode; }
 
+    [SerializeField] private bool playerSpellOverwrite = false;
+    public bool GetPlayerSpellOverwrite() { return playerSpellOverwrite; }
+
 
     //prefabs
     [SerializeField] public GameObject amPrefab;
@@ -124,7 +127,7 @@ public class AbstractSceneManager : MonoBehaviour
             //Debug.Log(player.name);
             PC = player.transform.GetChild(0).gameObject.GetComponent<PlayerController>();
             ADDM = PC.GetADDM();
-            PC.AssignSpell();
+            //PC.AssignSpell();
             playerCamera = player.transform.GetChild(0).transform.GetChild(0).GetComponent<Camera>();
 
             ADM.Wake(this);
@@ -288,7 +291,7 @@ public class AbstractSceneManager : MonoBehaviour
 
         //set enemy stats
         //health
-        Debug.Log(healthModifier);
+        //Debug.Log(healthModifier);
         int newHealth = Mathf.RoundToInt(curEnemyScript.GetMaxHealth() * healthModifier);
         curEnemyScript.SetMaxHealth(newHealth);
         curEnemyScript.FullHeal();
