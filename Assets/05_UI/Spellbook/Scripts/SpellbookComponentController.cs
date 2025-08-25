@@ -1,0 +1,38 @@
+using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
+
+public class SpellbookComponentController : MonoBehaviour
+{
+    [SerializeField] private Image componentIconDisplay;
+    [SerializeField] private TMP_Text componentInputDisplay;
+    private Sprite componentIcon;
+
+    public void Wake(string componentType, string inputType)
+    {
+        Debug.Log("SpellbookComponentController: Wake called with componentType " + componentType + " and inputType " + inputType);
+
+        //display appropriate input based on input type
+        componentInputDisplay.text = inputType;
+
+        //display appropriate icon based on component type
+        switch (componentType)
+        {
+            case "Shape":                              //---may be wrong path---
+                componentIcon = Resources.Load<Sprite>("ComponentIcons/Shape" + componentType + "Icon");
+                break;
+            case "Effect":
+                componentIcon = Resources.Load<Sprite>("ComponentIcons/Effect" + componentType + "Icon");
+                break;
+            case "Element":
+                componentIcon = Resources.Load<Sprite>("ComponentIcons/Element" + componentType + "Icon");
+                break;
+            default:
+                Debug.Log("SpellbookComponentController: unknown componentType " + componentType);
+                break;
+        }
+
+        //load appropriate icon based on component type 
+        if (componentType != null) { componentIconDisplay.sprite = componentIcon; }
+    }
+}
