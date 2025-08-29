@@ -1,7 +1,6 @@
 using System.Collections;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Windows;
+
 
 public class SpellbookManager : MonoBehaviour
 {    
@@ -190,6 +189,8 @@ public class SpellbookManager : MonoBehaviour
         //run any page transition logic here
         processing = true;
 
+        if (pageContentsDisplayed) { pageContentsDisplayed = false; } //reset contents page flag if currently on contents page
+
         //create spell if passing last page
         if (curPageNum == 2)
         {
@@ -298,15 +299,15 @@ public class SpellbookManager : MonoBehaviour
         {
             case 0: //shapes contents page
                 Debug.Log("Generating shapes contents page");
-                curSCnPC.Wake(availableShapes, shapeInputs);
+                curSCnPC.Wake(availableShapes, shapeInputs, 0);
             break;
             case 1: //effects contents page
                 Debug.Log("Generating effects contents page");
-                curSCnPC.Wake(availableEffects, effectInputs);
+                curSCnPC.Wake(availableEffects, effectInputs, 1);
             break;
             case 2: //elements contents page
                 Debug.Log("Generating elements contents page");
-                curSCnPC.Wake(availableElements, elementInputs);
+                curSCnPC.Wake(availableElements, elementInputs, 2);
             break;
             default:
                 Debug.Log("Could not generate contents page, unknown pageNum: " + pageNum);
@@ -323,20 +324,88 @@ public class SpellbookManager : MonoBehaviour
         {
             case 0: //shapes components page
                 Debug.Log("Generating shapes components page");
-                curSCmPC.Wake(availableShapes, shapeInputs);
+                curSCmPC.Wake(availableShapes, shapeInputs, 0);
             break;
             case 1: //effects components page
                 Debug.Log("Generating effects components page");
-                curSCmPC.Wake(availableEffects, effectInputs);
+                curSCmPC.Wake(availableEffects, effectInputs, 1);
             break;
             case 2: //elements components page
                 Debug.Log("Generating elements components page");
-                curSCmPC.Wake(availableElements, elementInputs);
+                curSCmPC.Wake(availableElements, elementInputs, 2);
             break;
             default:
                 Debug.Log("Could not generate component page, unknown pageNum: " + pageNum);
             break;
         }
+    }
+    private void GenerateContentsComponentsPage(int inputID)
+    {
+        Debug.Log("Generating post-contents components page");
+
+        int[] validIDs = new int[0];
+
+        //get valid components and inputs from contents page
+        switch (inputID)
+        {
+            case 0:
+                Debug.Log("Input A pressed, getting south components");
+                validIDs = curSCnPC.GetSouthComponentIDs();
+                break;
+            case 1:
+                Debug.Log("Input B pressed, getting east components");
+                break;
+            case 2:
+                Debug.Log("Input X pressed, getting west components");
+                break;
+            case 3:
+                Debug.Log("Input Y pressed, getting north components");
+                break;
+            default:
+                Debug.Log("Unknown inputID: " + inputID);
+                return;
+        }
+
+
+        string[] validComponents = new string[4];
+        int[,] validInputs = new int[4, 1];
+
+        switch(curPageNum)
+        {
+            case 0:
+                for (int i = 0; i < validComponents.Length; i++)
+                {
+                    validComponents[i] = availableShapes[i];
+                    validInputs[i, 0] = shapeInputs[i, 1];
+                }
+                break;
+            case 1:
+                for (int i = 0; i < validComponents.Length; i++)
+                {
+                    validComponents[i] = availableEffects[i];
+                    validInputs[i, 0] = effectInputs[i, 1];
+                }
+                break;
+            case 2:
+                for (int i = 0; i < validComponents.Length; i++)
+                {
+                    validComponents[i] = availableElements[i];
+                    validInputs[i, 0] = elementInputs[i, 1];
+                }
+                break;
+            default:
+                Debug.Log("Unknown curPageNum: " + curPageNum);
+                break;
+        }
+
+
+        //destroy existing page
+        if (curMainPage != null) { Destroy(curMainPage); }
+
+        //instantiate components page prefab
+        curMainPage = Instantiate(spellbookComponentsPagePrefab, rightPageCanvas.transform); //---add left page later---
+        curSCmPC = curMainPage.GetComponent<SpellbookComponentsPageController>();
+        curSCmPC.Wake(validComponents, validInputs, curPageNum);
     }
 
     private IEnumerator CloseSpellbook()
@@ -382,6 +451,10 @@ public class SpellbookManager : MonoBehaviour
                 // Too many inputs without match, reset combo
                 Debug.Log("Combo too long, resetting: " + currentInputCombo);
                 currentInputCombo = "";
+            }
+            else if(pageContentsDisplayed)
+            {
+                GenerateContentsComponentsPage(inputID);
             }
         }
     }
@@ -470,7 +543,8 @@ public class SpellbookManager : MonoBehaviour
     {
         Debug.Log("Adding all available components");
         availableShapes = new string[] { "Ball", "Beam", "Field" };
-        availableEffects = new string[] { "Arc", "Automatic", "Block", "Chain" };//, "Charge", "Delay", "Explode", "Grow", "Homing", "Link", "Multicast", "Pierce", "Repel", "Split", "Teleport" };
+        //availableEffects = new string[] { "Arc", "Automatic", "Block", "Chain" };
+        availableEffects = new string[] { "Arc", "Automatic", "Block", "Chain", "Charge", "Delay", "Explode", "Grow", "Homing", "Link", "Multicast", "Pierce", "Repel", "Split", "Teleport" };
         availableElements = new string[] { "Electric", "Fire", "Force", "Water" };
     }
     public void AddAvailableShape(string shapeName)

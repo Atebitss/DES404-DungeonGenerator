@@ -8,27 +8,27 @@ public class SpellbookComponentController : MonoBehaviour
     [SerializeField] private TMP_Text componentInputDisplay;
     private Sprite componentIcon;
 
-    public void Wake(string componentType, string inputType)
+    public void Wake(string componentType, string inputType, int numPage)
     {
-        Debug.Log("SpellbookComponentController: Wake called with componentType " + componentType + " and inputType " + inputType);
+        Debug.Log("SpellbookComponentController: Wake called with componentType " + componentType + " and inputType " + inputType + " on page " + numPage);
 
         //display appropriate input based on input type
         componentInputDisplay.text = inputType;
 
         //display appropriate icon based on component type
-        switch (componentType)
+        switch (numPage)
         {
-            case "Shape":                              //---may be wrong path---
+            case 0:                              //---probably wrong path---
                 componentIcon = Resources.Load<Sprite>("ComponentIcons/Shape" + componentType + "Icon");
                 break;
-            case "Effect":
+            case 1:
                 componentIcon = Resources.Load<Sprite>("ComponentIcons/Effect" + componentType + "Icon");
                 break;
-            case "Element":
+            case 2:
                 componentIcon = Resources.Load<Sprite>("ComponentIcons/Element" + componentType + "Icon");
                 break;
             default:
-                Debug.Log("SpellbookComponentController: unknown componentType " + componentType);
+                Debug.Log("SpellbookComponentController: Invalid page number " + numPage + " provided.");
                 break;
         }
 

@@ -11,14 +11,16 @@ public class SpellbookComponentsPageController : MonoBehaviour
     //data
     private string[] availableComponents;
     private int[,] componentInputs;
+    private int pageNum = -1;
 
-    public void Wake(string[] availableComponents, int[,] componentInputs)
+    public void Wake(string[] availableComponents, int[,] componentInputs, int pageNum)
     {
         Debug.Log("SpellbookContentsPageController: Wake called with " + availableComponents.Length + " available components.");
 
         //update local data
         this.availableComponents = availableComponents;
         this.componentInputs = componentInputs;
+        this.pageNum = pageNum;
 
         DisplayComponentsPage();
     }
@@ -61,7 +63,7 @@ public class SpellbookComponentsPageController : MonoBehaviour
                 {
                     components[i] = Instantiate(componentPrefab, componentGrid.transform);
                     SCCs[i] = components[i].GetComponent<SpellbookComponentController>();
-                    SCCs[i].Wake(availableComponents[i], inputTranslation);
+                    SCCs[i].Wake(availableComponents[i], inputTranslation, pageNum);
                 }
             }
         }
