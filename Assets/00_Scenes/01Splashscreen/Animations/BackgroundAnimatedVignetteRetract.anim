@@ -40,7 +40,7 @@ AnimationClip:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    path: BackgroundAnimatedVignette
+    path: Canvas/BackgroundAnimatedVignette
   m_FloatCurves:
   - serializedVersion: 2
     curve:
@@ -68,7 +68,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_Color.a
-    path: BackgroundAnimatedVignette/DarknessCenter
+    path: Canvas/BackgroundAnimatedVignette/DarknessCenter
     classID: 114
     script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
     flags: 0
@@ -98,7 +98,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_Color.a
-    path: BackgroundAnimatedVignette/DarknessEast
+    path: Canvas/BackgroundAnimatedVignette/DarknessEast
     classID: 114
     script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
     flags: 0
@@ -128,7 +128,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_Color.a
-    path: BackgroundAnimatedVignette/DarknessSouth
+    path: Canvas/BackgroundAnimatedVignette/DarknessNorth
     classID: 114
     script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
     flags: 0
@@ -158,7 +158,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_Color.a
-    path: BackgroundAnimatedVignette/DarknessWest
+    path: Canvas/BackgroundAnimatedVignette/DarknessSouth
     classID: 114
     script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
     flags: 0
@@ -188,7 +188,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_Color.a
-    path: BackgroundAnimatedVignette/DarknessNorth
+    path: Canvas/BackgroundAnimatedVignette/DarknessWest
     classID: 114
     script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
     flags: 0
@@ -201,7 +201,7 @@ AnimationClip:
   m_ClipBindingConstant:
     genericBindings:
     - serializedVersion: 2
-      path: 958128714
+      path: 2897891789
       attribute: 3
       script: {fileID: 0}
       typeID: 4
@@ -210,7 +210,7 @@ AnimationClip:
       isIntCurve: 0
       isSerializeReferenceCurve: 0
     - serializedVersion: 2
-      path: 1913380735
+      path: 3384273976
       attribute: 304273561
       script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
       typeID: 114
@@ -219,7 +219,7 @@ AnimationClip:
       isIntCurve: 0
       isSerializeReferenceCurve: 0
     - serializedVersion: 2
-      path: 3054269917
+      path: 2132081571
       attribute: 304273561
       script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
       typeID: 114
@@ -228,7 +228,7 @@ AnimationClip:
       isIntCurve: 0
       isSerializeReferenceCurve: 0
     - serializedVersion: 2
-      path: 1649266008
+      path: 1208405083
       attribute: 304273561
       script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
       typeID: 114
@@ -237,7 +237,7 @@ AnimationClip:
       isIntCurve: 0
       isSerializeReferenceCurve: 0
     - serializedVersion: 2
-      path: 1259684373
+      path: 3577317869
       attribute: 304273561
       script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
       typeID: 114
@@ -246,7 +246,7 @@ AnimationClip:
       isIntCurve: 0
       isSerializeReferenceCurve: 0
     - serializedVersion: 2
-      path: 4285696238
+      path: 2181942379
       attribute: 304273561
       script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
       typeID: 114
@@ -302,7 +302,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalScale.x
-    path: BackgroundAnimatedVignette
+    path: Canvas/BackgroundAnimatedVignette
     classID: 224
     script: {fileID: 0}
     flags: 0
@@ -332,7 +332,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalScale.y
-    path: BackgroundAnimatedVignette
+    path: Canvas/BackgroundAnimatedVignette
     classID: 224
     script: {fileID: 0}
     flags: 0
@@ -362,7 +362,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalScale.z
-    path: BackgroundAnimatedVignette
+    path: Canvas/BackgroundAnimatedVignette
     classID: 224
     script: {fileID: 0}
     flags: 0
@@ -392,7 +392,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_Color.a
-    path: BackgroundAnimatedVignette/DarknessCenter
+    path: Canvas/BackgroundAnimatedVignette/DarknessCenter
     classID: 114
     script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
     flags: 0
@@ -422,7 +422,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_Color.a
-    path: BackgroundAnimatedVignette/DarknessEast
+    path: Canvas/BackgroundAnimatedVignette/DarknessEast
     classID: 114
     script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
     flags: 0
@@ -452,7 +452,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_Color.a
-    path: BackgroundAnimatedVignette/DarknessSouth
+    path: Canvas/BackgroundAnimatedVignette/DarknessNorth
     classID: 114
     script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
     flags: 0
@@ -482,7 +482,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_Color.a
-    path: BackgroundAnimatedVignette/DarknessWest
+    path: Canvas/BackgroundAnimatedVignette/DarknessSouth
     classID: 114
     script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
     flags: 0
@@ -512,7 +512,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_Color.a
-    path: BackgroundAnimatedVignette/DarknessNorth
+    path: Canvas/BackgroundAnimatedVignette/DarknessWest
     classID: 114
     script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
     flags: 0

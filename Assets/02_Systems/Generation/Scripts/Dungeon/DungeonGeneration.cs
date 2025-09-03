@@ -1562,28 +1562,28 @@ public class DungeonGeneration : MonoBehaviour
 
                     for (int roomID = 0; roomID < largeRoomNum; roomID++)
                     {
-                        //Debug.Log("Dungeon Generation, assigning large room: " + roomID);
+                        Debug.Log("Dungeon Generation, assigning large room: " + roomID);
                         bool valid = false;
                         int sign = 0;
                         int[] curValidRoomIDs = FindThresholdRooms(scale, roomID); //find valid room types
                         int index = Random.Range(0, curValidRoomIDs.Length); //random ID between 0 and max valid types
                         int roomTypeID = curValidRoomIDs[index]; //find random room type
                         int tryCount = 0; //track number of tries
-                        //Debug.Log("Dungeon Generation, large roomTypeID: " + curValidRoomIDs[index]);
+                        Debug.Log("Dungeon Generation, large roomTypeID: " + curValidRoomIDs[index]);
 
                         while (sign == 0) { sign = Random.Range(-1, 2); } //choose to check up or down first
 
                         while (!valid && tryCount < 3) //while room invalid
                         {
                             //if (dbugEnabled) { MG.UpdateHUDDbugText("room type id: " + roomTypeID + ", " + largeRoomTypeStrings[roomTypeID]); }
-                            //Debug.Log("Dungeon Generation, is room " + roomID + " valid: " + IsRoomValid(scale, roomTypeID, roomID, curValidRoomIDs.Length)); 
+                            Debug.Log("Dungeon Generation, is room " + roomID + " valid: " + IsRoomValid(scale, roomTypeID, roomID, curValidRoomIDs.Length)); 
                             valid = IsRoomValid(scale, roomTypeID, roomID, curValidRoomIDs.Length); //set valid to room check
                             //if (dbugEnabled) { MG.UpdateHUDDbugText("valid: " + valid); }
                             
                             if (valid) { /*Debug.Log("Dungeon Generation, large room valid");*/ break; }
                             else if (!valid) //find unused room type, then loop
                             {
-                                //Debug.Log("Dungeon Generation, large room not valid");
+                                Debug.Log("Dungeon Generation, large room not valid");
                                 if (sign == 1 && index >= curValidRoomIDs.Length) //wrap around if exceeding array length
                                 {
                                     index = 0;
@@ -1597,9 +1597,9 @@ public class DungeonGeneration : MonoBehaviour
                                     index += sign;
                                 }
 
-                                //Debug.Log("Dungeon Generation, large roomType: " + index + " / " + curValidRoomIDs.Length);
-                                //Debug.Log("Dungeon Generation, large roomTypeID: " + curValidRoomIDs[index]);
-                                roomTypeID = curValidRoomIDs[index];
+                                Debug.Log("Dungeon Generation, large roomType: " + index + " / " + curValidRoomIDs.Length);
+                                Debug.Log("Dungeon Generation, large roomTypeID: " + curValidRoomIDs[index]);
+                                roomTypeID = curValidRoomIDs[index];   //---INDEX OUT OF BOUND ERROR HAPPENS HERE SOMETIMES---//
                                 tryCount++;
                             }
                         }
@@ -1640,7 +1640,7 @@ public class DungeonGeneration : MonoBehaviour
                     mediumRoomTypes.Keys.CopyTo(mediumRoomTypeStrings, 0);
                     for (int roomID = largeRoomNum; roomID < (largeRoomNum + mediumRoomNum); roomID++)
                     {
-                        //Debug.Log("Dungeon Generation, assigning medium room: " + roomID);
+                        Debug.Log("Dungeon Generation, assigning medium room: " + roomID);
                         //Debug.Log((roomID - largeRoomNum) + "/" + usedTypeMediumIDs.Length);
                         //select random room
                         bool valid = false;
@@ -1649,7 +1649,7 @@ public class DungeonGeneration : MonoBehaviour
                         int index = Random.Range(0, curValidRoomIDs.Length); //random number between 0 and max valid rooms
                         int roomTypeID = curValidRoomIDs[index]; //find random room type
                         int tryCount = 0; //track number of tries
-                        //Debug.Log("Dungeon Generation, medium roomTypeID: " + curValidRoomIDs[index]);
+                        Debug.Log("Dungeon Generation, medium roomTypeID: " + curValidRoomIDs[index]);
 
                         while (sign == 0) { sign = Random.Range(-1, 2); } //decide whether to look up or down
 
@@ -1718,14 +1718,14 @@ public class DungeonGeneration : MonoBehaviour
                             while (!valid && tryCount < 3) //while room invalid
                             { 
                                 //if (dbugEnabled) { MG.UpdateHUDDbugText("room type id: " + roomTypeID + ", " + mediumRoomTypeStrings[roomTypeID]); }
-                                //Debug.Log("Dungeon Generation, is room " + roomID + " valid: " + IsRoomValid(scale, roomTypeID, roomID, curValidRoomIDs.Length));
+                                Debug.Log("Dungeon Generation, is room " + roomID + " valid: " + IsRoomValid(scale, roomTypeID, roomID, curValidRoomIDs.Length));
                                 valid = IsRoomValid(scale, roomTypeID, roomID, curValidRoomIDs.Length); //set valid to room check
                                 //if (dbugEnabled) { MG.UpdateHUDDbugText("valid: " + valid); }
 
                                 if (valid) { break; }
                                 else if (!valid) //find unused room type, then loop
                                 {
-                                    //Debug.Log(index + "/" + curValidRoomIDs.Length);
+                                    Debug.Log("Dungeon Generation, medium room not valid");
                                     if (sign == 1 && index >= curValidRoomIDs.Length) //wrap around if exceeding array length
                                     {
                                         index = 0;
@@ -1739,9 +1739,9 @@ public class DungeonGeneration : MonoBehaviour
                                         index += sign;
                                     }
 
-                                    //Debug.Log("Dungeon Generation, medium roomType: " + index + " / " + curValidRoomIDs.Length);
-                                    //Debug.Log("Dungeon Generation, medium roomTypeID: " + curValidRoomIDs[index]);
-                                    roomTypeID = curValidRoomIDs[index];
+                                    Debug.Log("Dungeon Generation, medium roomType: " + index + " / " + curValidRoomIDs.Length);
+                                    Debug.Log("Dungeon Generation, medium roomTypeID: " + curValidRoomIDs[index]);
+                                    roomTypeID = curValidRoomIDs[index];   //---INDEX OUT OF BOUND ERROR HAPPENS HERE SOMETIMES---//
                                     tryCount++;
                                 }
                             }
