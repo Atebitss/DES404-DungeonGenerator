@@ -70,13 +70,14 @@ public class SpellbookManager : MonoBehaviour
             allSingleButtons[randomIndex] = temp;
         }
 
+        
         //assign shuffled buttons to shape inputs
         for (int i = 0; i < shapeInputs.GetLength(0) && i < (allSingleButtons.Length - 1); i++)
         {
             shapeInputs[i, 0] = allSingleButtons[i];
-            Debug.Log("Shape " + availableShapes[i] + " Input: " + shapeInputs[i, 0]);
+            if (availableShapes.Length > 0) { Debug.Log("Shape " + availableShapes[i] + " Input: " + shapeInputs[i, 0]); }
         }
-
+        
 
         //generate effect inputs (16 possible 2-button combos)
         int comboIndex = 0;
@@ -89,7 +90,6 @@ public class SpellbookManager : MonoBehaviour
                 comboIndex++;
             }
         }
-
 
         //shuffle effect combinations
         for (int i = 0; i < (comboIndex - 1); i++)
@@ -104,10 +104,10 @@ public class SpellbookManager : MonoBehaviour
             effectInputs[randomIndex, 0] = temp1;
             effectInputs[randomIndex, 1] = temp2;
 
-            Debug.Log("Effect " + availableEffects[i] + " Input: " + effectInputs[i, 0] + "," + effectInputs[i, 1]);
+            if (availableEffects.Length > 0) { Debug.Log("Effect " + availableEffects[i] + " Input: " + effectInputs[i, 0] + "," + effectInputs[i, 1]); }
         }
 
-
+        
         //generate element inputs
         comboIndex = 0;
         for (int button1 = 0; button1 < 4 && comboIndex < elementInputs.GetLength(0); button1++)
@@ -131,7 +131,7 @@ public class SpellbookManager : MonoBehaviour
             elementInputs[randomIndex, 0] = temp1;
             elementInputs[randomIndex, 1] = temp2;
 
-            Debug.Log("Element " + availableElements[i] + " Input: " + elementInputs[i, 0] + "," + elementInputs[i, 1]);
+            if (availableElements.Length > 0) { Debug.Log("Element " + availableElements[i] + " Input: " + elementInputs[i, 0] + "," + elementInputs[i, 1]); }
         }
     }
 

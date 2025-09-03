@@ -19,13 +19,13 @@ public class SpellbookComponentController : MonoBehaviour
         switch (numPage)
         {
             case 0:                              //---probably wrong path---
-                componentIcon = Resources.Load<Sprite>("ComponentIcons/Shape" + componentType + "Icon");
+                componentIcon = Resources.Load<Sprite>("SpellComponentIcons/Shape/Shape" + componentType + "Icon");
                 break;
             case 1:
-                componentIcon = Resources.Load<Sprite>("ComponentIcons/Effect" + componentType + "Icon");
+                componentIcon = Resources.Load<Sprite>("SpellComponentIcons/Effect/Effect" + componentType + "Icon");
                 break;
             case 2:
-                componentIcon = Resources.Load<Sprite>("ComponentIcons/Element" + componentType + "Icon");
+                componentIcon = Resources.Load<Sprite>("SpellComponentIcons/Element/Element" + componentType + "Icon");
                 break;
             default:
                 Debug.Log("SpellbookComponentController: Invalid page number " + numPage + " provided.");
