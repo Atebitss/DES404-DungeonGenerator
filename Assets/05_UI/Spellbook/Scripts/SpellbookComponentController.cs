@@ -18,14 +18,17 @@ public class SpellbookComponentController : MonoBehaviour
         //display appropriate icon based on component type
         switch (numPage)
         {
-            case 0:                              //---probably wrong path---
+            case 0:
                 componentIcon = Resources.Load<Sprite>("SpellComponentIcons/Shape/Shape" + componentType + "Icon");
+                Debug.Log("SpellbookComponentController: Loaded icon: " + componentIcon + " from " + "SpellComponentIcons/Shape/Shape" + componentType + "Icon");
                 break;
             case 1:
                 componentIcon = Resources.Load<Sprite>("SpellComponentIcons/Effect/Effect" + componentType + "Icon");
+                Debug.Log("SpellbookComponentController: Loaded icon: " + componentIcon + " from " + "SpellComponentIcons/Effect/Effect" + componentType + "Icon");
                 break;
             case 2:
                 componentIcon = Resources.Load<Sprite>("SpellComponentIcons/Element/Element" + componentType + "Icon");
+                Debug.Log("SpellbookComponentController: Loaded icon: " + componentIcon + " from " + "SpellComponentIcons/Element/Element" + componentType + "Icon");
                 break;
             default:
                 Debug.Log("SpellbookComponentController: Invalid page number " + numPage + " provided.");
@@ -33,6 +36,10 @@ public class SpellbookComponentController : MonoBehaviour
         }
 
         //load appropriate icon based on component type 
-        if (componentType != null) { componentIconDisplay.sprite = componentIcon; }
+        if (componentType != null) 
+        {
+            componentIconDisplay.sprite = componentIcon;
+            Debug.Log("SpellbookComponentController: " + componentIconDisplay.sprite);
+        }
     }
 }

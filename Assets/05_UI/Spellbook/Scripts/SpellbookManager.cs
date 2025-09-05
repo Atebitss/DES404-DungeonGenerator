@@ -354,12 +354,15 @@ public class SpellbookManager : MonoBehaviour
                 break;
             case 1:
                 Debug.Log("Input B pressed, getting east components");
+                validIDs = curSCnPC.GetEastComponentIDs();
                 break;
             case 2:
                 Debug.Log("Input X pressed, getting west components");
+                validIDs = curSCnPC.GetWestComponentIDs();
                 break;
             case 3:
                 Debug.Log("Input Y pressed, getting north components");
+                validIDs = curSCnPC.GetNorthComponentIDs();
                 break;
             default:
                 Debug.Log("Unknown inputID: " + inputID);
@@ -373,24 +376,33 @@ public class SpellbookManager : MonoBehaviour
         switch(curPageNum)
         {
             case 0:
-                for (int i = 0; i < validComponents.Length; i++)
+                for (int i = 0; i < validIDs.Length; i++)
                 {
-                    validComponents[i] = availableShapes[i];
-                    validInputs[i, 0] = shapeInputs[i, 1];
+                    if (validIDs[i] != -1)
+                    {
+                        validComponents[i] = availableShapes[validIDs[i]];
+                        validInputs[i, 0] = shapeInputs[validIDs[i], 1];
+                    }
                 }
                 break;
             case 1:
-                for (int i = 0; i < validComponents.Length; i++)
+                for (int i = 0; i < validIDs.Length; i++)
                 {
-                    validComponents[i] = availableEffects[i];
-                    validInputs[i, 0] = effectInputs[i, 1];
+                    if (validIDs[i] != -1)
+                    {
+                        validComponents[i] = availableEffects[validIDs[i]];
+                        validInputs[i, 0] = effectInputs[validIDs[i], 1];
+                    }
                 }
                 break;
             case 2:
-                for (int i = 0; i < validComponents.Length; i++)
+                for (int i = 0; i < validIDs.Length; i++)
                 {
-                    validComponents[i] = availableElements[i];
-                    validInputs[i, 0] = elementInputs[i, 1];
+                    if (validIDs[i] != -1)
+                    {
+                        validComponents[i] = availableElements[validIDs[i]];
+                        validInputs[i, 0] = elementInputs[validIDs[i], 1];
+                    }
                 }
                 break;
             default:

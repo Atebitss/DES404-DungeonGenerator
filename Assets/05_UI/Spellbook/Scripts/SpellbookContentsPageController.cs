@@ -15,7 +15,7 @@ public class SpellbookContentsPageController : MonoBehaviour
     private GameObject[] northComponents = new GameObject[4];
     private SpellbookComponentController[] nSCCs = new SpellbookComponentController[4];
 
-    //i references
+    //icon references
     [SerializeField] private Image[] componentIconDisplays = new Image[4];
 
     //data
@@ -23,8 +23,17 @@ public class SpellbookContentsPageController : MonoBehaviour
     private int[,] componentInputs;
     private int pageNum = -1;
 
-    private int[] southComponentIDs = new int[4];
+    private int[] southComponentIDs = new int[] {-1,-1,-1,-1};
     public int[] GetSouthComponentIDs() { return southComponentIDs; }
+
+    private int[] eastComponentIDs = new int[] { -1, -1, -1, -1 };
+    public int[] GetEastComponentIDs() { return eastComponentIDs; }
+
+    private int[] westComponentIDs = new int[] { -1, -1, -1, -1 };
+    public int[] GetWestComponentIDs() { return westComponentIDs; }
+
+    private int[] northComponentIDs = new int[] { -1, -1, -1, -1 };
+    public int[] GetNorthComponentIDs() { return northComponentIDs; }
 
     public void Wake(string[] availableComponents, int[,] componentInputs, int pageNum)
     {
@@ -52,51 +61,55 @@ public class SpellbookContentsPageController : MonoBehaviour
         //display components in their respective grids
         for (int i = 0; i < availableComponents.Length; i++)
         {
-            Debug.Log("Displaying component " + i + " with input " + componentInputs[i, 0]);
+            Debug.Log("Displaying component " + i + ", " + availableComponents[i] + " with input " + componentInputs[i, 0]);
             switch (componentInputs[i, 0])
             {
                 case 0: //south (A)
                     //add component to south grid
-                    Debug.Log("Placing component " + i + " in South grid.");
+                    Debug.Log("Placing component " + i + " in A grid.");
 
                     if (southComponents[southCount] == null)
                     {
                         southComponents[southCount] = Instantiate(componentPrefab, contentsGrids[0].transform);
                         sSCCs[southCount] = southComponents[southCount].GetComponent<SpellbookComponentController>();
-                        sSCCs[southCount].Wake(availableComponents[southCount], "", pageNum);
+                        sSCCs[southCount].Wake(availableComponents[i], "", pageNum);
+                        southComponentIDs[southCount] = i;
                         southCount++;
                     }
                     break;
                 case 1: //east (B)
                     //add component to east grid
-                    Debug.Log("Placing component " + i + " in East grid.");
+                    Debug.Log("Placing component " + i + ", " + availableComponents[i] + " in B grid.");
                     if (eastComponents[eastCount] == null)
                     {
                         eastComponents[eastCount] = Instantiate(componentPrefab, contentsGrids[1].transform);
                         eSCCs[eastCount] = eastComponents[eastCount].GetComponent<SpellbookComponentController>();
-                        eSCCs[eastCount].Wake(availableComponents[eastCount], "", pageNum);
+                        eSCCs[eastCount].Wake(availableComponents[i], "", pageNum);
+                        eastComponentIDs[eastCount] = i;
                         eastCount++;
                     }
                     break;
                 case 2: //west (X)
                     //add component to west grid
-                    Debug.Log("Placing component " + i + " in West grid.");
+                    Debug.Log("Placing component " + i + ", " + availableComponents[i] + " in X grid.");
                     if (westComponents[westCount] == null)
                     {
                         westComponents[westCount] = Instantiate(componentPrefab, contentsGrids[2].transform);
                         wSCCs[westCount] = westComponents[westCount].GetComponent<SpellbookComponentController>();
-                        wSCCs[westCount].Wake(availableComponents[westCount], "", pageNum);
+                        wSCCs[westCount].Wake(availableComponents[i], "", pageNum);
+                        westComponentIDs[westCount] = i;
                         westCount++;
                     }
                     break;
                 case 3: //north (Y)
                     //add component to north grid
-                    Debug.Log("Placing component " + i + " in North grid.");
+                    Debug.Log("Placing component " + i + ", " + availableComponents[i] + " in Y grid.");
                     if (northComponents[northCount] == null)
                     {
                         northComponents[northCount] = Instantiate(componentPrefab, contentsGrids[3].transform);
                         nSCCs[northCount] = northComponents[northCount].GetComponent<SpellbookComponentController>();
-                        nSCCs[northCount].Wake(availableComponents[northCount], "", pageNum);
+                        nSCCs[northCount].Wake(availableComponents[i], "", pageNum);
+                        northComponentIDs[northCount] = i;
                         northCount++;
                     }
                     break;

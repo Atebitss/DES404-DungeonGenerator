@@ -59,7 +59,7 @@ public class SpellbookComponentsPageController : MonoBehaviour
                     if (j < (componentInputs.GetLength(1) - 1)) { inputTranslation += ", "; }
                 }
 
-                if (components[i] == null)
+                if (components[i] == null && availableComponents[i] != null)
                 {
                     components[i] = Instantiate(componentPrefab, componentGrid.transform);
                     SCCs[i] = components[i].GetComponent<SpellbookComponentController>();
