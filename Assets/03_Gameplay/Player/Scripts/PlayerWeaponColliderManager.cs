@@ -59,7 +59,7 @@ public class PlayerWeaponColliderManager : MonoBehaviour
     {
         if (attacking)
         {
-            yield return new WaitForSeconds(0.1f); //wait for 0.1 seconds
+            yield return new WaitForSeconds(0.25f); //wait for x seconds
 
             //check for already overlapping enemy colliders
             BoxCollider weaponAttackCollider = GetComponent<BoxCollider>();

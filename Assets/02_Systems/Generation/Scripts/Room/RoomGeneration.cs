@@ -26,7 +26,7 @@ public class RoomGeneration : MonoBehaviour
     private float roomStartTime = 0f, roomEndTime = 0f, roomTotalTime = 0f;
     public bool GetRoomEntered() { return entered; }
     public void SetRoomEntered(bool entered) { this.entered = entered; }
-    public void FixedUpdate()
+    public void Update()
     {
         if(running)
         {

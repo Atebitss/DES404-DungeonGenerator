@@ -72,12 +72,13 @@ public class PlayerController : MonoBehaviour
         ASM = GameObject.FindWithTag("SceneManager").GetComponent<AbstractSceneManager>();
         AM = ASM.GetAudioManager();
         ADM = ASM.GetComponent<AdaptiveDifficultyManager>();
-        DDM = this.gameObject.transform.parent.GetChild(1).GetComponent<DbugDisplayManager>();
-        ADDM = this.gameObject.transform.parent.GetChild(1).GetComponent<AdaptiveDifficultyDbugManager>();
-        SVM = this.gameObject.transform.parent.GetChild(1).GetComponent<SkillVisualizationManager>();
-        SDM = this.gameObject.transform.parent.GetChild(1).GetComponent<SpellDbugManager>();
-        MM = this.gameObject.transform.parent.GetChild(1).GetComponent<MinimapManager>();
-        CVM = this.gameObject.transform.parent.GetChild(1).GetComponent<ConsumableVisualManager>();
+        GameObject playerParent = this.gameObject.transform.parent.GetChild(1).gameObject;
+        DDM = playerParent.GetComponent<DbugDisplayManager>();
+        ADDM = playerParent.GetComponent<AdaptiveDifficultyDbugManager>();
+        SVM = playerParent.GetComponent<SkillVisualizationManager>();
+        SDM = playerParent.GetComponent<SpellDbugManager>();
+        MM = playerParent.GetComponent<MinimapManager>();
+        CVM = playerParent.GetComponent<ConsumableVisualManager>();
 
         //update camera reference
         if (mainCamera == null) { mainCamera = Camera.main; }
@@ -113,7 +114,7 @@ public class PlayerController : MonoBehaviour
         //update health displays
         maxPlayerHealthBarWidth = playerHealthBarRect.sizeDelta.x;
         UpdatePlayerHealthBar();
-        BHDM = this.gameObject.transform.parent.GetChild(1).GetComponent<BossHealthDisplayManager>();
+        BHDM = playerParent.GetComponent<BossHealthDisplayManager>();
         BHDM.DisableBossHealthDisplay();
 
         //wake minimap
@@ -141,16 +142,22 @@ public class PlayerController : MonoBehaviour
     {
         if (active)
         {
-            if (ASM.GetDevMode()) 
+            UpdatePlayerMovement();
+        }
+    }
+    private void Update()
+    {
+        if (active)
+        {
+            if (ASM.GetDevMode())
             {
                 UpdateDDM();
                 UpdateSDM();
             }
-
-            UpdatePlayerMovement();
+             
             UpdatePlayerLooking();
-            UpdatePlayerStates();
             UpdateInteractionPrompt();
+            UpdatePlayerStates();
         }
     }
 
