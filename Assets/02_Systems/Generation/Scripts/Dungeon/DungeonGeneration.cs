@@ -1584,11 +1584,11 @@ public class DungeonGeneration : MonoBehaviour
                             else if (!valid) //find unused room type, then loop
                             {
                                 Debug.Log("Dungeon Generation, large room not valid");
-                                if (sign == 1 && index >= curValidRoomIDs.Length) //wrap around if exceeding array length
+                                if (sign == 1 && index >= (curValidRoomIDs.Length - 1)) //wrap around if exceeding array length
                                 {
                                     index = 0;
                                 }
-                                else if (sign == -1 && index <= 0) //wrap around if exceeding array length
+                                else if (sign == -1 && index <= 0) //wrap around if exceeding 0
                                 {
                                     index = (curValidRoomIDs.Length - 1);
                                 }
@@ -1726,7 +1726,7 @@ public class DungeonGeneration : MonoBehaviour
                                 else if (!valid) //find unused room type, then loop
                                 {
                                     Debug.Log("Dungeon Generation, medium room not valid");
-                                    if (sign == 1 && index >= curValidRoomIDs.Length) //wrap around if exceeding array length
+                                    if (sign == 1 && index >= (curValidRoomIDs.Length - 1)) //wrap around if exceeding array length
                                     {
                                         index = 0;
                                     }
