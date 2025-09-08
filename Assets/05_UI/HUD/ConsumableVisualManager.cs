@@ -10,7 +10,7 @@ public class ConsumableVisualManager : MonoBehaviour
     [SerializeField] private GameObject cvPrefab;
     [SerializeField] private Sprite[] consumableImages;
 
-    private GameObject[] consumableVisuals = new GameObject[0];
+    private GameObject[] consumableVisuals = new GameObject[100];
 
     private float spawnOffset = 0f; //offset for spawning visuals
 
@@ -47,11 +47,14 @@ public class ConsumableVisualManager : MonoBehaviour
         curCV.transform.SetParent(consumableVisualsParent.transform); //set parent to consumable visuals parent
         Debug.Log("ConsumableVisualManager, instantiated consumable visual: " + curCV.name);
 
-        //increase the size of the array and add visual
-        GameObject[] newCVs = new GameObject[consumableVisuals.Length + 1]; //increased array size
-        for (int i = 0; i < consumableVisuals.Length; i++) { newCVs[i] = consumableVisuals[i]; } //copy old array to new array
-        newCVs[newCVs.Length - 1] = curCV; //add the visual to the end of the array
-        consumableVisuals = newCVs; //set the new array to the old one
+        for (int i = 0; i < consumableVisuals.Length; i++)
+        {
+            if (consumableVisuals[i] == null)
+            {
+                consumableVisuals[i] = curCV; //add new visual to array
+                break;
+            }
+        }
 
         //set the image of the visual
         curCV.transform.GetChild(0).GetComponent<Image>().sprite = consumableImage;
@@ -70,15 +73,14 @@ public class ConsumableVisualManager : MonoBehaviour
         Debug.Log("ConsumableVisualManager, destroying consumable visual: " + trackedCV.name);
 
         //remove visual from array
-        GameObject[] newTrackedCVs = new GameObject[consumableVisuals.Length - 1]; //decreased array size
-        int trackedCVIndex = 0; //index of the tracked visual
         for (int i = 0; i < consumableVisuals.Length; i++)
         {
-            if (consumableVisuals[i] == trackedCV) { continue; } //skip the visual to be destroyed
-            newTrackedCVs[trackedCVIndex] = consumableVisuals[i]; //copy old array to new array
-            trackedCVIndex++; //increase index
+            if (consumableVisuals[i] == trackedCV)
+            {
+                consumableVisuals[i] = null;
+                break;
+            }
         }
-        consumableVisuals = newTrackedCVs; //set the new array to the old one
         Debug.Log("ConsumableVisualManager, removed consumable visual: " + trackedCV.name + " from array");
 
         OrginizeVisuals();
@@ -91,7 +93,10 @@ public class ConsumableVisualManager : MonoBehaviour
         //update position of the remaining visuals
         for (int i = 0; i < consumableVisuals.Length; i++)
         {
-            consumableVisuals[i].transform.localPosition = new Vector3((spawnOffset * i), 0, 0);
+            if (consumableVisuals[i] != null)
+            {
+                consumableVisuals[i].transform.localPosition = new Vector3((spawnOffset * i), 0, 0);
+            }
         }
     }
 
@@ -105,6 +110,6 @@ public class ConsumableVisualManager : MonoBehaviour
             Destroy(consumableVisuals[i].gameObject);
         }
 
-        consumableVisuals = new GameObject[0]; //reset array
+        consumableVisuals = new GameObject[100]; //reset array
     }
 }

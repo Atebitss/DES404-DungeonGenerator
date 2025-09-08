@@ -39,8 +39,8 @@ public class PlayerWeaponColliderManager : MonoBehaviour
     private void ResetAttack()
     {
         //Debug.Log("resetting attack");
-        foundEnemies = new GameObject[0]; //reset found enemies array
-        ignoredTrackedEnemies = new GameObject[0]; //reset ignored tracked enemies array
+        foundEnemies = new GameObject[100]; //reset found enemies array
+        ignoredTrackedEnemies = new GameObject[100]; //reset ignored tracked enemies array
 
         closestEnemyPos = Vector3.zero; //reset closest enemy position
         closestEnemyRot = Quaternion.identity; //reset closest enemy rotation
@@ -53,7 +53,7 @@ public class PlayerWeaponColliderManager : MonoBehaviour
 
 
     //~~~~~enemy tracking~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    private GameObject[] foundEnemies = new GameObject[0]; //track found enemies, used to avoid repeatedly damaging the same enemy
+    private GameObject[] foundEnemies = new GameObject[100]; //track found enemies, used to avoid repeatedly damaging the same enemy
 
     private IEnumerator OverlapCheck()
     {
@@ -110,10 +110,8 @@ public class PlayerWeaponColliderManager : MonoBehaviour
                 if (foundEnemies[enemyIndex] == exitCol.gameObject)
                 {
                     //remove enemy from tracked enemies array
-                    GameObject[] newFoundEnemies = new GameObject[foundEnemies.Length - 1];
-                    for (int newIndex = 0; newIndex < enemyIndex; newIndex++) { newFoundEnemies[newIndex] = foundEnemies[newIndex]; }
-                    for (int newIndex = enemyIndex; newIndex < newFoundEnemies.Length; newIndex++) { newFoundEnemies[newIndex] = foundEnemies[newIndex + 1]; }
-                    foundEnemies = newFoundEnemies;
+                    foundEnemies[enemyIndex] = null;
+                    break;
                 }
             }
 
@@ -122,10 +120,8 @@ public class PlayerWeaponColliderManager : MonoBehaviour
                 if (ignoredTrackedEnemies[enemyIndex] == exitCol.gameObject)
                 {
                     //remove enemy from ignored tracked enemies array
-                    GameObject[] newIgnoredTrackedEnemies = new GameObject[ignoredTrackedEnemies.Length - 1];
-                    for (int newIndex = 0; newIndex < enemyIndex; newIndex++) { newIgnoredTrackedEnemies[newIndex] = ignoredTrackedEnemies[newIndex]; }
-                    for (int newIndex = enemyIndex; newIndex < newIgnoredTrackedEnemies.Length; newIndex++) { newIgnoredTrackedEnemies[newIndex] = ignoredTrackedEnemies[newIndex + 1]; }
-                    ignoredTrackedEnemies = newIgnoredTrackedEnemies;
+                    ignoredTrackedEnemies[enemyIndex] = null;
+                    break;
                 }
             }
         }
@@ -135,7 +131,7 @@ public class PlayerWeaponColliderManager : MonoBehaviour
 
 
     //~~~~~enemy processing~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    private GameObject[] ignoredTrackedEnemies = new GameObject[0]; //track enemies that are ignored by the collider
+    private GameObject[] ignoredTrackedEnemies = new GameObject[100]; //track enemies that are ignored by the collider
     private Vector3 closestEnemyPos = Vector3.zero;
     private Quaternion closestEnemyRot = Quaternion.identity;
     private Vector3 checkSize = Vector3.zero;
@@ -145,10 +141,14 @@ public class PlayerWeaponColliderManager : MonoBehaviour
         //Debug.Log("processing enemy: " + curEnemy.transform.parent.name);
 
         //add enemy to array
-        GameObject[] newFoundEnemies = new GameObject[foundEnemies.Length + 1];
-        for (int enemyIndex = 0; enemyIndex < foundEnemies.Length; enemyIndex++) { newFoundEnemies[enemyIndex] = foundEnemies[enemyIndex]; }
-        newFoundEnemies[foundEnemies.Length] = curEnemy.gameObject;
-        foundEnemies = newFoundEnemies;
+        for (int enemyIndex = 0; enemyIndex < foundEnemies.Length; enemyIndex++) 
+        {
+            if(foundEnemies[enemyIndex] == null)
+            {
+                foundEnemies[enemyIndex] = curEnemy.gameObject;
+                break; 
+            } 
+        }
 
         if(attackType == "light")
         { 
@@ -209,10 +209,14 @@ public class PlayerWeaponColliderManager : MonoBehaviour
 
                         //Debug.Log("enemy added to ignored tracked enemies");
                         //add enemy to ignored tracked enemies
-                        GameObject[] newIgnoredTrackedEnemies = new GameObject[ignoredTrackedEnemies.Length + 1];
-                        for (int enemyIndex = 0; enemyIndex < ignoredTrackedEnemies.Length; enemyIndex++) { newIgnoredTrackedEnemies[enemyIndex] = ignoredTrackedEnemies[enemyIndex]; }
-                        newIgnoredTrackedEnemies[ignoredTrackedEnemies.Length] = hitColliders[hitIndex].gameObject;
-                        ignoredTrackedEnemies = newIgnoredTrackedEnemies;
+                        for (int enemyIndex = 0; enemyIndex < ignoredTrackedEnemies.Length; enemyIndex++)
+                        {
+                            if (ignoredTrackedEnemies[enemyIndex] == null)
+                            {
+                                ignoredTrackedEnemies[enemyIndex] = hitColliders[hitIndex].gameObject;
+                                break;
+                            }
+                        }
                     }
                 }
             }
@@ -250,10 +254,14 @@ public class PlayerWeaponColliderManager : MonoBehaviour
 
         //Debug.Log("adding enemy to ignore list");
         //add enemy to ignored tracked enemies so they cant be hit again
-        GameObject[] newIgnoredTrackedEnemies = new GameObject[ignoredTrackedEnemies.Length + 1];
-        for (int enemyIndex = 0; enemyIndex < ignoredTrackedEnemies.Length; enemyIndex++) { newIgnoredTrackedEnemies[enemyIndex] = ignoredTrackedEnemies[enemyIndex]; }
-        newIgnoredTrackedEnemies[ignoredTrackedEnemies.Length] = enemy;
-        ignoredTrackedEnemies = newIgnoredTrackedEnemies;
+        for (int enemyIndex = 0; enemyIndex < ignoredTrackedEnemies.Length; enemyIndex++)
+        {
+            if (ignoredTrackedEnemies[enemyIndex] == null)
+            {
+                ignoredTrackedEnemies[enemyIndex] = enemy.gameObject;
+                break;
+            }
+        }
 
 
         //Debug.Log("damaging enemy");

@@ -295,7 +295,8 @@ public class ShapeBeam : AbstractShape
     {
         //Debug.Log("ShapeBeam, FindShapeTargets");
         //Debug.Log("Beam segments length: " + beamSegments.Length);
-        targets = new GameObject[0];
+        targets = new GameObject[100];
+        int targetCount = 0;
 
         if (SS.GetEffectName().Contains("Explode"))
         {
@@ -334,18 +335,30 @@ public class ShapeBeam : AbstractShape
                         {
                             //Debug.Log("Found target: " + cols[i].gameObject.name);
                             //increase targets array and add the enemy
-                            GameObject[] tempTargets = new GameObject[targets.Length + 1];
-                            for (int j = 0; j < targets.Length; j++) { tempTargets[j] = targets[j]; }
-                            tempTargets[tempTargets.Length - 1] = cols[i].gameObject;
-                            targets = tempTargets;
+                            for (int t = 0; t < targets.Length; t++)
+                            {
+                                if (targets[t] == null)
+                                {
+                                    targets[t] = cols[i].gameObject;
+                                    targetCount++;
+                                    //Debug.Log("Added target to targets array at index " + t + ": " + targets[t]);
+                                    break;
+                                }
+                            }
                         }
                     }
                 }
             }
         }
 
-        //Debug.Log("Shape Beam, found " + targets.Length + " targets");
-        return targets;
+        GameObject[] foundTargets = new GameObject[targetCount];
+        for (int i = 0; i < targetCount; i++)
+        {
+            foundTargets[i] = targets[i];
+        }
+
+        Debug.Log("Shape Beam, found " + foundTargets.Length + " targets");
+        return foundTargets;
     }
 
 

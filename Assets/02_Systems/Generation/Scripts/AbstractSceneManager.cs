@@ -156,55 +156,63 @@ public class AbstractSceneManager : MonoBehaviour
 
 
     //enemy controller
-    private GameObject[] enemyObjects = new GameObject[0];
+    private GameObject[] enemyObjects = new GameObject[100];
     public GameObject[] GetEnemyObjects() { return enemyObjects; }
+    public int GetNumOfEnemies()
+    {
+        int count = 0;
+        for (int i = 0; i < enemyObjects.Length; i++)
+        {
+            if (enemyObjects[i] != null) { count++; }
+        }
+        return count;
+    }
 
 
     public void SpawnEnemy(GameObject enemy, Vector3 position, bool active)
     {
         if (MG != null) { if (dbugMode) { MG.UpdateHUDDbugText("Scene Manager: Spawning Enemy " + enemy.name); } }
-        int existingCount = enemyObjects.Length; //current number of enemies tracked
-        int newCount = (existingCount + 1); //new enemies to add + cur
+        int index = -1;
 
-        GameObject[] newEnemyObjects = new GameObject[newCount]; //create a new array with the updated size
-        for (int i = 0; i < existingCount; i++) { newEnemyObjects[i] = enemyObjects[i]; } //copy old data to new array
+        for (int i = 0; i < enemyObjects.Length; i++)
+        {
+            if (enemyObjects[i] == null)
+            {
+                enemyObjects[i] = Instantiate(enemy, position, Quaternion.identity);
+                index = i;
+                break;
+            }
+        }
 
-        //spawn new enemies and add to new array
-        int index = existingCount;
-        newEnemyObjects[index] = Instantiate(enemy, position, Quaternion.identity);
-        GenerateEnemy(newEnemyObjects[index], active);
+        GenerateEnemy(enemyObjects[index], active);
 
-        if (!newEnemyObjects[index].name.Contains("boss")) { newEnemyObjects[index].name = "Enemy" + index; }
-        else { newEnemyObjects[index].name = "Boss" + enemy.transform.GetChild(0).GetComponent<AbstractEnemy>().type; }
-
-        enemyObjects = newEnemyObjects; //replace old array with new array
+        if (!enemyObjects[index].name.Contains("boss")) { enemyObjects[index].name = "Enemy" + index; }
+        else { enemyObjects[index].name = "Boss" + enemy.transform.GetChild(0).GetComponent<AbstractEnemy>().type; }
     }
     public void SpawnEnemies(GameObject[] enemies, Vector3[] positions, bool active)
     {
         if (MG != null) { if (dbugMode) { MG.UpdateHUDDbugText("Scene Manager: Spawning Enemies"); } }
-        int existingCount = enemyObjects.Length; //current number of enemies tracked
-        int newCount = existingCount + enemies.Length; //new enemies to add + cur
-
-        GameObject[] newEnemyObjects = new GameObject[newCount]; //create a new array with the updated size
-        for (int i = 0; i < existingCount; i++) { newEnemyObjects[i] = enemyObjects[i]; } //copy old data to new array
 
         //spawn new enemies and add to new array
-        for (int i = 0; i < enemies.Length; i++)
+        for (int newEnemyIndex = 0; newEnemyIndex < enemies.Length; newEnemyIndex++)
         {
-            if (dbugMode) { MG.UpdateHUDDbugText("Scene Manager: Spawning Enemy " + enemies[i].name); }
-            int index = existingCount + i;
-            newEnemyObjects[index] = Instantiate(enemies[i], positions[i], Quaternion.identity);
-            GenerateEnemy(newEnemyObjects[index], active);
-            
-            if (newEnemyObjects[index].name.Contains("boss")) { newEnemyObjects[index].name = "Boss" + newEnemyObjects[index].GetComponent<AbstractEnemy>().type; }
-            else
+            if (dbugMode) { MG.UpdateHUDDbugText("Scene Manager: Spawning Enemy " + enemies[newEnemyIndex].name); }
+            for(int enemyIndex = 0; enemyIndex < enemyObjects.Length; enemyIndex++)
             {
-                newEnemyObjects[index].name = "Enemy" + index;
-                newEnemyObjects[index].transform.GetChild(0).name = "EnemyCharacter" + index;
+                if(enemyObjects[enemyIndex] == null)
+                {
+                    enemyObjects[enemyIndex] = Instantiate(enemies[newEnemyIndex], positions[newEnemyIndex], Quaternion.identity);
+                    GenerateEnemy(enemyObjects[enemyIndex], active);
+                    if (enemyObjects[enemyIndex].name.Contains("boss")) { enemyObjects[enemyIndex].name = "Boss" + enemyObjects[enemyIndex].transform.GetChild(0).GetComponent<AbstractEnemy>().type; }
+                    else 
+                    {
+                        enemyObjects[enemyIndex].name = "Enemy" + enemyIndex;
+                        enemyObjects[enemyIndex].transform.GetChild(0).name = "EnemyCharacter" + enemyIndex;
+                    }
+                    break;
+                }
             }
         }
-
-        enemyObjects = newEnemyObjects; //replace old array with new array
     }
     private void GenerateEnemy(GameObject curEnemy, bool active)
     {
@@ -342,21 +350,20 @@ public class AbstractSceneManager : MonoBehaviour
             if (enemyObjects[i] != null) { Destroy(enemyObjects[i]); }
         }
         
-        enemyObjects = new GameObject[0];
+        enemyObjects = new GameObject[100];
     }
     public void DestroyEnemy(GameObject enemy)
     {
         if (MG != null) { if (dbugMode) { MG.UpdateHUDDbugText("Scene Manager: Destroying Enemy " + enemy.name); } }
         //Debug.Log("removing enemy from array: " + enemy);
         //find index of enemy to remove
-        int removeIndex = -1;
         for(int i = 0; i < enemyObjects.Length; i++)
         {
             //Debug.Log("enemyObjects" + i + " / " + enemyObjects.Length + ": " + enemyObjects[i]);
             if(enemyObjects[i] == enemy)
             {
                 CGM.OnEnemyDeath(enemy.transform.GetChild(0).position);
-                removeIndex = i;
+                enemyObjects[i] = null;
                 break;
             }
         }
@@ -369,28 +376,6 @@ public class AbstractSceneManager : MonoBehaviour
                 if (linkedEnemies[i] == enemy) { PC.RemoveLinkedEnemy(linkedEnemies[i]); }
             }
         }
-
-        //if enemy was found, create new smaller array without it
-        if (removeIndex != -1)
-        {
-            GameObject[] newArray = new GameObject[enemyObjects.Length - 1];
-            int newArrayIndex = 0;
-            
-            //copy all elements except the removed enemy
-            for(int i = 0; i < enemyObjects.Length; i++)
-            {
-                if(i != removeIndex)
-                {
-                    newArray[newArrayIndex] = enemyObjects[i];
-                    newArrayIndex++;
-                }
-            }
-            
-            //update array
-            enemyObjects = newArray;
-        }
-
-        //Debug.Log("enemy objects: " + (enemyObjects.Length));
     }
 
 

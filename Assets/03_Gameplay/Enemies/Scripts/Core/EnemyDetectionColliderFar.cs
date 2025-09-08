@@ -7,7 +7,7 @@ public class EnemyDetectionColliderFar : MonoBehaviour
     private bool playerNear = false;
     public bool IsPlayerNear() { return playerNear; }
 
-    private GameObject[] enemiesNear = new GameObject[0];
+    private GameObject[] enemiesNear = new GameObject[100];
     private int enemyCount = 0;
     private bool enemyNear = false;
     public bool IsEnemyNear() { return enemyNear; }
@@ -22,10 +22,14 @@ public class EnemyDetectionColliderFar : MonoBehaviour
             enemyNear = true; 
 
             //add enemy to array
-            GameObject[] tempEnemiesNear = new GameObject[enemiesNear.Length + 1]; //increase array size
-            for (int i = 0; i < enemiesNear.Length; i++) { tempEnemiesNear[i] = enemiesNear[i]; } //copy old array
-            enemiesNear = tempEnemiesNear; //assign new array
-            enemiesNear[enemyCount] = col.gameObject; //add new enemy
+            for(int i = 0; i < enemiesNear.Length; i++)
+            {
+                if (enemiesNear[i] == null) //find first empty slot
+                {
+                    enemiesNear[i] = col.gameObject; //add enemy to array
+                    break; //exit loop
+                }
+            }
             enemyCount++; //increase enemy count
         }
     }
@@ -36,20 +40,16 @@ public class EnemyDetectionColliderFar : MonoBehaviour
         if (col.gameObject.tag == "Player") { playerNear = false; }
         if (col.gameObject.tag == "Enemy") 
         {
-            enemyNear = false; 
+            enemyNear = false;
             //remove enemy from array
-            GameObject[] tempEnemiesNear = new GameObject[enemiesNear.Length - 1]; //decrease array size
-            int tempIndex = 0;
-            for (int i = 0; i < enemiesNear.Length; i++) //copy old array except the enemy that left
+            for (int i = 0; i < enemiesNear.Length; i++)
             {
-                if (enemiesNear[i] != col.gameObject) 
+                if (enemiesNear[i] == col.gameObject) //find enemy in array
                 {
-                    tempEnemiesNear[tempIndex] = enemiesNear[i];
-                    tempIndex++; 
+                    enemiesNear[i] = null; //remove enemy from array
+                    break; //exit loop
                 }
-            } 
-            
-            enemiesNear = tempEnemiesNear; //assign new array
+            }
             enemyCount--; //decrease enemy count
         }
     }

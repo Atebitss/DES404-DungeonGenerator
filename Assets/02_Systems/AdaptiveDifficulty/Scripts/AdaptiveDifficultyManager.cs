@@ -55,15 +55,25 @@ public class AdaptiveDifficultyManager : MonoBehaviour
     //room clears
     private int roomsCleared = 0;
     public int GetRoomsCleared() { return roomsCleared; }
-    public void RoomCleared()
+    public void RoomCleared(float clearTime)
     {
         roomsCleared++;
         if (ADDM != null) { ADDM.roomsCleared = roomsCleared; }
+
+        //add new data
+        for (int i = 0; i < roomClearTimes.Length - 1; i++)
+        {
+            if (roomClearTimes[i] == 0f)
+            {
+                roomClearTimes[i] = clearTime;
+                break;
+            }
+        }
     }
 
     private float avgRoomClearTime = 0f;
     public float GetAvgRoomClearTime() { return avgRoomClearTime; }
-    private float[] roomClearTimes = new float[0];
+    private float[] roomClearTimes = new float[100];
 
     //floor clears
     private int floorsCleared = 0;
@@ -73,18 +83,22 @@ public class AdaptiveDifficultyManager : MonoBehaviour
         floorsCleared++;
         if (ADDM != null) { ADDM.floorsCleared = floorsCleared; }
 
-        //increase floorClearTimes array and add new data
-        float[] newFloorClearTimes = new float[floorClearTimes.Length + 1];
-        for (int i = 0; i < floorClearTimes.Length; i++) { newFloorClearTimes[i] = floorClearTimes[i]; }
-        newFloorClearTimes[floorClearTimes.Length] = clearTime; //new time
-        floorClearTimes = newFloorClearTimes;
+        //add new data
+        for(int i = 0; i < floorClearTimes.Length - 1; i++)
+        {
+            if(floorClearTimes[i] == 0f)
+            {
+                floorClearTimes[i] = clearTime;
+                break;
+            }
+        }
 
         FillDataFileFloor();
     }
 
     private float avgFloorClearTime = 0f;
     public float GetAvgFloorClearTime() { return avgFloorClearTime; }
-    private float[] floorClearTimes = new float[0];
+    private float[] floorClearTimes = new float[100];
 
 
     //to be tracked throughout a run, reset each room
@@ -128,22 +142,7 @@ public class AdaptiveDifficultyManager : MonoBehaviour
         //Debug.Log("Ending stat watch");
 
         endTime = Time.time;
-        if (ADDM != null)
-        {
-            ADDM.endTime = endTime;
-            ADDM.roomsCleared = roomsCleared;
-        }
-
-        //track room clear time
-        //increase roomClearTimes array size by 1
-        //copy old array to new, larger array
-        //add the current time to the end
-        //update old array
-        float[] newRoomClearTimes = new float[roomClearTimes.Length + 1];
-        for (int i = 0; i < roomClearTimes.Length; i++) { newRoomClearTimes[i] = roomClearTimes[i]; }
-        newRoomClearTimes[roomClearTimes.Length] = (endTime - startTime); //new time
-        roomClearTimes = newRoomClearTimes;
-        totalRoomsCleared++;
+        if (ADDM != null) { ADDM.endTime = endTime; }
 
         Invoke("DisableStatWatch", 0.1f);
     }
@@ -213,20 +212,21 @@ public class AdaptiveDifficultyManager : MonoBehaviour
 
 
 
-    private float[] timeIndexsOfDamageLastTaken = new float[0]; //time of when damage last taken
+    private float[] timeIndexsOfDamageLastTaken = new float[1000]; //time of when damage last taken
     private float avgTimeBetweenDamageTaken = 0f;
     public float[] GetTimesDamageTaken() { return timeIndexsOfDamageLastTaken; }
     public float GetAvgTimeBetweenDamageTaken() { return avgTimeBetweenDamageTaken; }
     public void DamageTaken()
     {
-        //increase timeIdexsOfDamageLastTaken array size by 1
-        //copy old array to new, larger array
-        //add the current time to the end
-        //update old array
-        float[] newTimeIndexsOfDamageLastTaken = new float[timeIndexsOfDamageLastTaken.Length + 1];
-        for (int i = 0; i < timeIndexsOfDamageLastTaken.Length; i++) { newTimeIndexsOfDamageLastTaken[i] = timeIndexsOfDamageLastTaken[i]; }
-        newTimeIndexsOfDamageLastTaken[timeIndexsOfDamageLastTaken.Length] = (Time.time - startTime); //new time
-        timeIndexsOfDamageLastTaken = newTimeIndexsOfDamageLastTaken;
+        //add new data
+        for (int i = 0; i < timeIndexsOfDamageLastTaken.Length - 1; i++)
+        {
+            if (timeIndexsOfDamageLastTaken[i] == 0f)
+            {
+                timeIndexsOfDamageLastTaken[i] = (Time.time - startTime);
+                break;
+            }
+        }
 
 
         float totalTime = 0f;
@@ -340,7 +340,6 @@ public class AdaptiveDifficultyManager : MonoBehaviour
 
     private int totalConsumablesUsed = 0;
 
-    private int totalRoomsCleared = 0;
     private int totalFloorsCleared = 0;
 
     private int totalDamageDealt = 0;
@@ -371,7 +370,6 @@ public class AdaptiveDifficultyManager : MonoBehaviour
         else { return 0f; }
     }
     public int GetTotalConsumablesUsed() { return totalConsumablesUsed; }
-    public int GetTotalRoomsCleared() { return totalRoomsCleared; }
     public int GetTotalFloorsCleared() { return totalFloorsCleared; }
 
     public int GetTotalDamageDealt() { return totalDamageDealt; }

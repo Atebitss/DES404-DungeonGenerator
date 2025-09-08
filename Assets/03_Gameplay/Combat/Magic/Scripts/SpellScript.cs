@@ -86,20 +86,20 @@ public class SpellScript : MonoBehaviour
     private GameObject[] triggerObjects;
     public GameObject[] GetTriggerObjects() { return triggerObjects; }
 
-    private GameObject[] targets = new GameObject[0];
+    private GameObject[] targets = new GameObject[100];
     public void SetSpellTargets(GameObject[] targets) { this.targets = targets; }
     public GameObject[] GetSpellTargets() { return targets; }
 
-    private GameObject[] ignoredTargets = new GameObject[1];
+    private GameObject[] ignoredTargets = new GameObject[100];
     public void SetIgnoredTargets(GameObject[] targets) { ignoredTargets = targets; }
     public void SetIgnoredTarget(GameObject target) { ignoredTargets[0] = target; }
     public GameObject[] GetIgnoredTargets() { return ignoredTargets; }
-    public void ResetIgnoredTargets() { ignoredTargets = new GameObject[1]; }
+    public void ResetIgnoredTargets() { ignoredTargets = new GameObject[100]; }
 
-    private GameObject[] hitTargets = new GameObject[0];
+    private GameObject[] hitTargets = new GameObject[100];
     public GameObject[] GetHitTargets() { return hitTargets; }
 
-    private AbstractEnemy[] targetScripts = new AbstractEnemy[0];
+    private AbstractEnemy[] targetScripts = new AbstractEnemy[100];
     public AbstractEnemy[] GetTargetScripts() { return targetScripts; }
 
 
@@ -362,35 +362,33 @@ public class SpellScript : MonoBehaviour
             {
                 //add the linked enemies to the target array
                 GameObject[] linkedTargets = PC.GetLinkedEnemies();
+                int linkedTargetCount = (linkedTargets.Length - 1);
                 Debug.Log("linked targets length: " + linkedTargets.Length);
 
                 //for each linked target
-                for (int i = 0; i < linkedTargets.Length; i++)
+                for (int linkedTarget = 0; linkedTarget < linkedTargets.Length; linkedTarget++)
                 {
-                    if (linkedTargets[i] != null)
+                    if (linkedTargets[linkedTarget] != null)
                     {
                         //check if it is already in the targets array
-                        bool alreadyInArray = false;
-                        for (int j = 0; j < targets.Length; j++)
+                        for (int enemyTarget = 0; enemyTarget < targets.Length; enemyTarget++)
                         {
-                            if (targets[j] == linkedTargets[i])
+                            if (targets[enemyTarget] == linkedTargets[linkedTarget])
                             {
-                                alreadyInArray = true;
+                                linkedTargets[linkedTarget] = null; //if it is, set to null so it isn't added again
+                                linkedTargetCount--;
                                 break;
                             }
                         }
-
-                        //if not in the array, add it
-                        if (!alreadyInArray)
-                        {
-                            Debug.Log("SpellScript adding linked enemy: " + linkedTargets[i].name);
-                            GameObject[] newTargets = new GameObject[targets.Length + 1];
-                            for (int target = 0; target < targets.Length; target++) { newTargets[target] = targets[target]; }
-                            newTargets[newTargets.Length - 1] = linkedTargets[i];
-                            targets = newTargets;
-                        }
                     }
                 }
+
+                GameObject[] newTargets = new GameObject[((targets.Length - 1) + linkedTargetCount)];
+
+                //combine the arrays
+                for (int targetsNum = 0; targetsNum < targets.Length; targetsNum++) { newTargets[targetsNum] = targets[targetsNum]; }
+                for (int linkedNum = 0; linkedNum < linkedTargets.Length; linkedNum++) { newTargets[((targets.Length - 1) + linkedNum)] = linkedTargets[linkedNum]; }
+                targets = newTargets;
             }
 
             //add hit targets scripts

@@ -23,6 +23,7 @@ public class RoomGeneration : MonoBehaviour
     //~~~~~running~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //room info
     [SerializeField] private bool entered = false, running = false;
+    private float roomStartTime = 0f, roomEndTime = 0f, roomTotalTime = 0f;
     public bool GetRoomEntered() { return entered; }
     public void SetRoomEntered(bool entered) { this.entered = entered; }
     public void FixedUpdate()
@@ -30,7 +31,7 @@ public class RoomGeneration : MonoBehaviour
         if(running)
         {
             //Debug.Log("running: " + running + "   enemies: " + ASM.GetEnemyObjects().Length);
-            if(ASM.GetEnemyObjects().Length == 0)
+            if(ASM.GetNumOfEnemies() == 0) //if no enemies remain, end combat --- ADD MORE WIN CONDITIONS LATER ---
             {
                 if (dbugEnabled) { MG.UpdateHUDDbugText("Room Generation: Room Complete"); }
                 if (bossRoom) //if boss room over, spawn way down
@@ -40,6 +41,8 @@ public class RoomGeneration : MonoBehaviour
                     portalObject.GetComponent<PortalManager>().SetDRM(ASM.GetDG().GetDRM());
                     portalObject.transform.parent = this.transform.GetChild(1);
                 }
+                roomEndTime = Time.time;
+                roomTotalTime = (roomEndTime - roomStartTime);
                 CGM.OnRoomClear(literalPosition + roomCenter);
                 UnlockDoors();
                 //open doors locked pre combat
@@ -48,7 +51,7 @@ public class RoomGeneration : MonoBehaviour
 
                 if (ADM != null) 
                 {
-                    ADM.RoomCleared();
+                    ADM.RoomCleared(roomTotalTime);
                     ADM.RunDifficultyAdapter(); 
                 }
             }
@@ -74,15 +77,13 @@ public class RoomGeneration : MonoBehaviour
 
     //walls
     [SerializeField] private GameObject wallSectionPrefab;
-    private GameObject[] wallObjects = new GameObject[0]; //0 - bottom, 1 - top, 2 - left, 3 - right
-    private float sectionXOffset, sectionZOffset;
 
     //doors
     [SerializeField] private GameObject doorwaySectionPrefab, doorPrefab;
-    private Vector3[] doorPositions = new Vector3[0];
+    private Vector3[] doorPositions = new Vector3[10];
     public Vector3[] GetDoorPositions() { return doorPositions; }
     public Vector3 GetDoorPosition(int index) { return doorPositions[index]; }
-    private GameObject[] doorObjects = new GameObject[0];
+    private GameObject[] doorObjects = new GameObject[10];
     public GameObject[] GetDoorObjects() { return doorObjects; }
     private GameObject doorClosedPreCombat;
     public void LockDoors()
@@ -409,23 +410,23 @@ public class RoomGeneration : MonoBehaviour
 
                 doorCount++;
 
-                //increase array size by 1 and add door
-                GameObject[] newDoorObjects = new GameObject[doorObjects.Length + 1];
                 for (int i = 0; i < doorObjects.Length; i++)
                 {
-                    newDoorObjects[i] = doorObjects[i];
+                    if (doorObjects[i] == null)
+                    {
+                        doorObjects[i] = curDoor;
+                        break;
+                    }
                 }
-                newDoorObjects[doorObjects.Length] = curDoor;
-                doorObjects = newDoorObjects;
 
-                //increase array size by 1 and add door position
-                Vector3[] newDoorPositions = new Vector3[doorPositions.Length + 1];
                 for (int i = 0; i < doorPositions.Length; i++)
                 {
-                    newDoorPositions[i] = doorPositions[i];
+                    if (doorPositions[i] == Vector3.zero)
+                    {
+                        doorPositions[i] = curPos;
+                        break;
+                    }
                 }
-                newDoorPositions[doorPositions.Length] = curPos;
-                doorPositions = newDoorPositions;
             }
         }
     }
@@ -508,7 +509,7 @@ public class RoomGeneration : MonoBehaviour
         {
             //if player is in room and room is not entered, start appropriate room event
             //Debug.Log("roomType: " + roomType);
-            if(!roomType.Contains("Entry") && !roomType.Contains("Treasure") && !roomType.Contains("Special") && !roomType.Contains("Boss")) {StartCombat();} 
+            if (!roomType.Contains("Entry") && !roomType.Contains("Treasure") && !roomType.Contains("Special") && !roomType.Contains("Boss")) {StartCombat();} 
             else if(roomType.Contains("Treasure")){StartTreasure(); }
             else if(roomType.Contains("Special")){StartSpecial();}
             else if(roomType.Contains("Entry")){StartEntry(); }
@@ -523,6 +524,7 @@ public class RoomGeneration : MonoBehaviour
         //update room state
         entered = true;
         running = true;
+        roomStartTime = Time.time;
 
         //lock doors
         LockDoors();
@@ -541,6 +543,7 @@ public class RoomGeneration : MonoBehaviour
         entered = true;
         running = true;
         bossRoom = true;
+        roomStartTime = Time.time;
 
         //lock doors
         LockDoors();
@@ -655,8 +658,8 @@ public class RoomGeneration : MonoBehaviour
         int enemyCount = Random.Range(enemyMin, enemyMax);
         if (dbugEnabled) { MG.UpdateHUDDbugText("Room Generation: Generating " + enemyCount + " Enemies"); }
 
-        Vector3[] enemyPositions = new Vector3[0];
-        GameObject[] enemyTypes = new GameObject[0];
+        Vector3[] enemyPositions = new Vector3[100];
+        GameObject[] enemyTypes = new GameObject[10];
         //Debug.Log("checkDistance: " + tileXOffset);
         //Debug.Log("enemyCount: " + enemyCount);
 
@@ -701,16 +704,15 @@ public class RoomGeneration : MonoBehaviour
                 //if player is not near by, enemy is not in radius, and there are no walls in radius, spawn enemy
                 if (!playerNearBy && !enemyInRadius && !wallInRadius)
                 {
-                    //expand enemy positions array and add new pos
-                    Vector3[] tempEnemyPositions = new Vector3[enemyPositions.Length + 1]; //new increased array
-                    for (int enemyIndex = 0; enemyIndex < enemyPositions.Length; enemyIndex++) { tempEnemyPositions[enemyIndex] = enemyPositions[enemyIndex]; } //copy old content
-                    tempEnemyPositions[(tempEnemyPositions.Length - 1)] = spawnPos; //add new data to last position
-                    enemyPositions = tempEnemyPositions; //update old array with new array
+                    for (int posIndex = 0; posIndex < enemyPositions.Length; posIndex++)
+                    {
+                        if (enemyPositions[posIndex] == Vector3.zero)
+                        {
+                            enemyPositions[posIndex] = spawnPos;
+                            break;
+                        }
+                    }
                     //Debug.Log("valid spawnPos: " + spawnPos);
-
-                    //expand enemy types array and add new type
-                    GameObject[] tempEnemyTypes = new GameObject[enemyTypes.Length + 1]; //new increased array
-                    for (int enemyIndex = 0; enemyIndex < enemyTypes.Length; enemyIndex++) { tempEnemyTypes[enemyIndex] = enemyTypes[enemyIndex]; } //copy old content
 
                     //alter chance to spawn large enemy appropriate to difficulty
                     int largeEnemyChance = 25;
@@ -742,8 +744,14 @@ public class RoomGeneration : MonoBehaviour
                     GameObject randType;
                     if (Random.Range(0, 100) <= largeEnemyChance) { randType = validEnemyTypes[1]; }
                     else { randType = validEnemyTypes[0]; }
-                    tempEnemyTypes[(tempEnemyTypes.Length - 1)] = randType;
-                    enemyTypes = tempEnemyTypes; //update old array with new array
+                    for (int posIndex = 0; posIndex < enemyTypes.Length; posIndex++)
+                    {
+                        if (enemyTypes[posIndex] == null)
+                        {
+                            enemyTypes[posIndex] = randType;
+                            break;
+                        }
+                    }
 
                     posValid = true; //ensure while break
                     break;

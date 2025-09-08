@@ -7,13 +7,13 @@ public class EnemyDetectionColliderNear : MonoBehaviour
     private bool playerNear = false;
     public bool IsPlayerNear() { return playerNear; }
 
-    private GameObject[] enemiesNear = new GameObject[0];
+    private GameObject[] enemiesNear = new GameObject[100];
     public GameObject[] GetEnemiesNear() { return enemiesNear; }
     private int enemyCount = 0;
     private bool enemyNear = false;
     public bool IsEnemyNear() { return enemyNear; }
 
-    private GameObject[] othersNear = new GameObject[0];
+    private GameObject[] othersNear = new GameObject[500];
     public GameObject[] GetOthersNear() { return othersNear; }
     private int otherCount = 0;
     private bool otherNear = false;
@@ -29,10 +29,14 @@ public class EnemyDetectionColliderNear : MonoBehaviour
             enemyNear = true;
 
             //add enemy to array
-            GameObject[] tempEnemiesNear = new GameObject[enemiesNear.Length + 1]; //increase array size
-            for (int i = 0; i < enemiesNear.Length; i++) { tempEnemiesNear[i] = enemiesNear[i]; } //copy old array
-            enemiesNear = tempEnemiesNear; //assign new array
-            enemiesNear[enemyCount] = col.gameObject; //add new enemy
+            for (int i = 0; i < enemiesNear.Length; i++)
+            {
+                if (enemiesNear[i] == null) //find first empty slot
+                {
+                    enemiesNear[i] = col.gameObject; //add enemy to array
+                    break; //exit loop
+                }
+            }
             enemyCount++; //increase enemy count
         }
         if (col.gameObject.tag == "Repel" || col.gameObject.tag == "Compel")
@@ -41,10 +45,14 @@ public class EnemyDetectionColliderNear : MonoBehaviour
             otherNear = true;
 
             //add other to array
-            GameObject[] tempOthersNear = new GameObject[othersNear.Length + 1]; //increase array size
-            for (int i = 0; i < othersNear.Length; i++) { tempOthersNear[i] = othersNear[i]; } //copy old array
-            othersNear = tempOthersNear; //assign new array
-            othersNear[otherCount] = col.gameObject; //add new other
+            for(int i = 0; i < othersNear.Length; i++)
+            {
+                if (othersNear[i] == null) //find first empty slot
+                {
+                    othersNear[i] = col.gameObject; //add other to array
+                    break; //exit loop
+                }
+            }
             otherCount++; //increase other count
         }
     }
@@ -55,19 +63,14 @@ public class EnemyDetectionColliderNear : MonoBehaviour
         if (col.gameObject.tag == "Player") { playerNear = false; }
         if (col.gameObject.tag == "Enemy") 
         {
-            //remove enemy from array
-            GameObject[] tempEnemiesNear = new GameObject[enemiesNear.Length - 1]; //decrease array size
-            int tempIndex = 0;
-            for (int i = 0; i < enemiesNear.Length; i++) //copy old array except the enemy that left
+            for (int i = 0; i < enemiesNear.Length; i++)
             {
-                if (enemiesNear[i] != col.gameObject) 
+                if (enemiesNear[i] == col.gameObject)
                 {
-                    tempEnemiesNear[tempIndex] = enemiesNear[i];
-                    tempIndex++; 
+                    enemiesNear[i] = null; //remove enemy from array
+                    break; //exit loop
                 }
-            } 
-
-            enemiesNear = tempEnemiesNear; //assign new array
+            }
             enemyCount--; //decrease enemy count
 
             if (enemyCount <= 0) { enemyNear = false; }
@@ -77,17 +80,14 @@ public class EnemyDetectionColliderNear : MonoBehaviour
             if (othersNear.Length > 0)
             {
                 //remove other from array
-                GameObject[] tempOthersNear = new GameObject[othersNear.Length - 1]; //decrease array size
-                int tempIndex = 0;
-                for (int i = 0; i < othersNear.Length; i++) //copy old array except the other that left
+                for (int i = 0; i < othersNear.Length; i++)
                 {
-                    if (othersNear[i] != col.gameObject)
+                    if (othersNear[i] == col.gameObject) //find other in array
                     {
-                        tempOthersNear[tempIndex] = othersNear[i];
-                        tempIndex++;
+                        othersNear[i] = null; //remove other from array
+                        break; //exit loop
                     }
                 }
-                othersNear = tempOthersNear; //assign new array
                 otherCount--; //decrease other count
 
                 if (otherCount <= 0) { otherNear = false; }

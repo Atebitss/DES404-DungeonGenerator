@@ -39,13 +39,17 @@ public abstract class AbstractShape : MonoBehaviour
     public Vector3[] pathPoints = new Vector3[2];
     public Vector3[] GetPathPoints() { return pathPoints; }
 
-    public GameObject[] targetObjects = new GameObject[0];
+    public GameObject[] targetObjects = new GameObject[100];
     public void AddTargetObject(GameObject newTarget)
     {
-        GameObject[] newTargetObjects = new GameObject[targetObjects.Length + 1];
-        for (int i = 0; i < targetObjects.Length; i++) { newTargetObjects[i] = targetObjects[i]; }
-        newTargetObjects[newTargetObjects.Length - 1] = newTarget;
-        targetObjects = newTargetObjects;
+        for (int i = 0; i < targetObjects.Length; i++)
+        {
+            if (targetObjects[i] == null)
+            {
+                targetObjects[i] = newTarget;
+                break;
+            }
+        }
     }
 
 
@@ -69,7 +73,7 @@ public abstract class AbstractShape : MonoBehaviour
     //targetting
     public abstract GameObject[] FindShapeTargets();
 
-    public GameObject[] targets = new GameObject[0]; //to keep track of targets that have already been hit
+    public GameObject[] targets = new GameObject[100]; //to keep track of targets that have already been hit
     public bool HasAlreadyHitTarget(GameObject enemy)
     {
         for (int i = 0; i < targets.Length; i++)

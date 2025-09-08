@@ -10,10 +10,10 @@ public class StatusVisualManager : MonoBehaviour
     [SerializeField] private GameObject svPrefab;
     [SerializeField] private Sprite[] statusImages;
 
-    private GameObject[] statusVisuals = new GameObject[0];
+    private GameObject[] statusVisuals = new GameObject[10];
     private float spawnOffset = 0f; //offset for spawning visuals
 
-    private float[] statusTimers = new float[0];
+    private float[] statusTimers = new float[10];
 
     public void ApplyVisual(string statusType, float statusTime)
     {
@@ -50,19 +50,26 @@ public class StatusVisualManager : MonoBehaviour
         Debug.Log("StatusVisualManager, instantiated status visual: " + curSV.name);
 
         //increase the size of the array and add visual
-        GameObject[] newSVs = new GameObject[statusVisuals.Length + 1]; //increased array size
-        for (int i = 0; i < statusVisuals.Length; i++) { newSVs[i] = statusVisuals[i]; } //copy old array to new array
-        newSVs[newSVs.Length - 1] = curSV; //add the visual to the end of the array
-        statusVisuals = newSVs; //set the new array to the old one
+        for(int i = 0; i < statusVisuals.Length; i++)
+        {
+            if (statusVisuals[i] == null)
+            {
+                statusVisuals[i] = curSV;
+                Debug.Log("StatusVisualManager, added status visual: " + curSV.name + " to array at index: " + i);
+                break;
+            }
+        }
 
         //increase the size of timer array and add new timer
-        float[] newStatusTimers = new float[statusTimers.Length + 1];
-        for (int i = 0; i < statusTimers.Length; i++)
+        for(int i = 0; i < statusTimers.Length; i++)
         {
-            newStatusTimers[i] = statusTimers[i];
+            if (statusTimers[i] == 0f)
+            {
+                statusTimers[i] = Time.time + statusTime; //set timer to current time + status time
+                Debug.Log("StatusVisualManager, added status timer: " + statusTimers[i] + " to array at index: " + i);
+                break;
+            }
         }
-        newStatusTimers[newStatusTimers.Length - 1] = (Time.time + statusTime); //add new timer
-        statusTimers = newStatusTimers;
 
         //set the image of the visual
         curSV.transform.GetChild(2).GetComponent<Image>().sprite = statusImage;
@@ -82,19 +89,15 @@ public class StatusVisualManager : MonoBehaviour
         Debug.Log("StatusVisualManager, destroying status visual: " + trackedCV.name);
 
         //remove visual from array
-        GameObject[] newTrackedCVs = new GameObject[statusVisuals.Length - 1]; //decreased array size
-        float[] newStatusTimers = new float[statusTimers.Length - 1]; //decreased timer array size
-        int trackedCVIndex = 0; //index of the tracked visual
         for (int i = 0; i < statusVisuals.Length; i++)
         {
-            if (statusVisuals[i] == trackedCV) { continue; } //skip the visual to be destroyed
-            newTrackedCVs[trackedCVIndex] = statusVisuals[i]; //copy old array to new array
-            newStatusTimers[trackedCVIndex] = statusTimers[i]; //copy corresponding timer
-            trackedCVIndex++; //increase index
+            if (statusVisuals[i] == trackedCV)
+            {
+                statusVisuals[i] = null; //remove visual from array
+                statusTimers[i] = 0f; //remove corresponding timer
+                break;
+            }
         }
-        statusVisuals = newTrackedCVs; //set the new array to the old one
-        statusTimers = newStatusTimers; //set the new timer array to the old one
-        Debug.Log("StatusVisualManager, removed status visual: " + trackedCV.name + " from array");
 
         OrginizeVisuals();
         Destroy(trackedCV.gameObject); //destroy the visual
@@ -106,7 +109,10 @@ public class StatusVisualManager : MonoBehaviour
         //update position of the remaining visuals
         for (int i = 0; i < statusVisuals.Length; i++)
         {
-            statusVisuals[i].transform.localPosition = new Vector3((spawnOffset * i), 0, 0);
+            if (statusVisuals[i] != null)
+            {
+                statusVisuals[i].transform.localPosition = new Vector3((spawnOffset * i), 0, 0);
+            }
         }
     }
 
@@ -115,9 +121,12 @@ public class StatusVisualManager : MonoBehaviour
     {
         for (int i = 0; i < statusVisuals.Length; i++)
         {
-            if (Time.time <= statusTimers[i])
+            if (statusVisuals[i] != null)
             {
-                statusVisuals[i].transform.GetChild(3).GetComponent<TMP_Text>().text = "" + (statusTimers[i] - Time.time).ToString("#");
+                if (Time.time <= statusTimers[i])
+                {
+                    statusVisuals[i].transform.GetChild(3).GetComponent<TMP_Text>().text = "" + (statusTimers[i] - Time.time).ToString("#");
+                }
             }
         }
     }
@@ -130,9 +139,10 @@ public class StatusVisualManager : MonoBehaviour
         //destroy all visuals
         for (int i = 0; i < statusVisuals.Length; i++)
         {
-            Destroy(statusVisuals[i].gameObject);
+            if (statusVisuals[i] != null)
+            {
+                Destroy(statusVisuals[i].gameObject);
+            }
         }
-
-        statusVisuals = new GameObject[0]; //reset array
     }
 }

@@ -24,7 +24,7 @@ public class PostLevelVisualManager : MonoBehaviour
         visualText.text =
             "Skill Score: " + ADM.GetSkillScore() +
             "   Difficulty: " + ADM.GetDifficulty() +
-            "\n\nRooms Cleared: " + ADM.GetTotalRoomsCleared() +
+            "\n\nRooms Cleared: " + ADM.GetRoomsCleared() +
             "   Avg Clear Time: " + ADM.GetAvgRoomClearTime() +
             "\nFloors Cleared: " + ADM.GetTotalFloorsCleared() +
             "\n\nAttacks: " + ADM.GetTotalMeleeAttacks() +

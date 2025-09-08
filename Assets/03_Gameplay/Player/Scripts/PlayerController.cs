@@ -672,20 +672,23 @@ public class PlayerController : MonoBehaviour
     private SpellbookManager SM;
 
     //linked enemies
-    private GameObject[] linkedEnemies = new GameObject[0]; //used to track enemies linked by link effect
+    private GameObject[] linkedEnemies = new GameObject[10]; //used to track enemies linked by link effect
     public GameObject[] GetLinkedEnemies() { return linkedEnemies; } //get linked enemies array
     public void AddLinkedEnemy(GameObject enemy)
     {
         //check if enemy is already linked
         for (int i = 0; i < linkedEnemies.Length; i++) { if (linkedEnemies[i] == enemy) { Debug.Log("enemy already linked"); return; } }
 
-        Debug.Log("linking " + enemy.name);
-
         //if not, add it to array
-        GameObject[] newLinkedEnemies = new GameObject[linkedEnemies.Length + 1];
-        for (int i = 0; i < linkedEnemies.Length; i++) { newLinkedEnemies[i] = linkedEnemies[i]; }
-        newLinkedEnemies[linkedEnemies.Length] = enemy;
-        linkedEnemies = newLinkedEnemies;
+        Debug.Log("linking " + enemy.name);
+        for (int i = 0; i < linkedEnemies.Length; i++) 
+        {
+            if (linkedEnemies[i] == null)
+            {
+                linkedEnemies[i] = enemy;
+                break;
+            }
+        }
 
         StartCoroutine("UnlinkEnemy", enemy);
     }
@@ -711,6 +714,7 @@ public class PlayerController : MonoBehaviour
             {
                 newLinkedEnemies[newIndex] = linkedEnemies[i];
                 newIndex++;
+                break;
             }
             //else { Debug.Log("unlinking " + enemy.name); }
         }

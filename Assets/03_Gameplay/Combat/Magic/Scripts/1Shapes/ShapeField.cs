@@ -293,7 +293,8 @@ public class ShapeField : AbstractShape
         //Debug.Log("ShapeField, FindShapeTargets");
         //Debug.Log("Field segments length: " + fieldSegments.Length);
 
-        targets = new GameObject[0];
+        targets = new GameObject[100];
+        int targetCount = 0;
 
         for (int seg = 0; seg < fieldSegments.Length; seg++)
         {
@@ -325,16 +326,27 @@ public class ShapeField : AbstractShape
                     {
                         //Debug.Log("Found target: " + cols[i].gameObject.name);
                         //increase targets array and add the enemy
-                        GameObject[] tempTargets = new GameObject[targets.Length + 1];
-                        for (int j = 0; j < targets.Length; j++) { tempTargets[j] = targets[j]; }
-                        tempTargets[tempTargets.Length - 1] = cols[i].gameObject;
-                        targets = tempTargets;
+                        for (int t = 0; t < targets.Length; t++)
+                        {
+                            if (targets[t] == null) 
+                            {
+                                targets[t] = cols[i].gameObject; 
+                                targetCount++;
+                                break; 
+                            }
+                        }
                     }
                 }
             }
         }
 
-        //Debug.Log("Shape Field, found " + targets.Length + " targets");
-        return targets;
+        GameObject[] foundTargets = new GameObject[targetCount];
+        for (int i = 0; i < targetCount; i++)
+        {
+            foundTargets[i] = targets[i];
+        }
+
+        Debug.Log("Shape Field, found " + foundTargets.Length + " targets");
+        return foundTargets;
     }
 }

@@ -99,6 +99,7 @@ public abstract class AbstractEnemy : MonoBehaviour
         PC = ASM.GetPlayerController();
         for (int i = 0; i < weaponAttackColliders.Length; i++)
         {
+            if (weaponAttackColliders[i] == null) { break; }
             EWCMs[i].SetAM(AM);
             EWCMs[i].SetWeaponDamage(attackDamage);
             if (ADM != null) { EWCMs[i].SetADM(ADM); }
@@ -192,8 +193,8 @@ public abstract class AbstractEnemy : MonoBehaviour
 
     //weapon
     [SerializeField] private GameObject weaponParent; //weapon parent
-    [SerializeField] private GameObject[] weaponAttackColliders; //weapon colliders
-    [SerializeField] public EnemyWeaponColliderManager[] EWCMs; //weapon collider scripts
+    [SerializeField] private GameObject[] weaponAttackColliders = new GameObject[5]; //weapon colliders
+    [SerializeField] public EnemyWeaponColliderManager[] EWCMs = new EnemyWeaponColliderManager[5]; //weapon collider scripts
 
     //detection
     private bool playerNear = false;
@@ -235,7 +236,7 @@ public abstract class AbstractEnemy : MonoBehaviour
         yield return new WaitForSeconds(0.1f); //wait for animation to start
         for (int i = 0; i < weaponAttackColliders.Length; i++)
         {
-            //~~~ CHANGE LATER SO ONLY APPROPRIATE COLLIDER IS ENABLED ~~~//
+            if (weaponAttackColliders[i] == null) { break; }
             if (EWCMs[i].gameObject.activeSelf) { EWCMs[i].EnableAttackCheck((GetCurAnimLength())); }
         }
         AM.Play("Sword_Swing1");

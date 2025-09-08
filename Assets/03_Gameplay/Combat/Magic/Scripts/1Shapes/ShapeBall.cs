@@ -191,6 +191,7 @@ public class ShapeBall : AbstractShape
     {
         Debug.Log("ShapeBall, FindShapeTargets");
         Collider[] cols = Physics.OverlapSphere(this.transform.position, SS.GetRadius());
+        int targetCount = 0;
 
         //add all unhit & unignored enemies to targets array
         for (int i = 0; i < cols.Length; i++) //for each collision
@@ -200,14 +201,25 @@ public class ShapeBall : AbstractShape
             {
                 Debug.Log("Found target: " + cols[i].gameObject.name);
                 //increase targets array and add the enemy
-                GameObject[] tempTargets = new GameObject[targets.Length + 1];
-                for (int j = 0; j < targets.Length; j++) { tempTargets[j] = targets[j]; }
-                tempTargets[tempTargets.Length - 1] = cols[i].gameObject;
-                targets = tempTargets;
+                for (int j = 0; j < targets.Length; j++)
+                {
+                    if (targets[j] == null)
+                    {
+                        targets[j] = cols[i].gameObject;
+                        targetCount++;
+                        break;
+                    }
+                }
             }
         }
 
-        Debug.Log("Shape Ball, found " + targets.Length + " targets");
-        return targets;
+        GameObject[] foundTargets = new GameObject[targetCount];
+        for(int i = 0; i < targetCount; i++)
+        {
+            foundTargets[i] = targets[i];
+        }
+
+        Debug.Log("Shape Ball, found " + foundTargets.Length + " targets");
+        return foundTargets;
     }
 }

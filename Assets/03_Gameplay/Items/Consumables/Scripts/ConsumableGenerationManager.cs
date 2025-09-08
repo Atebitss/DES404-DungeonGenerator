@@ -57,7 +57,7 @@ public class ConsumableGenerationManager : MonoBehaviour
     //~~~~~~generation~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     [SerializeField] private GameObject[] consumableTempPrefabs;
     [SerializeField] private GameObject[] consumableBoostPrefabs;
-    private GameObject[] curConsumables = new GameObject[0];
+    private GameObject[] curConsumables = new GameObject[100];
     public void OnEnemyDeath(Vector3 pos)
     {
         //Debug.Log("Consumable Generation, OnEnemyDeath");
@@ -73,11 +73,14 @@ public class ConsumableGenerationManager : MonoBehaviour
             consumable.name = consumable.name.Replace("(Clone)", "");
             //Debug.Log("spawning consumable: " + consumable.name);
 
-            //increase curConsumables array size
-            GameObject[] tempConsumables = new GameObject[curConsumables.Length + 1];
-            for (int i = 0; i < curConsumables.Length; i++) { tempConsumables[i] = curConsumables[i]; }
-            tempConsumables[tempConsumables.Length - 1] = consumable; //add new consumable to the end of the array
-            curConsumables = tempConsumables;
+            for(int i = 0; i < curConsumables.Length; i++)
+            {
+                if (curConsumables[i] == null) //find first empty index
+                {
+                    curConsumables[i] = consumable; //add new consumable to the array
+                    break;
+                }
+            }
         }
     }
 
@@ -95,11 +98,14 @@ public class ConsumableGenerationManager : MonoBehaviour
             consumable.name = consumable.name.Replace("Prefab", "");
             consumable.name = consumable.name.Replace("(Clone)", "");
 
-            //increase curConsumables array size
-            GameObject[] tempConsumables = new GameObject[curConsumables.Length + 1];
-            for (int i = 0; i < curConsumables.Length; i++) { tempConsumables[i] = curConsumables[i]; }
-            tempConsumables[tempConsumables.Length - 1] = consumable; //add new consumable to the end of the array
-            curConsumables = tempConsumables;
+            for (int i = 0; i < curConsumables.Length; i++)
+            {
+                if (curConsumables[i] == null) //find first empty index
+                {
+                    curConsumables[i] = consumable; //add new consumable to the array
+                    break;
+                }
+            }
         }
     }
     //~~~~~~generation~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
