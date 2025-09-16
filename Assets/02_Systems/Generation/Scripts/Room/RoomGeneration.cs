@@ -521,7 +521,7 @@ public class RoomGeneration : MonoBehaviour
             else if(roomType.Contains("Entry")){StartEntry(); }
             else if(roomType.Contains("Boss")){StartBoss();}
 
-            StaticOcclusionCulling.Compute(); //trigger room cull to disable nearby rooms
+            //StaticOcclusionCulling.Compute(); //trigger room cull to disable nearby rooms
         } 
     }
 

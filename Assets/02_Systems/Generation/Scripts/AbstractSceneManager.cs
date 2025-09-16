@@ -109,6 +109,20 @@ public class AbstractSceneManager : MonoBehaviour
     public AudioManager GetAudioManager() { return AM; }
 
 
+    /*private float SOCRunTime = 0f;
+    private void Update()
+    {
+        if (StaticOcclusionCulling.isRunning)
+        {
+            SOCRunTime += Time.deltaTime;
+        }
+        else
+        {
+            Debug.Log("SOC not running, run time: " + SOCRunTime);
+        }
+    }*/
+
+
 
     //player controller
     public GameObject player;
@@ -132,7 +146,8 @@ public class AbstractSceneManager : MonoBehaviour
             playerCamera = player.transform.GetChild(0).transform.GetChild(0).GetComponent<Camera>();
 
             ADM.Wake(this);
-            StaticOcclusionCulling.Compute();
+            StaticOcclusionCulling.Clear();
+            StaticOcclusionCulling.GenerateInBackground();
         }
         else
         {
@@ -196,7 +211,7 @@ public class AbstractSceneManager : MonoBehaviour
         if (MG != null) { if (dbugMode) { MG.UpdateHUDDbugText("Scene Manager: Spawning Enemies"); } }
 
         //spawn new enemies and add to new array
-        Debug.Log(enemies.Length + " enemies to spawn");
+        //Debug.Log(enemies.Length + " enemies to spawn");
         for (int newEnemyIndex = 0; newEnemyIndex < (enemies.Length - 1); newEnemyIndex++)
         {
             if (enemies[newEnemyIndex] != null)
@@ -206,7 +221,7 @@ public class AbstractSceneManager : MonoBehaviour
                 {
                     if (enemyObjects[enemyIndex] == null)
                     {
-                        Debug.Log("Scene Manager: Spawning Enemy " + enemies[newEnemyIndex] + " at array position " + enemyIndex);
+                        //Debug.Log("Scene Manager: Spawning Enemy " + enemies[newEnemyIndex] + " at array position " + enemyIndex);
                         enemyObjects[enemyIndex] = Instantiate(enemies[newEnemyIndex], positions[newEnemyIndex], Quaternion.identity);
                         GenerateEnemy(enemyObjects[enemyIndex], active);
                         if (enemyObjects[enemyIndex].name.Contains("boss")) { enemyObjects[enemyIndex].name = "Boss" + enemyObjects[enemyIndex].transform.GetChild(0).GetComponent<AbstractEnemy>().type; }
@@ -443,4 +458,13 @@ public class AbstractSceneManager : MonoBehaviour
         if (MG != null) { MG.RegenerateDungeon(); }
     }
     virtual public void RestartScene(){}
+
+    private void OnDestroy()
+    {
+        StaticOcclusionCulling.Clear();
+    }
+    private void OnApplicationQuit()
+    {
+        StaticOcclusionCulling.Clear();
+    }
 }

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 public class DungeonRealmManager : AbstractSceneManager
@@ -15,6 +16,7 @@ public class DungeonRealmManager : AbstractSceneManager
 
     override public void RestartScene()
     {
+        StaticOcclusionCulling.Clear();
         MapGeneration MG = this.gameObject.GetComponent<MapGeneration>();
         GameObject SM = this.gameObject;
         if (GetDbugMode()) { MG.UpdateHUDDbugText("Dungeon Scene Manager: Restarting Scene"); }
