@@ -26,7 +26,7 @@ public class EffectChain : AbstractEffect
     }
     public override void ApplyEffect()
     {
-        Debug.Log("Effect Chain apply effect");
+        //Debug.Log("Effect Chain apply effect");
         //find targets
         //sort targets by distance
         //set path points between spell and new target
@@ -42,7 +42,7 @@ public class EffectChain : AbstractEffect
         //check if the spell has been cast
         else if (curTargetNum <= maxTargets)
         {
-            Debug.Log(curTargetNum + " < " + maxTargets + ", checking for targets");
+            //Debug.Log(curTargetNum + " < " + maxTargets + ", checking for targets");
             if (SS.GetShapeName().Contains("Beam"))
             {
                 //find all targets
@@ -51,12 +51,12 @@ public class EffectChain : AbstractEffect
                 //for each possible target
                 for (int i = 0; curTargetNum < maxTargets; i++)
                 {
-                    Debug.Log("Chain effect applied, " + curTargetNum + "/" + maxTargets);
+                    //Debug.Log("Chain effect applied, " + curTargetNum + "/" + maxTargets);
                     SinglePointSort(); //find one target
-                    Debug.Log("Target found: " + targets[0].gameObject.transform.parent.name + " at " + targets[0].transform.position);
+                    //Debug.Log("Target found: " + targets[0].gameObject.transform.parent.name + " at " + targets[0].transform.position);
                     groupTargets[i] = targets[0]; //add target position to array
                     previousTargets[i] = targets[0]; //add target to previous targets array
-                    Debug.Log("Target confirmed: " + groupTargets[i]);
+                    //Debug.Log("Target confirmed: " + groupTargets[i]);
                     curTargetNum++;
                 }
 
@@ -73,7 +73,7 @@ public class EffectChain : AbstractEffect
 
     private void SinglePointSort()
     {
-        Debug.Log("EffectChain SinglePointSort");
+        //Debug.Log("EffectChain SinglePointSort");
         //Debug.Log("CheckPos: " + this.transform.position);
         //reset targets for new check
         targets = new GameObject[1];
@@ -114,7 +114,7 @@ public class EffectChain : AbstractEffect
         //update primary target with closest target
         if (unsortedTargets[0] != null)
         {
-            Debug.Log("Closest target: " + unsortedTargets[0].gameObject.transform.parent.name + " - " + dists[0]);
+            //Debug.Log("Closest target: " + unsortedTargets[0].gameObject.transform.parent.name + " - " + dists[0]);
             targets[0] = unsortedTargets[0];
         }
         //Debug.Log("new startPos: " + pathPoints[0] + "   new endPos: " + pathPoints[1]);
@@ -126,18 +126,18 @@ public class EffectChain : AbstractEffect
             //Debug.Log("z, " + groupTargets[(curTargetNum - 1)] + ", " + (curTargetNum - 1));
             if (curTargetNum > 1)
             {
-                Debug.Log("Finding targets at " + groupTargets[(curTargetNum - 2)].transform.position);
+                //Debug.Log("Finding targets at " + groupTargets[(curTargetNum - 2)].transform.position);
                 searchPos = groupTargets[(curTargetNum - 2)].transform.position;
             }
             else
             {
-                Debug.Log("Finding targets at " + SS.GetEndPos());
+                //Debug.Log("Finding targets at " + SS.GetEndPos());
                 searchPos = SS.GetEndPos();
             }
         }
         else
         {
-            Debug.Log("Finding targets at " + this.transform.position);
+            //Debug.Log("Finding targets at " + this.transform.position);
             searchPos = this.transform.position; //default search position is the spell position
         }
 
@@ -157,7 +157,7 @@ public class EffectChain : AbstractEffect
                         if (previousTargets[check] == null)
                         {
                             //add found target to first empty previous targets pos
-                            Debug.Log("current target found: " + targetCol[obj].transform.parent.name);
+                            //Debug.Log("current target found: " + targetCol[obj].transform.parent.name);
                             previousTargets[check] = targetCol[obj].gameObject;
                             //SS.SetIgnoredTargets(previousTargets);
                             check = previousTargets.Length; //break out of loop, no need to check further
@@ -191,8 +191,8 @@ public class EffectChain : AbstractEffect
             }
         }
 
-        //if (newTargets[0] != null) { for (int i = 0; i < newTargets.Length; i++) { Debug.Log("new target: " + newTargets[i]); } }
-        //else { Debug.Log("new targets null"); }
+        //if (newTargets[0] != null) { for (int i = 0; i < newTargets.Length; i++) { //Debug.Log("new target: " + newTargets[i]); } }
+        //else { //Debug.Log("new targets null"); }
         return newTargets;
     }
 
@@ -203,7 +203,7 @@ public class EffectChain : AbstractEffect
         {
             if (previousTargets[i] != null)
             {
-                if (previousTargets[i] == col) { /*Debug.Log("prev target found: " + previousTargets[i]);*/ return true; }
+                if (previousTargets[i] == col) { /*//Debug.Log("prev target found: " + previousTargets[i]);*/ return true; }
             }
         }
 

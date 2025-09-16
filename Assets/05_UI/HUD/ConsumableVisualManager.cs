@@ -68,9 +68,9 @@ public class ConsumableVisualManager : MonoBehaviour
     }
     private IEnumerator DestroyVisual(GameObject trackedCV, float timer)
     {
-        Debug.Log("ConsumableVisualManager, destroying consumable visual: " + trackedCV.name + " in " + timer + " seconds");
+        //Debug.Log("ConsumableVisualManager, destroying consumable visual: " + trackedCV.name + " in " + timer + " seconds");
         yield return new WaitForSeconds(timer); //wait for timer
-        Debug.Log("ConsumableVisualManager, destroying consumable visual: " + trackedCV.name);
+        //Debug.Log("ConsumableVisualManager, destroying consumable visual: " + trackedCV.name);
 
         //remove visual from array
         for (int i = 0; i < consumableVisuals.Length; i++)

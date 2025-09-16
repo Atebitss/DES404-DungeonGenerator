@@ -18,7 +18,7 @@ public class EffectCharge : AbstractEffect
 
         if (SS.GetPlayerController().GetCastHeld() && callCounter >= 5)
         {
-            Debug.Log("Charge effect applied");
+            //Debug.Log("Charge effect applied");
 
             if(damageModifier < 2f) //limit max damage increase to 100%
             {

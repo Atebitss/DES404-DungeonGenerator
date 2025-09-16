@@ -13,7 +13,7 @@ public class AbstractConsumable : MonoBehaviour
 
 
     //~~~~~~start~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    private float destroyTime = 10f; //time before consumable is destroyed
+    private WaitForSeconds WFS_lifeTimer = new WaitForSeconds(10f); //time before consumable is destroyed
     private void Start()
     {
         StartCoroutine(StartConsumable());
@@ -22,7 +22,7 @@ public class AbstractConsumable : MonoBehaviour
     {
         //start consumable
         //Debug.Log("AbstractConsumable, starting consumable: " + this.gameObject.name);
-        yield return new WaitForSeconds(destroyTime);
+        yield return WFS_lifeTimer;
         StartCoroutine("DestroyConsumable");
     }
     //~~~~~~start~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -57,6 +57,7 @@ public class AbstractConsumable : MonoBehaviour
 
 
     //~~~~~~end~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    private WaitForSeconds WFS_animDelay = new WaitForSeconds(1f);
     private IEnumerator DestroyConsumable()
     {
         //Debug.Log("AbstractConsumable, destroying consumable: " + this.gameObject.name);
@@ -66,7 +67,7 @@ public class AbstractConsumable : MonoBehaviour
             //animation.play("flicker");
 
             //wait for animation to finish
-            yield return new WaitForSeconds(1f);
+            yield return WFS_animDelay;
 
             //destroy consumable object
             Destroy(this.gameObject);

@@ -190,6 +190,7 @@ public abstract class AbstractEnemy : MonoBehaviour
 
     [SerializeField] public float attackDistance = 1.5f; //default attack distance
     [SerializeField] private int attackStage = 0; //used to track attack stage
+    private WaitForSeconds WFS_attackStageDelay = new WaitForSeconds(0.1f); //used to wait for animation to start
 
     //weapon
     [SerializeField] private GameObject weaponParent; //weapon parent
@@ -222,7 +223,7 @@ public abstract class AbstractEnemy : MonoBehaviour
         a.SetBool("attacking", true);
         a.SetInteger("attackStage", 1);
         attackState = 1; //set attack state to preparing
-        yield return new WaitForSeconds(0.1f); //wait for animation to start
+        yield return WFS_attackStageDelay; //wait for animation to start
         yield return new WaitForSeconds((GetCurAnimLength() + (0.5f / attackSpeed))); //wait aniamtion length + overhead time
 
         curAttackCoroutine = StartCoroutine(AttackSwing()); //start swinging attack coroutine
@@ -233,7 +234,7 @@ public abstract class AbstractEnemy : MonoBehaviour
         //Debug.Log("swing attack");
         a.SetInteger("attackStage", 2);
         attackState = 2; //set attack state to swinging
-        yield return new WaitForSeconds(0.1f); //wait for animation to start
+        yield return WFS_attackStageDelay; //wait for animation to start
         for (int i = 0; i < weaponAttackColliders.Length; i++)
         {
             if (weaponAttackColliders[i] == null) { break; }
@@ -250,7 +251,7 @@ public abstract class AbstractEnemy : MonoBehaviour
         //Debug.Log("reset attack");
         a.SetInteger("attackStage", 3);
         attackState = 3; //set attack state to reset
-        yield return new WaitForSeconds(0.1f); //wait for animation to start
+        yield return WFS_attackStageDelay; //wait for animation to start
         yield return new WaitForSeconds(GetCurAnimLength());
 
         curAttackCoroutine = StartCoroutine(AttackReset()); //start reset coroutine
@@ -258,13 +259,13 @@ public abstract class AbstractEnemy : MonoBehaviour
     private IEnumerator AttackReset()
     {
         //idle
-        yield return new WaitForSeconds(0.1f); //wait for animation to start
+        yield return WFS_attackStageDelay; //wait for animation to start
         //Debug.Log("return to idle");
         a.SetBool("attacking", false);
         a.SetInteger("attackStage", 0);
         attackState = 0; //set attack state to idle
 
-        yield return new WaitForSeconds(0.1f); //wait for animation to start
+        yield return WFS_attackStageDelay; //wait for animation to start
         attacking = false; //reset tracker
 
         Retreat();

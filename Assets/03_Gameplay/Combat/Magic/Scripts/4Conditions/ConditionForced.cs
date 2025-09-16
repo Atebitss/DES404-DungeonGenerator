@@ -58,7 +58,7 @@ public class ConditionForced : AbstractCondition
             //check if the target intersects with an object on the Solid layer
             for (int i = 0; i < cornerOffsets.Length; i++)
             {
-                Debug.DrawRay((collider.bounds.center + cornerOffsets[i]), dir * 0.1f, Color.blue, 10f);
+                //Debug.DrawRay((collider.bounds.center + cornerOffsets[i]), dir * 0.1f, Color.blue, 10f);
                 if (Physics.Raycast((collider.bounds.center + cornerOffsets[i]), dir, out RaycastHit hit, 0.1f))
                 {
                     //Debug.Log(this.gameObject.name + " solid collision: " + hit.collider.gameObject.name);

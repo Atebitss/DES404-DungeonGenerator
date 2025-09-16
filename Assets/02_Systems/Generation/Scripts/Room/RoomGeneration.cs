@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine;
 using TMPro;
+using UnityEditor;
 
 public class RoomGeneration : MonoBehaviour
 {
@@ -90,12 +91,16 @@ public class RoomGeneration : MonoBehaviour
     {
         if (dbugEnabled) { MG.UpdateHUDDbugText("Room Generation: Locking Doors"); }
         //Debug.Log("locking doors");
+        for (int i = 0; i < doorObjects.Length; i++) { Debug.Log("doorObjects[" + i + "]: " + doorObjects[i]); }
         for (int doorIndex = 0; doorIndex < doorObjects.Length; doorIndex++)
         {
-            AbstractDoorScript curADS = doorObjects[doorIndex].transform.GetChild(0).transform.GetChild(0).GetComponent<AbstractDoorScript>();
+            if (doorObjects[doorIndex] != null)
+            {
+                AbstractDoorScript curADS = doorObjects[doorIndex].transform.GetChild(0).transform.GetChild(0).GetComponent<AbstractDoorScript>();
 
-            if (curADS.GetIsOpen()) { doorClosedPreCombat = doorObjects[doorIndex]; }
-            curADS.LockDoor();
+                if (curADS.GetIsOpen()) { doorClosedPreCombat = doorObjects[doorIndex]; }
+                curADS.LockDoor();
+            }
         }
     }
     public void UnlockDoors()
@@ -103,7 +108,7 @@ public class RoomGeneration : MonoBehaviour
         if (dbugEnabled) { MG.UpdateHUDDbugText("Room Generation: Unlocking Doors"); }
         for (int i = 0; i < doorObjects.Length; i++)
         {
-            doorObjects[i].transform.GetChild(0).transform.GetChild(0).GetComponent<AbstractDoorScript>().UnlockDoor();
+            if (doorObjects[i] != null) { doorObjects[i].transform.GetChild(0).transform.GetChild(0).GetComponent<AbstractDoorScript>().UnlockDoor(); }
         }
     }
 
@@ -494,12 +499,13 @@ public class RoomGeneration : MonoBehaviour
 
 
     //~~~~~room interaction~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    private WaitForSeconds WFS_roomTriggerDelay = new WaitForSeconds(0.25f);
     private bool playerInRoom = false; //used to check if player is still in room before starting combat
     public void SetPlayerInRoom(bool inRoom) { playerInRoom = inRoom; } //updated by RoomColliderManager
     public IEnumerator RoomEntered() //called by RoomColliderManager when player enters room
     {
         if (dbugEnabled) { MG.UpdateHUDDbugText("Room Generation: Room Entered"); }
-        yield return new WaitForSeconds(0.25f); //wait for player to enter room
+        yield return WFS_roomTriggerDelay; //wait for player to enter room
         //Debug.Log("playerInRoom: " + playerInRoom + ", entered: " + entered);
 
         if (ASM.GetADDM() != null) { ASM.GetADDM().currentDifficulty = roomDifficulty; }
@@ -514,6 +520,8 @@ public class RoomGeneration : MonoBehaviour
             else if(roomType.Contains("Special")){StartSpecial();}
             else if(roomType.Contains("Entry")){StartEntry(); }
             else if(roomType.Contains("Boss")){StartBoss();}
+
+            StaticOcclusionCulling.Compute(); //trigger room cull to disable nearby rooms
         } 
     }
 

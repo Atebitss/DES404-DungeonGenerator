@@ -11,7 +11,7 @@ public class EffectHoming : AbstractEffect
     {
         if (targets[0] == null)
         {
-            Debug.Log("Homing effect applied");
+            //Debug.Log("Homing effect applied");
             //on initial call, find closest target to aim position
             targets[0] = FindClosestEnemyToPos(SS.GetEndPos());
         }
@@ -19,7 +19,7 @@ public class EffectHoming : AbstractEffect
 
     private GameObject FindClosestEnemyToPos(Vector3 pos)
     {
-        Debug.Log("Homing effect finding enemy");
+        //Debug.Log("Homing effect finding enemy");
         GameObject closestEnemy = null;
         float closestDistance = float.MaxValue;
 
@@ -28,19 +28,19 @@ public class EffectHoming : AbstractEffect
         {
             if (collisions[i].tag == "Enemy")
             {
-                Debug.Log("Homing effect found: " + collisions[i].gameObject.name);
+                //Debug.Log("Homing effect found: " + collisions[i].gameObject.name);
                 float distance = Vector3.Distance(pos, collisions[i].transform.position);
-                Debug.Log("Homing effect target distance: " + distance);
+                //Debug.Log("Homing effect target distance: " + distance);
                 if (distance < closestDistance)
                 {
                     closestDistance = distance;
                     closestEnemy = collisions[i].gameObject;
-                    Debug.Log("Homing effect target updated at: " + closestEnemy.transform.position);
+                    //Debug.Log("Homing effect target updated at: " + closestEnemy.transform.position);
                 }
             }
         }
 
-        if (closestEnemy != null) { Debug.Log("Homing effect target found: " + closestEnemy.name + " @ " + closestEnemy.transform.position); }
+        //if (closestEnemy != null) { Debug.Log("Homing effect target found: " + closestEnemy.name + " @ " + closestEnemy.transform.position); }
         return closestEnemy;
     }
 }

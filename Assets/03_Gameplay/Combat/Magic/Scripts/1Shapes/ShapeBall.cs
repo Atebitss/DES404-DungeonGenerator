@@ -109,7 +109,7 @@ public class ShapeBall : AbstractShape
 
         if (!delayed)
         {
-            Debug.Log("Ball shape applied");
+            //Debug.Log("Ball shape applied");
 
             speed = SS.GetSpeed();
             speed *= speedModifier;
@@ -119,10 +119,10 @@ public class ShapeBall : AbstractShape
             shapeCollider.radius = SS.GetRadius();
 
             pathPoints[0] = this.transform.position;
-            Debug.Log("start pos: " + pathPoints[0]);
+            //Debug.Log("start pos: " + pathPoints[0]);
             if (effectScript.targets[0] != null)
             {
-                Debug.Log("es target: " + effectScript.targets[0].transform.parent.name);
+                //Debug.Log("es target: " + effectScript.targets[0].transform.parent.name);
                 pathPoints[(pathPoints.Length - 1)] = effectScript.targets[0].transform.position;
             }
 
@@ -131,7 +131,7 @@ public class ShapeBall : AbstractShape
     }
     private IEnumerator MoveBall()
     {
-        Debug.Log("ShapeBall, MoveBall");
+        //Debug.Log("ShapeBall, MoveBall");
         for (int step = 0; step < pathPoints.Length - 1; step++)
         {
             Vector3 curStartPos = pathPoints[step];
@@ -160,7 +160,7 @@ public class ShapeBall : AbstractShape
                 Vector3 nextPosition = Vector3.Lerp(curStartPos, curEndPos, travelInterpolate);
 
 
-                Debug.DrawRay(transform.position, dir, Color.red, 10f);
+                //Debug.DrawRay(transform.position, dir, Color.red, 10f);
                 //check if the spell intersects with an object on the Enemy layer
                 if (Physics.Raycast(transform.position, dir, out RaycastHit hit, Vector3.Distance(transform.position, nextPosition) + 0.1f, LayerMask.GetMask("Enemy")) && !SS.CheckIgnoredTargets(hit.collider.gameObject) && !HasAlreadyHitTarget(hit.collider.gameObject))
                 {
@@ -175,7 +175,7 @@ public class ShapeBall : AbstractShape
                 yield return null;
             }
         }
-        Debug.Log("MoveBall finished");
+        //Debug.Log("MoveBall finished");
 
         //stop persistance and end spell after reaching destination
         if (SS.GetEffectName().Contains("Pierce")) 
@@ -189,7 +189,7 @@ public class ShapeBall : AbstractShape
 
     public override GameObject[] FindShapeTargets()
     {
-        Debug.Log("ShapeBall, FindShapeTargets");
+        //Debug.Log("ShapeBall, FindShapeTargets");
         Collider[] cols = Physics.OverlapSphere(this.transform.position, SS.GetRadius());
         int targetCount = 0;
 
@@ -199,7 +199,7 @@ public class ShapeBall : AbstractShape
             //if collider belongs to a unhit & uinignored enemy
             if (cols[i].gameObject.tag == "Enemy" && !SS.CheckIgnoredTargets(cols[i].gameObject) && !HasAlreadyHitTarget(cols[i].gameObject))
             {
-                Debug.Log("Found target: " + cols[i].gameObject.name);
+                //Debug.Log("Found target: " + cols[i].gameObject.name);
                 //increase targets array and add the enemy
                 for (int j = 0; j < targets.Length; j++)
                 {
@@ -219,7 +219,7 @@ public class ShapeBall : AbstractShape
             foundTargets[i] = targets[i];
         }
 
-        Debug.Log("Shape Ball, found " + foundTargets.Length + " targets");
+        //Debug.Log("Shape Ball, found " + foundTargets.Length + " targets");
         return foundTargets;
     }
 }

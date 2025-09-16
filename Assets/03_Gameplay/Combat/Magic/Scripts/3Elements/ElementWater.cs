@@ -22,7 +22,7 @@ public class ElementWater : AbstractElement
         //Debug.Log("Water element condition");
 
         GameObject[] targets = SS.GetSpellTargets();
-        for (int i = 0; i < targets.Length; i++) { Debug.Log("Element target" + i + ": " + targets[i]); }
+        //for (int i = 0; i < targets.Length; i++) { Debug.Log("Element target" + i + ": " + targets[i]); }
 
         if (targets != null)
         {

@@ -13,6 +13,7 @@ public class SpellbookManager : MonoBehaviour
     private string selectedShape = "";
     private string selectedEffect = "";
     private string selectedElement = "";
+    private WaitForSeconds WFS_pageAdvance = new WaitForSeconds(0.1f);
 
     //available components
     private string[] availableShapes = new string[0];
@@ -55,7 +56,7 @@ public class SpellbookManager : MonoBehaviour
     }
     private void GenerateAllPossibleInputs()
     {
-        Debug.Log("Generating all possible inputs");
+        //Debug.Log("Generating all possible inputs");
 
         //generate shape inputs (4 possible single buttons)
         int[] allSingleButtons = { 0, 1, 2, 3 };
@@ -75,7 +76,7 @@ public class SpellbookManager : MonoBehaviour
         for (int i = 0; i < shapeInputs.GetLength(0) && i < (allSingleButtons.Length - 1); i++)
         {
             shapeInputs[i, 0] = allSingleButtons[i];
-            if (availableShapes.Length > 0) { Debug.Log("Shape " + availableShapes[i] + " Input: " + shapeInputs[i, 0]); }
+            //if (availableShapes.Length > 0) { //Debug.Log("Shape " + availableShapes[i] + " Input: " + shapeInputs[i, 0]); }
         }
         
 
@@ -94,7 +95,7 @@ public class SpellbookManager : MonoBehaviour
         //shuffle effect combinations
         for (int i = 0; i < (comboIndex - 1); i++)
         {
-            Debug.Log("Shuffling effect combo " + i);
+            //Debug.Log("Shuffling effect combo " + i);
 
             int randomIndex = Random.Range(i, comboIndex);
             int temp1 = effectInputs[i, 0];
@@ -104,7 +105,7 @@ public class SpellbookManager : MonoBehaviour
             effectInputs[randomIndex, 0] = temp1;
             effectInputs[randomIndex, 1] = temp2;
 
-            if (availableEffects.Length > 0) { Debug.Log("Effect " + availableEffects[i] + " Input: " + effectInputs[i, 0] + "," + effectInputs[i, 1]); }
+            //if (availableEffects.Length > 0) { //Debug.Log("Effect " + availableEffects[i] + " Input: " + effectInputs[i, 0] + "," + effectInputs[i, 1]); }
         }
 
         
@@ -131,7 +132,7 @@ public class SpellbookManager : MonoBehaviour
             elementInputs[randomIndex, 0] = temp1;
             elementInputs[randomIndex, 1] = temp2;
 
-            if (availableElements.Length > 0) { Debug.Log("Element " + availableElements[i] + " Input: " + elementInputs[i, 0] + "," + elementInputs[i, 1]); }
+            //if (availableElements.Length > 0) { //Debug.Log("Element " + availableElements[i] + " Input: " + elementInputs[i, 0] + "," + elementInputs[i, 1]); }
         }
     }
 
@@ -141,7 +142,7 @@ public class SpellbookManager : MonoBehaviour
         //Debug.Log("Spellbook Held");
         if (!spellbookActive && !processing)
         {
-            Debug.Log("Spellbook not active");
+            //Debug.Log("Spellbook not active");
             //if the spellbook is not active, open it
             StartCoroutine(OpenSpellbook());
         }
@@ -151,7 +152,7 @@ public class SpellbookManager : MonoBehaviour
         //Debug.Log("Spellbook Released");
         if (spellbookActive)
         {
-            Debug.Log("Spellbook active");
+            //Debug.Log("Spellbook active");
             
             //if the spellbook is active, close it
             StartCoroutine(CloseSpellbook());
@@ -168,7 +169,7 @@ public class SpellbookManager : MonoBehaviour
 
     private IEnumerator OpenSpellbook()
     {
-        Debug.Log("Opening Spellbook");
+        //Debug.Log("Opening Spellbook");
         //run any initialization logic here
         ResetSpellCreation();
         processing = true;
@@ -177,14 +178,14 @@ public class SpellbookManager : MonoBehaviour
         //run book open animation
         DeterminePageDisplay();
 
-        yield return new WaitForSeconds(pageAdvanceTime); // simulate animation time
+        yield return WFS_pageAdvance; // simulate animation time
         spellbookActive = true;
         processing = false;
-        Debug.Log("Spellbook Opened");
+        //Debug.Log("Spellbook Opened");
     }
     private IEnumerator AdvancePage()
     {
-        Debug.Log("Advancing Page");
+        //Debug.Log("Advancing Page");
 
         //run any page transition logic here
         processing = true;
@@ -200,11 +201,11 @@ public class SpellbookManager : MonoBehaviour
 
         //play page transition animation
 
-        yield return new WaitForSeconds(pageAdvanceTime); // simulate animation time
+        yield return WFS_pageAdvance; // simulate animation time
         curPageNum++;
         DeterminePageDisplay();
         processing = false;
-        Debug.Log("Page Advanced to: " + curPageNum);
+        //Debug.Log("Page Advanced to: " + curPageNum);
     }
     private void DeterminePageDisplay()
     {
@@ -221,17 +222,17 @@ public class SpellbookManager : MonoBehaviour
                 //update right page to show components/contents
                 if (availableShapes.Length == 0)
                 {
-                    Debug.Log("No available shapes");
+                    //Debug.Log("No available shapes");
                 }
                 else if(availableShapes.Length > 4)
                 {
-                    Debug.Log("More than 4 shapes, displaying Shapes Contents Page");
+                    //Debug.Log("More than 4 shapes, displaying Shapes Contents Page");
                     pageContentsDisplayed = true;
                     GenerateContentsPage(0);
                 }
                 else if(availableShapes.Length <= 4)
                 {
-                    Debug.Log("Displaying Shapes Page");
+                    //Debug.Log("Displaying Shapes Page");
                     pageContentsDisplayed = false;
                     GenerateComponentsPage(0);
                 }
@@ -243,17 +244,17 @@ public class SpellbookManager : MonoBehaviour
                 //update right page to show components/contents
                 if (availableEffects.Length == 0)
                 {
-                    Debug.Log("No available effects");
+                    //Debug.Log("No available effects");
                 }
                 else if (availableEffects.Length > 4)
                 {
-                    Debug.Log("More than 4 effects, displaying effects contents page");
+                    //Debug.Log("More than 4 effects, displaying effects contents page");
                     pageContentsDisplayed = true;
                     GenerateContentsPage(1);
                 }
                 else if (availableEffects.Length <= 4)
                 {
-                    Debug.Log("Displaying effects page");
+                    //Debug.Log("Displaying effects page");
                     pageContentsDisplayed = false;
                     GenerateComponentsPage(1);
                 }
@@ -265,17 +266,17 @@ public class SpellbookManager : MonoBehaviour
                 //update right page to show components/contents
                 if (availableEffects.Length == 0)
                 {
-                    Debug.Log("No available elements");
+                    //Debug.Log("No available elements");
                 }
                 else if (availableElements.Length > 4)
                 {
-                    Debug.Log("More than 4 elements, displaying elements contents page");
+                    //Debug.Log("More than 4 elements, displaying elements contents page");
                     pageContentsDisplayed = true;
                     GenerateContentsPage(2);
                 }
                 else if (availableElements.Length <= 4)
                 {
-                    Debug.Log("Displaying elements page");
+                    //Debug.Log("Displaying elements page");
                     pageContentsDisplayed = false;
                     GenerateComponentsPage(2);
                 }
@@ -298,19 +299,19 @@ public class SpellbookManager : MonoBehaviour
         switch (pageNum)
         {
             case 0: //shapes contents page
-                Debug.Log("Generating shapes contents page");
+                //Debug.Log("Generating shapes contents page");
                 curSCnPC.Wake(availableShapes, shapeInputs, 0);
             break;
             case 1: //effects contents page
-                Debug.Log("Generating effects contents page");
+                //Debug.Log("Generating effects contents page");
                 curSCnPC.Wake(availableEffects, effectInputs, 1);
             break;
             case 2: //elements contents page
-                Debug.Log("Generating elements contents page");
+                //Debug.Log("Generating elements contents page");
                 curSCnPC.Wake(availableElements, elementInputs, 2);
             break;
             default:
-                Debug.Log("Could not generate contents page, unknown pageNum: " + pageNum);
+                //Debug.Log("Could not generate contents page, unknown pageNum: " + pageNum);
             break;
         }
     }
@@ -323,25 +324,25 @@ public class SpellbookManager : MonoBehaviour
         switch (pageNum)
         {
             case 0: //shapes components page
-                Debug.Log("Generating shapes components page");
+                //Debug.Log("Generating shapes components page");
                 curSCmPC.Wake(availableShapes, shapeInputs, 0);
             break;
             case 1: //effects components page
-                Debug.Log("Generating effects components page");
+                //Debug.Log("Generating effects components page");
                 curSCmPC.Wake(availableEffects, effectInputs, 1);
             break;
             case 2: //elements components page
-                Debug.Log("Generating elements components page");
+                //Debug.Log("Generating elements components page");
                 curSCmPC.Wake(availableElements, elementInputs, 2);
             break;
             default:
-                Debug.Log("Could not generate component page, unknown pageNum: " + pageNum);
+                //Debug.Log("Could not generate component page, unknown pageNum: " + pageNum);
             break;
         }
     }
     private void GenerateContentsComponentsPage(int inputID)
     {
-        Debug.Log("Generating post-contents components page");
+        //Debug.Log("Generating post-contents components page");
 
         int[] validIDs = new int[0];
 
@@ -349,23 +350,23 @@ public class SpellbookManager : MonoBehaviour
         switch (inputID)
         {
             case 0:
-                Debug.Log("Input A pressed, getting south components");
+                //Debug.Log("Input A pressed, getting south components");
                 validIDs = curSCnPC.GetSouthComponentIDs();
                 break;
             case 1:
-                Debug.Log("Input B pressed, getting east components");
+                //Debug.Log("Input B pressed, getting east components");
                 validIDs = curSCnPC.GetEastComponentIDs();
                 break;
             case 2:
-                Debug.Log("Input X pressed, getting west components");
+                //Debug.Log("Input X pressed, getting west components");
                 validIDs = curSCnPC.GetWestComponentIDs();
                 break;
             case 3:
-                Debug.Log("Input Y pressed, getting north components");
+                //Debug.Log("Input Y pressed, getting north components");
                 validIDs = curSCnPC.GetNorthComponentIDs();
                 break;
             default:
-                Debug.Log("Unknown inputID: " + inputID);
+                //Debug.Log("Unknown inputID: " + inputID);
                 return;
         }
 
@@ -406,7 +407,7 @@ public class SpellbookManager : MonoBehaviour
                 }
                 break;
             default:
-                Debug.Log("Unknown curPageNum: " + curPageNum);
+                //Debug.Log("Unknown curPageNum: " + curPageNum);
                 break;
         }
 
@@ -422,7 +423,7 @@ public class SpellbookManager : MonoBehaviour
 
     private IEnumerator CloseSpellbook()
     {
-        Debug.Log("Closing Spellbook");
+        //Debug.Log("Closing Spellbook");
         //run any cleanup logic here
         ResetSpellCreation();
         processing = true;
@@ -431,29 +432,29 @@ public class SpellbookManager : MonoBehaviour
         //play closing animation
         DeterminePageDisplay();
 
-        yield return new WaitForSeconds(pageAdvanceTime); // simulate animation time
+        yield return WFS_pageAdvance; // simulate animation time
         processing = false;
-        Debug.Log("Spellbook Closed");
+        //Debug.Log("Spellbook Closed");
     }
 
     public void SpellbookInput(int inputID)
     {
-        Debug.Log("Spellbook Input: " + inputID);
+        //Debug.Log("Spellbook Input: " + inputID);
 
         if (!processing)
         {
-            Debug.Log("Processing input: " + inputID);
+            //Debug.Log("Processing input: " + inputID);
             processing = true;
 
             //add input to current combo
             currentInputCombo += inputID;
             lastInputTime = Time.time;
-            Debug.Log("Current combo: " + currentInputCombo);
+            //Debug.Log("Current combo: " + currentInputCombo);
 
             // Check if combo matches any available component
             if (CheckForComboMatch(inputID))
             {
-                Debug.Log("Combo matched a component: " + currentInputCombo);
+                //Debug.Log("Combo matched a component: " + currentInputCombo);
                 // Found match, advance to next page
                 currentInputCombo = "";
                 StartCoroutine(AdvancePage());
@@ -461,7 +462,7 @@ public class SpellbookManager : MonoBehaviour
             else if (currentInputCombo.Length >= 3)
             {
                 // Too many inputs without match, reset combo
-                Debug.Log("Combo too long, resetting: " + currentInputCombo);
+                //Debug.Log("Combo too long, resetting: " + currentInputCombo);
                 currentInputCombo = "";
             }
             else if(pageContentsDisplayed)
@@ -475,76 +476,76 @@ public class SpellbookManager : MonoBehaviour
         // Parse current combo into button array
         int[] buttons = new int[currentInputCombo.Length];
         for (int i = 0; i < buttons.Length; i++) { buttons[i] = int.Parse(currentInputCombo[i].ToString()); }
-        Debug.Log("Checking combo match for buttons: " + string.Join(",", buttons));
+        //Debug.Log("Checking combo match for buttons: " + string.Join(",", buttons));
 
         switch (curPageNum)
         {
             case 0: //shapes page
-                Debug.Log("Checking shape inputs, buttons length: " + buttons.Length);
+                //Debug.Log("Checking shape inputs, buttons length: " + buttons.Length);
                 if (buttons.Length == 1)
                 {
                     for (int i = 0; i < availableShapes.Length; i++)
                     {
-                        Debug.Log("Comparing to shape input: " + shapeInputs[i, 0]);
+                        //Debug.Log("Comparing to shape input: " + shapeInputs[i, 0]);
                         if (shapeInputs[i, 0] == buttons[0])
                         {
                             selectedShape = availableShapes[i];
-                            Debug.Log("Selected Shape: " + selectedShape);
+                            //Debug.Log("Selected Shape: " + selectedShape);
                             return true;
                         }
                     }
                 }
-                else { Debug.Log("Shape input length not 1, cannot match"); }
+                //else { Debug.Log("Shape input length not 1, cannot match"); }
                 break;
 
             case 1: //effects page
-                Debug.Log("Checking effect inputs, buttons length: " + buttons.Length);
+                //Debug.Log("Checking effect inputs, buttons length: " + buttons.Length);
                 if (buttons.Length == 2)
                 {
                     for (int i = 0; i < availableEffects.Length; i++)
                     {
-                        Debug.Log("Comparing to effect input: " + effectInputs[i, 0] + "," + effectInputs[i, 1]);
+                        //Debug.Log("Comparing to effect input: " + effectInputs[i, 0] + "," + effectInputs[i, 1]);
                         if (effectInputs[i, 0] == buttons[0] && effectInputs[i, 1] == buttons[1])
                         {
                             selectedEffect = availableEffects[i];
-                            Debug.Log("Selected Effect: " + selectedEffect);
+                            //Debug.Log("Selected Effect: " + selectedEffect);
                             return true;
                         }
                     }
                 }
-                else { Debug.Log("Effect input length not 2, cannot match"); }
+                //else { Debug.Log("Effect input length not 2, cannot match"); }
                 break;
 
             case 2: //elements page
-                Debug.Log("Checking element inputs, buttons length: " + buttons.Length);
+                //Debug.Log("Checking element inputs, buttons length: " + buttons.Length);
                 if (buttons.Length == 2)
                 {
                     for (int i = 0; i < availableElements.Length; i++)
                     {
-                        Debug.Log("Comparing to element input: " + elementInputs[i, 0] + "," + elementInputs[i, 1]);
+                        //Debug.Log("Comparing to element input: " + elementInputs[i, 0] + "," + elementInputs[i, 1]);
                         if (elementInputs[i, 0] == buttons[0] && elementInputs[i, 1] == buttons[1])
                         {
                             selectedElement = availableElements[i];
-                            Debug.Log("Selected Element: " + selectedElement);
+                            //Debug.Log("Selected Element: " + selectedElement);
                             return true;
                         }
                     }
                 }
-                else { Debug.Log("Element input length not 2, cannot match"); }
+                //else { Debug.Log("Element input length not 2, cannot match"); }
                 break;
             default:
-                Debug.Log("Unknown curPageNum: " + curPageNum);
+                //Debug.Log("Unknown curPageNum: " + curPageNum);
             break;
         }
 
         processing = false;
-        Debug.Log("No match found for combo: " + currentInputCombo);
+        //Debug.Log("No match found for combo: " + currentInputCombo);
         return false;
     }
 
     private void CompleteSpell()
     {
-        Debug.Log("Spell Completed");
+        //Debug.Log("Spell Completed");
 
         PC.AssignSpell(selectedShape, selectedEffect, selectedElement);
     }
@@ -553,7 +554,7 @@ public class SpellbookManager : MonoBehaviour
 
     public void AddAllAvailableComponents()
     {
-        Debug.Log("Adding all available components");
+        //Debug.Log("Adding all available components");
         availableShapes = new string[] { "Ball", "Beam", "Field" };
         //availableEffects = new string[] { "Arc", "Automatic", "Block", "Chain" };
         availableEffects = new string[] { "Arc", "Automatic", "Block", "Chain", "Charge", "Delay", "Explode", "Grow", "Homing", "Link", "Multicast", "Pierce", "Repel", "Split", "Teleport" };

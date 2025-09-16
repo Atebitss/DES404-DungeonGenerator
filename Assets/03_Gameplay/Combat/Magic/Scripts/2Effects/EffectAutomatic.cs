@@ -9,6 +9,6 @@ public class EffectAutomatic : AbstractEffect
     }
     public override void ApplyEffect()
     {
-        Debug.Log("Automatic effect applied");
+        //Debug.Log("Automatic effect applied");
     }
 }

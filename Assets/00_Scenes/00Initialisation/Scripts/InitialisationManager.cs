@@ -5,7 +5,7 @@ public class InitialisationManager : MonoBehaviour
 {
     void Start()
     {
-        Debug.Log("Starting SaffensDescent.exe, loading 1.1 SplashScreen scene.");
+        //Debug.Log("Starting SaffensDescent.exe, loading 1.1 SplashScreen scene.");
         SceneManager.LoadScene("1.1 SplashScreen");
     }
 }

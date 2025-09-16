@@ -18,7 +18,7 @@ public class EffectGrow : AbstractEffect
 
         if (callCounter == 5)
         {
-            Debug.Log("Grow effect applied");
+            //Debug.Log("Grow effect applied");
 
             if (damageModifier < 2f) //limit max damage increase to +100%
             {

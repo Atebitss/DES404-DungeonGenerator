@@ -64,8 +64,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3669646095299361949}
-  - component: {fileID: 6678770419892747007}
   - component: {fileID: 2202927025678989107}
+  - component: {fileID: 6273663115483407400}
   - component: {fileID: 8101444903286160388}
   - component: {fileID: 8031259027901366901}
   - component: {fileID: 4808322099658674531}
@@ -92,8 +92,16 @@ Transform:
   - {fileID: 4246261909021138117}
   m_Father: {fileID: 5893396320326747290}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!23 &6678770419892747007
-MeshRenderer:
+--- !u!33 &2202927025678989107
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6652337933876020100}
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!137 &6273663115483407400
+SkinnedMeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -102,12 +110,12 @@ MeshRenderer:
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
+  m_DynamicOccludee: 0
   m_StaticShadowCaster: 0
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
+  m_RayTracingMode: 3
   m_RayTraceProcedural: 0
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
@@ -136,15 +144,18 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_AdditionalVertexStreams: {fileID: 0}
---- !u!33 &2202927025678989107
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6652337933876020100}
+  serializedVersion: 2
+  m_Quality: 0
+  m_UpdateWhenOffscreen: 1
+  m_SkinnedMotionVectors: 0
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+  m_Bones: []
+  m_BlendShapeWeights: []
+  m_RootBone: {fileID: 0}
+  m_AABB:
+    m_Center: {x: 0, y: 0, z: 0}
+    m_Extent: {x: 100, y: 100, z: 100}
+  m_DirtyAABB: 0
 --- !u!54 &8101444903286160388
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -210,7 +221,7 @@ MonoBehaviour:
   isOpen: 0
   isLocked: 0
   a: {fileID: 8162492440024748058}
-  r: {fileID: 6678770419892747007}
+  r: {fileID: 6273663115483407400}
   open: {fileID: 2100000, guid: 826e97eaed5596d4692d2fc0c59fb67c, type: 2}
   closed: {fileID: 2100000, guid: 5b237680ad2e6af4db21715ad686ee55, type: 2}
   locked: {fileID: 2100000, guid: d63cd463a39159248947b55378044460, type: 2}

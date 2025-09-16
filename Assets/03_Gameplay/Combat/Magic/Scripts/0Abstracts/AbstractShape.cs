@@ -80,7 +80,7 @@ public abstract class AbstractShape : MonoBehaviour
         {
             if (targets[i] == enemy)
             {
-                Debug.Log("already hit enemy: " + enemy.name);
+                //Debug.Log("already hit enemy: " + enemy.name);
                 return true;
             }
         }
@@ -124,7 +124,7 @@ public abstract class AbstractShape : MonoBehaviour
     }
     public void EndAim() 
     {
-        Debug.Log("shape end aim");
+        //Debug.Log("shape end aim");
         lastPointConfirmed = true;
         SS.SetStartPos(pathPoints[0]);
         SS.SetEndPos(pathPoints[pathPoints.Length - 1]);
@@ -135,7 +135,7 @@ public abstract class AbstractShape : MonoBehaviour
 
     public IEnumerator DelayCast(float delayTime)
     {
-        Debug.Log("Spell Shape delay cast");
+        //Debug.Log("Spell Shape delay cast");
         delayed = true; //set delayed to true so the spell does not cast immediately
         yield return new WaitForSeconds(delayTime); //wait for the specified time
         delayed = false; //set delayed to false so the spell can be cast
@@ -144,7 +144,7 @@ public abstract class AbstractShape : MonoBehaviour
     }
     public void EndDelay()
     {
-        Debug.Log("Spell Shape end delay");
+        //Debug.Log("Spell Shape end delay");
         StopCoroutine(DelayCast(0f));
     }
 

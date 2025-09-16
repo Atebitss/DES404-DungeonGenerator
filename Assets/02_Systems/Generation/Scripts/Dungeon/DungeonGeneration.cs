@@ -17,6 +17,8 @@ public class DungeonGeneration : MonoBehaviour
     //debug info
     private bool dbugEnabled = false;
     private bool visualDemo = false;
+    private WaitForSeconds WFS_visualDemo = new WaitForSeconds(.1f);
+    private WaitForSeconds WFS_regenDelay = new WaitForSeconds(1f);
 
     //generation data
     private Vector2 mapBoundsMax, mapBoundsMin; //dungeon area literal positions
@@ -329,9 +331,9 @@ public class DungeonGeneration : MonoBehaviour
             DRM.ToggleLoadingVisual(false);
         }
 
-            //choose dungeon type (will be influenced elsewhere later)
+        //choose dungeon type (will be influenced elsewhere later)
 
-            //Debug.Log("GenerateDungeon: DetermineNumOfRooms");
+        //Debug.Log("GenerateDungeon: DetermineNumOfRooms");
         DetermineNumOfRooms(); //calclulate number of possible rooms
 
         //Debug.Log("GenerateDungeon: PlotRooms");
@@ -359,7 +361,7 @@ public class DungeonGeneration : MonoBehaviour
         if (ASM.GetDevMode() && ASM.GetRegenMode())
         {
             //regenerate the dungeon instead of spawning a player
-            yield return new WaitForSeconds(1f);
+            yield return WFS_regenDelay;
             ASM.RestartScene();
         }
         else
@@ -534,7 +536,7 @@ public class DungeonGeneration : MonoBehaviour
                     }
 
                     //visual wait update
-                    if (visualDemo) { yield return new WaitForSeconds(.1f); }
+                    if (visualDemo) { yield return WFS_visualDemo; }
                     else { yield return null; }
                 }
                 else //if making large or medium rooms, find a random position within dungeon area without allowing the new room to pass the area bounds
@@ -579,7 +581,7 @@ public class DungeonGeneration : MonoBehaviour
                                 placed = true;
                                 
                                 //visual wait update
-                                if (visualDemo) { yield return new WaitForSeconds(.1f); }
+                                if (visualDemo) { yield return WFS_visualDemo; }
                                 else { yield return null; }
 
                                 break;
@@ -633,7 +635,7 @@ public class DungeonGeneration : MonoBehaviour
                     roomPositions[curRoomsSpawned] = new Vector2(roomPosX[curRoomsSpawned], roomPosZ[curRoomsSpawned]);
 
                     //visual wait update
-                    if (visualDemo) { yield return new WaitForSeconds(.1f); }
+                    if (visualDemo) { yield return WFS_visualDemo; }
                     else { yield return null; }
                 }
             }
@@ -683,7 +685,7 @@ public class DungeonGeneration : MonoBehaviour
                 roomCenters[curRoomsSpawned] = new Vector2(roomPosX[curRoomsSpawned] + (roomBoundsX[curRoomsSpawned] / 2), roomPosZ[curRoomsSpawned] + (roomBoundsZ[curRoomsSpawned] / 2));
                 //find and set room center
                 curRoomsSpawned++; //iterate loop to next room
-                if (visualDemo) { yield return new WaitForSeconds(.1f); }
+                if (visualDemo) { yield return WFS_visualDemo; }
                 else { yield return null; }
             }
 
@@ -714,7 +716,7 @@ public class DungeonGeneration : MonoBehaviour
                 }
                 
                 //visual wait update
-                if (visualDemo) { yield return new WaitForSeconds(.1f); }
+                if (visualDemo) { yield return WFS_visualDemo; }
                 else { yield return null; }
             }
             else if (roomSpawnAttempts == ((largeRoomNum + mediumRoomNum) - 1))
@@ -740,7 +742,7 @@ public class DungeonGeneration : MonoBehaviour
                 }
                 
                 //visual wait update
-                if (visualDemo) { yield return new WaitForSeconds(.1f); }
+                if (visualDemo) { yield return WFS_visualDemo; }
                 else { yield return null; }
             }
             else if (roomSpawnAttempts == ((largeRoomNum + mediumRoomNum + smallRoomNum) - 1))
@@ -767,7 +769,7 @@ public class DungeonGeneration : MonoBehaviour
                 }
                 
                 //visual wait update
-                if (visualDemo) { yield return new WaitForSeconds(.1f); }
+                if (visualDemo) { yield return WFS_visualDemo; }
                 else { yield return null; }
 
                 break;
@@ -976,7 +978,7 @@ public class DungeonGeneration : MonoBehaviour
                 }
             }
 
-            if (visualDemo) { yield return new WaitForSeconds(.1f); }
+            if (visualDemo) { yield return WFS_visualDemo; }
             else { yield return null; }
         }
     }
@@ -1006,7 +1008,7 @@ public class DungeonGeneration : MonoBehaviour
 
                     //start room to room path generation
                     yield return StartCoroutine(PG.BeginPathGeneration(startPos, targetPos, boundsX, boundsZ, scale));
-                    if (visualDemo) { yield return new WaitForSeconds(.1f); }
+                    if (visualDemo) { yield return WFS_visualDemo; }
                     else { yield return null; }
                 }
                 
@@ -1058,7 +1060,7 @@ public class DungeonGeneration : MonoBehaviour
 
                     //start room to room path generation
                     yield return StartCoroutine(PG.BeginPathGeneration(startPos, targetPos, boundsX, boundsZ, scale));
-                    if (visualDemo) { yield return new WaitForSeconds(.1f); }
+                    if (visualDemo) { yield return WFS_visualDemo; }
                     else { yield return null; }
                 }
             }
@@ -1084,10 +1086,10 @@ public class DungeonGeneration : MonoBehaviour
 
                     //start room to room path generation
                     yield return StartCoroutine(PG.BeginPathGeneration(startPos, targetPos, boundsX, boundsZ, scale));
-                    if (visualDemo) { yield return new WaitForSeconds(.1f); }
+                    if (visualDemo) { yield return WFS_visualDemo; }
                     else { yield return null; }
                 }
-                //else { Debug.Log("roomID == parentRoomID"); yield return null; }
+                //else { //Debug.Log("roomID == parentRoomID"); yield return null; }
             }
         }
         //else { if (dbugEnabled) {MG.UpdateHUDDbugText("scale past hallway gen"); }
@@ -1164,16 +1166,16 @@ public class DungeonGeneration : MonoBehaviour
         if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Defining Important Rooms"); }
 
         FindBossRoom();
-        if (visualDemo) { yield return new WaitForSeconds(.1f); }
+        if (visualDemo) { yield return WFS_visualDemo; }
         else { yield return null; }
         FindEntryRoom();
-        if (visualDemo) { yield return new WaitForSeconds(.1f); }
+        if (visualDemo) { yield return WFS_visualDemo; }
         else { yield return null; }
         FindTreasureRooms();
-        if (visualDemo) { yield return new WaitForSeconds(.1f); }
+        if (visualDemo) { yield return WFS_visualDemo; }
         else { yield return null; }
         FindSpecialRooms();
-        if (visualDemo) { yield return new WaitForSeconds(.1f); }
+        if (visualDemo) { yield return WFS_visualDemo; }
         else { yield return null; }
     }
 
@@ -1542,7 +1544,7 @@ public class DungeonGeneration : MonoBehaviour
                 roomStates[roomID] = "Crypt" + roomStateTemp;
                 //Debug.Log("Dungeon Generation, room state: " + roomStates[roomID]);
                 if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Defined Common Room " + roomID + " as " + roomStates[roomID]); }
-                if (visualDemo) { yield return new WaitForSeconds(.1f); }
+                if (visualDemo) { yield return WFS_visualDemo; }
             }
         }
         else
@@ -1562,28 +1564,28 @@ public class DungeonGeneration : MonoBehaviour
 
                     for (int roomID = 0; roomID < largeRoomNum; roomID++)
                     {
-                        Debug.Log("Dungeon Generation, assigning large room: " + roomID);
+                        //Debug.Log("Dungeon Generation, assigning large room: " + roomID);
                         bool valid = false;
                         int sign = 0;
                         int[] curValidRoomIDs = FindThresholdRooms(scale, roomID); //find valid room types
                         int index = Random.Range(0, curValidRoomIDs.Length); //random ID between 0 and max valid types
                         int roomTypeID = curValidRoomIDs[index]; //find random room type
                         int tryCount = 0; //track number of tries
-                        Debug.Log("Dungeon Generation, large roomTypeID: " + curValidRoomIDs[index]);
+                        //Debug.Log("Dungeon Generation, large roomTypeID: " + curValidRoomIDs[index]);
 
                         while (sign == 0) { sign = Random.Range(-1, 2); } //choose to check up or down first
 
                         while (!valid && tryCount < 3) //while room invalid
                         {
                             //if (dbugEnabled) { MG.UpdateHUDDbugText("room type id: " + roomTypeID + ", " + largeRoomTypeStrings[roomTypeID]); }
-                            Debug.Log("Dungeon Generation, is room " + roomID + " valid: " + IsRoomValid(scale, roomTypeID, roomID, curValidRoomIDs.Length)); 
+                            //Debug.Log("Dungeon Generation, is room " + roomID + " valid: " + IsRoomValid(scale, roomTypeID, roomID, curValidRoomIDs.Length)); 
                             valid = IsRoomValid(scale, roomTypeID, roomID, curValidRoomIDs.Length); //set valid to room check
                             //if (dbugEnabled) { MG.UpdateHUDDbugText("valid: " + valid); }
                             
-                            if (valid) { /*Debug.Log("Dungeon Generation, large room valid");*/ break; }
+                            if (valid) { /*//Debug.Log("Dungeon Generation, large room valid");*/ break; }
                             else if (!valid) //find unused room type, then loop
                             {
-                                Debug.Log("Dungeon Generation, large room not valid");
+                                //Debug.Log("Dungeon Generation, large room not valid");
                                 if (sign == 1 && index >= (curValidRoomIDs.Length - 1)) //wrap around if exceeding array length
                                 {
                                     index = 0;
@@ -1597,8 +1599,8 @@ public class DungeonGeneration : MonoBehaviour
                                     index += sign;
                                 }
 
-                                Debug.Log("Dungeon Generation, large roomType: " + index + " / " + curValidRoomIDs.Length);
-                                Debug.Log("Dungeon Generation, large roomTypeID: " + curValidRoomIDs[index]);
+                                //Debug.Log("Dungeon Generation, large roomType: " + index + " / " + curValidRoomIDs.Length);
+                                //Debug.Log("Dungeon Generation, large roomTypeID: " + curValidRoomIDs[index]);
                                 roomTypeID = curValidRoomIDs[index];   //---INDEX OUT OF BOUND ERROR HAPPENS HERE SOMETIMES---//
                                 tryCount++;
                             }
@@ -1628,7 +1630,7 @@ public class DungeonGeneration : MonoBehaviour
                         else if(roomStates[roomID] == "Boss") { futureBossRoomType = largeRoomTypeStrings[roomTypeID]; continue; } //function around boss room
                         else { string roomStateTemp = roomStates[roomID]; roomStates[roomID] = roomStateTemp + largeRoomTypeStrings[roomTypeID]; }
 
-                        if (visualDemo) { yield return new WaitForSeconds(.1f); }
+                        if (visualDemo) { yield return WFS_visualDemo; }
                     }
                 }
                 else if (scale == 1)
@@ -1640,7 +1642,7 @@ public class DungeonGeneration : MonoBehaviour
                     mediumRoomTypes.Keys.CopyTo(mediumRoomTypeStrings, 0);
                     for (int roomID = largeRoomNum; roomID < (largeRoomNum + mediumRoomNum); roomID++)
                     {
-                        Debug.Log("Dungeon Generation, assigning medium room: " + roomID);
+                        //Debug.Log("Dungeon Generation, assigning medium room: " + roomID);
                         //Debug.Log((roomID - largeRoomNum) + "/" + usedTypeMediumIDs.Length);
                         //select random room
                         bool valid = false;
@@ -1649,7 +1651,7 @@ public class DungeonGeneration : MonoBehaviour
                         int index = Random.Range(0, curValidRoomIDs.Length); //random number between 0 and max valid rooms
                         int roomTypeID = curValidRoomIDs[index]; //find random room type
                         int tryCount = 0; //track number of tries
-                        Debug.Log("Dungeon Generation, medium roomTypeID: " + curValidRoomIDs[index]);
+                        //Debug.Log("Dungeon Generation, medium roomTypeID: " + curValidRoomIDs[index]);
 
                         while (sign == 0) { sign = Random.Range(-1, 2); } //decide whether to look up or down
 
@@ -1697,7 +1699,7 @@ public class DungeonGeneration : MonoBehaviour
                             //Debug.Log("Dungeon Generation, room " + roomID + ", medium special, assigned " + specialRoomType[roomTypeID]);
                             if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Defined Special Room " + roomID + " as " + specialRoomType[roomTypeID]); }
                             specialRoomsFound++; //increase number of special rooms spawned
-                            if (visualDemo) { yield return new WaitForSeconds(.1f); }
+                            if (visualDemo) { yield return WFS_visualDemo; }
                             continue;
                         }
                         else if (roomStates[roomID] == "Entry")
@@ -1709,7 +1711,7 @@ public class DungeonGeneration : MonoBehaviour
                             usedTypeMediumIDs[(roomID - largeRoomNum)] = 21; //set used ID tp antechamber ID
                             //Debug.Log("Dungeon Generation, room " + roomID + ", medium entry, assigned " + roomStates[roomID]);
                             if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Defined Common Room " + roomID + " as " + roomStates[roomID]); }
-                            if (visualDemo) { yield return new WaitForSeconds(.1f); }
+                            if (visualDemo) { yield return WFS_visualDemo; }
                             continue;
                         }
                         else
@@ -1718,14 +1720,14 @@ public class DungeonGeneration : MonoBehaviour
                             while (!valid && tryCount < 3) //while room invalid
                             { 
                                 //if (dbugEnabled) { MG.UpdateHUDDbugText("room type id: " + roomTypeID + ", " + mediumRoomTypeStrings[roomTypeID]); }
-                                Debug.Log("Dungeon Generation, is room " + roomID + " valid: " + IsRoomValid(scale, roomTypeID, roomID, curValidRoomIDs.Length));
+                                //Debug.Log("Dungeon Generation, is room " + roomID + " valid: " + IsRoomValid(scale, roomTypeID, roomID, curValidRoomIDs.Length));
                                 valid = IsRoomValid(scale, roomTypeID, roomID, curValidRoomIDs.Length); //set valid to room check
                                 //if (dbugEnabled) { MG.UpdateHUDDbugText("valid: " + valid); }
 
                                 if (valid) { break; }
                                 else if (!valid) //find unused room type, then loop
                                 {
-                                    Debug.Log("Dungeon Generation, medium room not valid");
+                                    //Debug.Log("Dungeon Generation, medium room not valid");
                                     if (sign == 1 && index >= (curValidRoomIDs.Length - 1)) //wrap around if exceeding array length
                                     {
                                         index = 0;
@@ -1739,8 +1741,8 @@ public class DungeonGeneration : MonoBehaviour
                                         index += sign;
                                     }
 
-                                    Debug.Log("Dungeon Generation, medium roomType: " + index + " / " + curValidRoomIDs.Length);
-                                    Debug.Log("Dungeon Generation, medium roomTypeID: " + curValidRoomIDs[index]);
+                                    //Debug.Log("Dungeon Generation, medium roomType: " + index + " / " + curValidRoomIDs.Length);
+                                    //Debug.Log("Dungeon Generation, medium roomTypeID: " + curValidRoomIDs[index]);
                                     roomTypeID = curValidRoomIDs[index];   //---INDEX OUT OF BOUND ERROR HAPPENS HERE SOMETIMES---//
                                     tryCount++;
                                 }
@@ -1766,7 +1768,7 @@ public class DungeonGeneration : MonoBehaviour
                         usedTypeMediumIDs[(roomID - largeRoomNum)] = roomTypeID; //set used ID to room type ID
                         //Debug.Log("Dungeon Generation, room " + roomID + ", medium, assigned " + mediumRoomTypeStrings[roomTypeID]);
                         if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Defined Common Room " + roomID + " as " + mediumRoomTypeStrings[roomTypeID]); }
-                        if (visualDemo) { yield return new WaitForSeconds(.1f); }
+                        if (visualDemo) { yield return WFS_visualDemo; }
                     }
                 }
                 else if (scale == 0)
@@ -1828,7 +1830,7 @@ public class DungeonGeneration : MonoBehaviour
                             //Debug.Log("Dungeon Generation, room " + roomID + ", small special, assigned " + specialRoomType[roomTypeID]);
                             if (dbugEnabled) { MG.UpdateHUDDbugText("room " + roomID + ": small special room " + (roomID - largeRoomNum - mediumRoomNum) + "/" + smallRoomNum + " set as " + specialRoomType[roomTypeID]); }
                             specialRoomsFound++; //increment special rooms spawned
-                            if (visualDemo) { yield return new WaitForSeconds(.1f); }
+                            if (visualDemo) { yield return WFS_visualDemo; }
                             continue;
                         }
                         else if (roomStates[roomID] == "Treasure")
@@ -1872,7 +1874,7 @@ public class DungeonGeneration : MonoBehaviour
                             //Debug.Log("Dungeon Generation, room " + roomID + ", small treasure, assigned: " + treasureRoomType[roomTypeID]);
                             if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Defined Common Room " + roomID + " as " + treasureRoomType[roomTypeID]); }
                             treasureRoomsFound++; //increment treasure rooms found
-                            if (visualDemo) { yield return new WaitForSeconds(.1f); }
+                            if (visualDemo) { yield return WFS_visualDemo; }
                             continue;
                         }
                         else if (roomStates[roomID] == "Entry")
@@ -1882,7 +1884,7 @@ public class DungeonGeneration : MonoBehaviour
                             //Debug.Log("Dungeon Generation, room " + roomID + ", small entry, assigned " + roomStates[roomID]);
                             if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Defined Common Room " + roomID + " as " + roomStates[roomID]); }
                             roomStates[roomID] = "Entry";
-                            if (visualDemo) { yield return new WaitForSeconds(.1f); }
+                            if (visualDemo) { yield return WFS_visualDemo; }
                             continue;
                         }
                         else
@@ -1983,7 +1985,7 @@ public class DungeonGeneration : MonoBehaviour
                                         //Debug.Log("Dungeon Generation, room " + roomID + ", small, assigned " + validSmallRoomTypes[roomTypeID]);
                                         if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Defined Common Room " + roomID + " as " + validSmallRoomTypes[roomTypeID]); }
                                     }
-                                    if (visualDemo) { yield return new WaitForSeconds(.1f); }
+                                    if (visualDemo) { yield return WFS_visualDemo; }
                                     break;
                                 default: //shouldnt occur, added due to old issue i think its fixed now
                                     //Debug.Log("Dungeon Generation, assigning small secret room");
@@ -1994,7 +1996,7 @@ public class DungeonGeneration : MonoBehaviour
                                     //Debug.Log("room " + (roomID - (largeRoomNum + mediumRoomNum)) + ": room set as " + roomStates[(roomID - (largeRoomNum + mediumRoomNum))]);
                                     //Debug.Log("Dungeon Generation, room " + roomID + ", small secret, assigned " + roomStates[roomID]);
                                     if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Defined Common Room " + roomID + " as " + roomStates[roomID]); }
-                                    if (visualDemo) { yield return new WaitForSeconds(.1f); }
+                                    if (visualDemo) { yield return WFS_visualDemo; }
                                     break;
                             }
                         }
@@ -2169,7 +2171,7 @@ public class DungeonGeneration : MonoBehaviour
             roomObjects[roomID].name = roomScales[roomID] + roomStates[roomID] + roomID; //set room name
             roomObjects[roomID].GetComponent<RoomGeneration>().Wake(roomID, roomPosX[roomID], roomPosZ[roomID], roomBoundsX[roomID], roomBoundsZ[roomID], roomScales[roomID], roomStates[roomID], instantiatePos); //wake room script
             if (dbugEnabled) { MG.UpdateHUDDbugText("Dungeon Generation: Generating Room " + roomObjects[roomID]); }
-            if (visualDemo) { yield return new WaitForSeconds(.1f); }
+            if (visualDemo) { yield return WFS_visualDemo; }
         }
     }
 }

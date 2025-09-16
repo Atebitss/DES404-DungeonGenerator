@@ -14,6 +14,7 @@ public class PathGeneration : MonoBehaviour
     //debug info
     private bool dbugEnabled = false;
     private bool visualDemo = false;
+    private WaitForSeconds WFS_visualDelay = new WaitForSeconds(0.1f);
 
     //map creation
     private int boundsX, boundsZ; //map generation
@@ -514,7 +515,7 @@ public class PathGeneration : MonoBehaviour
             }
 
             //Debug.Log("PG. Finished path section: " + pathSection + " / " + (path.Length - 1));
-            if (visualDemo) { yield return new WaitForSeconds(.1f); }
+            if (visualDemo) { yield return WFS_visualDelay; }
             else { yield return null; }
         }
 
@@ -533,7 +534,7 @@ public class PathGeneration : MonoBehaviour
         {
             CreateHallway();
             hallwayParentIndex++;
-            if (visualDemo) { yield return new WaitForSeconds(.1f); }
+            if (visualDemo) { yield return WFS_visualDelay; }
             else { yield return null; }
         }
 
@@ -553,11 +554,6 @@ public class PathGeneration : MonoBehaviour
             GameObject hallwayFloor = Instantiate(hallwayFloorPrefab, new Vector3(xPos, -0.5f, zPos), Quaternion.identity);
             hallwayFloor.transform.parent = hallwayParents[hallwayParentIndex].transform;
             hallwayFloor.name = "Hallway" + hallwayParentIndex + "Floor" + sectionIndex;
-
-            Debug.Log("hallwayParentIndex: " + hallwayParentIndex + ", floorIndex: " + floorIndex);
-            Debug.Log("hallwayFloors: " + hallwayFloors);
-            Debug.Log("hallwayFloors: " + hallwayFloors[hallwayParentIndex]);
-            Debug.Log("hallwayFloors: " + hallwayFloors[hallwayParentIndex][floorIndex]);
 
             //add new hallwayFloor to hallwayFloors dictionary
             hallwayFloors[hallwayParentIndex][floorIndex] = hallwayFloor;

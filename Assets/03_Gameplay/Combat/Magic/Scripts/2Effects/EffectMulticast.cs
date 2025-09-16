@@ -9,7 +9,7 @@ public class EffectMulticast : AbstractEffect
     }
     public override void ApplyEffect()
     {
-        Debug.Log("Multicast effect applied");
+        //Debug.Log("Multicast effect applied");
 
         if(SS.GetShapeName().Contains("Beam"))
         {

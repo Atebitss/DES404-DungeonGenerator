@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class EnemyWeaponColliderManager : MonoBehaviour
 {
+    private WaitForSeconds WFS_overlapCheckDelay = new WaitForSeconds(0.1f);
     private bool attacking = false;
     private int attackDamage = 1;
     private AudioManager AM;
@@ -47,7 +48,7 @@ public class EnemyWeaponColliderManager : MonoBehaviour
     {
         if (attacking && !hasHitPlayer)
         {
-            yield return new WaitForSeconds(0.1f); //wait for 0.1 seconds
+            yield return WFS_overlapCheckDelay; //wait for 0.1 seconds
 
             //check for already overlapping enemy colliders
             BoxCollider weaponAttackCollider = GetComponent<BoxCollider>();
@@ -65,7 +66,7 @@ public class EnemyWeaponColliderManager : MonoBehaviour
                 //Debug.Log(hitIndex + ": " + hitColliders[hitIndex].gameObject.name);
                 if (hitColliders[hitIndex].gameObject.tag == "Player" && !hasHitPlayer)
                 {
-                    Debug.Log("player found in overlap: " + hitColliders[hitIndex].gameObject.transform.parent.name);
+                    //Debug.Log("player found in overlap: " + hitColliders[hitIndex].gameObject.transform.parent.name);
                     hitColliders[hitIndex].gameObject.GetComponent<PlayerController>().DamageTarget(attackDamage);
                     AM.Play("Sword_Hit" + Random.Range(1, 3));
                     hasHitPlayer = true;

@@ -54,12 +54,13 @@ public class PlayerWeaponColliderManager : MonoBehaviour
 
     //~~~~~enemy tracking~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     private GameObject[] foundEnemies = new GameObject[100]; //track found enemies, used to avoid repeatedly damaging the same enemy
+    private WaitForSeconds WFS_overlapCheckDelay = new WaitForSeconds(0.25f);
 
     private IEnumerator OverlapCheck()
     {
         if (attacking)
         {
-            yield return new WaitForSeconds(0.25f); //wait for x seconds
+            yield return WFS_overlapCheckDelay; //wait for x seconds
 
             //check for already overlapping enemy colliders
             BoxCollider weaponAttackCollider = GetComponent<BoxCollider>();

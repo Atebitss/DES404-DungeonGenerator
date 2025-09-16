@@ -16,7 +16,7 @@ public class EffectSplit : AbstractEffect
     {
         if (!triggered)
         {
-            Debug.Log("Split effect applied");
+            //Debug.Log("Split effect applied");
 
             //create 2-5 spells
             //modify spell damage, size and radius by the number of spells created
@@ -31,7 +31,7 @@ public class EffectSplit : AbstractEffect
             //create x split projectiles
             for (int i = 0; i < splitCount; i++)
             {
-                Debug.Log("split " + i);
+                //Debug.Log("split " + i);
                 //create new spell instance
                 GameObject splitSpell = Instantiate(Resources.Load<GameObject>("SpellParent"), currentPos, Quaternion.identity);
                 SpellScript splitSS = splitSpell.transform.GetChild(0).GetComponent<SpellScript>().StartSpellScript(SS.GetASM());
@@ -67,7 +67,7 @@ public class EffectSplit : AbstractEffect
                 }
 
 
-                Debug.Log("Random angle Y: " + randomAngleY);
+                //Debug.Log("Random angle Y: " + randomAngleY);
                 Vector3 randomDirection = (Quaternion.Euler(0, randomAngleY, 0) * baseDirection);
 
                 Vector3 startPos = currentPos;
@@ -85,7 +85,7 @@ public class EffectSplit : AbstractEffect
                 newTargetPoints[1] = endPos;
 
                 AbstractShape splitShapeScript = splitSS.GetShapeScript();
-                Debug.Log(startPos + " " + endPos);
+                //Debug.Log(startPos + " " + endPos);
                 if (splitShapeScript != null)
                 {
                     splitShapeScript.pathPoints = newTargetPoints;
@@ -97,7 +97,7 @@ public class EffectSplit : AbstractEffect
                 splitSS.SetIgnoredTargets(shapeScript.targets); //add hit targets to ignore list
                 for (int j = 0; j < SS.GetHitTargets().Length; j++)
                 {
-                    Debug.Log("Split spell ignored target: " + SS.GetHitTargets()[j].name);
+                    //Debug.Log("Split spell ignored target: " + SS.GetHitTargets()[j].name);
                 }
 
                 splitSS.UpdateComponentRefs(); //update component references

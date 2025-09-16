@@ -6,6 +6,8 @@ public class ShapeBeam : AbstractShape
     private BoxCollider shapeCollider;
     private float width = 1f, length = 2f;
     private GameObject[] beamSegments = new GameObject[0];
+    private WaitForSeconds WFS_checkDelay = new WaitForSeconds(1f);
+    private WaitForSeconds WFS_maxRunTimer = new WaitForSeconds(5f);
 
     public override void StartShapeScript(SpellScript SS)
     {
@@ -168,13 +170,15 @@ public class ShapeBeam : AbstractShape
 
         if (castable && !casting && !delayed)
         {
-            Debug.Log("Beam shape apply shape");
+            //Debug.Log("Beam shape apply shape");
 
             shapeCollider.size = new Vector3(width, width, length);
 
             //set beam time and check interval
             maxRunTime = (SS.GetSpellCooldownMax() / 2f); //set max run time to half of spell cooldown
             checkInterval = ((maxRunTime - 0.25f) / 3f); //set check interval to 1/3 of max run time
+            WFS_maxRunTimer = new WaitForSeconds(maxRunTime);
+            WFS_checkDelay = new WaitForSeconds(checkInterval);
 
             //disallow more casts
             casting = true;
@@ -191,16 +195,16 @@ public class ShapeBeam : AbstractShape
     {
         while (!castable && casting)
         {
-            Debug.Log("Checking for overlapping targets");
+            //Debug.Log("Checking for overlapping targets");
             SS.EndSpell();
             targetCheckCount++;
-            yield return new WaitForSeconds(checkInterval); //wait for x seconds
+            yield return WFS_checkDelay; //wait for x seconds
         }
     }
     private IEnumerator EndBeam()
     {
-        yield return new WaitForSeconds(maxRunTime); //wait for y second
-        Debug.Log("Ending beam shape");
+        yield return WFS_maxRunTimer; //wait for y second
+        //Debug.Log("Ending beam shape");
 
         for (int i = 0; i < beamSegments.Length; i++)
         {
@@ -242,7 +246,7 @@ public class ShapeBeam : AbstractShape
         //Debug.Log("segmentCount: " + segmentCount);
         beamSegments = new GameObject[segmentCount];
 
-        //for (int i = 0; i < pathPoints.Length; i++) { Debug.Log("pathPoints[" + i + "]: " + pathPoints[i]); }
+        //for (int i = 0; i < pathPoints.Length; i++) { //Debug.Log("pathPoints[" + i + "]: " + pathPoints[i]); }
 
         //create individual segments
         for (int i = 0; i < segmentCount; i++)
@@ -357,7 +361,7 @@ public class ShapeBeam : AbstractShape
             foundTargets[i] = targets[i];
         }
 
-        Debug.Log("Shape Beam, found " + foundTargets.Length + " targets");
+        //Debug.Log("Shape Beam, found " + foundTargets.Length + " targets");
         return foundTargets;
     }
 

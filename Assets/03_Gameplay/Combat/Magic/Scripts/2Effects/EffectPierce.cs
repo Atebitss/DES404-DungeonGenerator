@@ -9,7 +9,7 @@ public class EffectPierce : AbstractEffect
 
         if (!SS.GetSpellPersist()) //set once
         {
-            Debug.Log("Pierce effect applied");
+            //Debug.Log("Pierce effect applied");
             SS.SetSpellPersist(true);
         }
     }

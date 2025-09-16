@@ -15,7 +15,7 @@ public class EffectExplode : AbstractEffect
     }
     public override void ApplyEffect()
     {
-        Debug.Log("Explosion effect applied");
+        //Debug.Log("Explosion effect applied");
 
         //if spell uses shape beam 
         if (SS.GetShapeName().Contains("Beam"))
@@ -46,7 +46,7 @@ public class EffectExplode : AbstractEffect
                         if (cols[i].gameObject.tag == "Enemy" && !SS.CheckIgnoredTargets(cols[i].gameObject) && !HasAlreadyHitTarget(cols[i].gameObject))
                         {
                             //add target to targets array
-                            Debug.Log("Explosion hit enemy: " + cols[i].gameObject.name);
+                            //Debug.Log("Explosion hit enemy: " + cols[i].gameObject.name);
                             GameObject[] tempTargets = new GameObject[targets.Length + 1];
                             for (int j = 0; j < targets.Length; j++)
                             {
@@ -67,7 +67,7 @@ public class EffectExplode : AbstractEffect
         {
             if (targets[i] == enemy)
             {
-                Debug.Log("already hit enemy: " + enemy.name);
+                //Debug.Log("already hit enemy: " + enemy.name);
                 return true;
             }
         }

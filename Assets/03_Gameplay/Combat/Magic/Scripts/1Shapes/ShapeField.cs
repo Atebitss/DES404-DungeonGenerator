@@ -6,9 +6,12 @@ public class ShapeField : AbstractShape
     private BoxCollider shapeCollider;
     private GameObject[] fieldSegments = new GameObject[1];
 
+    private WaitForSeconds WFS_checkDelay = new WaitForSeconds(1f);
+    private WaitForSeconds WFS_maxTimer = new WaitForSeconds(5f);
+
     public override void StartShapeScript(SpellScript SS)
     {
-        Debug.Log("Field shape script started");
+        //Debug.Log("Field shape script started");
 
         damageModifier = 1f; speedModifier = 1f; radiusModifier = 1f; cooldownModifier = 2f;
         shapeMesh = Resources.Load<Mesh>("CustomMeshes/shapeField");
@@ -122,7 +125,7 @@ public class ShapeField : AbstractShape
         //place the field segments at the aimed position
         if (castable && !casting && !delayed)
         {
-            Debug.Log("Field shape applied");
+            //Debug.Log("Field shape applied");
             //Debug.Log("maxRunTime: " + maxRunTime + ", checkInterval: " + checkInterval);
 
             CalculateRunTimes();
@@ -148,7 +151,7 @@ public class ShapeField : AbstractShape
             }
             else if(!SS.GetEffectName().Contains("Arc") && !SS.GetEffectName().Contains("Null"))
             {
-                Debug.Log("Setting field position to last target position: " + this.transform.position);
+                //Debug.Log("Setting field position to last target position: " + this.transform.position);
                 this.transform.parent.transform.position = this.transform.position; //set position to last target position
                 this.transform.localPosition = Vector3.zero;
             }
@@ -180,15 +183,17 @@ public class ShapeField : AbstractShape
         float percentage = Mathf.Lerp(minPercentage, maxPercentage, normalizedValue); //calculate percentage based on normalized value
         percentage = Mathf.Clamp(percentage, minPercentage, maxPercentage); //limit percentage to min and max values
         checkInterval = maxRunTime * percentage; //set check interval to calculated percentage of max run time
+        WFS_maxTimer = new WaitForSeconds(maxRunTime);
+        WFS_checkDelay = new WaitForSeconds(checkInterval);
 
-        Debug.Log("maxRunTime: " + maxRunTime + ", checkInterval: " + checkInterval);
+        //Debug.Log("maxRunTime: " + maxRunTime + ", checkInterval: " + checkInterval);
     }
     private IEnumerator OverlapCheck()
     {
         while (!castable && casting)
         {
             //Debug.Log("Checking for overlapping targets");
-            yield return new WaitForSeconds(checkInterval); //wait for x seconds
+            yield return WFS_checkDelay; //wait for x seconds
 
             SS.EndSpell();
             targetCheckCount++;
@@ -209,8 +214,8 @@ public class ShapeField : AbstractShape
     }
     private IEnumerator EndField()
     {
-        yield return new WaitForSeconds(maxRunTime); //wait for y second
-        Debug.Log("Ending field shape");
+        yield return WFS_maxTimer; //wait for y second
+        //Debug.Log("Ending field shape");
 
         for (int i = 0; i < fieldSegments.Length; i++)
         {
@@ -271,7 +276,7 @@ public class ShapeField : AbstractShape
                 //Debug.Log("Landing position is valid: " + standHit.point);
                 fieldSegments[seg].transform.position = standHit.point;
             }
-            //else { Debug.Log("Landing position is not valid, trying again"); }
+            //else { //Debug.Log("Landing position is not valid, trying again"); }
 
             //add visual
             MeshFilter meshFilter = fieldSegments[seg].AddComponent<MeshFilter>();
@@ -346,7 +351,7 @@ public class ShapeField : AbstractShape
             foundTargets[i] = targets[i];
         }
 
-        Debug.Log("Shape Field, found " + foundTargets.Length + " targets");
+        //Debug.Log("Shape Field, found " + foundTargets.Length + " targets");
         return foundTargets;
     }
 }

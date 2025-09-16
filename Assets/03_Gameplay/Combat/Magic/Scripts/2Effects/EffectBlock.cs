@@ -9,7 +9,7 @@ public class EffectBlock : AbstractEffect
     }
     public override void ApplyEffect()
     {
-        Debug.Log("Block effect applied");
+        //Debug.Log("Block effect applied");
 
         GameObject[] targets = SS.GetSpellTargets();
         if (targets != null)

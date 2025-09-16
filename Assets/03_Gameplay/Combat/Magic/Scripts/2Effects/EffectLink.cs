@@ -10,7 +10,7 @@ public class EffectLink : AbstractEffect
     public override void ApplyEffect()
     {
         //add enemy to players linked enemy array
-        Debug.Log("Link effect applied");
+        //Debug.Log("Link effect applied");
 
         PlayerController PC = SS.GetPlayerController();
         GameObject[] targets = shapeScript.targets;

@@ -1,3 +1,4 @@
+using UnityEditor;
 using UnityEngine;
 public class AbstractSceneManager : MonoBehaviour
 {
@@ -131,6 +132,7 @@ public class AbstractSceneManager : MonoBehaviour
             playerCamera = player.transform.GetChild(0).transform.GetChild(0).GetComponent<Camera>();
 
             ADM.Wake(this);
+            StaticOcclusionCulling.Compute();
         }
         else
         {
@@ -194,22 +196,27 @@ public class AbstractSceneManager : MonoBehaviour
         if (MG != null) { if (dbugMode) { MG.UpdateHUDDbugText("Scene Manager: Spawning Enemies"); } }
 
         //spawn new enemies and add to new array
-        for (int newEnemyIndex = 0; newEnemyIndex < enemies.Length; newEnemyIndex++)
+        Debug.Log(enemies.Length + " enemies to spawn");
+        for (int newEnemyIndex = 0; newEnemyIndex < (enemies.Length - 1); newEnemyIndex++)
         {
-            if (dbugMode) { MG.UpdateHUDDbugText("Scene Manager: Spawning Enemy " + enemies[newEnemyIndex].name); }
-            for(int enemyIndex = 0; enemyIndex < enemyObjects.Length; enemyIndex++)
+            if (enemies[newEnemyIndex] != null)
             {
-                if(enemyObjects[enemyIndex] == null)
+                if (dbugMode) { MG.UpdateHUDDbugText("Scene Manager: Spawning Enemy " + enemies[newEnemyIndex].name); }
+                for (int enemyIndex = 0; enemyIndex < (enemyObjects.Length - 1); enemyIndex++)
                 {
-                    enemyObjects[enemyIndex] = Instantiate(enemies[newEnemyIndex], positions[newEnemyIndex], Quaternion.identity);
-                    GenerateEnemy(enemyObjects[enemyIndex], active);
-                    if (enemyObjects[enemyIndex].name.Contains("boss")) { enemyObjects[enemyIndex].name = "Boss" + enemyObjects[enemyIndex].transform.GetChild(0).GetComponent<AbstractEnemy>().type; }
-                    else 
+                    if (enemyObjects[enemyIndex] == null)
                     {
-                        enemyObjects[enemyIndex].name = "Enemy" + enemyIndex;
-                        enemyObjects[enemyIndex].transform.GetChild(0).name = "EnemyCharacter" + enemyIndex;
+                        Debug.Log("Scene Manager: Spawning Enemy " + enemies[newEnemyIndex] + " at array position " + enemyIndex);
+                        enemyObjects[enemyIndex] = Instantiate(enemies[newEnemyIndex], positions[newEnemyIndex], Quaternion.identity);
+                        GenerateEnemy(enemyObjects[enemyIndex], active);
+                        if (enemyObjects[enemyIndex].name.Contains("boss")) { enemyObjects[enemyIndex].name = "Boss" + enemyObjects[enemyIndex].transform.GetChild(0).GetComponent<AbstractEnemy>().type; }
+                        else
+                        {
+                            enemyObjects[enemyIndex].name = "Enemy" + enemyIndex;
+                            enemyObjects[enemyIndex].transform.GetChild(0).name = "EnemyCharacter" + enemyIndex;
+                        }
+                        break;
                     }
-                    break;
                 }
             }
         }

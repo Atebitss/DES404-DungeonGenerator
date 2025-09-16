@@ -152,12 +152,13 @@ public class AudioManager : MonoBehaviour
         if (volume >= 0.1f) { StartCoroutine(Lower(volume, s)); }
     }
 
+    private WaitForSeconds WFS_lower = new WaitForSeconds(0.1f);
     IEnumerator Lower(float volume, AudioSound s)
     {
         volume -= 0.1f;
         s.source.volume = volume;
         //Debug.Log(s.name + " volume: " + s.source.volume);
-        yield return new WaitForSeconds(0.1f);
+        yield return WFS_lower;
         if (volume >= 0.1f) { StartCoroutine(Lower(volume, s)); }
     }
 }

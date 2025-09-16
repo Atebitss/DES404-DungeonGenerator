@@ -31,6 +31,7 @@ public class PlayerController : MonoBehaviour
     private SpellDbugManager SDM; //spell debug display
 
 
+
     [Header("-Minimap")]
     [SerializeField] private GameObject MV;
     private MinimapManager MM; //minimap manager
@@ -41,7 +42,7 @@ public class PlayerController : MonoBehaviour
     private ConsumableVisualManager CVM; //consumable visual manager
     public ConsumableVisualManager GetCVM() { return CVM; }
 
-    [Header("-Debug Displays")]
+    [Header("-//Debug Displays")]
     [SerializeField] private GameObject DbugDisplay;
     [SerializeField] private GameObject ADDbugDisplay;
     [SerializeField] private GameObject SpellDbugDisplay;
@@ -314,7 +315,7 @@ public class PlayerController : MonoBehaviour
             //Space / Button South
             if (ctx.performed && grounded && !jumping) //if player is on the ground and not currently jumping
             {
-                Debug.Log("jump");
+                //Debug.Log("jump");
 
 
             }
@@ -608,7 +609,7 @@ public class PlayerController : MonoBehaviour
     }
     private void ResetHeavyAttackAnimBool() 
     {
-        /*Debug.Log("reset heavy attack");*/ 
+        /*//Debug.Log("reset heavy attack");*/ 
         a.SetBool("attackingHeavy", false); 
     }
 
@@ -679,15 +680,16 @@ public class PlayerController : MonoBehaviour
     private SpellbookManager SM;
 
     //linked enemies
+    private WaitForSeconds WFS_unlinkTimer = new WaitForSeconds(30f); //used for unlinking enemies after 30 seconds
     private GameObject[] linkedEnemies = new GameObject[10]; //used to track enemies linked by link effect
     public GameObject[] GetLinkedEnemies() { return linkedEnemies; } //get linked enemies array
     public void AddLinkedEnemy(GameObject enemy)
     {
         //check if enemy is already linked
-        for (int i = 0; i < linkedEnemies.Length; i++) { if (linkedEnemies[i] == enemy) { Debug.Log("enemy already linked"); return; } }
+        //for (int i = 0; i < linkedEnemies.Length; i++) { if (linkedEnemies[i] == enemy) { Debug.Log("enemy already linked"); return; } }
 
         //if not, add it to array
-        Debug.Log("linking " + enemy.name);
+        //Debug.Log("linking " + enemy.name);
         for (int i = 0; i < linkedEnemies.Length; i++) 
         {
             if (linkedEnemies[i] == null)
@@ -701,7 +703,7 @@ public class PlayerController : MonoBehaviour
     }
     private IEnumerator UnlinkEnemy(GameObject enemy)
     {
-        yield return new WaitForSeconds(30f); //wait 30 seconds before unlinking enemy
+        yield return WFS_unlinkTimer; //wait 30 seconds before unlinking enemy
         for (int i = 0; i < linkedEnemies.Length; i++)
         {
             if (linkedEnemies[i] == enemy)
@@ -723,7 +725,7 @@ public class PlayerController : MonoBehaviour
                 newIndex++;
                 break;
             }
-            //else { Debug.Log("unlinking " + enemy.name); }
+            //else { //Debug.Log("unlinking " + enemy.name); }
         }
 
         linkedEnemies = newLinkedEnemies;
@@ -731,18 +733,18 @@ public class PlayerController : MonoBehaviour
 
     //burst cast
     private int burstCounter, burstMax = 3; //used to track burst casts
-    private float burstCooldownTimer = 0.5f; //used to track burst cooldown
+    private WaitForSeconds WFS_burstCooldown = new WaitForSeconds(0.5f); //used for burst cooldown
     private bool bursting = false; //used to track if player is burst casting
 
 
     //random spell assigned on awake
     public void AssignSpell(string shapeName, string effectName, string elementName)
     {
-        Debug.Log("PlayerController, AssignSpell");
+        //Debug.Log("PlayerController, AssignSpell");
 
         if (castable && curSpell == null)
         {
-            Debug.Log("creating new spell");
+            //Debug.Log("creating new spell");
             //instantiate new spell game object & reference it's script while updating it with spell components
             GameObject spellInstance = Instantiate(spellPrefab, this.transform.position, Quaternion.identity);
             spellInstance.transform.SetParent(leftHand.transform);
@@ -751,7 +753,7 @@ public class PlayerController : MonoBehaviour
             //Debug.Log(curSpell);
         }
 
-        Debug.Log("setting up new spell");
+        //Debug.Log("setting up new spell");
         //1f for base difficulty, 0.5f for easy, 1.5f for hard
         if (curSpell != null)
         {
@@ -779,7 +781,7 @@ public class PlayerController : MonoBehaviour
 
             ADM.SetSpellStrength(spellStrength); //update adaptive difficulty
             spellCooldownMax = curSpell.GetSpellCooldownMax(); //update spell cooldown max
-            Debug.Log("Cooldown Max: " + spellCooldownMax);
+            //Debug.Log("Cooldown Max: " + spellCooldownMax);
             curSpell.UpdateRadius(); //update spell radius before casting
             spellReady = true;
         }
@@ -887,7 +889,7 @@ public class PlayerController : MonoBehaviour
     {
         if (active && castHeld && context.performed)
         {
-            Debug.Log(context.control.name);
+            //Debug.Log(context.control.name);
             int inputID = -1;
 
             switch(context.control.name)
@@ -933,7 +935,7 @@ public class PlayerController : MonoBehaviour
             curSpell = null; //reset current spell
             AssignSpell(shapeName, effectName, elementName); //assign new spell
 
-            yield return new WaitForSeconds(burstCooldownTimer); //wait for cooldown
+            yield return WFS_burstCooldown; //wait for cooldown
 
         }
 
@@ -965,14 +967,14 @@ public class PlayerController : MonoBehaviour
     {
         if (!invincible) 
         {
-            /*Debug.Log("setting health: " + newHealth);*/ 
+            /*//Debug.Log("setting health: " + newHealth);*/ 
             healthPointsCurrent = newHealth; 
             HealthCheck(); 
         }
     }
     public void AlterCurrentHealthPoints(int alter) 
     {
-        /*Debug.Log("altering health: " + alter);*/ 
+        /*//Debug.Log("altering health: " + alter);*/ 
         healthPointsCurrent += alter; 
         HealthCheck(); 
     }
@@ -1001,7 +1003,7 @@ public class PlayerController : MonoBehaviour
         {
             if (healthPointsCurrent <= 0)
             {
-                /*Debug.Log("health check: " + healthPointsCurrent);*/
+                /*//Debug.Log("health check: " + healthPointsCurrent);*/
                 UpdatePlayerHealthBar();
                 ASM.DestroyPlayer();
             }
@@ -1179,8 +1181,9 @@ public class PlayerController : MonoBehaviour
     //~~~~~interaction~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     [Header("-Interaction")]
     [SerializeField] private LayerMask interactionMask;
-    private float interactDistance = 2.5f, interactCooldown = .25f;
+    private float interactDistance = 2.5f;
     private bool interacting = false;
+    private WaitForSeconds WFS_interactCooldown = new WaitForSeconds(0.25f);
 
     public void OnInteract(InputAction.CallbackContext ctx)
     {
@@ -1221,7 +1224,7 @@ public class PlayerController : MonoBehaviour
     }
     IEnumerator ResetInteraction()
     {
-        yield return new WaitForSeconds(interactCooldown);
+        yield return WFS_interactCooldown;
         //Debug.Log("interact reset");
         interacting = false;
     }
@@ -1350,7 +1353,7 @@ public class PlayerController : MonoBehaviour
         if (ctx.performed)
         {
             //reset dungeon
-            Debug.Log("reset dungeon");
+            //Debug.Log("reset dungeon");
             ASM.RestartScene();
         }
     }
