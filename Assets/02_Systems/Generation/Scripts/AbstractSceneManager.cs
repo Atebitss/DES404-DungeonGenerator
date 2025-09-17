@@ -75,6 +75,9 @@ public class AbstractSceneManager : MonoBehaviour
 
     //misc
     [SerializeField][Range(0.1f, 100f)] public float playerLookSensitivityOverwrite = 1.0f;
+    [SerializeField] private bool enableMinimap = false;
+    public bool GetEnableMinimap() { return enableMinimap; }
+    public void SetEnableMinimap(bool newEnableMinimap) { enableMinimap = newEnableMinimap; }
 
 
 

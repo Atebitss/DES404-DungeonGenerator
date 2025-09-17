@@ -54,6 +54,11 @@ public class MapGeneration : MonoBehaviour
         gridStates[posX, posZ] = gridState;
     }
     public string GetGridState(int posX, int posZ) { /*Debug.Log(gridStates[posX, posZ]);*/ return gridStates[posX, posZ]; }
+    public string[,] GetGridStates() 
+    {
+        //for (int x = 0; x < boundsX; x++) { for (int z = 0; z < boundsZ; z++) { Debug.Log("grid state " + x + ", " + z + ": " + gridStates[x, z]); } }
+        return gridStates; 
+    } //get all grid states as a single array
 
 
     public void ResetMap()
@@ -140,7 +145,6 @@ public class MapGeneration : MonoBehaviour
 
         //begin dungeon generation within bounds
         //if(genAttempts > 1) { ASM.RestartScene(); }
-        Debug.Log("DG: " + DG);
         DG.BeginDungeonGeneration(treasureRoomsMax, treasureRoomsMin, specialRoomsMax, specialRoomsMin, boundsX, boundsZ, totalSpace, gridPositions);
     }
     private void DefineBounds()

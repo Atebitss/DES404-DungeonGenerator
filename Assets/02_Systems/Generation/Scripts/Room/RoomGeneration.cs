@@ -170,7 +170,6 @@ public class RoomGeneration : MonoBehaviour
         GenerateFloor();
         GenerateDoorways();
         GenerateWalls();
-        SetMinimapIcon();
 
         if (dbugEnabled)
         {
@@ -505,6 +504,7 @@ public class RoomGeneration : MonoBehaviour
     public IEnumerator RoomEntered() //called by RoomColliderManager when player enters room
     {
         if (dbugEnabled) { MG.UpdateHUDDbugText("Room Generation: Room Entered"); }
+        UpdateMinimapPlayerIcon();
         yield return WFS_roomTriggerDelay; //wait for player to enter room
         //Debug.Log("playerInRoom: " + playerInRoom + ", entered: " + entered);
 
@@ -780,24 +780,9 @@ public class RoomGeneration : MonoBehaviour
     [SerializeField] private GameObject roomIconPrefab;
     private GameObject roomMinimapIcon;
 
-    private void SetMinimapIcon()
+    private void UpdateMinimapPlayerIcon()
     {
-        //Debug.Log("roomType: " + roomType);
-        if (roomType.Contains("Entry") || roomType.Contains("Treasure") || roomType.Contains("Special") || roomType.Contains("Boss"))
-        {
-            //Debug.Log("creating minimap icon");
-
-            string iconType = "";
-            if (roomType.Contains("Treasure")) { iconType = "Treasure"; }
-            else if (roomType.Contains("Special")) { iconType = "Special"; }
-            else if (roomType.Contains("Entry")) { iconType = "Entry"; }
-            else if (roomType.Contains("Boss")) { iconType = "Boss"; }
-
-            roomMinimapIcon = Instantiate(roomIconPrefab, new Vector3((literalPosition.x + (roomBoundsX / 2)), (literalPosition.y + 5f), (literalPosition.z + (roomBoundsZ / 2))), Quaternion.identity);
-            roomMinimapIcon.name = iconType + "MinimapIcon";
-            roomMinimapIcon.transform.parent = this.transform;
-            roomMinimapIcon.GetComponent<MinimapIconManager>().Wake(iconType);
-        }
+        //---EXPAND TO DISPLAY PLAYERS CURRENT LOCATION---//
     }
     //~~~~~minimap~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -119,13 +119,7 @@ public class PlayerController : MonoBehaviour
         BHDM.DisableBossHealthDisplay();
 
         //wake minimap
-        if (GameObject.Find("MinimapCamera") == null) 
-        {
-            //if there is no minimap camera, disable the minimap
-            MM.enabled = false;
-            MV.SetActive(false);
-        }
-        else { MM.Wake(ASM.GetMG().GetBoundsX(), ASM.GetMG().GetBoundsZ()); }
+        if (ASM.GetEnableMinimap()) { MM.Wake(ASM.GetMG().GetBoundsX(), ASM.GetMG().GetBoundsZ(), ASM.GetMG().GetGridStates()); }
     }
 
     private void OnDestroy()
